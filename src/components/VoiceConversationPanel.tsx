@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Loader2, Volume2, PhoneOff } from "lucide-react";
+import { Mic, Loader2, Volume2, PhoneOff, Keyboard } from "lucide-react";
 import { speak as browserSpeak } from "@/lib/speech/browserTts";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
@@ -11,6 +11,9 @@ type VoicePref = "female" | "male";
 interface VoiceConversationPanelProps {
   onSend: (text: string) => Promise<string | null>;
   onExit: () => void;
+  onEnd: () => void;
+  ending: boolean;
+  canEnd: boolean;
 }
 
 const MAX_SILENT_RETRIES = 3;
@@ -36,7 +39,7 @@ function loadVoicePref(): VoicePref {
 // is already live the instant playback ends — otherwise that fetch+
 // import gap after "מקשיבים לכם..." appears is enough to clip the very
 // start of what the user says.
-export default function VoiceConversationPanel({ onSend, onExit }: VoiceConversationPanelProps) {
+export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, canEnd }: VoiceConversationPanelProps) {
   const [state, setState] = useState<CallState>("connecting");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [restartTick, setRestartTick] = useState(0);
@@ -52,6 +55,15 @@ export default function VoiceConversationPanel({ onSend, onExit }: VoiceConversa
 
   useEffect(() => {
     let cancelled = false;
+
+    if (ending) {
+      // The parent is scoring/closing the conversation — stop the loop
+      // and let it take over, don't start another listen cycle.
+      window.speechSynthesis?.cancel();
+      return () => {
+        cancelled = true;
+      };
+    }
 
     type Sdk = typeof import("microsoft-cognitiveservices-speech-sdk");
     type Credentials = { token: string; region: string; sdk: Sdk };
@@ -182,7 +194,7 @@ export default function VoiceConversationPanel({ onSend, onExit }: VoiceConversa
       cancelled = true;
       window.speechSynthesis?.cancel();
     };
-  }, [onSend, restartTick]);
+  }, [onSend, restartTick, ending]);
 
   function resume() {
     silentTurnsRef.current = 0;
@@ -213,7 +225,7 @@ export default function VoiceConversationPanel({ onSend, onExit }: VoiceConversa
 
       <div className="relative flex items-center justify-center w-28 h-28">
         <AnimatePresence>
-          {state === "listening" && (
+          {!ending && state === "listening" && (
             <motion.span
               key="ring"
               initial={{ opacity: 0.5, scale: 1 }}
@@ -226,24 +238,29 @@ export default function VoiceConversationPanel({ onSend, onExit }: VoiceConversa
         </AnimatePresence>
         <motion.div
           animate={
-            state === "listening"
+            !ending && state === "listening"
               ? { scale: [1, 1.05, 1] }
-              : state === "speaking"
+              : !ending && state === "speaking"
                 ? { scale: [1, 1.03, 1] }
                 : { scale: 1 }
           }
-          transition={{ duration: 1.1, repeat: state === "listening" || state === "speaking" ? Infinity : 0 }}
+          transition={{
+            duration: 1.1,
+            repeat: !ending && (state === "listening" || state === "speaking") ? Infinity : 0,
+          }}
           className={`relative w-24 h-24 rounded-full flex items-center justify-center border-2 ${
-            state === "listening"
-              ? "bg-primary/10 border-primary text-primary"
-              : state === "speaking"
-                ? "bg-accent/10 border-accent text-accent-hover"
-                : state === "error"
-                  ? "bg-danger-ink border-danger text-danger"
-                  : "bg-background-2 border-card-border text-muted"
+            ending
+              ? "bg-background-2 border-card-border text-muted"
+              : state === "listening"
+                ? "bg-primary/10 border-primary text-primary"
+                : state === "speaking"
+                  ? "bg-accent/10 border-accent text-accent-hover"
+                  : state === "error"
+                    ? "bg-danger-ink border-danger text-danger"
+                    : "bg-background-2 border-card-border text-muted"
           }`}
         >
-          {state === "thinking" || state === "connecting" ? (
+          {ending || state === "thinking" || state === "connecting" ? (
             <Loader2 size={32} className="animate-spin" />
           ) : state === "speaking" ? (
             <Volume2 size={32} />
@@ -254,15 +271,16 @@ export default function VoiceConversationPanel({ onSend, onExit }: VoiceConversa
       </div>
 
       <p className="text-sm font-medium text-muted min-h-5 text-center px-4">
-        {state === "connecting" && "מתחברים..."}
-        {state === "listening" && "מקשיבים לכם..."}
-        {state === "thinking" && "חושבים..."}
-        {state === "speaking" && "Saylo עונה..."}
-        {state === "paused" && "עדיין שם? הקישו כדי להמשיך"}
-        {state === "error" && errorMessage}
+        {ending && "מסכמים את השיחה..."}
+        {!ending && state === "connecting" && "מתחברים..."}
+        {!ending && state === "listening" && "מקשיבים לכם..."}
+        {!ending && state === "thinking" && "חושבים..."}
+        {!ending && state === "speaking" && "Saylo עונה..."}
+        {!ending && state === "paused" && "עדיין שם? הקישו כדי להמשיך"}
+        {!ending && state === "error" && errorMessage}
       </p>
 
-      {(state === "paused" || state === "error") && (
+      {!ending && (state === "paused" || state === "error") && (
         <button
           onClick={resume}
           className="px-4 py-2 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
@@ -272,10 +290,20 @@ export default function VoiceConversationPanel({ onSend, onExit }: VoiceConversa
       )}
 
       <button
-        onClick={onExit}
-        className="mt-2 flex items-center gap-1.5 text-sm px-4 py-2 rounded-xl border border-card-border text-danger hover:bg-danger-ink transition-colors"
+        onClick={onEnd}
+        disabled={ending || !canEnd}
+        title={!canEnd ? "אמרו משהו קודם כדי לקבל משוב" : undefined}
+        className="mt-2 flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
       >
-        <PhoneOff size={16} /> חזרה להקלדה
+        <PhoneOff size={16} /> סיום שיחה וקבלת משוב
+      </button>
+
+      <button
+        onClick={onExit}
+        disabled={ending}
+        className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors disabled:opacity-50"
+      >
+        <Keyboard size={13} /> להמשיך בהקלדה בלי לסיים
       </button>
     </div>
   );

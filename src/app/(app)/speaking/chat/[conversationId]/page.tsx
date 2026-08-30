@@ -145,6 +145,8 @@ export default function SpeakingChatPage() {
     );
   }
 
+  const hasUserMessage = !!messages?.some((m) => m.role === "user");
+
   return (
     <div className="max-w-xl mx-auto px-4 py-8 flex flex-col h-[calc(100vh-6rem)]">
       <div className="flex items-center justify-between mb-4">
@@ -170,7 +172,7 @@ export default function SpeakingChatPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleEnd}
-            disabled={ending || !messages?.some((m) => m.role === "user")}
+            disabled={ending || !hasUserMessage}
             className="text-sm px-4 py-2 rounded-lg border border-card-border hover:bg-background-2 transition-colors disabled:opacity-40"
           >
             {ending ? "מנתח..." : "סיימו שיחה"}
@@ -206,7 +208,13 @@ export default function SpeakingChatPage() {
 
       {voiceMode ? (
         <div className="pt-2 border-t border-card-border">
-          <VoiceConversationPanel onSend={sendMessage} onExit={() => setVoiceMode(false)} />
+          <VoiceConversationPanel
+            onSend={sendMessage}
+            onExit={() => setVoiceMode(false)}
+            onEnd={handleEnd}
+            ending={ending}
+            canEnd={hasUserMessage}
+          />
         </div>
       ) : (
         <div className="flex gap-2 pt-2 border-t border-card-border">
