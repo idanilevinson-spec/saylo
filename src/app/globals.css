@@ -1,0 +1,135 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  --background: #f7f8fd;
+  --background-2: #eef1fb;
+  --foreground: #12142b;
+  --card: #ffffff;
+  --card-border: #e3e7f6;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-ink: #ffffff;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --accent-ink: #431407;
+  --success: #16a34a;
+  --success-ink: #f0fdf4;
+  --danger: #ef4444;
+  --danger-ink: #fef2f2;
+  --muted: #6b7280;
+}
+
+/* Three theme states: an explicit choice (data-theme) always wins; with no
+   explicit choice, prefers-color-scheme decides. Every dark value is
+   re-declared in full (never patched partially) so neither path is ever a
+   mix of light and dark tokens. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0f1115;
+    --background-2: #171a22;
+    --foreground: #e8eaf1;
+    --card: #1a1d26;
+    --card-border: #2b2f3c;
+    --primary: #818cf8;
+    --primary-hover: #a5b4fc;
+    --primary-ink: #14152b;
+    --accent: #fbbf24;
+    --accent-hover: #fcd34d;
+    --accent-ink: #1c1300;
+    --success: #4ade80;
+    --success-ink: #052e13;
+    --danger: #f87171;
+    --danger-ink: #450a0a;
+    --muted: #9aa0b4;
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #0f1115;
+  --background-2: #171a22;
+  --foreground: #e8eaf1;
+  --card: #1a1d26;
+  --card-border: #2b2f3c;
+  --primary: #818cf8;
+  --primary-hover: #a5b4fc;
+  --primary-ink: #14152b;
+  --accent: #fbbf24;
+  --accent-hover: #fcd34d;
+  --accent-ink: #1c1300;
+  --success: #4ade80;
+  --success-ink: #052e13;
+  --danger: #f87171;
+  --danger-ink: #450a0a;
+  --muted: #9aa0b4;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-2: var(--background-2);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-border: var(--card-border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-ink: var(--primary-ink);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-ink: var(--accent-ink);
+  --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
+  --color-danger: var(--danger);
+  --color-danger-ink: var(--danger-ink);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-rubik);
+  --font-content: var(--font-jakarta);
+}
+
+body {
+  background:
+    radial-gradient(ellipse 55% 40% at 82% -8%, color-mix(in srgb, var(--primary) 14%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 0% 10%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 55%),
+    var(--background);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-rubik), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+}
+
+/* Lightweight entrance animation for server-rendered page content, which
+   can't use framer-motion (that needs a Client Component). Interactive
+   elements that need hover/tap feedback use the ContentCard/MotionLink
+   client components instead. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none;
+  }
+}
+
+/* All English learning content renders through the EnglishText component,
+   which applies this class — keeps it visually distinct from Hebrew UI chrome
+   so learners never confuse "what the app says" with "what they're learning". */
+.font-content {
+  font-family: var(--font-jakarta), Arial, Helvetica, sans-serif;
+}
