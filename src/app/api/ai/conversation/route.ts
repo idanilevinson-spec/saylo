@@ -47,10 +47,19 @@ export async function POST(request: Request) {
   const scenarioPrompt =
     (conversation.conversation_scenarios as unknown as { system_prompt: string } | null)?.system_prompt ?? null;
 
+  const { data: latestPlacement } = await supabase
+    .from("placement_tests")
+    .select("result_cefr_overall")
+    .eq("profile_id", user.id)
+    .eq("status", "completed")
+    .order("completed_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   const claudeMessage = await anthropic.messages.create({
     model: CLAUDE_MODEL,
     max_tokens: 300,
-    system: buildConversationSystemPrompt(scenarioPrompt),
+    system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null),
     tools: [{ type: "web_search_20260318", name: "web_search", max_uses: 2 }],
     messages: (history ?? []).map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("assistant" as const),
