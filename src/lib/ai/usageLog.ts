@@ -7,9 +7,14 @@ export async function logAiUsage(
   profileId: string,
   feature: string,
   inputTokens: number,
-  outputTokens: number
+  outputTokens: number,
+  searchRequests = 0
 ): Promise<void> {
-  await supabase
-    .from("ai_usage_log")
-    .insert({ profile_id: profileId, feature, input_tokens: inputTokens, output_tokens: outputTokens });
+  await supabase.from("ai_usage_log").insert({
+    profile_id: profileId,
+    feature,
+    input_tokens: inputTokens,
+    output_tokens: outputTokens,
+    search_requests: searchRequests,
+  });
 }

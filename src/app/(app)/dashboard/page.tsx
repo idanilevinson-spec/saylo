@@ -15,6 +15,7 @@ import {
   NotebookPen,
   Quote,
   MessageCircle,
+  Phone,
   Flame,
   Star,
   Heart,
@@ -38,6 +39,7 @@ const MODULES = [
   { icon: NotebookPen, title: "כתיבה", body: "משוב אישי מ-AI על מה שכתבתם", href: "/writing", available: true },
   { icon: Quote, title: "ניבים וביטויים", body: "אנגלית שאנשים באמת מדברים", href: "/idioms", available: true },
   { icon: MessageCircle, title: "דיבור עם AI", body: "תרגלו שיחה אמיתית באנגלית", href: "/speaking", available: true },
+  { icon: Phone, title: "שיחה עם נציג AI", body: "שיחה קולית חופשית — כמו שיחת טלפון", href: "/speaking/voice", available: true },
 ];
 
 function greeting() {
@@ -93,7 +95,7 @@ export default function DashboardPage() {
         </div>
         <div className="mt-6 h-24 rounded-2xl bg-background-2 animate-pulse" />
         <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="h-28 rounded-2xl bg-background-2 animate-pulse" />
           ))}
         </div>

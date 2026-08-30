@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
@@ -13,12 +13,14 @@ import type { ConversationMessage, ConversationScore } from "@/types/database";
 
 export default function SpeakingChatPage() {
   const { conversationId } = useParams<{ conversationId: string }>();
+  const searchParams = useSearchParams();
+  const startInVoiceMode = searchParams.get("mode") === "voice";
   const { profile } = useAuth();
   const [messages, setMessages] = useState<ConversationMessage[] | null>(null);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [ending, setEnding] = useState(false);
-  const [voiceMode, setVoiceMode] = useState(false);
+  const [voiceMode, setVoiceMode] = useState(startInVoiceMode);
   const [score, setScore] = useState<ConversationScore | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -146,7 +148,11 @@ export default function SpeakingChatPage() {
   return (
     <div className="max-w-xl mx-auto px-4 py-8 flex flex-col h-[calc(100vh-6rem)]">
       <div className="flex items-center justify-between mb-4">
-        <MotionLink whileTap={{ scale: 0.97 }} href="/speaking" className="text-sm text-primary">
+        <MotionLink
+          whileTap={{ scale: 0.97 }}
+          href={startInVoiceMode ? "/speaking/voice" : "/speaking"}
+          className="text-sm text-primary"
+        >
           ← לתרחישים
         </MotionLink>
         <div className="flex items-center gap-2">

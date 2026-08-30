@@ -51,6 +51,7 @@ export async function POST(request: Request) {
     model: CLAUDE_MODEL,
     max_tokens: 300,
     system: buildConversationSystemPrompt(scenarioPrompt),
+    tools: [{ type: "web_search_20260318", name: "web_search", max_uses: 2 }],
     messages: (history ?? []).map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("assistant" as const),
       content: m.content,
@@ -67,7 +68,8 @@ export async function POST(request: Request) {
     user.id,
     "conversation_turn",
     claudeMessage.usage.input_tokens,
-    claudeMessage.usage.output_tokens
+    claudeMessage.usage.output_tokens,
+    claudeMessage.usage.server_tool_use?.web_search_requests ?? 0
   );
 
   return NextResponse.json({ reply });

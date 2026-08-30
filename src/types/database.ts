@@ -30,6 +30,16 @@ export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
 export type ContentStatus = "draft" | "ai_generated_pending_review" | "published";
 
+export type ConversationTopicCategory =
+  | "daily_life"
+  | "social"
+  | "travel"
+  | "work_professional"
+  | "academic"
+  | "health_wellbeing"
+  | "serious_topics"
+  | "entertainment_culture";
+
 export type SkillArea = "vocabulary" | "grammar" | "listening" | "reading" | "writing" | "speaking";
 
 export type LearningPathNodeType = "vocabulary_topic" | "grammar_topic";
@@ -299,6 +309,7 @@ export interface ConversationScenario {
   title_en: string;
   system_prompt: string;
   cefr_level: CefrLevel;
+  category: ConversationTopicCategory;
   status: ContentStatus;
   sort_order: number;
   created_at: string;

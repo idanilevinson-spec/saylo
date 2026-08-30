@@ -13,7 +13,12 @@ export const anthropic = new Anthropic({ apiKey });
 
 export const CLAUDE_MODEL = "claude-sonnet-5";
 
+// With tool use (e.g. web search) a reply can carry multiple text blocks
+// interleaved with tool_use/tool_result blocks — join all of them instead of
+// taking just the first, which would truncate a reply that searched first.
 export function extractText(message: Anthropic.Message): string {
-  const block = message.content.find((b) => b.type === "text");
-  return block?.type === "text" ? block.text : "";
+  return message.content
+    .filter((b): b is Anthropic.TextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("\n\n");
 }

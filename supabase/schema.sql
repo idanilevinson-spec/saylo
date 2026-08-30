@@ -97,6 +97,17 @@ create type content_status as enum ('draft', 'ai_generated_pending_review', 'pub
 
 create type skill_area as enum ('vocabulary', 'grammar', 'listening', 'reading', 'writing', 'speaking');
 
+create type conversation_topic_category as enum (
+  'daily_life',
+  'social',
+  'travel',
+  'work_professional',
+  'academic',
+  'health_wellbeing',
+  'serious_topics',
+  'entertainment_culture'
+);
+
 create type learning_path_node_type as enum ('vocabulary_topic', 'grammar_topic');
 
 -- ============ VOCABULARY ============
@@ -547,6 +558,7 @@ create table public.ai_usage_log (
   feature text not null,
   input_tokens int not null default 0,
   output_tokens int not null default 0,
+  search_requests int not null default 0,
   created_at timestamptz not null default now()
 );
 
@@ -621,6 +633,7 @@ create table public.conversation_scenarios (
   title_en text not null,
   system_prompt text not null,
   cefr_level cefr_level not null,
+  category conversation_topic_category not null default 'daily_life',
   status content_status not null default 'published',
   sort_order int not null default 0,
   created_at timestamptz not null default now()
