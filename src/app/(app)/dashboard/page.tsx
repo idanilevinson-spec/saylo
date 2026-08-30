@@ -132,6 +132,9 @@ export default function DashboardPage() {
               <Heart size={16} className="fill-current" /> {hearts.current}/{hearts.max} לבבות
             </span>
           )}
+          <Link href="/progress" className="text-primary hover:underline">
+            כל ההתקדמות שלי ←
+          </Link>
         </motion.div>
       )}
 
