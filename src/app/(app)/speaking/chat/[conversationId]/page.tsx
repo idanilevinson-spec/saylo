@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { Phone } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
+import VoiceConversationPanel from "@/components/VoiceConversationPanel";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import type { ConversationMessage, ConversationScore } from "@/types/database";
@@ -16,6 +18,7 @@ export default function SpeakingChatPage() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [ending, setEnding] = useState(false);
+  const [voiceMode, setVoiceMode] = useState(false);
   const [score, setScore] = useState<ConversationScore | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -32,33 +35,44 @@ export default function SpeakingChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const sendMessage = useCallback(
+    async (text: string): Promise<string | null> => {
+      if (!text.trim() || !profile) return null;
+
+      setMessages((prev) => [
+        ...(prev ?? []),
+        { id: `temp-${Date.now()}`, conversation_id: conversationId, role: "user", content: text, created_at: new Date().toISOString() },
+      ]);
+
+      try {
+        const res = await fetch("/api/ai/conversation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conversationId, message: text }),
+        });
+        if (!res.ok) throw new Error("failed");
+        const { reply } = await res.json();
+        const { data } = await supabase
+          .from("conversation_messages")
+          .select("*")
+          .eq("conversation_id", conversationId)
+          .order("created_at");
+        setMessages(data ?? []);
+        return reply as string;
+      } catch {
+        return null;
+      }
+    },
+    [conversationId, profile]
+  );
+
   async function handleSend() {
-    if (!input.trim() || sending || !profile) return;
+    if (!input.trim() || sending) return;
     const text = input.trim();
     setInput("");
     setSending(true);
-
-    setMessages((prev) => [
-      ...(prev ?? []),
-      { id: `temp-${Date.now()}`, conversation_id: conversationId, role: "user", content: text, created_at: new Date().toISOString() },
-    ]);
-
-    try {
-      const res = await fetch("/api/ai/conversation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversationId, message: text }),
-      });
-      if (!res.ok) throw new Error("failed");
-      const { data } = await supabase
-        .from("conversation_messages")
-        .select("*")
-        .eq("conversation_id", conversationId)
-        .order("created_at");
-      setMessages(data ?? []);
-    } finally {
-      setSending(false);
-    }
+    await sendMessage(text);
+    setSending(false);
   }
 
   async function handleEnd() {
@@ -135,15 +149,27 @@ export default function SpeakingChatPage() {
         <MotionLink whileTap={{ scale: 0.97 }} href="/speaking" className="text-sm text-primary">
           ← לתרחישים
         </MotionLink>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={handleEnd}
-          disabled={ending || !messages?.some((m) => m.role === "user")}
-          className="text-sm px-4 py-2 rounded-lg border border-card-border hover:bg-background-2 transition-colors disabled:opacity-40"
-        >
-          {ending ? "מנתח..." : "סיימו שיחה"}
-        </motion.button>
+        <div className="flex items-center gap-2">
+          {!voiceMode && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setVoiceMode(true)}
+              className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Phone size={15} /> שיחה קולית
+            </motion.button>
+          )}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleEnd}
+            disabled={ending || !messages?.some((m) => m.role === "user")}
+            className="text-sm px-4 py-2 rounded-lg border border-card-border hover:bg-background-2 transition-colors disabled:opacity-40"
+          >
+            {ending ? "מנתח..." : "סיימו שיחה"}
+          </motion.button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-3 pb-4">
@@ -172,27 +198,33 @@ export default function SpeakingChatPage() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="flex gap-2 pt-2 border-t border-card-border">
-        <input
-          type="text"
-          dir="ltr"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          disabled={sending}
-          placeholder="Type in English..."
-          className="flex-1 px-4 py-2.5 rounded-xl border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
-        />
-        <motion.button
-          whileHover={input.trim() && !sending ? { scale: 1.05 } : undefined}
-          whileTap={input.trim() && !sending ? { scale: 0.95 } : undefined}
-          onClick={handleSend}
-          disabled={!input.trim() || sending}
-          className="px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
-        >
-          שליחה
-        </motion.button>
-      </div>
+      {voiceMode ? (
+        <div className="pt-2 border-t border-card-border">
+          <VoiceConversationPanel onSend={sendMessage} onExit={() => setVoiceMode(false)} />
+        </div>
+      ) : (
+        <div className="flex gap-2 pt-2 border-t border-card-border">
+          <input
+            type="text"
+            dir="ltr"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            disabled={sending}
+            placeholder="Type in English..."
+            className="flex-1 px-4 py-2.5 rounded-xl border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
+          />
+          <motion.button
+            whileHover={input.trim() && !sending ? { scale: 1.05 } : undefined}
+            whileTap={input.trim() && !sending ? { scale: 0.95 } : undefined}
+            onClick={handleSend}
+            disabled={!input.trim() || sending}
+            className="px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
+          >
+            שליחה
+          </motion.button>
+        </div>
+      )}
     </div>
   );
 }
