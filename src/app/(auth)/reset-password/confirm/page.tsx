@@ -87,8 +87,9 @@ export default function ResetPasswordConfirmPage() {
         className="mt-8 space-y-4"
       >
         <div>
-          <label className="block text-sm font-medium mb-1.5">סיסמה חדשה</label>
+          <label htmlFor="new-password" className="block text-sm font-medium mb-1.5">סיסמה חדשה</label>
           <input
+            id="new-password"
             type="password"
             dir="ltr"
             value={password}

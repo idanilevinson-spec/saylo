@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Rubik, Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
+import { MotionConfig } from "framer-motion";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
 import Navbar from "@/components/Navbar";
@@ -54,11 +55,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </Script>
       </head>
       <body className="min-h-full flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:right-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary focus:text-primary-ink focus:font-medium"
+        >
+          דלגו לתוכן הראשי
+        </a>
         <ServiceWorkerRegister />
-        <AuthProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-        </AuthProvider>
+        <MotionConfig reducedMotion="user">
+          <AuthProvider>
+            <Navbar />
+            <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+              {children}
+            </main>
+          </AuthProvider>
+        </MotionConfig>
       </body>
     </html>
   );

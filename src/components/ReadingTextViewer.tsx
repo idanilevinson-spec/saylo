@@ -57,13 +57,17 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord }: ReadingTextVi
                   {popover.entry.ipa}
                 </EnglishText>
               )}
-              <button onClick={() => speak(popover.word)} className="text-primary text-sm">
+              <button
+                onClick={() => speak(popover.word)}
+                aria-label={`השמעת הגייה של ${popover.word}`}
+                className="text-primary text-sm"
+              >
                 <Volume2 size={14} />
               </button>
             </div>
             <p className="mt-1">{popover.entry.translation_he}</p>
           </div>
-          <button onClick={() => setPopover(null)} className="text-muted hover:text-foreground">
+          <button onClick={() => setPopover(null)} aria-label="סגירה" className="text-muted hover:text-foreground">
             <X size={16} />
           </button>
         </div>

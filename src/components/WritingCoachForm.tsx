@@ -106,6 +106,7 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
     <div>
       <textarea
         dir="ltr"
+        aria-label="התשובה שלכם באנגלית"
         value={text}
         onChange={(e) => setText(e.target.value)}
         disabled={submitting}

@@ -60,8 +60,9 @@ export default function ResetPasswordPage() {
         className="mt-8 space-y-4"
       >
         <div>
-          <label className="block text-sm font-medium mb-1.5">אימייל</label>
+          <label htmlFor="reset-email" className="block text-sm font-medium mb-1.5">אימייל</label>
           <input
+            id="reset-email"
             type="email"
             dir="ltr"
             value={email}

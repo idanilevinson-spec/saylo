@@ -52,8 +52,9 @@ export default function LoginForm() {
         className="mt-8 space-y-4"
       >
         <div>
-          <label className="block text-sm font-medium mb-1.5">אימייל</label>
+          <label htmlFor="login-email" className="block text-sm font-medium mb-1.5">אימייל</label>
           <input
+            id="login-email"
             type="email"
             dir="ltr"
             value={email}
@@ -63,8 +64,9 @@ export default function LoginForm() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1.5">סיסמה</label>
+          <label htmlFor="login-password" className="block text-sm font-medium mb-1.5">סיסמה</label>
           <input
+            id="login-password"
             type="password"
             dir="ltr"
             value={password}

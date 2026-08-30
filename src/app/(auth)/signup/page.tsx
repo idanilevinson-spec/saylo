@@ -97,8 +97,9 @@ export default function SignupPage() {
         className="mt-8 space-y-4"
       >
         <div>
-          <label className="block text-sm font-medium mb-1.5">שם מלא</label>
+          <label htmlFor="signup-name" className="block text-sm font-medium mb-1.5">שם מלא</label>
           <input
+            id="signup-name"
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
@@ -107,8 +108,9 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1.5">גיל</label>
+          <label htmlFor="signup-age" className="block text-sm font-medium mb-1.5">גיל</label>
           <input
+            id="signup-age"
             type="number"
             min={4}
             max={119}
@@ -119,8 +121,9 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1.5">אימייל</label>
+          <label htmlFor="signup-email" className="block text-sm font-medium mb-1.5">אימייל</label>
           <input
+            id="signup-email"
             type="email"
             dir="ltr"
             value={email}
@@ -130,8 +133,9 @@ export default function SignupPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1.5">סיסמה</label>
+          <label htmlFor="signup-password" className="block text-sm font-medium mb-1.5">סיסמה</label>
           <input
+            id="signup-password"
             type="password"
             dir="ltr"
             value={password}

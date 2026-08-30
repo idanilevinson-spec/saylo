@@ -79,8 +79,9 @@ export default function ProfileSetupPage() {
         className="mt-8 space-y-4"
       >
         <div>
-          <label className="block text-sm font-medium mb-1.5">שם מלא</label>
+          <label htmlFor="setup-name" className="block text-sm font-medium mb-1.5">שם מלא</label>
           <input
+            id="setup-name"
             type="text"
             value={nameValue}
             onChange={(e) => setDisplayName(e.target.value)}
@@ -89,8 +90,9 @@ export default function ProfileSetupPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1.5">גיל</label>
+          <label htmlFor="setup-age" className="block text-sm font-medium mb-1.5">גיל</label>
           <input
+            id="setup-age"
             type="number"
             min={4}
             max={119}

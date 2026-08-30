@@ -77,6 +77,7 @@ export default function ConsentRequestForm({ status }: ConsentRequestFormProps) 
       <input
         type="email"
         dir="ltr"
+        aria-label="אימייל ההורה או האפוטרופוס"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="parent@example.com"
