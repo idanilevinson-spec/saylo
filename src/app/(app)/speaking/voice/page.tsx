@@ -55,6 +55,7 @@ export default function VoiceConversationHubPage() {
   const router = useRouter();
   const [scenarios, setScenarios] = useState<ConversationScenario[] | null>(null);
   const [starting, setStarting] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
 
   useEffect(() => {
     supabase
@@ -82,12 +83,17 @@ export default function VoiceConversationHubPage() {
   async function startConversation(scenarioId: string | null) {
     if (!profile || starting) return;
     setStarting(true);
-    const { data } = await supabase
+    setLimitReached(false);
+    const { data, error } = await supabase
       .from("conversations")
       .insert({ profile_id: profile.id, scenario_id: scenarioId })
       .select()
       .single();
-    if (data) router.push(`/speaking/chat/${data.id}?mode=voice`);
+    if (data) {
+      router.push(`/speaking/chat/${data.id}?mode=voice`);
+    } else if (error?.message.includes("daily_conversation_limit_reached")) {
+      setLimitReached(true);
+    }
     setStarting(false);
   }
 
@@ -105,6 +111,12 @@ export default function VoiceConversationHubPage() {
             שיחה קולית חופשית עם ה-AI — כמו שיחת טלפון. בחרו נושא, או פתחו שיחה חופשית על מה שבא לכם.
           </p>
         </div>
+
+        {limitReached && (
+          <div className="mt-6 p-4 rounded-xl bg-danger-ink text-danger text-sm">
+            הגעתם למגבלת 5 שיחות ליום. אפשר להתחיל שיחה חדשה בעוד עד 24 שעות — השיחות הישנות שלכם עדיין זמינות לצפייה.
+          </div>
+        )}
 
         <motion.button
           initial={{ opacity: 0, y: 16 }}

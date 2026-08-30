@@ -18,6 +18,7 @@ export default function SpeakingPage() {
   const router = useRouter();
   const [scenarios, setScenarios] = useState<ConversationScenario[] | null>(null);
   const [starting, setStarting] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
 
   useEffect(() => {
     supabase
@@ -44,12 +45,17 @@ export default function SpeakingPage() {
   async function startConversation(scenarioId: string | null) {
     if (!profile || starting) return;
     setStarting(true);
-    const { data } = await supabase
+    setLimitReached(false);
+    const { data, error } = await supabase
       .from("conversations")
       .insert({ profile_id: profile.id, scenario_id: scenarioId })
       .select()
       .single();
-    if (data) router.push(`/speaking/chat/${data.id}`);
+    if (data) {
+      router.push(`/speaking/chat/${data.id}`);
+    } else if (error?.message.includes("daily_conversation_limit_reached")) {
+      setLimitReached(true);
+    }
     setStarting(false);
   }
 
@@ -60,6 +66,12 @@ export default function SpeakingPage() {
           <h1 className="text-3xl font-bold">דיבור עם AI</h1>
           <p className="mt-2 text-muted">תרגלו שיחה אמיתית באנגלית — בחרו תרחיש או פתחו שיחה חופשית</p>
         </div>
+
+        {limitReached && (
+          <div className="mt-6 p-4 rounded-xl bg-danger-ink text-danger text-sm">
+            הגעתם למגבלת 5 שיחות ליום. אפשר להתחיל שיחה חדשה בעוד עד 24 שעות — השיחות הישנות שלכם עדיין זמינות לצפייה.
+          </div>
+        )}
 
         <motion.button
           initial={{ opacity: 0, y: 16 }}

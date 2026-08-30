@@ -650,6 +650,39 @@ create table public.conversations (
 
 create index conversations_profile_idx on public.conversations (profile_id, created_at);
 
+-- Caps new conversations at 5 per profile per rolling 24 hours (admins
+-- exempt) so a single user can't run up Claude/Azure costs unbounded.
+create or replace function public.enforce_daily_conversation_limit()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  recent_count int;
+begin
+  if public.is_admin(new.profile_id) then
+    return new;
+  end if;
+
+  select count(*) into recent_count
+  from public.conversations
+  where profile_id = new.profile_id
+    and created_at >= now() - interval '24 hours';
+
+  if recent_count >= 5 then
+    raise exception 'daily_conversation_limit_reached';
+  end if;
+
+  return new;
+end;
+$$;
+
+create trigger conversations_daily_limit
+  before insert on public.conversations
+  for each row
+  execute function public.enforce_daily_conversation_limit();
+
 create table public.conversation_messages (
   id uuid primary key default gen_random_uuid(),
   conversation_id uuid not null references public.conversations(id) on delete cascade,
