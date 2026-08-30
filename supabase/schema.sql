@@ -552,6 +552,55 @@ create table public.writing_feedback (
   created_at timestamptz not null default now()
 );
 
+-- Caps writing-coach submissions at 15 per profile per rolling 24 hours
+-- (admins exempt) — same pattern as the conversations daily limit.
+create or replace function public.enforce_daily_writing_limit()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  recent_count int;
+begin
+  if public.is_admin(new.profile_id) then
+    return new;
+  end if;
+
+  select count(*) into recent_count
+  from public.writing_submissions
+  where profile_id = new.profile_id
+    and created_at >= now() - interval '24 hours';
+
+  if recent_count >= 15 then
+    raise exception 'daily_writing_limit_reached';
+  end if;
+
+  return new;
+end;
+$$;
+
+create trigger writing_submissions_daily_limit
+  before insert on public.writing_submissions
+  for each row
+  execute function public.enforce_daily_writing_limit();
+
+-- Caches the AI teacher's dashboard suggestion per user so it's only
+-- regenerated at most once a day, instead of on every dashboard visit.
+create table public.teacher_suggestion_cache (
+  profile_id uuid primary key references public.profiles(id) on delete cascade,
+  suggestion text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.teacher_suggestion_cache enable row level security;
+
+create policy "users manage their own teacher suggestion cache"
+  on public.teacher_suggestion_cache for all
+  to authenticated
+  using (auth.uid() = profile_id)
+  with check (auth.uid() = profile_id);
+
 create table public.ai_usage_log (
   id uuid primary key default gen_random_uuid(),
   profile_id uuid not null references public.profiles(id) on delete cascade,

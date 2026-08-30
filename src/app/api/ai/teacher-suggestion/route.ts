@@ -5,6 +5,8 @@ import { buildTeacherSuggestionPrompt } from "@/lib/ai/prompts/teacherSuggestion
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
 
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
 export async function GET() {
   const supabase = await createClient();
   const {
@@ -13,6 +15,16 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   if (!(await isPremiumServer(supabase, user.id))) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
+  }
+
+  const { data: cached } = await supabase
+    .from("teacher_suggestion_cache")
+    .select("suggestion, created_at")
+    .eq("profile_id", user.id)
+    .maybeSingle();
+
+  if (cached && Date.now() - new Date(cached.created_at).getTime() < CACHE_TTL_MS) {
+    return NextResponse.json({ suggestion: cached.suggestion });
   }
 
   const { data: wrongAttempts } = await supabase
@@ -63,6 +75,10 @@ export async function GET() {
   const suggestion = extractText(message);
 
   await logAiUsage(supabase, user.id, "teacher_suggestion", message.usage.input_tokens, message.usage.output_tokens);
+
+  await supabase
+    .from("teacher_suggestion_cache")
+    .upsert({ profile_id: user.id, suggestion, created_at: new Date().toISOString() });
 
   return NextResponse.json({ suggestion });
 }

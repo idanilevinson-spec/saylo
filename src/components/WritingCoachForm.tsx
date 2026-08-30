@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Crown } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import IconBadge from "@/components/IconBadge";
 
 interface WritingFeedbackResult {
   overall_score: number;
@@ -20,12 +22,14 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
   const [feedback, setFeedback] = useState<WritingFeedbackResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [premiumRequired, setPremiumRequired] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
 
   async function handleSubmit() {
     if (!text.trim() || submitting) return;
     setSubmitting(true);
     setError(null);
     setPremiumRequired(false);
+    setLimitReached(false);
     try {
       const res = await fetch("/api/ai/writing-coach", {
         method: "POST",
@@ -34,6 +38,10 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
       });
       if (res.status === 403) {
         setPremiumRequired(true);
+        return;
+      }
+      if (res.status === 429) {
+        setLimitReached(true);
         return;
       }
       if (!res.ok) throw new Error("request failed");
@@ -49,7 +57,7 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
   if (premiumRequired) {
     return (
       <div className="bg-card border border-card-border rounded-2xl p-6 text-center">
-        <p className="text-3xl mb-2">⭐</p>
+        <IconBadge icon={Crown} tone="accent" className="mx-auto" />
         <p className="font-bold">Writing Coach זמין למנויי פרימיום</p>
         <p className="mt-2 text-sm text-muted">תקופת הניסיון שלכם הסתיימה. שדרגו כדי להמשיך לקבל משוב על כתיבה.</p>
         <Link
@@ -58,6 +66,15 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
         >
           לצפייה במסלולים
         </Link>
+      </div>
+    );
+  }
+
+  if (limitReached) {
+    return (
+      <div className="bg-card border border-card-border rounded-2xl p-6 text-center">
+        <p className="font-bold">הגעתם למגבלת המשובים היומית</p>
+        <p className="mt-2 text-sm text-muted">אפשר לשלוח עד 15 טקסטים ליום. נסו שוב בעוד עד 24 שעות.</p>
       </div>
     );
   }

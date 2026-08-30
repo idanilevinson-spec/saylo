@@ -41,6 +41,9 @@ export async function POST(request: Request) {
     .insert({ profile_id: user.id, writing_prompt_id: writingPromptId, submitted_text: submittedText })
     .select()
     .single();
+  if (submissionError?.message.includes("daily_writing_limit_reached")) {
+    return NextResponse.json({ error: "daily limit reached" }, { status: 429 });
+  }
   if (submissionError || !submission) {
     return NextResponse.json({ error: "failed to save submission" }, { status: 500 });
   }
