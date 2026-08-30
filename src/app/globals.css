@@ -2,22 +2,22 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #f7f8fd;
-  --background-2: #eef1fb;
-  --foreground: #12142b;
+  --background: #f6f9fd;
+  --background-2: #ecf3fb;
+  --foreground: #081025;
   --card: #ffffff;
-  --card-border: #e3e7f6;
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
+  --card-border: #e1eaf6;
+  --primary: #0066d6;
+  --primary-hover: #0052ad;
   --primary-ink: #ffffff;
-  --accent: #f59e0b;
-  --accent-hover: #d97706;
-  --accent-ink: #431407;
+  --accent: #00a19d;
+  --accent-hover: #008783;
+  --accent-ink: #04211f;
   --success: #16a34a;
   --success-ink: #f0fdf4;
   --danger: #ef4444;
   --danger-ink: #fef2f2;
-  --muted: #6b7280;
+  --muted: #667085;
 }
 
 /* Three theme states: an explicit choice (data-theme) always wins; with no
@@ -26,42 +26,42 @@
    mix of light and dark tokens. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --background: #0f1115;
-    --background-2: #171a22;
-    --foreground: #e8eaf1;
-    --card: #1a1d26;
-    --card-border: #2b2f3c;
-    --primary: #818cf8;
-    --primary-hover: #a5b4fc;
-    --primary-ink: #14152b;
-    --accent: #fbbf24;
-    --accent-hover: #fcd34d;
-    --accent-ink: #1c1300;
+    --background: #0a0f1a;
+    --background-2: #121826;
+    --foreground: #e8f0fb;
+    --card: #151c2c;
+    --card-border: #26314a;
+    --primary: #4d9eff;
+    --primary-hover: #7ab8ff;
+    --primary-ink: #04122b;
+    --accent: #2dd4cf;
+    --accent-hover: #5ee6e1;
+    --accent-ink: #042e2c;
     --success: #4ade80;
     --success-ink: #052e13;
     --danger: #f87171;
     --danger-ink: #450a0a;
-    --muted: #9aa0b4;
+    --muted: #94a3c2;
   }
 }
 
 :root[data-theme="dark"] {
-  --background: #0f1115;
-  --background-2: #171a22;
-  --foreground: #e8eaf1;
-  --card: #1a1d26;
-  --card-border: #2b2f3c;
-  --primary: #818cf8;
-  --primary-hover: #a5b4fc;
-  --primary-ink: #14152b;
-  --accent: #fbbf24;
-  --accent-hover: #fcd34d;
-  --accent-ink: #1c1300;
+  --background: #0a0f1a;
+  --background-2: #121826;
+  --foreground: #e8f0fb;
+  --card: #151c2c;
+  --card-border: #26314a;
+  --primary: #4d9eff;
+  --primary-hover: #7ab8ff;
+  --primary-ink: #04122b;
+  --accent: #2dd4cf;
+  --accent-hover: #5ee6e1;
+  --accent-ink: #042e2c;
   --success: #4ade80;
   --success-ink: #052e13;
   --danger: #f87171;
   --danger-ink: #450a0a;
-  --muted: #9aa0b4;
+  --muted: #94a3c2;
 }
 
 @theme inline {

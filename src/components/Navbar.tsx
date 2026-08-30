@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
 import EnglishText from "@/components/EnglishText";
@@ -50,16 +51,19 @@ export default function Navbar() {
     >
       <ScrollProgress />
       <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
-        <Link href="/" className="leading-tight" onClick={() => setMenuOpen(false)}>
-          <EnglishText
-            as="span"
-            className="block text-xl font-bold tracking-tight bg-gradient-to-l from-primary to-accent bg-clip-text text-transparent"
-          >
-            Saylo
-          </EnglishText>
-          <EnglishText as="span" className="block text-[10px] text-muted font-medium -mt-0.5">
-            Your knowledge, Our Success
-          </EnglishText>
+        <Link href="/" className="flex items-center gap-2 leading-tight" onClick={() => setMenuOpen(false)}>
+          <Image src="/logo-mark.png" alt="" width={32} height={32} className="rounded-lg" />
+          <span>
+            <EnglishText
+              as="span"
+              className="block text-xl font-bold tracking-tight bg-gradient-to-l from-primary to-accent bg-clip-text text-transparent"
+            >
+              saylo
+            </EnglishText>
+            <EnglishText as="span" className="block text-[10px] text-muted font-medium -mt-0.5">
+              Speak. Learn. Grow.
+            </EnglishText>
+          </span>
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">
