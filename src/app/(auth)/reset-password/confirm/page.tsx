@@ -3,6 +3,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
 import { supabase } from "@/lib/supabase/browserClient";
 
 // Reached only via the link in the password-reset email. Supabase's client
@@ -49,7 +51,7 @@ export default function ResetPasswordConfirmPage() {
   if (done) {
     return (
       <div className="max-w-md mx-auto px-4 py-24 text-center">
-        <p className="text-4xl mb-4">✅</p>
+        <IconBadge icon={CheckCircle2} tone="success" />
         <h1 className="text-2xl font-bold">הסיסמה עודכנה בהצלחה</h1>
         <motion.button
           whileHover={{ scale: 1.02 }}

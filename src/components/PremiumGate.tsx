@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { Crown } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
 import { useAuth } from "@/context/AuthProvider";
 import { isUserPremium } from "@/lib/subscriptions/subscriptionService";
 
@@ -28,7 +30,7 @@ export default function PremiumGate({ children, featureName }: PremiumGateProps)
   if (status === "blocked") {
     return (
       <div className="max-w-md mx-auto px-4 py-24 text-center">
-        <p className="text-4xl mb-4">⭐</p>
+        <IconBadge icon={Crown} tone="accent" />
         <h1 className="text-2xl font-bold">{featureName} זמין למנויי פרימיום</h1>
         <p className="mt-2 text-muted">תקופת הניסיון שלכם הסתיימה. שדרגו כדי להמשיך וליהנות מכל התכונות.</p>
         <Link

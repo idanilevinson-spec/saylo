@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Check } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
@@ -94,12 +95,19 @@ export default function PricingCards() {
       >
         <h3 className="font-bold mb-3">מה כלול בכל המסלולים בתשלום?</h3>
         <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted">
-          <li>✓ מבחן רמה ומסלול לימוד אישי</li>
-          <li>✓ מורה AI אישי ללא הגבלה</li>
-          <li>✓ תרגול דיבור עם AI</li>
-          <li>✓ תרגילים ללא הגבלה</li>
-          <li>✓ חזרה חכמה יומית</li>
-          <li>✓ כל 6 רמות ה־CEFR</li>
+          {[
+            "מבחן רמה ומסלול לימוד אישי",
+            "מורה AI אישי ללא הגבלה",
+            "תרגול דיבור עם AI",
+            "תרגילים ללא הגבלה",
+            "חזרה חכמה יומית",
+            "כל 6 רמות ה־CEFR",
+          ].map((item) => (
+            <li key={item} className="flex items-center gap-2">
+              <Check size={16} className="shrink-0 text-success" />
+              {item}
+            </li>
+          ))}
         </ul>
       </motion.div>
     </section>

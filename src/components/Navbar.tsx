@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
 import EnglishText from "@/components/EnglishText";
@@ -109,7 +110,7 @@ export default function Navbar() {
               aria-expanded={menuOpen}
               className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
-              {menuOpen ? "✕" : "☰"}
+              {menuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           )}
         </div>

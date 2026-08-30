@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Mic } from "lucide-react";
 import { supabase } from "@/lib/supabase/browserClient";
 import { useAuth } from "@/context/AuthProvider";
 
@@ -103,9 +104,9 @@ export default function PronunciationRecorder({ targetPhrase }: { targetPhrase: 
       {status === "idle" && (
         <button
           onClick={startRecording}
-          className="text-sm px-3 py-1.5 rounded-lg border border-card-border hover:border-primary/40 hover:bg-background-2 transition-colors"
+          className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border border-card-border hover:border-primary/40 hover:bg-background-2 transition-colors"
         >
-          🎤 תרגלו הגייה
+          <Mic size={14} /> תרגלו הגייה
         </button>
       )}
 
@@ -114,9 +115,9 @@ export default function PronunciationRecorder({ targetPhrase }: { targetPhrase: 
           disabled
           animate={{ scale: [1, 1.06, 1] }}
           transition={{ duration: 1.1, repeat: Infinity }}
-          className="text-sm px-3 py-1.5 rounded-lg bg-danger-ink text-danger font-medium"
+          className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg bg-danger-ink text-danger font-medium"
         >
-          🎤 מקשיב... דברו עכשיו
+          <Mic size={14} /> מקשיב... דברו עכשיו
         </motion.button>
       )}
 
@@ -150,8 +151,8 @@ export default function PronunciationRecorder({ targetPhrase }: { targetPhrase: 
       </AnimatePresence>
 
       {status === "done" && (
-        <button onClick={startRecording} className="mt-2 text-sm text-primary hover:underline">
-          נסו שוב 🎤
+        <button onClick={startRecording} className="mt-2 flex items-center gap-1.5 text-sm text-primary hover:underline">
+          <Mic size={14} /> נסו שוב
         </button>
       )}
     </div>

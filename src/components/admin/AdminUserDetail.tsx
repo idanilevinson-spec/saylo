@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Flame } from "lucide-react";
 import { supabase } from "@/lib/supabase/browserClient";
 import { useAuth } from "@/context/AuthProvider";
 import StatusBadge from "@/components/admin/StatusBadge";
@@ -118,7 +119,9 @@ export default function AdminUserDetail({ profileId }: { profileId: string }) {
         </div>
         <div className="bg-card border border-card-border rounded-2xl p-5">
           <p className="text-sm text-muted">רצף</p>
-          <p className="mt-2 text-2xl font-bold">{streak?.current_streak ?? 0} 🔥</p>
+          <p className="mt-2 text-2xl font-bold flex items-center gap-1.5">
+            {streak?.current_streak ?? 0} <Flame size={18} className="fill-current text-accent-hover" />
+          </p>
           <p className="text-xs text-muted">שיא: {streak?.longest_streak ?? 0}</p>
         </div>
       </div>

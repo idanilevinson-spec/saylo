@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Volume2, X } from "lucide-react";
 import { speak } from "@/lib/speech/browserTts";
 import EnglishText from "@/components/EnglishText";
 import type { VocabularyLookupEntry } from "@/lib/content/vocabulary";
@@ -57,13 +58,13 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord }: ReadingTextVi
                 </EnglishText>
               )}
               <button onClick={() => speak(popover.word)} className="text-primary text-sm">
-                🔊
+                <Volume2 size={14} />
               </button>
             </div>
             <p className="mt-1">{popover.entry.translation_he}</p>
           </div>
           <button onClick={() => setPopover(null)} className="text-muted hover:text-foreground">
-            ✕
+            <X size={16} />
           </button>
         </div>
       )}

@@ -5,6 +5,7 @@ import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import GrammarLessonContent from "@/components/GrammarLessonContent";
 import MotionLink from "@/components/MotionLink";
+import { Target } from "lucide-react";
 import { getGrammarTopicBySlug, listGrammarLessons } from "@/lib/content/grammar";
 import { createClient } from "@/lib/supabase/serverClient";
 
@@ -52,9 +53,9 @@ export default async function GrammarTopicPage({ params }: PageProps) {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               href={`/practice/${firstExercise.id}`}
-              className="px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
             >
-              תרגלו את הנושא 🎯
+              תרגלו את הנושא <Target size={16} />
             </MotionLink>
           )}
         </div>

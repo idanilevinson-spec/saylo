@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
+import { Target } from "lucide-react";
 import SpeakButton from "@/components/SpeakButton";
 import PronunciationRecorder from "@/components/PronunciationRecorder";
 import MotionLink from "@/components/MotionLink";
@@ -54,9 +55,9 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               href={`/practice/${firstExercise.id}`}
-              className="px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
             >
-              תרגלו את הנושא 🎯
+              תרגלו את הנושא <Target size={16} />
             </MotionLink>
           )}
         </div>

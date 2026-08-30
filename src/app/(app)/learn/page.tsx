@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BookOpen, PenLine } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ContentCard from "@/components/ContentCard";
@@ -24,14 +25,18 @@ export default async function LearnPage() {
         <p className="mt-10 text-muted">התוכן בדרך — חזרו לבדוק בקרוב.</p>
       ) : (
         <ol className="mt-8 space-y-3">
-          {entries.map((entry, i) => (
+          {entries.map((entry, i) => {
+            const Icon = entry.node.node_type === "vocabulary_topic" ? BookOpen : PenLine;
+            return (
             <li key={entry.node.id}>
               <ContentCard href={entry.href} index={i} className="p-4">
                 <div className="flex items-center gap-4">
                   <span className="w-8 h-8 shrink-0 rounded-full bg-background-2 flex items-center justify-center text-sm font-bold text-muted">
                     {i + 1}
                   </span>
-                  <span className="text-xl">{entry.icon}</span>
+                  <span className="w-9 h-9 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                    <Icon size={18} />
+                  </span>
                   <span className="flex-1">
                     <span className="block font-medium">{entry.title_he}</span>
                     <EnglishText as="span" className="block text-xs text-muted">
@@ -42,7 +47,8 @@ export default async function LearnPage() {
                 </div>
               </ContentCard>
             </li>
-          ))}
+            );
+          })}
         </ol>
       )}
     </div>

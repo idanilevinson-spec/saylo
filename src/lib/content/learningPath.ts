@@ -6,7 +6,6 @@ export interface LearningPathEntry {
   href: string;
   title_he: string;
   title_en: string;
-  icon: string;
 }
 
 // learning_path_nodes is polymorphic (node_type + ref_id), so this resolves
@@ -46,7 +45,6 @@ export async function listLearningPath(): Promise<LearningPathEntry[]> {
           href: `/vocabulary/${topic.slug}`,
           title_he: topic.name_he,
           title_en: topic.name_en,
-          icon: "📚",
         },
       ];
     }
@@ -58,7 +56,6 @@ export async function listLearningPath(): Promise<LearningPathEntry[]> {
         href: `/grammar/${topic.slug}`,
         title_he: topic.name_he,
         title_en: topic.name_en,
-        icon: "✍️",
       },
     ];
   });

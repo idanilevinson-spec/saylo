@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { HeartCrack } from "lucide-react";
+import IconBadge from "@/components/IconBadge";
 import { useAuth } from "@/context/AuthProvider";
 import { isUserPremium } from "@/lib/subscriptions/subscriptionService";
 import { getCurrentHearts } from "@/lib/subscriptions/heartsService";
@@ -33,7 +35,7 @@ export default function HeartsGate({ children }: { children: ReactNode }) {
   if (status === "blocked") {
     return (
       <div className="max-w-md mx-auto px-4 py-24 text-center">
-        <p className="text-4xl mb-4">💔</p>
+        <IconBadge icon={HeartCrack} tone="danger" />
         <h1 className="text-2xl font-bold">נגמרו לכם הלבבות להיום</h1>
         <p className="mt-2 text-muted">הלבבות מתחדשים עם הזמן, או שדרגו לפרימיום לתרגול ללא הגבלה.</p>
         <Link

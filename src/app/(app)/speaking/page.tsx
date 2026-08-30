@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { MessageCircle } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ConsentRequestForm from "@/components/ConsentRequestForm";
@@ -70,7 +71,9 @@ export default function SpeakingPage() {
           disabled={starting}
           className="mt-8 w-full text-right bg-primary/5 border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-[border-color] disabled:opacity-60"
         >
-          <span className="text-2xl">💬</span>
+          <span className="inline-flex w-10 h-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <MessageCircle size={20} />
+          </span>
           <h2 className="mt-2 font-bold">שיחה חופשית</h2>
           <p className="text-sm text-muted mt-1">דברו על מה שבא לכם עם המורה ה-AI</p>
         </motion.button>

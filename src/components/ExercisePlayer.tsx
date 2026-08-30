@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { CheckCircle2, XCircle, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
 import type { Exercise } from "@/types/database";
@@ -71,14 +72,17 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
               transition={{ duration: 0.3, type: "spring", bounce: 0.3 }}
               className={`mt-6 p-4 rounded-xl ${result.isCorrect ? "bg-success/10" : "bg-danger/10"}`}
             >
-              <p className={`font-bold ${result.isCorrect ? "text-success" : "text-danger"}`}>
-                {result.isCorrect ? "✓ תשובה נכונה!" : "✗ לא בדיוק"}
+              <p className={`flex items-center gap-1.5 font-bold ${result.isCorrect ? "text-success" : "text-danger"}`}>
+                {result.isCorrect ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
+                {result.isCorrect ? "תשובה נכונה!" : "לא בדיוק"}
               </p>
               <p className="mt-1 text-sm text-muted">
                 +{result.xpAwarded} XP · רצף {result.currentStreak} ימים
               </p>
               {result.heartsRemaining !== null && (
-                <p className="mt-1 text-sm text-danger">💔 נשארו לכם {result.heartsRemaining} לבבות</p>
+                <p className="mt-1 flex items-center gap-1.5 text-sm text-danger">
+                  <Heart size={14} className="fill-current" /> נשארו לכם {result.heartsRemaining} לבבות
+                </p>
               )}
               {result.newBadges.length > 0 && (
                 <motion.p

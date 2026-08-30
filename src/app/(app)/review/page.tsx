@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { PartyPopper, CheckCircle2, XCircle, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
 import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
 import McqQuestion from "@/components/McqQuestion";
 import HeartsGate from "@/components/HeartsGate";
+import IconBadge from "@/components/IconBadge";
 import type { McqResponse } from "@/types/exercises";
 
 export default function ReviewPage() {
@@ -34,14 +36,9 @@ export default function ReviewPage() {
         transition={{ duration: 0.4 }}
         className="max-w-xl mx-auto px-4 py-24 text-center"
       >
-        <motion.p
-          initial={{ scale: 0.5 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
-          className="text-4xl mb-4"
-        >
-          🎉
-        </motion.p>
+        <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
+          <IconBadge icon={PartyPopper} tone="accent" />
+        </motion.div>
         <h1 className="text-2xl font-bold">אין לכם היום מילים לחזרה</h1>
         <p className="mt-2 text-muted">חזרו מחר, או תרגלו נושא חדש בינתיים.</p>
         <Link href="/vocabulary" className="mt-6 inline-block text-primary font-medium">
@@ -59,14 +56,9 @@ export default function ReviewPage() {
         transition={{ duration: 0.4 }}
         className="max-w-xl mx-auto px-4 py-24 text-center"
       >
-        <motion.p
-          initial={{ scale: 0.5 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
-          className="text-4xl mb-4"
-        >
-          ✅
-        </motion.p>
+        <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
+          <IconBadge icon={CheckCircle2} tone="success" />
+        </motion.div>
         <h1 className="text-2xl font-bold">סיימתם את החזרה היומית!</h1>
         <Link href="/dashboard" className="mt-6 inline-block text-primary font-medium">
           ללוח הבקרה ←
@@ -106,12 +98,15 @@ export default function ReviewPage() {
                 transition={{ duration: 0.3 }}
                 className={`mt-6 p-4 rounded-xl ${result.isCorrect ? "bg-success/10" : "bg-danger/10"}`}
               >
-                <p className={`font-bold ${result.isCorrect ? "text-success" : "text-danger"}`}>
-                  {result.isCorrect ? "✓ תשובה נכונה!" : "✗ לא בדיוק"}
+                <p className={`flex items-center gap-1.5 font-bold ${result.isCorrect ? "text-success" : "text-danger"}`}>
+                  {result.isCorrect ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
+                  {result.isCorrect ? "תשובה נכונה!" : "לא בדיוק"}
                 </p>
                 <p className="mt-1 text-sm text-muted">+{result.xpAwarded} XP</p>
                 {result.heartsRemaining !== null && (
-                  <p className="mt-1 text-sm text-danger">💔 נשארו לכם {result.heartsRemaining} לבבות</p>
+                  <p className="mt-1 flex items-center gap-1.5 text-sm text-danger">
+                    <Heart size={14} className="fill-current" /> נשארו לכם {result.heartsRemaining} לבבות
+                  </p>
                 )}
               </motion.div>
               <motion.button

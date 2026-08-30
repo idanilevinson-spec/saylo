@@ -4,6 +4,21 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import {
+  Target,
+  Map,
+  BookOpen,
+  PenLine,
+  Brain,
+  BookOpenText,
+  Headphones,
+  NotebookPen,
+  Quote,
+  MessageCircle,
+  Flame,
+  Star,
+  Heart,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import TeacherSuggestionCard from "@/components/TeacherSuggestionCard";
@@ -13,16 +28,16 @@ import { getCurrentHearts } from "@/lib/subscriptions/heartsService";
 import type { Subscription } from "@/types/database";
 
 const MODULES = [
-  { icon: "🎯", title: "מבחן רמה", body: "גלו את רמת האנגלית שלכם", href: "/placement", available: true },
-  { icon: "🗺️", title: "מסלול לימוד", body: "הסדר המומלץ להתחלה", href: "/learn", available: true },
-  { icon: "📚", title: "אוצר מילים", body: "מספרים, צבעים, משפחה ועוד", href: "/vocabulary", available: true },
-  { icon: "✍️", title: "דקדוק", body: "5 שיעורי יסוד ברמת A1", href: "/grammar", available: true },
-  { icon: "🧠", title: "חזרה חכמה", body: "המילים שהגיע זמנן", href: "/review", available: true },
-  { icon: "📖", title: "קריאה", body: "טקסטים עם מילון בלחיצה", href: "/reading", available: true },
-  { icon: "🎧", title: "האזנה", body: "הקשיבו ובדקו את עצמכם", href: "/listening", available: true },
-  { icon: "📝", title: "כתיבה", body: "משוב אישי מ-AI על מה שכתבתם", href: "/writing", available: true },
-  { icon: "🔥", title: "ניבים וביטויים", body: "אנגלית שאנשים באמת מדברים", href: "/idioms", available: true },
-  { icon: "🗣️", title: "דיבור עם AI", body: "תרגלו שיחה אמיתית באנגלית", href: "/speaking", available: true },
+  { icon: Target, title: "מבחן רמה", body: "גלו את רמת האנגלית שלכם", href: "/placement", available: true },
+  { icon: Map, title: "מסלול לימוד", body: "הסדר המומלץ להתחלה", href: "/learn", available: true },
+  { icon: BookOpen, title: "אוצר מילים", body: "מספרים, צבעים, משפחה ועוד", href: "/vocabulary", available: true },
+  { icon: PenLine, title: "דקדוק", body: "5 שיעורי יסוד ברמת A1", href: "/grammar", available: true },
+  { icon: Brain, title: "חזרה חכמה", body: "המילים שהגיע זמנן", href: "/review", available: true },
+  { icon: BookOpenText, title: "קריאה", body: "טקסטים עם מילון בלחיצה", href: "/reading", available: true },
+  { icon: Headphones, title: "האזנה", body: "הקשיבו ובדקו את עצמכם", href: "/listening", available: true },
+  { icon: NotebookPen, title: "כתיבה", body: "משוב אישי מ-AI על מה שכתבתם", href: "/writing", available: true },
+  { icon: Quote, title: "ניבים וביטויים", body: "אנגלית שאנשים באמת מדברים", href: "/idioms", available: true },
+  { icon: MessageCircle, title: "דיבור עם AI", body: "תרגלו שיחה אמיתית באנגלית", href: "/speaking", available: true },
 ];
 
 function greeting() {
@@ -69,7 +84,21 @@ export default function DashboardPage() {
   }, [profile, subscription, stats]);
 
   if (loading || !profile) {
-    return <div className="max-w-4xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>;
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="h-9 w-64 rounded-lg bg-background-2 animate-pulse" />
+        <div className="mt-4 flex gap-3">
+          <div className="h-8 w-28 rounded-full bg-background-2 animate-pulse" />
+          <div className="h-8 w-32 rounded-full bg-background-2 animate-pulse" />
+        </div>
+        <div className="mt-6 h-24 rounded-2xl bg-background-2 animate-pulse" />
+        <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="h-28 rounded-2xl bg-background-2 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -91,14 +120,14 @@ export default function DashboardPage() {
           className="mt-4 flex items-center gap-4 text-sm"
         >
           <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent-hover font-bold">
-            🔥 {stats.currentStreak} ימים ברצף
+            <Flame size={16} className="fill-current" /> {stats.currentStreak} ימים ברצף
           </span>
           <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-bold">
-            ⭐ {stats.totalXp} XP · רמה {stats.level}
+            <Star size={16} className="fill-current" /> {stats.totalXp} XP · רמה {stats.level}
           </span>
           {hearts && (
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-danger-ink text-danger font-bold">
-              💔 {hearts.current}/{hearts.max} לבבות
+              <Heart size={16} className="fill-current" /> {hearts.current}/{hearts.max} לבבות
             </span>
           )}
         </motion.div>
@@ -126,7 +155,9 @@ export default function DashboardPage() {
         {MODULES.map((m, i) => {
           const content = (
             <>
-              <span className="text-2xl">{m.icon}</span>
+              <span className="inline-flex w-10 h-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <m.icon size={20} strokeWidth={2} />
+              </span>
               <h3 className="mt-2 font-bold">{m.title}</h3>
               <p className="mt-1 text-xs text-muted">{m.body}</p>
             </>

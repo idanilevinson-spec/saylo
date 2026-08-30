@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Volume2, Turtle } from "lucide-react";
 import { speak } from "@/lib/speech/browserTts";
 import type { DictationContent, DictationResponse } from "@/types/exercises";
 
@@ -20,15 +21,15 @@ export default function DictationQuestion({ content, disabled, onSubmit }: Dicta
       <div className="flex gap-2">
         <button
           onClick={() => speak(c.audioText, 1)}
-          className="px-4 py-2 rounded-xl border border-card-border hover:border-primary/40 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-card-border hover:border-primary/40 transition-colors"
         >
-          🔊 השמעה
+          <Volume2 size={16} /> השמעה
         </button>
         <button
           onClick={() => speak(c.audioText, 0.6)}
-          className="px-4 py-2 rounded-xl border border-card-border hover:border-primary/40 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-card-border hover:border-primary/40 transition-colors"
         >
-          🐢 לאט
+          <Turtle size={16} /> לאט
         </button>
       </div>
       <input

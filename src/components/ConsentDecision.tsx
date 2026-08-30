@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/browserClient";
 
 interface ConsentDecisionProps {
@@ -23,7 +24,11 @@ export default function ConsentDecision({ token, initialStatus }: ConsentDecisio
   if (status !== "pending") {
     return (
       <div className="mt-6 text-center p-4 rounded-xl bg-background-2">
-        {status === "granted" && <p className="text-success font-bold">✓ האישור ניתן. תודה!</p>}
+        {status === "granted" && (
+          <p className="text-success font-bold flex items-center justify-center gap-1.5">
+            <CheckCircle2 size={16} /> האישור ניתן. תודה!
+          </p>
+        )}
         {status === "denied" && <p className="text-danger font-bold">הבקשה נדחתה.</p>}
       </div>
     );

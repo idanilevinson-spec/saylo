@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Bell, BellOff } from "lucide-react";
 import { supabase } from "@/lib/supabase/browserClient";
 import { useAuth } from "@/context/AuthProvider";
 
@@ -87,9 +88,17 @@ export default function PushSubscribeButton() {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
       onClick={status === "on" ? disable : enable}
-      className="w-full px-4 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors"
+      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors"
     >
-      {status === "on" ? "🔔 התראות פעילות — לביטול" : "🔕 הפעלת התראות דחיפה"}
+      {status === "on" ? (
+        <>
+          <Bell size={18} /> התראות פעילות — לביטול
+        </>
+      ) : (
+        <>
+          <BellOff size={18} /> הפעלת התראות דחיפה
+        </>
+      )}
     </motion.button>
   );
 }

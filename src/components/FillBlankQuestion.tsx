@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Lightbulb } from "lucide-react";
 import type { FillBlankContent, FillBlankResponse } from "@/types/exercises";
 
 interface FillBlankQuestionProps {
@@ -28,7 +29,11 @@ export default function FillBlankQuestion({ content, disabled, onSubmit }: FillB
         />
         {after}
       </p>
-      {c.hint && <p className="mt-2 text-sm text-muted">💡 {c.hint}</p>}
+      {c.hint && (
+        <p className="mt-2 text-sm text-muted flex items-center gap-1.5">
+          <Lightbulb size={14} /> {c.hint}
+        </p>
+      )}
       {!disabled && (
         <button
           onClick={() => text.trim() && onSubmit({ text })}

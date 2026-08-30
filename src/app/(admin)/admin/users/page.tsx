@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { Flame } from "lucide-react";
 import { supabase } from "@/lib/supabase/browserClient";
 import StatusBadge from "@/components/admin/StatusBadge";
 import type { AgeBand } from "@/types/database";
@@ -99,7 +100,11 @@ export default function AdminUsersPage() {
                   <td className="py-2.5 pe-4">
                     {u.subscription_status ? <StatusBadge status={u.subscription_status} /> : "—"}
                   </td>
-                  <td className="py-2.5 pe-4">{u.current_streak} 🔥</td>
+                  <td className="py-2.5 pe-4">
+                    <span className="flex items-center gap-1 text-accent-hover font-medium">
+                      {u.current_streak} <Flame size={14} className="fill-current" />
+                    </span>
+                  </td>
                   <td className="py-2.5 pe-4 text-muted">
                     {new Date(u.created_at).toLocaleDateString("he-IL")}
                   </td>
