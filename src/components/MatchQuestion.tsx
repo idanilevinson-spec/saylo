@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Check } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import type { MatchContent, MatchResponse } from "@/types/exercises";
 
@@ -39,6 +40,13 @@ export default function MatchQuestion({ content, disabled, onSubmit }: MatchQues
   return (
     <div>
       <p className="font-medium text-lg mb-4">התאימו בין המילה לתרגום</p>
+      <p role="status" className="sr-only">
+        {selectedLeft
+          ? `נבחר: ${selectedLeft} — עכשיו בחרו את התרגום שלה`
+          : allMatched
+            ? "כל הזוגות הותאמו"
+            : "בחרו מילה כדי להתחיל להתאים"}
+      </p>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           {c.pairs.map((p) => (
@@ -46,15 +54,17 @@ export default function MatchQuestion({ content, disabled, onSubmit }: MatchQues
               key={p.left}
               disabled={disabled || matchedLeftSet.has(p.left)}
               onClick={() => setSelectedLeft(p.left)}
-              className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-colors ${
+              aria-pressed={selectedLeft === p.left}
+              className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors ${
                 matchedLeftSet.has(p.left)
-                  ? "border-success bg-success/10 opacity-60"
+                  ? "border-card-border bg-background-2 opacity-60"
                   : selectedLeft === p.left
                     ? "border-primary bg-primary/5"
                     : "border-card-border hover:border-primary/40"
               }`}
             >
               <EnglishText>{p.left}</EnglishText>
+              {matchedLeftSet.has(p.left) && <Check size={14} className="text-muted shrink-0" />}
             </button>
           ))}
         </div>
@@ -64,13 +74,14 @@ export default function MatchQuestion({ content, disabled, onSubmit }: MatchQues
               key={right}
               disabled={disabled || matchedRightSet.has(right) || !selectedLeft}
               onClick={() => pickRight(right)}
-              className={`w-full px-3 py-2.5 rounded-xl border text-sm transition-colors ${
+              className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors ${
                 matchedRightSet.has(right)
-                  ? "border-success bg-success/10 opacity-60"
+                  ? "border-card-border bg-background-2 opacity-60"
                   : "border-card-border hover:border-primary/40 disabled:opacity-40"
               }`}
             >
               {right}
+              {matchedRightSet.has(right) && <Check size={14} className="text-muted shrink-0" />}
             </button>
           ))}
         </div>

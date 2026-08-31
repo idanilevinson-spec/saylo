@@ -23,6 +23,7 @@ export default function McqQuestion({ content, disabled, onSubmit }: McqQuestion
             key={i}
             disabled={disabled}
             onClick={() => setSelected(i)}
+            aria-pressed={selected === i}
             className={`w-full text-right px-4 py-3 rounded-xl border transition-colors ${
               selected === i ? "border-primary bg-primary/5" : "border-card-border hover:border-primary/40"
             } disabled:opacity-70`}

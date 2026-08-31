@@ -35,6 +35,7 @@ export default function DictationQuestion({ content, disabled, onSubmit }: Dicta
       <input
         type="text"
         dir="ltr"
+        aria-label="מה ששמעתם"
         value={text}
         onChange={(e) => setText(e.target.value)}
         disabled={disabled}

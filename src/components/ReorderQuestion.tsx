@@ -29,19 +29,35 @@ export default function ReorderQuestion({ content, disabled, onSubmit }: Reorder
     setPicked((prev) => [...prev, tokenIndex]);
   }
 
+  function unpick(position: number) {
+    if (disabled) return;
+    setPicked((prev) => prev.filter((_, i) => i !== position));
+  }
+
   return (
     <div>
-      <p className="font-medium text-lg mb-4">סדרו את המשפט בסדר הנכון</p>
+      <p className="font-medium text-lg mb-4">סדרו את המשפט בסדר הנכון — בנק המילים למטה</p>
 
-      <div dir="ltr" className="min-h-14 flex flex-wrap gap-2 p-3 rounded-xl border border-card-border bg-background-2">
+      <div
+        dir="ltr"
+        className="min-h-14 flex flex-wrap gap-2 p-3 rounded-xl border border-card-border bg-background-2"
+      >
+        {picked.length === 0 && <span className="text-sm text-muted self-center">לחצו על מילים מהבנק למטה</span>}
         {picked.map((tokenIndex, i) => (
-          <span key={i} className="px-3 py-1.5 rounded-lg bg-primary text-primary-ink text-sm">
+          <button
+            key={i}
+            disabled={disabled}
+            onClick={() => unpick(i)}
+            aria-label={`הסירו את המילה ${c.tokens[tokenIndex]} מהמשפט`}
+            className="px-3 py-1.5 rounded-lg bg-primary text-primary-ink text-sm hover:bg-primary-hover transition-colors disabled:hover:bg-primary"
+          >
             <EnglishText>{c.tokens[tokenIndex]}</EnglishText>
-          </span>
+          </button>
         ))}
       </div>
 
-      <div dir="ltr" className="mt-3 flex flex-wrap gap-2">
+      <p className="mt-3 text-xs text-muted">בנק מילים:</p>
+      <div dir="ltr" className="mt-1 flex flex-wrap gap-2">
         {shuffledIndices
           .filter((i) => !picked.includes(i))
           .map((tokenIndex) => (
@@ -49,6 +65,7 @@ export default function ReorderQuestion({ content, disabled, onSubmit }: Reorder
               key={tokenIndex}
               disabled={disabled}
               onClick={() => pick(tokenIndex)}
+              aria-label={`הוסיפו את המילה ${c.tokens[tokenIndex]} למשפט`}
               className="px-3 py-1.5 rounded-lg border border-card-border hover:border-primary/40 text-sm transition-colors"
             >
               <EnglishText>{c.tokens[tokenIndex]}</EnglishText>

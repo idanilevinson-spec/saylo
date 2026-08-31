@@ -22,6 +22,7 @@ export default function FillBlankQuestion({ content, disabled, onSubmit }: FillB
         <input
           type="text"
           dir="ltr"
+          aria-label={`השלימו את החלק החסר במשפט: ${c.sentence}`}
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={disabled}
