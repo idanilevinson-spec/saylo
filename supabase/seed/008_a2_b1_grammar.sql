@@ -290,7 +290,7 @@ $$משתמשים במשפט תנאי ראשון לתיאור מצבים **ריא
 
 **מתי משתמשים:** כשהתנאי הוא ריאלי וסביר שיקרה — לא היפותטי (משפט תנאי שני, שנלמד בהמשך, הוא להיפותטי).$$)
 
-) as l(topic_slug, title_he, body_md, lvl)
+) as l(topic_slug, title_he, lvl, body_md)
   on gt.slug = l.topic_slug;
 
 -- ============ EXERCISES (3 fill-blank + 1 reorder per topic) ============
