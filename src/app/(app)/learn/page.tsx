@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, PenLine, CheckCircle2, Circle, CircleDot, Sparkles } from "lucide-react";
+import { CheckCircle2, Circle, CircleDot, Sparkles } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ContentCard from "@/components/ContentCard";
 import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { listTopicsWithMastery, type TopicWithMastery } from "@/lib/content/topicMastery";
+import { getTopicIcon } from "@/lib/content/topicIcons";
 
 const STATUS_META = {
   not_started: { icon: Circle, className: "text-muted" },
@@ -72,7 +73,7 @@ export default function LearnPage() {
       ) : (
         <ol className="mt-6 space-y-3">
           {entries.map((entry, i) => {
-            const Icon = entry.kind === "vocabulary" ? BookOpen : PenLine;
+            const Icon = getTopicIcon(entry.kind, entry.slug);
             const status = STATUS_META[entry.status];
             const StatusIcon = status.icon;
             return (
@@ -84,12 +85,14 @@ export default function LearnPage() {
                     </span>
                     <span className="flex-1 min-w-0">
                       <span className="block font-medium truncate">{entry.name_he}</span>
-                      <EnglishText as="span" className="block text-xs text-muted">
-                        {entry.name_en}
-                        {entry.accuracy !== null && ` · ${entry.accuracy}%`}
-                      </EnglishText>
+                      <span className="mt-1.5 flex flex-col items-start gap-1">
+                        <EnglishText as="span" className="text-xs font-medium tracking-tight text-foreground/60 truncate">
+                          {entry.name_en}
+                          {entry.accuracy !== null && ` · ${entry.accuracy}%`}
+                        </EnglishText>
+                        <CefrBadge level={entry.cefr_level} />
+                      </span>
                     </span>
-                    <CefrBadge level={entry.cefr_level} />
                     <StatusIcon size={20} className={`shrink-0 ${status.className}`} aria-label={entry.status} />
                   </div>
                 </ContentCard>

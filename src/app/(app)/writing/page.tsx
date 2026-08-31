@@ -31,13 +31,13 @@ export default async function WritingPage() {
         <div className="mt-8 grid sm:grid-cols-2 gap-4">
           {prompts.map((p, i) => (
             <ContentCard key={p.id} href={`/writing/${p.id}`} index={i}>
-              <div className="flex items-center justify-between">
-                <h2 className="font-bold text-lg">{p.title_he}</h2>
+              <h2 className="font-bold text-lg">{p.title_he}</h2>
+              <div className="mt-3 flex flex-col items-start gap-1.5">
+                <EnglishText as="span" className="text-sm font-medium tracking-tight text-foreground/70">
+                  {p.prompt_en}
+                </EnglishText>
                 <CefrBadge level={p.cefr_level} />
               </div>
-              <EnglishText as="p" className="mt-1 text-sm text-muted">
-                {p.prompt_en}
-              </EnglishText>
             </ContentCard>
           ))}
         </div>

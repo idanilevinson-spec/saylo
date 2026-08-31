@@ -43,7 +43,10 @@ export default function ContentCard({ href, index = 0, className = "", children 
   );
 
   return href ? (
-    <Link href={href} className="block h-full">
+    <Link
+      href={href}
+      className="block h-full rounded-2xl focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+    >
       {card}
     </Link>
   ) : (

@@ -24,13 +24,13 @@ export default async function VocabularyPage() {
         <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {topics.map((topic, i) => (
             <ContentCard key={topic.id} href={`/vocabulary/${topic.slug}`} index={i}>
-              <div className="flex items-center justify-between">
-                <h2 className="font-bold text-lg">{topic.name_he}</h2>
+              <h2 className="font-bold text-lg">{topic.name_he}</h2>
+              <div className="mt-3 flex flex-col items-start gap-1.5">
+                <EnglishText as="span" className="text-sm font-medium tracking-tight text-foreground/70">
+                  {topic.name_en}
+                </EnglishText>
                 <CefrBadge level={topic.cefr_level} />
               </div>
-              <EnglishText as="p" className="mt-1 text-sm text-muted">
-                {topic.name_en}
-              </EnglishText>
             </ContentCard>
           ))}
         </div>
