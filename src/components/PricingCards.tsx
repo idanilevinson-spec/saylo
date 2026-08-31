@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { Check } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
 
@@ -43,7 +43,8 @@ export default function PricingCards() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.4, delay: i * 0.08 }}
-            className={`relative rounded-2xl p-6 border flex flex-col ${
+            whileHover={{ y: -3 }}
+            className={`relative rounded-2xl p-6 border flex flex-col transition-shadow hover:shadow-lg hover:shadow-primary/5 ${
               plan.badge
                 ? "border-primary bg-card shadow-xl shadow-primary/10 lg:-translate-y-2"
                 : "border-card-border bg-card"
@@ -67,20 +68,24 @@ export default function PricingCards() {
             </p>
 
             {session ? (
-              <button
+              <motion.button
+                whileHover={loadingCode === null ? { scale: 1.02 } : undefined}
+                whileTap={loadingCode === null ? { scale: 0.97 } : undefined}
                 onClick={() => handleCheckout(plan.code)}
                 disabled={loadingCode !== null}
-                className="mt-6 px-4 py-2.5 rounded-xl font-medium transition-colors bg-primary text-primary-ink hover:bg-primary-hover disabled:opacity-50"
+                className="mt-6 px-4 py-2.5 rounded-xl font-medium transition-colors bg-primary text-primary-ink hover:bg-primary-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 {loadingCode === plan.code ? "פותח תשלום..." : "התחילו עכשיו"}
-              </button>
+              </motion.button>
             ) : (
-              <Link
+              <MotionLink
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
                 href="/signup"
-                className="mt-6 block text-center px-4 py-2.5 rounded-xl font-medium transition-colors bg-primary text-primary-ink hover:bg-primary-hover"
+                className="mt-6 block text-center px-4 py-2.5 rounded-xl font-medium transition-colors bg-primary text-primary-ink hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 התחילו עכשיו
-              </Link>
+              </MotionLink>
             )}
           </motion.div>
         ))}
