@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ReadingTextViewer from "@/components/ReadingTextViewer";
+import ReadingResponseForm from "@/components/ReadingResponseForm";
 import MotionLink from "@/components/MotionLink";
 import { Target } from "lucide-react";
 import { getReadingText } from "@/lib/content/reading";
@@ -60,10 +61,16 @@ export default async function ReadingTextPage({ params }: PageProps) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           href={`/practice/${firstExercise.id}`}
-          className="mt-6 flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-6 flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           בדקו את ההבנה שלכם <Target size={16} />
         </MotionLink>
+      )}
+
+      {text.open_question_en && (
+        <div className="mt-6">
+          <ReadingResponseForm readingTextId={text.id} questionEn={text.open_question_en} />
+        </div>
       )}
     </div>
   );

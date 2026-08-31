@@ -208,6 +208,7 @@ export interface ReadingText {
   status: ContentStatus;
   sort_order: number;
   created_at: string;
+  open_question_en: string | null;
 }
 
 export interface ListeningClip {
