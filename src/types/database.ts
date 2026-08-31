@@ -141,6 +141,18 @@ export interface ExerciseAttempt {
   created_at: string;
 }
 
+export type VocabularyGameType = "speed_round" | "spelling" | "daily_challenge";
+
+export interface VocabularyGameSession {
+  id: string;
+  profile_id: string;
+  game_type: VocabularyGameType;
+  total_questions: number;
+  correct_count: number;
+  xp_awarded: number;
+  created_at: string;
+}
+
 export interface SrsItem {
   id: string;
   profile_id: string;
