@@ -19,6 +19,7 @@ import {
   Flame,
   Star,
   Heart,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -46,10 +47,11 @@ const FEATURED_MODULES = [
 ];
 
 const MODULES = [
+  { icon: Sparkles, title: "שיעור יומי", body: "נושא אחד, נבחר בשבילכם להיום", href: "/learn/today", available: true },
   { icon: Target, title: "מבחן רמה", body: "גלו את רמת האנגלית שלכם", href: "/placement", available: true },
-  { icon: Map, title: "מסלול לימוד", body: "הסדר המומלץ להתחלה", href: "/learn", available: true },
+  { icon: Map, title: "מסלול לימוד", body: "כל הנושאים מ-A1 עד C2", href: "/learn", available: true },
   { icon: BookOpen, title: "אוצר מילים", body: "מספרים, צבעים, משפחה ועוד", href: "/vocabulary", available: true },
-  { icon: PenLine, title: "דקדוק", body: "5 שיעורי יסוד ברמת A1", href: "/grammar", available: true },
+  { icon: PenLine, title: "דקדוק", body: "מסלול מלא מ-A1 עד C2", href: "/grammar", available: true },
   { icon: Brain, title: "חזרה חכמה", body: "המילים שהגיע זמנן", href: "/review", available: true },
   { icon: BookOpenText, title: "קריאה", body: "טקסטים עם מילון בלחיצה", href: "/reading", available: true },
   { icon: Headphones, title: "האזנה", body: "הקשיבו ובדקו את עצמכם", href: "/listening", available: true },
