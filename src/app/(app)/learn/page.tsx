@@ -83,17 +83,15 @@ export default function LearnPage() {
                     <span className="w-9 h-9 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                       <Icon size={18} />
                     </span>
-                    <span className="flex-1 min-w-0">
-                      <EnglishText as="span" className="block font-bold truncate">
+                    <span className="flex-1 min-w-0 flex flex-col items-start gap-1">
+                      <EnglishText as="span" className="max-w-full truncate font-bold">
                         {entry.name_en}
                       </EnglishText>
-                      <span className="mt-1.5 flex flex-col items-start gap-1">
-                        <span className="text-xs font-medium text-foreground/60 truncate">
-                          {entry.name_he}
-                          {entry.accuracy !== null && ` · ${entry.accuracy}%`}
-                        </span>
-                        <CefrBadge level={entry.cefr_level} />
+                      <span className="max-w-full truncate text-xs font-medium text-foreground/60">
+                        {entry.name_he}
+                        {entry.accuracy !== null && ` · ${entry.accuracy}%`}
                       </span>
+                      <CefrBadge level={entry.cefr_level} />
                     </span>
                     <StatusIcon size={20} className={`shrink-0 ${status.className}`} aria-label={entry.status} />
                   </div>
