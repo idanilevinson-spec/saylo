@@ -118,14 +118,29 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                   התרגיל הבא →
                 </MotionLink>
               ) : (
-                <MotionLink
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  href={backHref}
-                  className="block text-center px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
-                >
-                  סיימתם את הנושא! 🎉
-                </MotionLink>
+                <div>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, y: 6 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ delay: 0.15, type: "spring", bounce: 0.5 }}
+                    dir="ltr"
+                    className="mx-auto mb-4 w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/25 text-sm font-medium"
+                  >
+                    <span className="text-accent-hover">Well done</span>
+                    <span aria-hidden="true" className="text-accent text-xs">
+                      ⇄
+                    </span>
+                    <bdi className="text-foreground">כל הכבוד</bdi>
+                  </motion.div>
+                  <MotionLink
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    href={backHref}
+                    className="block text-center px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+                  >
+                    סיימתם את הנושא!
+                  </MotionLink>
+                </div>
               )}
             </motion.div>
           )}
