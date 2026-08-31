@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Zap, PenTool, Sparkles, Flame } from "lucide-react";
+import { Zap, PenTool, Sparkles, Flame, BookOpenCheck } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import ContentCard from "@/components/ContentCard";
@@ -20,6 +20,13 @@ const GAME_MODES = [
     title: "סיבוב מהירות",
     body: "ענו נכון ומהר ככל האפשר — כל תשובה מהירה מזכה בבונוס XP",
     href: "/games/speed",
+    tone: "primary" as const,
+  },
+  {
+    icon: BookOpenCheck,
+    title: "זיהוי לפי הגדרה",
+    body: "מוצגת הגדרה באנגלית — זהו איזו מילה מתאימה",
+    href: "/games/definition",
     tone: "primary" as const,
   },
   {

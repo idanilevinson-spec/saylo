@@ -67,6 +67,7 @@ export interface VocabularyItem {
   sort_order: number;
   status: ContentStatus;
   created_at: string;
+  definition_en: string | null;
 }
 
 export interface GrammarTopic {
@@ -141,7 +142,7 @@ export interface ExerciseAttempt {
   created_at: string;
 }
 
-export type VocabularyGameType = "speed_round" | "spelling" | "daily_challenge";
+export type VocabularyGameType = "speed_round" | "spelling" | "daily_challenge" | "definition";
 
 export interface VocabularyGameSession {
   id: string;
