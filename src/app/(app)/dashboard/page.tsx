@@ -31,14 +31,14 @@ import type { Subscription } from "@/types/database";
 const FEATURED_MODULES = [
   {
     icon: Phone,
-    title: "מורה AI",
-    body: "שיחה קולית חופשית — כמו שיחת טלפון",
+    title: "שיחה קולית עם מורה AI",
+    body: "שיחה חופשית בקול — כמו שיחת טלפון",
     href: "/speaking/voice",
     tone: "accent" as const,
   },
   {
     icon: MessageCircle,
-    title: "דיבור עם AI",
+    title: "צ'אט עם מורה AI",
     body: "תרגלו שיחה אמיתית באנגלית בהקלדה",
     href: "/speaking",
     tone: "primary" as const,

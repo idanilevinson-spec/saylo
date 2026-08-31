@@ -60,29 +60,56 @@ export default function LandingFeatures() {
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.4 }}
-            className="col-span-2 row-span-2 relative overflow-hidden rounded-2xl border border-primary/30 bg-primary/5 p-6 flex flex-col justify-between"
+            className="col-span-2 relative overflow-hidden rounded-2xl border border-accent/30 bg-accent/5 p-6 flex flex-col justify-center hover:border-accent/50 hover:shadow-md transition-all"
           >
             <div
               aria-hidden="true"
               className="absolute inset-0 opacity-70"
               style={{
                 background:
-                  "radial-gradient(ellipse 65% 55% at 100% 0%, color-mix(in srgb, var(--primary) 20%, transparent) 0%, transparent 60%), radial-gradient(ellipse 55% 50% at 0% 100%, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 55%)",
+                  "radial-gradient(ellipse 65% 60% at 100% 0%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 60%)",
               }}
             />
-            <div className="relative">
-              <span className="inline-flex w-14 h-14 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-                <Phone size={26} strokeWidth={2} />
+            <div className="relative flex items-start gap-4">
+              <span className="inline-flex w-12 h-12 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent-hover">
+                <Phone size={22} strokeWidth={2} />
               </span>
-              <h3 className="mt-4 text-xl font-bold">דיבור עם AI — עכשיו גם בקול</h3>
-              <p className="mt-2 text-sm text-muted leading-relaxed max-w-xs">
-                תרגלו מצבים אמיתיים — ראיון עבודה, מסעדה, שדה תעופה — בשיחה קולית חופשית, כמו שיחת טלפון
-                אמיתית עם מורה שמקשיב ומגיב אליכם.
-              </p>
+              <div>
+                <h3 className="text-lg font-bold">שיחה קולית עם מורה AI</h3>
+                <p className="mt-1.5 text-sm text-muted leading-relaxed max-w-sm">
+                  תרגלו מצבים אמיתיים — ראיון עבודה, מסעדה, שדה תעופה — בשיחה קולית חופשית, כמו שיחת טלפון
+                  אמיתית עם מורה שמקשיב ומגיב אליכם.
+                </p>
+              </div>
             </div>
-            <div className="relative flex items-center gap-2 text-xs font-medium text-primary">
-              <MessageCircle size={14} />
-              גם בהקלדה, אם אתם מעדיפים
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.97 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.4, delay: 0.06 }}
+            className="col-span-2 relative overflow-hidden rounded-2xl border border-primary/30 bg-primary/5 p-6 flex flex-col justify-center hover:border-primary/50 hover:shadow-md transition-all"
+          >
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 opacity-70"
+              style={{
+                background:
+                  "radial-gradient(ellipse 65% 60% at 100% 0%, color-mix(in srgb, var(--primary) 20%, transparent) 0%, transparent 60%)",
+              }}
+            />
+            <div className="relative flex items-start gap-4">
+              <span className="inline-flex w-12 h-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+                <MessageCircle size={22} strokeWidth={2} />
+              </span>
+              <div>
+                <h3 className="text-lg font-bold">צ&apos;אט עם מורה AI</h3>
+                <p className="mt-1.5 text-sm text-muted leading-relaxed max-w-sm">
+                  מעדיפים להקליד? אותם תרחישים ואותו מורה, בשיחת טקסט בקצב שלכם — בלי לחץ, עם זמן לחשוב על
+                  כל תשובה.
+                </p>
+              </div>
             </div>
           </motion.div>
 
