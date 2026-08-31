@@ -24,7 +24,7 @@ export default function McqQuestion({ content, disabled, onSubmit }: McqQuestion
             disabled={disabled}
             onClick={() => setSelected(i)}
             aria-pressed={selected === i}
-            className={`w-full text-right px-4 py-3 rounded-xl border transition-colors ${
+            className={`w-full text-right px-4 py-3 rounded-xl border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
               selected === i ? "border-primary bg-primary/5" : "border-card-border hover:border-primary/40"
             } disabled:opacity-70`}
           >
@@ -36,7 +36,7 @@ export default function McqQuestion({ content, disabled, onSubmit }: McqQuestion
         <button
           onClick={() => selected !== null && onSubmit({ selectedIndex: selected })}
           disabled={selected === null}
-          className="mt-6 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
+          className="mt-6 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           בדיקה
         </button>

@@ -49,7 +49,7 @@ export default function ReorderQuestion({ content, disabled, onSubmit }: Reorder
             disabled={disabled}
             onClick={() => unpick(i)}
             aria-label={`הסירו את המילה ${c.tokens[tokenIndex]} מהמשפט`}
-            className="px-3 py-1.5 rounded-lg bg-primary text-primary-ink text-sm hover:bg-primary-hover transition-colors disabled:hover:bg-primary"
+            className="px-3 py-1.5 rounded-lg bg-primary text-primary-ink text-sm hover:bg-primary-hover transition-colors disabled:hover:bg-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             <EnglishText>{c.tokens[tokenIndex]}</EnglishText>
           </button>
@@ -66,7 +66,7 @@ export default function ReorderQuestion({ content, disabled, onSubmit }: Reorder
               disabled={disabled}
               onClick={() => pick(tokenIndex)}
               aria-label={`הוסיפו את המילה ${c.tokens[tokenIndex]} למשפט`}
-              className="px-3 py-1.5 rounded-lg border border-card-border hover:border-primary/40 text-sm transition-colors"
+              className="px-3 py-1.5 rounded-lg border border-card-border hover:border-primary/40 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
               <EnglishText>{c.tokens[tokenIndex]}</EnglishText>
             </button>
@@ -78,14 +78,14 @@ export default function ReorderQuestion({ content, disabled, onSubmit }: Reorder
           <button
             onClick={() => setPicked([])}
             disabled={picked.length === 0}
-            className="px-4 py-2.5 rounded-xl border border-card-border font-medium disabled:opacity-40 hover:bg-background-2 transition-colors"
+            className="px-4 py-2.5 rounded-xl border border-card-border font-medium disabled:opacity-40 hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             איפוס
           </button>
           <button
             onClick={() => picked.length === c.tokens.length && onSubmit({ order: picked })}
             disabled={picked.length !== c.tokens.length}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             בדיקה
           </button>
