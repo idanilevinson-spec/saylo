@@ -98,6 +98,15 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* A slightly tightened, more editorial headline feel everywhere, without
+   touching every page's Tailwind classes — text-wrap: balance also keeps
+   multi-line headings from wrapping into an awkward lone last word. */
+h1,
+h2 {
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
 @media (prefers-reduced-motion: reduce) {
   body {
     transition: none;
