@@ -24,11 +24,11 @@ export default async function ReadingPage() {
         <div className="mt-8 grid sm:grid-cols-2 gap-4">
           {texts.map((text, i) => (
             <ContentCard key={text.id} href={`/reading/${text.id}`} index={i}>
-              <h2 className="font-bold text-lg">{text.title_he}</h2>
-              <div className="mt-3 flex flex-col items-start gap-1.5">
-                <EnglishText as="span" className="text-sm font-medium tracking-tight text-foreground/70">
+              <div className="flex flex-col items-start gap-1.5">
+                <EnglishText as="h2" className="text-lg font-bold">
                   {text.title_en}
                 </EnglishText>
+                <p className="text-sm font-medium text-foreground/70">{text.title_he}</p>
                 <CefrBadge level={text.cefr_level} />
               </div>
             </ContentCard>

@@ -24,11 +24,11 @@ export default async function GrammarPage() {
         <div className="mt-8 grid sm:grid-cols-2 gap-4">
           {topics.map((topic, i) => (
             <ContentCard key={topic.id} href={`/grammar/${topic.slug}`} index={i}>
-              <h2 className="font-bold text-lg">{topic.name_he}</h2>
-              <div className="mt-3 flex flex-col items-start gap-1.5">
-                <EnglishText as="span" className="text-sm font-medium tracking-tight text-foreground/70">
+              <div className="flex flex-col items-start gap-1.5">
+                <EnglishText as="h2" className="text-lg font-bold">
                   {topic.name_en}
                 </EnglishText>
+                <p className="text-sm font-medium text-foreground/70">{topic.name_he}</p>
                 <CefrBadge level={topic.cefr_level} />
               </div>
             </ContentCard>

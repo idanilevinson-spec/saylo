@@ -84,12 +84,14 @@ export default function LearnPage() {
                       <Icon size={18} />
                     </span>
                     <span className="flex-1 min-w-0">
-                      <span className="block font-medium truncate">{entry.name_he}</span>
+                      <EnglishText as="span" className="block font-bold truncate">
+                        {entry.name_en}
+                      </EnglishText>
                       <span className="mt-1.5 flex flex-col items-start gap-1">
-                        <EnglishText as="span" className="text-xs font-medium tracking-tight text-foreground/60 truncate">
-                          {entry.name_en}
+                        <span className="text-xs font-medium text-foreground/60 truncate">
+                          {entry.name_he}
                           {entry.accuracy !== null && ` · ${entry.accuracy}%`}
-                        </EnglishText>
+                        </span>
                         <CefrBadge level={entry.cefr_level} />
                       </span>
                     </span>
