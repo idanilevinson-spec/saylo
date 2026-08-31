@@ -142,3 +142,31 @@ h2 {
 .font-content {
   font-family: var(--font-jakarta), Arial, Helvetica, sans-serif;
 }
+
+/* Tailwind Typography's color palettes (prose-neutral etc.) are fixed
+   light-mode grays that never adapt to this app's dark theme, which made
+   grammar-lesson body text nearly unreadable in dark mode. Tying the
+   plugin's own CSS variables to our theme tokens fixes that everywhere
+   .prose is used, in all three theme states, without needing prose-invert
+   (which only exists for Tailwind's class-based dark mode, not the
+   data-theme attribute this app actually uses). Unlayered rules like this
+   one beat Tailwind's layered utilities regardless of source order, so
+   this overrides prose-neutral's colors even though it's declared first. */
+.prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted);
+  --tw-prose-bullets: var(--muted);
+  --tw-prose-hr: var(--card-border);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--card-border);
+  --tw-prose-captions: var(--muted);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--background-2);
+  --tw-prose-th-borders: var(--card-border);
+  --tw-prose-td-borders: var(--card-border);
+}
