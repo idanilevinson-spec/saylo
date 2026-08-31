@@ -6,6 +6,7 @@ import { touchStreak } from "@/lib/gamification/streaks";
 import { checkAndAwardBadges } from "@/lib/gamification/badges";
 import { isUserPremium } from "@/lib/subscriptions/subscriptionService";
 import { spendHeartOnMistake } from "@/lib/subscriptions/heartsService";
+import { refreshSkillLevelFromAttempts } from "@/lib/assessment/skillLevel";
 import type { Exercise, Badge } from "@/types/database";
 
 export interface AttemptResult {
@@ -38,6 +39,10 @@ export async function recordAttempt(
   if (exercise.type === "mcq" && exercise.vocabulary_item_id) {
     await updateSrsForVocabularyItem(profileId, exercise.vocabulary_item_id, isCorrect);
   }
+
+  // Fire-and-forget: keeps skill_levels current without slowing down the
+  // exercise feedback the learner is waiting on.
+  void refreshSkillLevelFromAttempts(profileId, exercise.skill_area);
 
   const xpAmount = isCorrect ? XP_CORRECT : XP_ATTEMPT;
   const [{ totalXp, level }, streak, { count }] = await Promise.all([

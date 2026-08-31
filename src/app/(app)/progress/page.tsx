@@ -18,7 +18,9 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
-import type { SkillArea } from "@/types/database";
+import type { CefrLevel, SkillArea } from "@/types/database";
+
+const CEFR_ORDER: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const DAYS = 14;
 
@@ -44,6 +46,7 @@ interface ProgressData {
   dailyXp: number[];
   dailyAccuracy: (number | null)[];
   skillAccuracy: Partial<Record<SkillArea, { correct: number; total: number }>>;
+  skillLevels: Partial<Record<SkillArea, CefrLevel>>;
   conversationScores: number[];
   badges: { name_he: string; description_he: string; earned_at: string }[];
 }
@@ -90,6 +93,11 @@ export default function ProgressPage() {
         .eq("profile_id", profile.id)
         .gte("created_at", since.toISOString()),
       supabase
+        .from("exercise_attempts")
+        .select("is_correct, exercises(skill_area)")
+        .eq("profile_id", profile.id),
+      supabase.from("skill_levels").select("skill, cefr_level").eq("profile_id", profile.id),
+      supabase
         .from("conversations")
         .select("created_at, conversation_scores(overall_score)")
         .eq("profile_id", profile.id)
@@ -101,7 +109,7 @@ export default function ProgressPage() {
         .select("earned_at, badges(name_he, description_he)")
         .eq("profile_id", profile.id)
         .order("earned_at", { ascending: false }),
-    ]).then(([xpRes, streakRes, xpEventsRes, attemptsRes, conversationsRes, badgesRes]) => {
+    ]).then(([xpRes, streakRes, xpEventsRes, attemptsRes, allTimeAttemptsRes, skillLevelsRes, conversationsRes, badgesRes]) => {
       const dailyXp = buckets.map((b) =>
         (xpEventsRes.data ?? [])
           .filter((e) => e.created_at.slice(0, 10) === b.date)
@@ -116,12 +124,17 @@ export default function ProgressPage() {
       });
 
       const skillAccuracy: ProgressData["skillAccuracy"] = {};
-      for (const a of attemptsRes.data ?? []) {
+      for (const a of allTimeAttemptsRes.data ?? []) {
         const area = (a.exercises as unknown as { skill_area: SkillArea } | null)?.skill_area;
         if (!area) continue;
         if (!skillAccuracy[area]) skillAccuracy[area] = { correct: 0, total: 0 };
         skillAccuracy[area]!.total += 1;
         if (a.is_correct) skillAccuracy[area]!.correct += 1;
+      }
+
+      const skillLevels: ProgressData["skillLevels"] = {};
+      for (const row of skillLevelsRes.data ?? []) {
+        skillLevels[row.skill as SkillArea] = row.cefr_level as CefrLevel;
       }
 
       const conversationScores = (conversationsRes.data ?? [])
@@ -142,6 +155,7 @@ export default function ProgressPage() {
         dailyXp,
         dailyAccuracy,
         skillAccuracy,
+        skillLevels,
         conversationScores,
         badges,
       });
@@ -219,6 +233,8 @@ export default function ProgressPage() {
           <AccuracyLineChart buckets={buckets} values={data.dailyAccuracy} />
         </motion.div>
       </div>
+
+      <SkillLevelsPanel skillLevels={data.skillLevels} />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -306,6 +322,67 @@ export default function ProgressPage() {
         )}
       </motion.div>
     </div>
+  );
+}
+
+function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillArea, CefrLevel>> }) {
+  const assessed = (Object.keys(SKILL_META) as SkillArea[]).filter((s) => skillLevels[s]);
+  const weakestRank = assessed.length
+    ? Math.min(...assessed.map((s) => CEFR_ORDER.indexOf(skillLevels[s] as CefrLevel)))
+    : -1;
+  const weakestSkills = assessed.filter((s) => CEFR_ORDER.indexOf(skillLevels[s] as CefrLevel) === weakestRank);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.18 }}
+      className="mt-4 bg-card border border-card-border rounded-2xl p-6"
+    >
+      <h2 className="font-bold">חוזקות וחולשות</h2>
+      <p className="text-xs text-muted mt-0.5">רמת CEFR נוכחית בכל תחום, מתעדכנת ככל שאתם מתרגלים</p>
+
+      {assessed.length === 0 ? (
+        <p className="mt-4 text-sm text-muted">עדיין אין מספיק נתונים. עברו מבחן רמה או תרגלו כדי להתחיל לראות כאן פירוט.</p>
+      ) : (
+        <div className="mt-5 grid sm:grid-cols-2 gap-3">
+          {(Object.keys(SKILL_META) as SkillArea[]).map((skill) => {
+            const meta = SKILL_META[skill];
+            const level = skillLevels[skill];
+            const isWeakest = level && weakestSkills.includes(skill);
+            return (
+              <div
+                key={skill}
+                className={`flex items-center gap-3 p-3 rounded-xl border ${
+                  isWeakest ? "border-accent/50 bg-accent/5" : "border-card-border"
+                }`}
+              >
+                <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <meta.icon size={16} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm">{meta.label}</p>
+                  {level ? (
+                    <EnglishText as="p" className="text-xs text-muted">
+                      רמה {level}
+                    </EnglishText>
+                  ) : (
+                    <p className="text-xs text-muted">
+                      {skill === "speaking" ? "יבדק בשיחה עם ה-AI" : "טרם נבדק"}
+                    </p>
+                  )}
+                </div>
+                {isWeakest && (
+                  <span className="shrink-0 text-xs font-medium text-accent-hover bg-accent/10 px-2 py-1 rounded-full">
+                    להתמקד כאן
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </motion.div>
   );
 }
 

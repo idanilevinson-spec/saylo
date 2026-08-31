@@ -245,6 +245,7 @@ export interface PlacementQuestion {
   status: ContentStatus;
   sort_order: number;
   created_at: string;
+  audio_text: string | null;
 }
 
 export interface PlacementTest {

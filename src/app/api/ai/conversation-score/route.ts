@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/serverClient";
 import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
 import { buildConversationScoringPrompt, type TranscriptTurn } from "@/lib/ai/prompts/conversationScoring";
 import { logAiUsage } from "@/lib/ai/usageLog";
+import { setSkillLevelFromScore } from "@/lib/assessment/skillLevel";
 import type { ConversationFeedback } from "@/types/database";
 
 interface ScoringResult extends ConversationFeedback {
@@ -104,6 +105,7 @@ export async function POST(request: Request) {
     claudeMessage.usage.input_tokens,
     claudeMessage.usage.output_tokens
   );
+  await setSkillLevelFromScore(supabase, user.id, "speaking", parsed.overallScore ?? 0);
 
   return NextResponse.json({ score });
 }

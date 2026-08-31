@@ -4,6 +4,7 @@ import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
 import { buildWritingCoachPrompt } from "@/lib/ai/prompts/writingCoach";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
+import { setSkillLevelFromScore } from "@/lib/assessment/skillLevel";
 
 interface WritingCoachResult {
   overallScore: number;
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
     .single();
 
   await logAiUsage(supabase, user.id, "writing_coach", message.usage.input_tokens, message.usage.output_tokens);
+  await setSkillLevelFromScore(supabase, user.id, "writing", parsed.overallScore ?? 0);
 
   return NextResponse.json({ submission, feedback });
 }

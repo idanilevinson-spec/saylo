@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Volume2, Turtle } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
+import { speak } from "@/lib/speech/browserTts";
 import type { PlacementQuestion, SkillArea } from "@/types/database";
 
 const SKILL_LABELS_HE: Record<SkillArea, string> = {
@@ -16,6 +18,11 @@ const SKILL_LABELS_HE: Record<SkillArea, string> = {
   writing: "כתיבה",
   speaking: "דיבור",
 };
+
+const SKILL_ORDER: SkillArea[] = ["vocabulary", "grammar", "reading", "listening", "writing", "speaking"];
+
+const WRITING_SAMPLE_PROMPT_HE =
+  "כתבו 2-4 משפטים באנגלית על עצמכם: מה שמכם, מאיפה אתם, ודבר אחד שאתם אוהבים לעשות.";
 
 interface SkillScore {
   skill: SkillArea;
@@ -35,6 +42,8 @@ export default function PlacementPage() {
   const [testId, setTestId] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [showWritingStep, setShowWritingStep] = useState(false);
+  const [writingSample, setWritingSample] = useState("");
   const [finishing, setFinishing] = useState(false);
   const [result, setResult] = useState<PlacementResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -107,17 +116,28 @@ export default function PlacementPage() {
         >
           <table className="w-full text-sm">
             <tbody>
-              {result.scores.map((s) => (
-                <tr key={s.skill} className="border-b border-card-border last:border-0">
-                  <td className="p-3 font-medium">{SKILL_LABELS_HE[s.skill]}</td>
-                  <td className="p-3 text-muted">{s.percentCorrect}%</td>
-                  <td className="p-3">
-                    <EnglishText as="span" className="font-bold text-primary">
-                      {s.cefrLevel}
-                    </EnglishText>
-                  </td>
-                </tr>
-              ))}
+              {SKILL_ORDER.map((skill) => {
+                const s = result.scores.find((sc) => sc.skill === skill);
+                return (
+                  <tr key={skill} className="border-b border-card-border last:border-0">
+                    <td className="p-3 font-medium">{SKILL_LABELS_HE[skill]}</td>
+                    {s ? (
+                      <>
+                        <td className="p-3 text-muted">{s.percentCorrect}%</td>
+                        <td className="p-3">
+                          <EnglishText as="span" className="font-bold text-primary">
+                            {s.cefrLevel}
+                          </EnglishText>
+                        </td>
+                      </>
+                    ) : (
+                      <td className="p-3 text-muted italic" colSpan={2}>
+                        {skill === "speaking" ? "יבדק בשיחה הראשונה שלכם עם ה-AI" : "טרם נבדק"}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </motion.div>
@@ -137,6 +157,26 @@ export default function PlacementPage() {
   const question = questions[index];
   const isLast = index === questions.length - 1;
 
+  async function submitFinal(sample: string) {
+    if (!testId) return;
+    setFinishing(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/ai/placement-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ placementTestId: testId, writingSample: sample }),
+      });
+      if (!res.ok) throw new Error("request failed");
+      const data = (await res.json()) as PlacementResult;
+      setResult(data);
+    } catch {
+      setError("אירעה שגיאה בניתוח התוצאות. נסו שוב.");
+    } finally {
+      setFinishing(false);
+    }
+  }
+
   async function handleNext() {
     if (selected === null || !testId || !profile) return;
 
@@ -154,27 +194,62 @@ export default function PlacementPage() {
       return;
     }
 
-    setFinishing(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/ai/placement-summary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ placementTestId: testId }),
-      });
-      if (!res.ok) throw new Error("request failed");
-      const data = (await res.json()) as PlacementResult;
-      setResult(data);
-    } catch {
-      setError("אירעה שגיאה בניתוח התוצאות. נסו שוב.");
-    } finally {
-      setFinishing(false);
-    }
+    setShowWritingStep(true);
   }
 
   if (finishing) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">מנתח את התוצאות שלכם...</div>
+    );
+  }
+
+  if (showWritingStep) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-12">
+        <p className="text-sm text-muted mb-4">שלב אחרון (רשות)</p>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="bg-card border border-card-border rounded-2xl p-6 sm:p-8"
+        >
+          <p className="font-medium text-lg">{WRITING_SAMPLE_PROMPT_HE}</p>
+          <p className="mt-1 text-sm text-muted">
+            זה עוזר לנו להעריך גם את רמת הכתיבה שלכם. אפשר לדלג אם אתם מעדיפים.
+          </p>
+          <textarea
+            dir="ltr"
+            aria-label="דגימת כתיבה למבחן ההתחלה"
+            value={writingSample}
+            onChange={(e) => setWritingSample(e.target.value)}
+            rows={5}
+            placeholder="Write your answer here..."
+            className="mt-4 w-full px-4 py-3 rounded-xl border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+
+          {error && <p className="mt-4 text-sm text-danger">{error}</p>}
+
+          <div className="mt-6 flex gap-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => submitFinal("")}
+              className="px-4 py-2.5 rounded-xl border border-card-border font-medium hover:border-primary/40 transition-colors"
+            >
+              דילוג
+            </motion.button>
+            <motion.button
+              whileHover={writingSample.trim() ? { scale: 1.02 } : undefined}
+              whileTap={writingSample.trim() ? { scale: 0.97 } : undefined}
+              onClick={() => submitFinal(writingSample)}
+              disabled={!writingSample.trim()}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
+            >
+              סיום המבחן
+            </motion.button>
+          </div>
+        </motion.div>
+      </div>
     );
   }
 
@@ -197,9 +272,29 @@ export default function PlacementPage() {
         transition={{ duration: 0.35 }}
         className="bg-card border border-card-border rounded-2xl p-6 sm:p-8"
       >
-        <EnglishText as="p" className="font-medium text-lg">
-          {question.prompt}
-        </EnglishText>
+        {question.skill_area === "listening" && question.audio_text ? (
+          <div>
+            <p className="font-medium text-lg mb-3">{question.prompt}</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => speak(question.audio_text as string, 1)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-card-border hover:border-primary/40 transition-colors"
+              >
+                <Volume2 size={16} /> השמעה
+              </button>
+              <button
+                onClick={() => speak(question.audio_text as string, 0.6)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-card-border hover:border-primary/40 transition-colors"
+              >
+                <Turtle size={16} /> לאט
+              </button>
+            </div>
+          </div>
+        ) : (
+          <EnglishText as="p" className="font-medium text-lg">
+            {question.prompt}
+          </EnglishText>
+        )}
 
         <div className="mt-4 space-y-2">
           {question.options.map((option, i) => (
@@ -226,7 +321,7 @@ export default function PlacementPage() {
           disabled={selected === null}
           className="mt-6 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
         >
-          {isLast ? "סיום המבחן" : "הבא →"}
+          {isLast ? "לשלב האחרון →" : "הבא →"}
         </motion.button>
       </motion.div>
     </div>
