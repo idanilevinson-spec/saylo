@@ -1,0 +1,218 @@
+-- Pushes vocabulary further at both extremes, per the user's explicit
+-- ask for "more levels, both basic and advanced": 4 new A1 topics
+-- (daily-routines, hobbies, places-in-town, school) and 4 new C2 topics
+-- (rhetoric-persuasion, psychology-cognition, scientific-inquiry,
+-- literary-analysis) — 80 words, same programmatic-generation approach
+-- as seed 010/014 so MCQ correctness is guaranteed by construction.
+-- Run this AFTER seed 001+002+010+014 have been applied.
+-- Safe to re-run: topics are upserted by slug; vocabulary_items and
+-- exercises for these topics are cleared and reinserted.
+
+insert into public.topics (slug, name_he, name_en, cefr_level, sort_order) values
+  ('daily-routines', 'שגרת יום יומית', 'Daily Routines', 'A1', 23),
+  ('hobbies', 'תחביבים', 'Hobbies', 'A1', 24),
+  ('places-in-town', 'מקומות בעיר', 'Places in Town', 'A1', 25),
+  ('school', 'בית ספר', 'School', 'A1', 26),
+  ('rhetoric-persuasion', 'רטוריקה ושכנוע', 'Rhetoric & Persuasion', 'C2', 27),
+  ('psychology-cognition', 'פסיכולוגיה וקוגניציה', 'Psychology & Cognition', 'C2', 28),
+  ('scientific-inquiry', 'חקירה מדעית', 'Scientific Inquiry', 'C2', 29),
+  ('literary-analysis', 'ניתוח ספרותי', 'Literary Analysis', 'C2', 30)
+on conflict (slug) do update set
+  name_he = excluded.name_he,
+  name_en = excluded.name_en,
+  cefr_level = excluded.cefr_level,
+  sort_order = excluded.sort_order;
+
+delete from public.vocabulary_items
+where topic_id in (select id from public.topics where slug in ('daily-routines', 'hobbies', 'places-in-town', 'school', 'rhetoric-persuasion', 'psychology-cognition', 'scientific-inquiry', 'literary-analysis'));
+
+insert into public.vocabulary_items (topic_id, headword, ipa, part_of_speech, translation_he, example_en, cefr_level, sort_order)
+select t.id, v.headword, v.ipa, v.part_of_speech, v.translation_he, v.example_en, t.cefr_level, v.sort_order
+from public.topics t
+join (values
+  ('daily-routines', 'wake up', '/weɪk ʌp/', 'phrasal verb', 'להתעורר', 'I wake up at seven every morning.', 1),
+  ('daily-routines', 'get up', '/ɡet ʌp/', 'phrasal verb', 'לקום מהמיטה', 'She gets up early on weekdays.', 2),
+  ('daily-routines', 'brush teeth', '/brʌʃ tiːθ/', 'verb phrase', 'לצחצח שיניים', 'Don''t forget to brush your teeth.', 3),
+  ('daily-routines', 'take a shower', '/teɪk ə ˈʃaʊər/', 'verb phrase', 'להתקלח', 'He takes a shower before breakfast.', 4),
+  ('daily-routines', 'get dressed', '/ɡet drest/', 'verb phrase', 'להתלבש', 'The kids get dressed for school quickly.', 5),
+  ('daily-routines', 'have breakfast', '/hæv ˈbrekfəst/', 'verb phrase', 'לאכול ארוחת בוקר', 'We have breakfast together every day.', 6),
+  ('daily-routines', 'go to work', '/ɡoʊ tə wɜːrk/', 'verb phrase', 'ללכת לעבודה', 'I go to work by bus.', 7),
+  ('daily-routines', 'come home', '/kʌm hoʊm/', 'verb phrase', 'לחזור הביתה', 'He comes home at six in the evening.', 8),
+  ('daily-routines', 'go to bed', '/ɡoʊ tə bed/', 'verb phrase', 'ללכת לישון', 'The children go to bed at nine.', 9),
+  ('daily-routines', 'sleep', '/sliːp/', 'verb', 'לישון', 'I sleep eight hours a night.', 10),
+  ('hobbies', 'reading', '/ˈriːdɪŋ/', 'noun', 'קריאה (כתחביב)', 'Reading is her favorite hobby.', 1),
+  ('hobbies', 'swimming', '/ˈswɪmɪŋ/', 'noun', 'שחייה', 'We go swimming every summer.', 2),
+  ('hobbies', 'drawing', '/ˈdrɔːɪŋ/', 'noun', 'ציור (רישום)', 'He is good at drawing animals.', 3),
+  ('hobbies', 'cooking', '/ˈkʊkɪŋ/', 'noun', 'בישול', 'Cooking helps me relax after work.', 4),
+  ('hobbies', 'dancing', '/ˈdænsɪŋ/', 'noun', 'ריקוד', 'They love dancing at parties.', 5),
+  ('hobbies', 'singing', '/ˈsɪŋɪŋ/', 'noun', 'שירה', 'Singing in the choir makes her happy.', 6),
+  ('hobbies', 'painting', '/ˈpeɪntɪŋ/', 'noun', 'ציור (בצבעים)', 'My grandfather enjoys painting landscapes.', 7),
+  ('hobbies', 'running', '/ˈrʌnɪŋ/', 'noun', 'ריצה', 'Running in the morning wakes me up.', 8),
+  ('hobbies', 'fishing', '/ˈfɪʃɪŋ/', 'noun', 'דיג', 'My father goes fishing on weekends.', 9),
+  ('hobbies', 'gardening', '/ˈɡɑːrdənɪŋ/', 'noun', 'גינון', 'Gardening is a peaceful hobby.', 10),
+  ('places-in-town', 'bank', '/bæŋk/', 'noun', 'בנק', 'I need to go to the bank today.', 1),
+  ('places-in-town', 'hospital', '/ˈhɒspɪtəl/', 'noun', 'בית חולים', 'The hospital is near my house.', 2),
+  ('places-in-town', 'park', '/pɑːrk/', 'noun', 'פארק', 'We walked in the park yesterday.', 3),
+  ('places-in-town', 'library', '/ˈlaɪbrəri/', 'noun', 'ספרייה', 'She borrowed a book from the library.', 4),
+  ('places-in-town', 'restaurant', '/ˈrestərɒnt/', 'noun', 'מסעדה', 'We ate dinner at a nice restaurant.', 5),
+  ('places-in-town', 'supermarket', '/ˈsuːpərmɑːrkɪt/', 'noun', 'סופרמרקט', 'I buy food at the supermarket.', 6),
+  ('places-in-town', 'school', '/skuːl/', 'noun', 'בית ספר', 'The children walk to school together.', 7),
+  ('places-in-town', 'hotel', '/hoʊˈtel/', 'noun', 'מלון', 'We stayed at a hotel near the beach.', 8),
+  ('places-in-town', 'museum', '/mjuːˈziːəm/', 'noun', 'מוזיאון', 'The museum has a new art exhibition.', 9),
+  ('places-in-town', 'pharmacy', '/ˈfɑːrməsi/', 'noun', 'בית מרקחת', 'You can buy medicine at the pharmacy.', 10),
+  ('school', 'teacher', '/ˈtiːtʃər/', 'noun', 'מורה', 'Our teacher explains things clearly.', 1),
+  ('school', 'student', '/ˈstuːdənt/', 'noun', 'תלמיד/ה', 'Every student needs a notebook.', 2),
+  ('school', 'classroom', '/ˈklæsruːm/', 'noun', 'כיתה', 'The classroom has twenty desks.', 3),
+  ('school', 'homework', '/ˈhoʊmwɜːrk/', 'noun', 'שיעורי בית', 'I finished my homework before dinner.', 4),
+  ('school', 'pencil', '/ˈpensəl/', 'noun', 'עיפרון', 'Can I borrow a pencil, please?', 5),
+  ('school', 'book', '/bʊk/', 'noun', 'ספר', 'Open your book to page ten.', 6),
+  ('school', 'notebook', '/ˈnoʊtbʊk/', 'noun', 'מחברת', 'She writes notes in her notebook.', 7),
+  ('school', 'desk', '/desk/', 'noun', 'שולחן כתיבה', 'My desk is next to the window.', 8),
+  ('school', 'blackboard', '/ˈblækbɔːrd/', 'noun', 'לוח', 'The teacher wrote the date on the blackboard.', 9),
+  ('school', 'exam', '/ɪɡˈzæm/', 'noun', 'מבחן', 'We have a math exam tomorrow.', 10),
+  ('rhetoric-persuasion', 'rhetoric', '/ˈretərɪk/', 'noun', 'רטוריקה', 'The politician''s speech was full of rhetoric.', 1),
+  ('rhetoric-persuasion', 'persuade', '/pərˈsweɪd/', 'verb', 'לשכנע', 'She tried to persuade him to stay.', 2),
+  ('rhetoric-persuasion', 'hyperbole', '/haɪˈpɜːrbəli/', 'noun', 'הפרזה (לשונית)', 'Saying "I''ve told you a million times" is hyperbole.', 3),
+  ('rhetoric-persuasion', 'irony', '/ˈaɪrəni/', 'noun', 'אירוניה', 'It was pure irony that the fire station burned down.', 4),
+  ('rhetoric-persuasion', 'euphemism', '/ˈjuːfəmɪzəm/', 'noun', 'לשון נקייה', '"Passed away" is a euphemism for "died".', 5),
+  ('rhetoric-persuasion', 'connotation', '/ˌkɒnəˈteɪʃən/', 'noun', 'משמעות נלווית', 'The word "cheap" has a negative connotation.', 6),
+  ('rhetoric-persuasion', 'discourse', '/ˈdɪskɔːrs/', 'noun', 'שיח (ציבורי)', 'Public discourse has become more polarized.', 7),
+  ('rhetoric-persuasion', 'eloquent', '/ˈeləkwənt/', 'adjective', 'רהוט, בעל כושר ביטוי', 'She gave an eloquent speech at the conference.', 8),
+  ('rhetoric-persuasion', 'satire', '/ˈsætaɪər/', 'noun', 'סאטירה', 'The show uses satire to criticize politicians.', 9),
+  ('rhetoric-persuasion', 'allegory', '/ˈæləɡɔːri/', 'noun', 'אלגוריה, משל', 'The novel is an allegory for political corruption.', 10),
+  ('psychology-cognition', 'cognition', '/kɒɡˈnɪʃən/', 'noun', 'קוגניציה, הכרה', 'The study focuses on human cognition.', 1),
+  ('psychology-cognition', 'perception', '/pərˈsepʃən/', 'noun', 'תפיסה', 'Our perception of time changes with age.', 2),
+  ('psychology-cognition', 'introspection', '/ˌɪntrəˈspekʃən/', 'noun', 'התבוננות פנימית', 'She spent the evening in quiet introspection.', 3),
+  ('psychology-cognition', 'bias', '/ˈbaɪəs/', 'noun', 'הטיה', 'Everyone has some unconscious bias.', 4),
+  ('psychology-cognition', 'empathy', '/ˈempəθi/', 'noun', 'אמפתיה', 'Good therapists show great empathy.', 5),
+  ('psychology-cognition', 'resilience', '/rɪˈzɪliəns/', 'noun', 'חוסן נפשי', 'Children often show remarkable resilience.', 6),
+  ('psychology-cognition', 'subconscious', '/sʌbˈkɒnʃəs/', 'adjective', 'תת-מודע', 'Some fears are stored in the subconscious mind.', 7),
+  ('psychology-cognition', 'temperament', '/ˈtempərəmənt/', 'noun', 'מזג (אישיותי)', 'The baby has a calm temperament.', 8),
+  ('psychology-cognition', 'intuition', '/ˌɪntuˈɪʃən/', 'noun', 'אינטואיציה', 'Trust your intuition when something feels wrong.', 9),
+  ('psychology-cognition', 'disposition', '/ˌdɪspəˈzɪʃən/', 'noun', 'נטייה, טבע', 'She has a cheerful disposition.', 10),
+  ('scientific-inquiry', 'empirical', '/ɪmˈpɪrɪkəl/', 'adjective', 'אמפירי', 'The theory is based on empirical evidence.', 1),
+  ('scientific-inquiry', 'phenomenon', '/fəˈnɒmɪnən/', 'noun', 'תופעה', 'Lightning is a natural phenomenon.', 2),
+  ('scientific-inquiry', 'paradigm', '/ˈpærədaɪm/', 'noun', 'פרדיגמה, מודל חשיבה', 'This discovery created a new scientific paradigm.', 3),
+  ('scientific-inquiry', 'causation', '/kɔːˈzeɪʃən/', 'noun', 'סיבתיות', 'Correlation does not always imply causation.', 4),
+  ('scientific-inquiry', 'variable', '/ˈveəriəbəl/', 'noun', 'משתנה', 'The experiment controlled for several variables.', 5),
+  ('scientific-inquiry', 'anomaly', '/əˈnɒməli/', 'noun', 'חריגה, אנומליה', 'The results showed an unexpected anomaly.', 6),
+  ('scientific-inquiry', 'replicate', '/ˈreplɪkeɪt/', 'verb', 'לשחזר (ניסוי)', 'Other scientists could not replicate the results.', 7),
+  ('scientific-inquiry', 'theoretical', '/ˌθiːəˈretɪkəl/', 'adjective', 'תיאורטי', 'This is still a theoretical model, not proven.', 8),
+  ('scientific-inquiry', 'quantify', '/ˈkwɒntɪfaɪ/', 'verb', 'לכמת', 'It''s hard to quantify how people feel.', 9),
+  ('scientific-inquiry', 'systematic', '/ˌsɪstəˈmætɪk/', 'adjective', 'שיטתי', 'The researchers used a systematic approach.', 10),
+  ('literary-analysis', 'narrative', '/ˈnærətɪv/', 'noun', 'נרטיב, סיפור', 'The novel has a complex narrative structure.', 1),
+  ('literary-analysis', 'protagonist', '/proʊˈtæɡənɪst/', 'noun', 'גיבור/ת הסיפור', 'The protagonist faces a difficult choice.', 2),
+  ('literary-analysis', 'motif', '/moʊˈtiːf/', 'noun', 'מוטיב', 'Water is a recurring motif in the book.', 3),
+  ('literary-analysis', 'symbolism', '/ˈsɪmbəlɪzəm/', 'noun', 'סמליות', 'The author uses symbolism throughout the story.', 4),
+  ('literary-analysis', 'foreshadowing', '/fɔːrˈʃædoʊɪŋ/', 'noun', 'רמיזה מוקדמת', 'The storm is foreshadowing of the conflict to come.', 5),
+  ('literary-analysis', 'juxtaposition', '/ˌdʒʌkstəpəˈzɪʃən/', 'noun', 'הנגדה', 'The film uses juxtaposition of wealth and poverty.', 6),
+  ('literary-analysis', 'prose', '/proʊz/', 'noun', 'פרוזה', 'Her prose is simple but powerful.', 7),
+  ('literary-analysis', 'verse', '/vɜːrs/', 'noun', 'שירה, חרוזים', 'The poem is written in free verse.', 8),
+  ('literary-analysis', 'metaphor', '/ˈmetəfɔːr/', 'noun', 'מטאפורה', '"Time is money" is a well-known metaphor.', 9),
+  ('literary-analysis', 'tone', '/toʊn/', 'noun', 'טון (ספרותי)', 'The tone of the essay is quite critical.', 10)
+) as v(topic_slug, headword, ipa, part_of_speech, translation_he, example_en, sort_order)
+  on t.slug = v.topic_slug;
+
+delete from public.exercises
+where topic_id in (select id from public.topics where slug in ('daily-routines', 'hobbies', 'places-in-town', 'school', 'rhetoric-persuasion', 'psychology-cognition', 'scientific-inquiry', 'literary-analysis'));
+
+insert into public.exercises (type, skill_area, topic_id, vocabulary_item_id, cefr_level, content, sort_order)
+select 'mcq'::exercise_type, 'vocabulary'::skill_area, t.id, v.id, t.cefr_level, gen.content::jsonb, gen.sort_order
+from (values
+  ('daily-routines', 'wake up', '{"prompt":"מה המילה באנגלית עבור \"להתעורר\"?","options":["wake up","go to work","brush teeth","take a shower"],"correctIndex":0}'::jsonb, 1),
+  ('daily-routines', 'get up', '{"prompt":"מה המילה באנגלית עבור \"לקום מהמיטה\"?","options":["sleep","get up","go to bed","have breakfast"],"correctIndex":1}'::jsonb, 2),
+  ('daily-routines', 'brush teeth', '{"prompt":"מה המילה באנגלית עבור \"לצחצח שיניים\"?","options":["sleep","come home","brush teeth","go to bed"],"correctIndex":2}'::jsonb, 3),
+  ('daily-routines', 'take a shower', '{"prompt":"מה המילה באנגלית עבור \"להתקלח\"?","options":["get dressed","wake up","come home","take a shower"],"correctIndex":3}'::jsonb, 4),
+  ('daily-routines', 'get dressed', '{"prompt":"מה המילה באנגלית עבור \"להתלבש\"?","options":["get dressed","take a shower","wake up","get up"],"correctIndex":0}'::jsonb, 5),
+  ('daily-routines', 'have breakfast', '{"prompt":"מה המילה באנגלית עבור \"לאכול ארוחת בוקר\"?","options":["go to bed","have breakfast","brush teeth","come home"],"correctIndex":1}'::jsonb, 6),
+  ('daily-routines', 'go to work', '{"prompt":"מה המילה באנגלית עבור \"ללכת לעבודה\"?","options":["get up","sleep","go to work","come home"],"correctIndex":2}'::jsonb, 7),
+  ('daily-routines', 'come home', '{"prompt":"מה המילה באנגלית עבור \"לחזור הביתה\"?","options":["have breakfast","take a shower","sleep","come home"],"correctIndex":3}'::jsonb, 8),
+  ('daily-routines', 'go to bed', '{"prompt":"מה המילה באנגלית עבור \"ללכת לישון\"?","options":["go to bed","brush teeth","have breakfast","take a shower"],"correctIndex":0}'::jsonb, 9),
+  ('daily-routines', 'sleep', '{"prompt":"מה המילה באנגלית עבור \"לישון\"?","options":["go to work","sleep","go to bed","come home"],"correctIndex":1}'::jsonb, 10),
+  ('hobbies', 'reading', '{"prompt":"מה המילה באנגלית עבור \"קריאה (כתחביב)\"?","options":["reading","dancing","painting","running"],"correctIndex":0}'::jsonb, 1),
+  ('hobbies', 'swimming', '{"prompt":"מה המילה באנגלית עבור \"שחייה\"?","options":["painting","swimming","drawing","cooking"],"correctIndex":1}'::jsonb, 2),
+  ('hobbies', 'drawing', '{"prompt":"מה המילה באנגלית עבור \"ציור (רישום)\"?","options":["gardening","fishing","drawing","singing"],"correctIndex":2}'::jsonb, 3),
+  ('hobbies', 'cooking', '{"prompt":"מה המילה באנגלית עבור \"בישול\"?","options":["gardening","running","fishing","cooking"],"correctIndex":3}'::jsonb, 4),
+  ('hobbies', 'dancing', '{"prompt":"מה המילה באנגלית עבור \"ריקוד\"?","options":["dancing","cooking","reading","running"],"correctIndex":0}'::jsonb, 5),
+  ('hobbies', 'singing', '{"prompt":"מה המילה באנגלית עבור \"שירה\"?","options":["cooking","singing","reading","swimming"],"correctIndex":1}'::jsonb, 6),
+  ('hobbies', 'painting', '{"prompt":"מה המילה באנגלית עבור \"ציור (בצבעים)\"?","options":["fishing","drawing","painting","running"],"correctIndex":2}'::jsonb, 7),
+  ('hobbies', 'running', '{"prompt":"מה המילה באנגלית עבור \"ריצה\"?","options":["swimming","gardening","painting","running"],"correctIndex":3}'::jsonb, 8),
+  ('hobbies', 'fishing', '{"prompt":"מה המילה באנגלית עבור \"דיג\"?","options":["fishing","singing","cooking","gardening"],"correctIndex":0}'::jsonb, 9),
+  ('hobbies', 'gardening', '{"prompt":"מה המילה באנגלית עבור \"גינון\"?","options":["drawing","gardening","singing","cooking"],"correctIndex":1}'::jsonb, 10),
+  ('places-in-town', 'bank', '{"prompt":"מה המילה באנגלית עבור \"בנק\"?","options":["bank","school","park","library"],"correctIndex":0}'::jsonb, 1),
+  ('places-in-town', 'hospital', '{"prompt":"מה המילה באנגלית עבור \"בית חולים\"?","options":["pharmacy","hospital","museum","supermarket"],"correctIndex":1}'::jsonb, 2),
+  ('places-in-town', 'park', '{"prompt":"מה המילה באנגלית עבור \"פארק\"?","options":["pharmacy","hotel","park","museum"],"correctIndex":2}'::jsonb, 3),
+  ('places-in-town', 'library', '{"prompt":"מה המילה באנגלית עבור \"ספרייה\"?","options":["restaurant","bank","hotel","library"],"correctIndex":3}'::jsonb, 4),
+  ('places-in-town', 'restaurant', '{"prompt":"מה המילה באנגלית עבור \"מסעדה\"?","options":["restaurant","library","bank","hospital"],"correctIndex":0}'::jsonb, 5),
+  ('places-in-town', 'supermarket', '{"prompt":"מה המילה באנגלית עבור \"סופרמרקט\"?","options":["museum","supermarket","park","hotel"],"correctIndex":1}'::jsonb, 6),
+  ('places-in-town', 'school', '{"prompt":"מה המילה באנגלית עבור \"בית ספר\"?","options":["hospital","pharmacy","school","hotel"],"correctIndex":2}'::jsonb, 7),
+  ('places-in-town', 'hotel', '{"prompt":"מה המילה באנגלית עבור \"מלון\"?","options":["supermarket","library","pharmacy","hotel"],"correctIndex":3}'::jsonb, 8),
+  ('places-in-town', 'museum', '{"prompt":"מה המילה באנגלית עבור \"מוזיאון\"?","options":["museum","park","supermarket","library"],"correctIndex":0}'::jsonb, 9),
+  ('places-in-town', 'pharmacy', '{"prompt":"מה המילה באנגלית עבור \"בית מרקחת\"?","options":["school","pharmacy","museum","hotel"],"correctIndex":1}'::jsonb, 10),
+  ('school', 'teacher', '{"prompt":"מה המילה באנגלית עבור \"מורה\"?","options":["teacher","exam","blackboard","pencil"],"correctIndex":0}'::jsonb, 1),
+  ('school', 'student', '{"prompt":"מה המילה באנגלית עבור \"תלמיד/ה\"?","options":["classroom","student","homework","blackboard"],"correctIndex":1}'::jsonb, 2),
+  ('school', 'classroom', '{"prompt":"מה המילה באנגלית עבור \"כיתה\"?","options":["book","notebook","classroom","homework"],"correctIndex":2}'::jsonb, 3),
+  ('school', 'homework', '{"prompt":"מה המילה באנגלית עבור \"שיעורי בית\"?","options":["blackboard","desk","book","homework"],"correctIndex":3}'::jsonb, 4),
+  ('school', 'pencil', '{"prompt":"מה המילה באנגלית עבור \"עיפרון\"?","options":["pencil","classroom","homework","blackboard"],"correctIndex":0}'::jsonb, 5),
+  ('school', 'book', '{"prompt":"מה המילה באנגלית עבור \"ספר\"?","options":["desk","book","pencil","teacher"],"correctIndex":1}'::jsonb, 6),
+  ('school', 'notebook', '{"prompt":"מה המילה באנגלית עבור \"מחברת\"?","options":["pencil","homework","notebook","classroom"],"correctIndex":2}'::jsonb, 7),
+  ('school', 'desk', '{"prompt":"מה המילה באנגלית עבור \"שולחן כתיבה\"?","options":["blackboard","teacher","student","desk"],"correctIndex":3}'::jsonb, 8),
+  ('school', 'blackboard', '{"prompt":"מה המילה באנגלית עבור \"לוח\"?","options":["blackboard","student","desk","book"],"correctIndex":0}'::jsonb, 9),
+  ('school', 'exam', '{"prompt":"מה המילה באנגלית עבור \"מבחן\"?","options":["book","exam","pencil","classroom"],"correctIndex":1}'::jsonb, 10),
+  ('rhetoric-persuasion', 'rhetoric', '{"prompt":"מה המילה באנגלית עבור \"רטוריקה\"?","options":["rhetoric","irony","persuade","discourse"],"correctIndex":0}'::jsonb, 1),
+  ('rhetoric-persuasion', 'persuade', '{"prompt":"מה המילה באנגלית עבור \"לשכנע\"?","options":["discourse","persuade","satire","rhetoric"],"correctIndex":1}'::jsonb, 2),
+  ('rhetoric-persuasion', 'hyperbole', '{"prompt":"מה המילה באנגלית עבור \"הפרזה (לשונית)\"?","options":["persuade","euphemism","hyperbole","satire"],"correctIndex":2}'::jsonb, 3),
+  ('rhetoric-persuasion', 'irony', '{"prompt":"מה המילה באנגלית עבור \"אירוניה\"?","options":["connotation","rhetoric","allegory","irony"],"correctIndex":3}'::jsonb, 4),
+  ('rhetoric-persuasion', 'euphemism', '{"prompt":"מה המילה באנגלית עבור \"לשון נקייה\"?","options":["euphemism","connotation","hyperbole","irony"],"correctIndex":0}'::jsonb, 5),
+  ('rhetoric-persuasion', 'connotation', '{"prompt":"מה המילה באנגלית עבור \"משמעות נלווית\"?","options":["satire","connotation","rhetoric","discourse"],"correctIndex":1}'::jsonb, 6),
+  ('rhetoric-persuasion', 'discourse', '{"prompt":"מה המילה באנגלית עבור \"שיח (ציבורי)\"?","options":["euphemism","eloquent","discourse","persuade"],"correctIndex":2}'::jsonb, 7),
+  ('rhetoric-persuasion', 'eloquent', '{"prompt":"מה המילה באנגלית עבור \"רהוט, בעל כושר ביטוי\"?","options":["connotation","discourse","irony","eloquent"],"correctIndex":3}'::jsonb, 8),
+  ('rhetoric-persuasion', 'satire', '{"prompt":"מה המילה באנגלית עבור \"סאטירה\"?","options":["satire","hyperbole","discourse","rhetoric"],"correctIndex":0}'::jsonb, 9),
+  ('rhetoric-persuasion', 'allegory', '{"prompt":"מה המילה באנגלית עבור \"אלגוריה, משל\"?","options":["rhetoric","allegory","irony","satire"],"correctIndex":1}'::jsonb, 10),
+  ('psychology-cognition', 'cognition', '{"prompt":"מה המילה באנגלית עבור \"קוגניציה, הכרה\"?","options":["cognition","resilience","subconscious","bias"],"correctIndex":0}'::jsonb, 1),
+  ('psychology-cognition', 'perception', '{"prompt":"מה המילה באנגלית עבור \"תפיסה\"?","options":["intuition","perception","temperament","resilience"],"correctIndex":1}'::jsonb, 2),
+  ('psychology-cognition', 'introspection', '{"prompt":"מה המילה באנגלית עבור \"התבוננות פנימית\"?","options":["bias","empathy","introspection","intuition"],"correctIndex":2}'::jsonb, 3),
+  ('psychology-cognition', 'bias', '{"prompt":"מה המילה באנגלית עבור \"הטיה\"?","options":["temperament","resilience","cognition","bias"],"correctIndex":3}'::jsonb, 4),
+  ('psychology-cognition', 'empathy', '{"prompt":"מה המילה באנגלית עבור \"אמפתיה\"?","options":["empathy","resilience","bias","introspection"],"correctIndex":0}'::jsonb, 5),
+  ('psychology-cognition', 'resilience', '{"prompt":"מה המילה באנגלית עבור \"חוסן נפשי\"?","options":["intuition","resilience","cognition","perception"],"correctIndex":1}'::jsonb, 6),
+  ('psychology-cognition', 'subconscious', '{"prompt":"מה המילה באנגלית עבור \"תת-מודע\"?","options":["perception","intuition","subconscious","resilience"],"correctIndex":2}'::jsonb, 7),
+  ('psychology-cognition', 'temperament', '{"prompt":"מה המילה באנגלית עבור \"מזג (אישיותי)\"?","options":["resilience","empathy","introspection","temperament"],"correctIndex":3}'::jsonb, 8),
+  ('psychology-cognition', 'intuition', '{"prompt":"מה המילה באנגלית עבור \"אינטואיציה\"?","options":["intuition","disposition","resilience","temperament"],"correctIndex":0}'::jsonb, 9),
+  ('psychology-cognition', 'disposition', '{"prompt":"מה המילה באנגלית עבור \"נטייה, טבע\"?","options":["resilience","disposition","introspection","temperament"],"correctIndex":1}'::jsonb, 10),
+  ('scientific-inquiry', 'empirical', '{"prompt":"מה המילה באנגלית עבור \"אמפירי\"?","options":["empirical","paradigm","replicate","causation"],"correctIndex":0}'::jsonb, 1),
+  ('scientific-inquiry', 'phenomenon', '{"prompt":"מה המילה באנגלית עבור \"תופעה\"?","options":["theoretical","phenomenon","replicate","systematic"],"correctIndex":1}'::jsonb, 2),
+  ('scientific-inquiry', 'paradigm', '{"prompt":"מה המילה באנגלית עבור \"פרדיגמה, מודל חשיבה\"?","options":["phenomenon","causation","paradigm","replicate"],"correctIndex":2}'::jsonb, 3),
+  ('scientific-inquiry', 'causation', '{"prompt":"מה המילה באנגלית עבור \"סיבתיות\"?","options":["phenomenon","systematic","replicate","causation"],"correctIndex":3}'::jsonb, 4),
+  ('scientific-inquiry', 'variable', '{"prompt":"מה המילה באנגלית עבור \"משתנה\"?","options":["variable","theoretical","anomaly","paradigm"],"correctIndex":0}'::jsonb, 5),
+  ('scientific-inquiry', 'anomaly', '{"prompt":"מה המילה באנגלית עבור \"חריגה, אנומליה\"?","options":["replicate","anomaly","systematic","causation"],"correctIndex":1}'::jsonb, 6),
+  ('scientific-inquiry', 'replicate', '{"prompt":"מה המילה באנגלית עבור \"לשחזר (ניסוי)\"?","options":["variable","quantify","replicate","empirical"],"correctIndex":2}'::jsonb, 7),
+  ('scientific-inquiry', 'theoretical', '{"prompt":"מה המילה באנגלית עבור \"תיאורטי\"?","options":["replicate","causation","paradigm","theoretical"],"correctIndex":3}'::jsonb, 8),
+  ('scientific-inquiry', 'quantify', '{"prompt":"מה המילה באנגלית עבור \"לכמת\"?","options":["quantify","empirical","anomaly","systematic"],"correctIndex":0}'::jsonb, 9),
+  ('scientific-inquiry', 'systematic', '{"prompt":"מה המילה באנגלית עבור \"שיטתי\"?","options":["variable","systematic","phenomenon","theoretical"],"correctIndex":1}'::jsonb, 10),
+  ('literary-analysis', 'narrative', '{"prompt":"מה המילה באנגלית עבור \"נרטיב, סיפור\"?","options":["narrative","foreshadowing","prose","motif"],"correctIndex":0}'::jsonb, 1),
+  ('literary-analysis', 'protagonist', '{"prompt":"מה המילה באנגלית עבור \"גיבור/ת הסיפור\"?","options":["foreshadowing","protagonist","tone","narrative"],"correctIndex":1}'::jsonb, 2),
+  ('literary-analysis', 'motif', '{"prompt":"מה המילה באנגלית עבור \"מוטיב\"?","options":["foreshadowing","verse","motif","prose"],"correctIndex":2}'::jsonb, 3),
+  ('literary-analysis', 'symbolism', '{"prompt":"מה המילה באנגלית עבור \"סמליות\"?","options":["narrative","motif","juxtaposition","symbolism"],"correctIndex":3}'::jsonb, 4),
+  ('literary-analysis', 'foreshadowing', '{"prompt":"מה המילה באנגלית עבור \"רמיזה מוקדמת\"?","options":["foreshadowing","juxtaposition","protagonist","tone"],"correctIndex":0}'::jsonb, 5),
+  ('literary-analysis', 'juxtaposition', '{"prompt":"מה המילה באנגלית עבור \"הנגדה\"?","options":["foreshadowing","juxtaposition","symbolism","tone"],"correctIndex":1}'::jsonb, 6),
+  ('literary-analysis', 'prose', '{"prompt":"מה המילה באנגלית עבור \"פרוזה\"?","options":["metaphor","tone","prose","protagonist"],"correctIndex":2}'::jsonb, 7),
+  ('literary-analysis', 'verse', '{"prompt":"מה המילה באנגלית עבור \"שירה, חרוזים\"?","options":["motif","foreshadowing","symbolism","verse"],"correctIndex":3}'::jsonb, 8),
+  ('literary-analysis', 'metaphor', '{"prompt":"מה המילה באנגלית עבור \"מטאפורה\"?","options":["metaphor","narrative","tone","symbolism"],"correctIndex":0}'::jsonb, 9),
+  ('literary-analysis', 'tone', '{"prompt":"מה המילה באנגלית עבור \"טון (ספרותי)\"?","options":["metaphor","tone","prose","verse"],"correctIndex":1}'::jsonb, 10)
+) as gen(topic_slug, headword, content, sort_order)
+join public.topics t on t.slug = gen.topic_slug
+join public.vocabulary_items v on v.topic_id = t.id and v.headword = gen.headword;
+
+insert into public.exercises (type, skill_area, topic_id, cefr_level, content, sort_order)
+select 'match'::exercise_type, 'vocabulary'::skill_area, t.id, t.cefr_level, gen.content, 100
+from (values
+  ('daily-routines', '{"pairs":[{"left":"get up","right":"לקום מהמיטה"},{"left":"have breakfast","right":"לאכול ארוחת בוקר"},{"left":"take a shower","right":"להתקלח"},{"left":"sleep","right":"לישון"}]}'::jsonb),
+  ('hobbies', '{"pairs":[{"left":"swimming","right":"שחייה"},{"left":"cooking","right":"בישול"},{"left":"reading","right":"קריאה (כתחביב)"},{"left":"gardening","right":"גינון"}]}'::jsonb),
+  ('places-in-town', '{"pairs":[{"left":"hospital","right":"בית חולים"},{"left":"supermarket","right":"סופרמרקט"},{"left":"library","right":"ספרייה"},{"left":"pharmacy","right":"בית מרקחת"}]}'::jsonb),
+  ('school', '{"pairs":[{"left":"book","right":"ספר"},{"left":"student","right":"תלמיד/ה"},{"left":"teacher","right":"מורה"},{"left":"classroom","right":"כיתה"}]}'::jsonb),
+  ('rhetoric-persuasion', '{"pairs":[{"left":"satire","right":"סאטירה"},{"left":"euphemism","right":"לשון נקייה"},{"left":"hyperbole","right":"הפרזה (לשונית)"},{"left":"eloquent","right":"רהוט, בעל כושר ביטוי"}]}'::jsonb),
+  ('psychology-cognition', '{"pairs":[{"left":"subconscious","right":"תת-מודע"},{"left":"perception","right":"תפיסה"},{"left":"intuition","right":"אינטואיציה"},{"left":"temperament","right":"מזג (אישיותי)"}]}'::jsonb),
+  ('scientific-inquiry', '{"pairs":[{"left":"causation","right":"סיבתיות"},{"left":"quantify","right":"לכמת"},{"left":"theoretical","right":"תיאורטי"},{"left":"replicate","right":"לשחזר (ניסוי)"}]}'::jsonb),
+  ('literary-analysis', '{"pairs":[{"left":"verse","right":"שירה, חרוזים"},{"left":"metaphor","right":"מטאפורה"},{"left":"symbolism","right":"סמליות"},{"left":"prose","right":"פרוזה"}]}'::jsonb)
+) as gen(topic_slug, content)
+join public.topics t on t.slug = gen.topic_slug;
