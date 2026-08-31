@@ -182,9 +182,12 @@ export default function DashboardPage() {
           transition={{ duration: 0.4, delay: 0.1 }}
           className="col-span-2 row-span-2 relative overflow-hidden rounded-2xl border border-card-border p-6 flex flex-col justify-between"
         >
-          <div
+          <motion.div
             aria-hidden="true"
-            className="absolute inset-0 opacity-70"
+            className="absolute inset-0"
+            initial={{ opacity: 0.55 }}
+            animate={{ opacity: [0.55, 0.75, 0.55] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
             style={{
               background:
                 "radial-gradient(ellipse 70% 60% at 100% 0%, color-mix(in srgb, var(--primary) 18%, transparent) 0%, transparent 60%), radial-gradient(ellipse 60% 55% at 0% 100%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 55%)",

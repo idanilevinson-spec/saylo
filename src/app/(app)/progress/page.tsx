@@ -195,8 +195,12 @@ export default function ProgressPage() {
         transition={{ duration: 0.4, delay: 0.05 }}
         className="mt-6 relative overflow-hidden rounded-2xl border border-card-border p-6 sm:p-8"
       >
-        <div
-          className="absolute inset-0 opacity-60"
+        <motion.div
+          aria-hidden="true"
+          className="absolute inset-0"
+          initial={{ opacity: 0.45 }}
+          animate={{ opacity: [0.45, 0.65, 0.45] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           style={{
             background:
               "radial-gradient(ellipse 70% 60% at 15% 0%, color-mix(in srgb, var(--primary) 16%, transparent) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 100% 100%, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 55%)",

@@ -6,6 +6,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
 import Navbar from "@/components/Navbar";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import PageTransition from "@/components/PageTransition";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -66,7 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <AuthProvider>
             <Navbar />
             <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
-              {children}
+              <PageTransition>{children}</PageTransition>
             </main>
           </AuthProvider>
         </MotionConfig>
