@@ -9,6 +9,10 @@ import EnglishText from "@/components/EnglishText";
 // English-only template can borrow — it only makes sense for a site
 // that actually teaches English *to* Hebrew speakers, so it doubles as
 // a quiet demo of the product (every pair is a real word Saylo teaches).
+// Hidden below xl (not the sm used for the old English-only version):
+// measured that a bilingual pair is wide enough to overlap the h1 at
+// any narrower width, since the h1's own max-w-3xl column leaves too
+// little side margin until the viewport is genuinely wide.
 const FLOATING_WORDS = [
   { en: "Hello", he: "שלום", top: "10%", right: "6%", delay: 0 },
   { en: "Practice", he: "תרגול", top: "60%", right: "2%", delay: 0.7 },
@@ -42,7 +46,7 @@ export default function LandingHero() {
       {FLOATING_WORDS.map((w) => (
         <motion.div
           key={w.en}
-          className="hidden sm:block absolute pointer-events-none"
+          className="hidden xl:block absolute pointer-events-none"
           style={{ top: w.top, right: w.right, left: w.left }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: [0, 1, 1, 0], y: [20, -10, -10, -30] }}
