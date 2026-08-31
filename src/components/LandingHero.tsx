@@ -5,11 +5,15 @@ import { useRef } from "react";
 import Link from "next/link";
 import EnglishText from "@/components/EnglishText";
 
+// A bilingual word-pair badge is the one visual motif no generic,
+// English-only template can borrow — it only makes sense for a site
+// that actually teaches English *to* Hebrew speakers, so it doubles as
+// a quiet demo of the product (every pair is a real word Saylo teaches).
 const FLOATING_WORDS = [
-  { word: "Hello", top: "10%", right: "6%", delay: 0 },
-  { word: "Practice", top: "60%", right: "2%", delay: 0.7 },
-  { word: "Fluent", top: "26%", left: "2%", delay: 1.3 },
-  { word: "Grow", top: "70%", left: "8%", delay: 2 },
+  { en: "Hello", he: "שלום", top: "10%", right: "6%", delay: 0 },
+  { en: "Practice", he: "תרגול", top: "60%", right: "2%", delay: 0.7 },
+  { en: "Fluent", he: "שוטף", top: "26%", left: "2%", delay: 1.3 },
+  { en: "Grow", he: "לצמוח", top: "70%", left: "8%", delay: 2 },
 ];
 
 export default function LandingHero() {
@@ -37,16 +41,23 @@ export default function LandingHero() {
 
       {FLOATING_WORDS.map((w) => (
         <motion.div
-          key={w.word}
+          key={w.en}
           className="hidden sm:block absolute pointer-events-none"
           style={{ top: w.top, right: w.right, left: w.left }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: [0, 1, 1, 0], y: [20, -10, -10, -30] }}
           transition={{ duration: 6, delay: w.delay, repeat: Infinity, ease: "easeInOut" }}
         >
-          <EnglishText className="px-3 py-1.5 rounded-full bg-card border border-card-border shadow-sm text-sm font-medium text-primary block">
-            {w.word}
-          </EnglishText>
+          <div
+            dir="ltr"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-card-border shadow-sm text-sm font-medium"
+          >
+            <EnglishText className="text-primary">{w.en}</EnglishText>
+            <span aria-hidden="true" className="text-accent text-xs">
+              ⇄
+            </span>
+            <bdi className="text-foreground">{w.he}</bdi>
+          </div>
         </motion.div>
       ))}
 
