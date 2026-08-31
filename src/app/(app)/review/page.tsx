@@ -7,6 +7,7 @@ import { PartyPopper, CheckCircle2, XCircle, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
 import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
+import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import McqQuestion from "@/components/McqQuestion";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
@@ -73,6 +74,8 @@ export default function ReviewPage() {
     if (!profile) return;
     const res = await recordAttempt(profile.id, current.exercise, response);
     setResult(res);
+    if (res.isCorrect) playCorrectSound();
+    else playIncorrectSound();
   }
 
   return (
@@ -113,6 +116,7 @@ export default function ReviewPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => {
+                  if (index + 1 >= items.length) playCompleteSound();
                   setResult(null);
                   setIndex((i) => i + 1);
                 }}

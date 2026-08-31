@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
+import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import type { Exercise } from "@/types/database";
 import McqQuestion from "@/components/McqQuestion";
 import FillBlankQuestion from "@/components/FillBlankQuestion";
@@ -33,6 +34,9 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
     const res = await recordAttempt(profile.id, exercise, response);
     setResult(res);
     setSubmitting(false);
+    if (res.isCorrect) playCorrectSound();
+    else playIncorrectSound();
+    if (!nextHref) setTimeout(playCompleteSound, 350);
   }
 
   return (
