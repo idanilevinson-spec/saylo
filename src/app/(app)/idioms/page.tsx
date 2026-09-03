@@ -14,9 +14,20 @@ export default async function IdiomsPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="animate-fade-up">
-        <h1 className="text-3xl font-bold">ניבים ופעלים דו-מיליים</h1>
-        <p className="mt-2 text-muted">אנגלית שאנשים באמת מדברים — לא רק מה שכתוב בספר הדקדוק</p>
+      <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 -top-16 h-48 -z-10"
+          style={{
+            background:
+              "radial-gradient(ellipse 55% 100% at 20% 30%, color-mix(in srgb, var(--primary) 11%, transparent) 0%, transparent 65%), radial-gradient(ellipse 45% 100% at 85% 10%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 60%)",
+          }}
+        />
+        <div className="animate-fade-up">
+          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">שפה יומיומית</span>
+          <h1 className="text-3xl font-bold">ניבים ופעלים דו-מיליים</h1>
+          <p className="mt-2 text-muted">אנגלית שאנשים באמת מדברים — לא רק מה שכתוב בספר הדקדוק</p>
+        </div>
       </div>
 
       <h2 className="mt-10 text-lg font-bold text-muted">Phrasal Verbs</h2>
@@ -26,7 +37,7 @@ export default async function IdiomsPage() {
             <EnglishText as="p" className="text-lg font-bold text-primary">
               {item.phrase}
             </EnglishText>
-            <p className="mt-1 font-medium">{item.meaning_he}</p>
+            <p className="mt-1 font-pen text-lg text-accent-hover">{item.meaning_he}</p>
             <EnglishText as="p" className="mt-2 text-sm text-muted">
               {item.example_en}
             </EnglishText>
@@ -41,7 +52,7 @@ export default async function IdiomsPage() {
             <EnglishText as="p" className="text-lg font-bold text-primary">
               {item.phrase}
             </EnglishText>
-            <p className="mt-1 font-medium">{item.meaning_he}</p>
+            <p className="mt-1 font-pen text-lg text-accent-hover">{item.meaning_he}</p>
             <EnglishText as="p" className="mt-2 text-sm text-muted">
               {item.example_en}
             </EnglishText>

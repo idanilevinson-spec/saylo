@@ -224,6 +224,15 @@ export interface ReadingText {
   open_question_en: string | null;
 }
 
+export interface ReadingOpenQuestion {
+  id: string;
+  reading_text_id: string;
+  question_en: string;
+  sort_order: number;
+  status: ContentStatus;
+  created_at: string;
+}
+
 export interface ListeningClip {
   id: string;
   title_he: string;

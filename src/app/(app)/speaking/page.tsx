@@ -63,6 +63,9 @@ export default function SpeakingPage() {
     <PremiumGate featureName="דיבור עם AI">
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="animate-fade-up">
+          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">
+            תרגול חי
+          </span>
           <h1 className="text-3xl font-bold">דיבור עם AI</h1>
           <p className="mt-2 text-muted">תרגלו שיחה אמיתית באנגלית — בחרו תרחיש או פתחו שיחה חופשית</p>
         </div>

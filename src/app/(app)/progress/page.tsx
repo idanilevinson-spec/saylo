@@ -18,6 +18,7 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
+import CefrBadge from "@/components/CefrBadge";
 import type { CefrLevel, SkillArea } from "@/types/database";
 
 const CEFR_ORDER: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -367,9 +368,9 @@ function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillAr
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm">{meta.label}</p>
                   {level ? (
-                    <EnglishText as="p" className="text-xs text-muted">
-                      רמה {level}
-                    </EnglishText>
+                    <span className="mt-0.5 inline-block">
+                      <CefrBadge level={level} />
+                    </span>
                   ) : (
                     <p className="text-xs text-muted">
                       {skill === "speaking" ? "יבדק בשיחה עם ה-AI" : "טרם נבדק"}

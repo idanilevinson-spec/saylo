@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Loader2, Volume2, PhoneOff, Keyboard } from "lucide-react";
+import { PhoneOff, Keyboard } from "lucide-react";
 import { speak as browserSpeak } from "@/lib/speech/browserTts";
+import SayloAvatar, { type AvatarExpression } from "@/components/SayloAvatar";
+import { loadVoicePref, saveVoicePref, NEURAL_VOICE, type VoicePref } from "@/lib/speech/voicePref";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
-type VoicePref = "female" | "male";
 
 interface VoiceConversationPanelProps {
   onSend: (text: string) => Promise<string | null>;
@@ -17,15 +18,6 @@ interface VoiceConversationPanelProps {
 }
 
 const MAX_SILENT_RETRIES = 3;
-const NEURAL_VOICE: Record<VoicePref, string> = {
-  female: "en-US-JennyNeural",
-  male: "en-US-GuyNeural",
-};
-
-function loadVoicePref(): VoicePref {
-  if (typeof window === "undefined") return "female";
-  return localStorage.getItem("voiceConversationPref") === "male" ? "male" : "female";
-}
 
 // Hands-free "phone call" mode for AI conversation practice: loops
 // Azure recognizeOnceAsync (listen) -> onSend (Claude turn) -> Azure
@@ -44,13 +36,14 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [restartTick, setRestartTick] = useState(0);
   const [voicePref, setVoicePref] = useState<VoicePref>(() => loadVoicePref());
+  const [viseme, setViseme] = useState<number | undefined>(undefined);
   const silentTurnsRef = useRef(0);
   const voicePrefRef = useRef<VoicePref>(voicePref);
 
   function selectVoice(pref: VoicePref) {
     setVoicePref(pref);
     voicePrefRef.current = pref;
-    localStorage.setItem("voiceConversationPref", pref);
+    saveVoicePref(pref);
   }
 
   useEffect(() => {
@@ -145,6 +138,11 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
     function speakReply(replyText: string) {
       setState("speaking");
+      // No live viseme data yet for this turn — the avatar falls back to
+      // its decorative loop until the first visemeReceived event (Azure
+      // path) sets a real value below, or stays undefined for the whole
+      // turn on the browser-TTS fallback path, which has no visemes.
+      setViseme(undefined);
       // Prefetch the next listen's credentials while this reply plays,
       // so listenOnce() below can skip straight to opening the mic.
       const nextListenPreload = loadCredentials().catch(() => null);
@@ -156,6 +154,12 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
           speechConfig.speechSynthesisVoiceName = NEURAL_VOICE[voicePrefRef.current];
           const audioConfig = sdk.AudioConfig.fromDefaultSpeakerOutput();
           const synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
+          // Real lip-sync: Azure fires one of these per syllable, timed to
+          // the actual audio — visemeId 0 means silence/mouth-closed,
+          // anything else means the mouth is shaping a sound right now.
+          synthesizer.visemeReceived = (_sender, e) => {
+            if (!cancelled) setViseme(e.visemeId);
+          };
 
           synthesizer.speakTextAsync(
             replyText,
@@ -202,12 +206,31 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     setRestartTick((t) => t + 1);
   }
 
+  // "ending" (scoring the call) reuses the "thinking" expression — it's the
+  // same "processing" moment, just for the whole conversation instead of
+  // one turn. "connecting"/"paused" fall back to "idle" — the orb is
+  // always on screen, never swapped out for a generic spinner.
+  const avatarExpression: AvatarExpression = ending
+    ? "thinking"
+    : state === "listening" || state === "thinking" || state === "speaking" || state === "error"
+      ? state
+      : "idle";
+
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-8">
+    <div className="relative flex flex-col items-center justify-center gap-7 py-12 px-4 overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 55% at 50% 20%, color-mix(in srgb, var(--primary) 10%, transparent) 0%, transparent 60%), radial-gradient(ellipse 55% 50% at 50% 90%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 55%)",
+        }}
+      />
+
       <div className="flex items-center gap-1.5 p-1 rounded-full bg-background-2 border border-card-border">
         <button
           onClick={() => selectVoice("female")}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             voicePref === "female" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
           }`}
         >
@@ -215,7 +238,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         </button>
         <button
           onClick={() => selectVoice("male")}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             voicePref === "male" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
           }`}
         >
@@ -223,54 +246,39 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         </button>
       </div>
 
-      <div className="relative flex items-center justify-center w-28 h-28">
+      <div className="relative flex items-center justify-center w-64 h-64 sm:w-72 sm:h-72">
+        {/* passport-stamp echo: a quiet dashed ring framing the orb, the
+            same motif as the CEFR stamps and the placement-test result */}
+        <div
+          aria-hidden="true"
+          className={`absolute inset-[8%] rounded-full border-2 border-dashed transition-colors duration-500 ${
+            state === "listening"
+              ? "border-primary/50"
+              : state === "speaking"
+                ? "border-accent/50"
+                : state === "error"
+                  ? "border-danger/40"
+                  : "border-card-border"
+          }`}
+        />
+
         <AnimatePresence>
           {!ending && state === "listening" && (
             <motion.span
               key="ring"
               initial={{ opacity: 0.5, scale: 1 }}
-              animate={{ opacity: 0, scale: 1.6 }}
+              animate={{ opacity: 0, scale: 1.45 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
-              className="absolute inset-0 rounded-full bg-primary/30"
+              className="absolute inset-[8%] rounded-full bg-primary/25"
             />
           )}
         </AnimatePresence>
-        <motion.div
-          animate={
-            !ending && state === "listening"
-              ? { scale: [1, 1.05, 1] }
-              : !ending && state === "speaking"
-                ? { scale: [1, 1.03, 1] }
-                : { scale: 1 }
-          }
-          transition={{
-            duration: 1.1,
-            repeat: !ending && (state === "listening" || state === "speaking") ? Infinity : 0,
-          }}
-          className={`relative w-24 h-24 rounded-full flex items-center justify-center border-2 ${
-            ending
-              ? "bg-background-2 border-card-border text-muted"
-              : state === "listening"
-                ? "bg-primary/10 border-primary text-primary"
-                : state === "speaking"
-                  ? "bg-accent/10 border-accent text-accent-hover"
-                  : state === "error"
-                    ? "bg-danger-ink border-danger text-danger"
-                    : "bg-background-2 border-card-border text-muted"
-          }`}
-        >
-          {ending || state === "thinking" || state === "connecting" ? (
-            <Loader2 size={32} className="animate-spin" />
-          ) : state === "speaking" ? (
-            <Volume2 size={32} />
-          ) : (
-            <Mic size={32} />
-          )}
-        </motion.div>
+
+        <SayloAvatar expression={avatarExpression} gender={voicePref} visemeId={viseme} size={224} />
       </div>
 
-      <p className="text-sm font-medium text-muted min-h-5 text-center px-4">
+      <p className="text-xl sm:text-2xl font-semibold min-h-8 text-center px-4">
         {ending && "מסכמים את השיחה..."}
         {!ending && state === "connecting" && "מתחברים..."}
         {!ending && state === "listening" && "מקשיבים לכם..."}
@@ -283,7 +291,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       {!ending && (state === "paused" || state === "error") && (
         <button
           onClick={resume}
-          className="px-4 py-2 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           {state === "paused" ? "המשך האזנה" : "נסו שוב"}
         </button>
@@ -293,7 +301,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         onClick={onEnd}
         disabled={ending || !canEnd}
         title={!canEnd ? "אמרו משהו קודם כדי לקבל משוב" : undefined}
-        className="mt-2 flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
+        className="mt-2 flex items-center gap-1.5 px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
       >
         <PhoneOff size={16} /> סיום שיחה וקבלת משוב
       </button>

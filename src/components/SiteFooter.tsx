@@ -20,7 +20,10 @@ export default function SiteFooter() {
             התחברות
           </Link>
         </nav>
-        <span>© {new Date().getFullYear()} כל הזכויות שמורות</span>
+        <span>
+          © {new Date().getFullYear()} כל הזכויות שמורות ל-
+          <EnglishText as="span">SAYLO</EnglishText> לימודי אנגלית
+        </span>
       </div>
     </footer>
   );

@@ -13,9 +13,20 @@ export default async function ListeningPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="animate-fade-up">
-        <h1 className="text-3xl font-bold">האזנה</h1>
-        <p className="mt-2 text-muted">הקשיבו לקטע, נסו להבין בלי תמלול, ואז בדקו את עצמכם</p>
+      <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 -top-16 h-48 -z-10"
+          style={{
+            background:
+              "radial-gradient(ellipse 55% 100% at 20% 30%, color-mix(in srgb, var(--primary) 11%, transparent) 0%, transparent 65%), radial-gradient(ellipse 45% 100% at 85% 10%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 60%)",
+          }}
+        />
+        <div className="animate-fade-up">
+          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">אימון שמיעה</span>
+          <h1 className="text-3xl font-bold">האזנה</h1>
+          <p className="mt-2 text-muted">הקשיבו לקטע, נסו להבין בלי תמלול, ואז בדקו את עצמכם</p>
+        </div>
       </div>
 
       {clips.length === 0 ? (

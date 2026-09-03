@@ -3,10 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
-import ReadingTextViewer from "@/components/ReadingTextViewer";
-import ReadingResponseForm from "@/components/ReadingResponseForm";
-import MotionLink from "@/components/MotionLink";
-import { Target } from "lucide-react";
+import ReadingExam from "@/components/ReadingExam";
 import { getReadingText } from "@/lib/content/reading";
 import { getVocabularyLookupMap } from "@/lib/content/vocabulary";
 import { createClient } from "@/lib/supabase/serverClient";
@@ -27,14 +24,20 @@ export default async function ReadingTextPage({ params }: PageProps) {
   if (!text) notFound();
 
   const supabase = await createClient();
-  const { data: firstExercise } = await supabase
-    .from("exercises")
-    .select("id")
-    .eq("reading_text_id", text.id)
-    .eq("status", "published")
-    .order("sort_order")
-    .limit(1)
-    .maybeSingle();
+  const [{ data: exercises }, { data: openQuestions }] = await Promise.all([
+    supabase
+      .from("exercises")
+      .select("*")
+      .eq("reading_text_id", text.id)
+      .eq("status", "published")
+      .order("sort_order"),
+    supabase
+      .from("reading_open_questions")
+      .select("*")
+      .eq("reading_text_id", text.id)
+      .eq("status", "published")
+      .order("sort_order"),
+  ]);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
@@ -42,36 +45,32 @@ export default async function ReadingTextPage({ params }: PageProps) {
         ← כל הטקסטים
       </Link>
 
-      <div className="animate-fade-up">
-        <div className="mt-4 flex items-center gap-3">
-          <h1 className="text-3xl font-bold">{text.title_he}</h1>
-          <CefrBadge level={text.cefr_level} />
+      <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 -top-10 h-40 -z-10"
+          style={{
+            background:
+              "radial-gradient(ellipse 55% 100% at 20% 30%, color-mix(in srgb, var(--primary) 11%, transparent) 0%, transparent 65%), radial-gradient(ellipse 45% 100% at 85% 10%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 60%)",
+          }}
+        />
+        <div className="animate-fade-up">
+          <div className="mt-4 flex items-center gap-3">
+            <h1 className="text-3xl font-bold">{text.title_he}</h1>
+            <CefrBadge level={text.cefr_level} />
+          </div>
+          <EnglishText as="p" className="mt-1 text-muted">
+            {text.title_en}
+          </EnglishText>
         </div>
-        <EnglishText as="p" className="mt-1 text-muted">
-          {text.title_en}
-        </EnglishText>
       </div>
 
-      <div className="mt-8 bg-card border border-card-border rounded-2xl p-6 sm:p-8">
-        <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} />
-      </div>
-
-      {firstExercise && (
-        <MotionLink
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          href={`/practice/${firstExercise.id}`}
-          className="mt-6 flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-        >
-          בדקו את ההבנה שלכם <Target size={16} />
-        </MotionLink>
-      )}
-
-      {text.open_question_en && (
-        <div className="mt-6">
-          <ReadingResponseForm readingTextId={text.id} questionEn={text.open_question_en} />
-        </div>
-      )}
+      <ReadingExam
+        text={text}
+        exercises={exercises ?? []}
+        openQuestions={openQuestions ?? []}
+        vocabByWord={vocabByWord}
+      />
     </div>
   );
 }

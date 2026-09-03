@@ -16,9 +16,22 @@ interface ReadingResponseResult {
 interface ReadingResponseFormProps {
   readingTextId: string;
   questionEn: string;
+  /** Which of the text's (possibly several) open questions this is — omit
+   *  for the legacy single-question flow, which grades against
+   *  reading_texts.open_question_en directly. */
+  questionId?: string;
+  /** Called once grading succeeds — lets a parent flow (e.g. a full timed
+   *  reading exam) know this step is done without this form needing to
+   *  know anything about what comes after it. */
+  onGraded?: (result: ReadingResponseResult) => void;
 }
 
-export default function ReadingResponseForm({ readingTextId, questionEn }: ReadingResponseFormProps) {
+export default function ReadingResponseForm({
+  readingTextId,
+  questionEn,
+  questionId,
+  onGraded,
+}: ReadingResponseFormProps) {
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ReadingResponseResult | null>(null);
@@ -36,7 +49,7 @@ export default function ReadingResponseForm({ readingTextId, questionEn }: Readi
       const res = await fetch("/api/ai/reading-response", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ readingTextId, submittedText: text }),
+        body: JSON.stringify({ readingTextId, submittedText: text, openQuestionId: questionId }),
       });
       if (res.status === 403) {
         setPremiumRequired(true);
@@ -49,6 +62,7 @@ export default function ReadingResponseForm({ readingTextId, questionEn }: Readi
       if (!res.ok) throw new Error("request failed");
       const data = await res.json();
       setResult(data.response);
+      onGraded?.(data.response);
     } catch {
       setError("אירעה שגיאה בקבלת המשוב. נסו שוב.");
     } finally {

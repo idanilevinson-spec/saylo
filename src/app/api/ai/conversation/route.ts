@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 
   const claudeMessage = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    max_tokens: 300,
+    max_tokens: 550,
     system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null),
     tools: [{ type: "web_search_20260318", name: "web_search", max_uses: 2 }],
     messages: (history ?? []).map((m) => ({

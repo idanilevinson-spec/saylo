@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
-import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
+import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/ai/claudeClient";
 import { buildReadingResponsePrompt } from "@/lib/ai/prompts/readingResponse";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
@@ -23,16 +23,32 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
   }
 
-  const { readingTextId, submittedText } = (await request.json()) as {
+  const { readingTextId, submittedText, openQuestionId } = (await request.json()) as {
     readingTextId?: string;
     submittedText?: string;
+    openQuestionId?: string;
   };
   if (!readingTextId || !submittedText?.trim()) {
     return NextResponse.json({ error: "missing readingTextId or submittedText" }, { status: 400 });
   }
 
   const { data: text } = await supabase.from("reading_texts").select("*").eq("id", readingTextId).maybeSingle();
-  if (!text || !text.open_question_en) {
+  if (!text) return NextResponse.json({ error: "reading text not found" }, { status: 404 });
+
+  // A text can now carry several open questions (reading_open_questions,
+  // addressed by id) — fall back to the original single open_question_en
+  // column when no id is given, so older callers keep working unchanged.
+  let questionEn = text.open_question_en;
+  if (openQuestionId) {
+    const { data: question } = await supabase
+      .from("reading_open_questions")
+      .select("question_en")
+      .eq("id", openQuestionId)
+      .eq("reading_text_id", readingTextId)
+      .maybeSingle();
+    questionEn = question?.question_en ?? null;
+  }
+  if (!questionEn) {
     return NextResponse.json({ error: "reading text or question not found" }, { status: 404 });
   }
 
@@ -45,13 +61,17 @@ export async function POST(request: Request) {
 
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    max_tokens: 700,
+    // Detailed Hebrew feedback plus a model answer can run past 700 tokens
+    // for longer C1/C2 passages, which truncates the JSON mid-string and
+    // makes it unparseable — 1024 leaves real headroom, confirmed against
+    // repeated live failures at 700.
+    max_tokens: 1024,
     messages: [
       {
         role: "user",
         content: buildReadingResponsePrompt(
           text.body_en,
-          text.open_question_en,
+          questionEn,
           submittedText,
           (skillLevel?.cefr_level as CefrLevel | undefined) ?? null
         ),
@@ -60,16 +80,11 @@ export async function POST(request: Request) {
   });
   const raw = extractText(message);
 
-  let parsed: ReadingResponseResult;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    parsed = {
-      score: 0,
-      feedbackHe: "אירעה שגיאה בניתוח התשובה של ה-AI. נסו לשלוח שוב.",
-      modelAnswerEn: "",
-    };
-  }
+  const parsed = parseJsonResponse<ReadingResponseResult>(raw) ?? {
+    score: 0,
+    feedbackHe: "אירעה שגיאה בניתוח התשובה של ה-AI. נסו לשלוח שוב.",
+    modelAnswerEn: "",
+  };
 
   const score = Math.max(0, Math.min(100, Math.round(parsed.score ?? 0)));
 
@@ -78,6 +93,7 @@ export async function POST(request: Request) {
     .insert({
       profile_id: user.id,
       reading_text_id: readingTextId,
+      open_question_id: openQuestionId ?? null,
       submitted_text: submittedText,
       score,
       feedback_he: parsed.feedbackHe ?? "",

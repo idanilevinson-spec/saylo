@@ -91,7 +91,7 @@ export default function ProfilePage() {
             </span>
             <p className="text-xs text-muted">XP</p>
           </div>
-          <div className="h-8 w-px bg-card-border" />
+          <div className="h-8 border-e border-dashed border-card-border" />
           <div className="flex flex-col items-center gap-1">
             <span className="flex items-center gap-1 text-accent-hover">
               <Trophy size={16} />
@@ -101,7 +101,7 @@ export default function ProfilePage() {
             </span>
             <p className="text-xs text-muted">רמה</p>
           </div>
-          <div className="h-8 w-px bg-card-border" />
+          <div className="h-8 border-e border-dashed border-card-border" />
           <div className="flex flex-col items-center gap-1">
             <span className="flex items-center gap-1 text-accent-hover">
               <Flame size={16} />

@@ -20,9 +20,20 @@ export default async function WritingPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="animate-fade-up">
-        <h1 className="text-3xl font-bold">כתיבה</h1>
-        <p className="mt-2 text-muted">כתבו טקסט קצר באנגלית, וקבלו משוב אישי ממורה ה-AI</p>
+      <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 -top-16 h-48 -z-10"
+          style={{
+            background:
+              "radial-gradient(ellipse 55% 100% at 20% 30%, color-mix(in srgb, var(--primary) 11%, transparent) 0%, transparent 65%), radial-gradient(ellipse 45% 100% at 85% 10%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 60%)",
+          }}
+        />
+        <div className="animate-fade-up">
+          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">ביטוי בכתב</span>
+          <h1 className="text-3xl font-bold">כתיבה</h1>
+          <p className="mt-2 text-muted">כתבו טקסט קצר באנגלית, וקבלו משוב אישי ממורה ה-AI</p>
+        </div>
       </div>
 
       {prompts.length === 0 ? (

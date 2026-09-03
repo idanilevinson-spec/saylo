@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
-import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
+import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/ai/claudeClient";
 import { buildPlacementSummaryPrompt, type SkillScore } from "@/lib/ai/prompts/placementSummary";
 import { buildWritingCoachPrompt } from "@/lib/ai/prompts/writingCoach";
 import { logAiUsage } from "@/lib/ai/usageLog";
@@ -63,18 +63,19 @@ export async function POST(request: Request) {
   if (writingSample?.trim()) {
     const writingMessage = await anthropic.messages.create({
       model: CLAUDE_MODEL,
-      max_tokens: 700,
+      // See reading-response route: 700 could truncate the JSON mid-string
+      // on longer feedback, making it unparseable.
+      max_tokens: 1024,
       messages: [{ role: "user", content: buildWritingCoachPrompt(PLACEMENT_WRITING_PROMPT, writingSample) }],
     });
     writingUsage = writingMessage.usage;
-    try {
-      const parsed = JSON.parse(extractText(writingMessage)) as { overallScore?: number };
+    const parsed = parseJsonResponse<{ overallScore?: number }>(extractText(writingMessage));
+    if (parsed) {
       const percentCorrect = Math.max(0, Math.min(100, parsed.overallScore ?? 0));
       scores.push({ skill: "writing", percentCorrect, cefrLevel: cefrLevelFromPercent(percentCorrect) });
-    } catch {
-      // If the AI didn't return parseable JSON, skip scoring writing rather
-      // than block the rest of the (already-graded) placement result.
     }
+    // If the AI didn't return parseable JSON, skip scoring writing rather
+    // than block the rest of the (already-graded) placement result.
   }
 
   const message = await anthropic.messages.create({

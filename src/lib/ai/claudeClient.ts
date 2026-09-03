@@ -22,3 +22,22 @@ export function extractText(message: Anthropic.Message): string {
     .map((b) => b.text)
     .join("\n\n");
 }
+
+// Every JSON-response prompt in this codebase tells the model to reply
+// with raw JSON and no markdown code fences, but that instruction isn't
+// reliably followed — the model sometimes wraps its (otherwise valid)
+// JSON in a ```json ... ``` block anyway. Stripping a fence before
+// parsing, rather than only trusting the instruction, is what makes
+// parsing actually robust instead of failing on a coin flip.
+export function parseJsonResponse<T>(raw: string): T | null {
+  const cleaned = raw
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+  try {
+    return JSON.parse(cleaned) as T;
+  } catch {
+    return null;
+  }
+}

@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Volume2, Turtle } from "lucide-react";
+import { Volume2, Turtle, Target } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
+import CefrBadge from "@/components/CefrBadge";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { speak } from "@/lib/speech/browserTts";
-import type { PlacementQuestion, SkillArea } from "@/types/database";
+import type { CefrLevel, PlacementQuestion, SkillArea } from "@/types/database";
 
 const SKILL_LABELS_HE: Record<SkillArea, string> = {
   vocabulary: "אוצר מילים",
@@ -40,6 +41,8 @@ export default function PlacementPage() {
   const { profile, loading: authLoading } = useAuth();
   const [questions, setQuestions] = useState<PlacementQuestion[] | null>(null);
   const [testId, setTestId] = useState<string | null>(null);
+  const [started, setStarted] = useState(false);
+  const [starting, setStarting] = useState(false);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [showWritingStep, setShowWritingStep] = useState(false);
@@ -50,18 +53,12 @@ export default function PlacementPage() {
 
   useEffect(() => {
     if (!profile) return;
-    (async () => {
-      const [{ data: qs }, { data: test }] = await Promise.all([
-        supabase.from("placement_questions").select("*").eq("status", "published").order("sort_order"),
-        supabase
-          .from("placement_tests")
-          .insert({ profile_id: profile.id })
-          .select()
-          .single(),
-      ]);
-      setQuestions(qs ?? []);
-      setTestId(test?.id ?? null);
-    })();
+    supabase
+      .from("placement_questions")
+      .select("*")
+      .eq("status", "published")
+      .order("sort_order")
+      .then(({ data }) => setQuestions(data ?? []));
   }, [profile]);
 
   if (authLoading || questions === null) {
@@ -72,6 +69,46 @@ export default function PlacementPage() {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">
         מבחן הרמה עוד לא זמין — חזרו בקרוב.
+      </div>
+    );
+  }
+
+  async function handleStart() {
+    if (!profile || starting) return;
+    setStarting(true);
+    const { data: test } = await supabase.from("placement_tests").insert({ profile_id: profile.id }).select().single();
+    setTestId(test?.id ?? null);
+    setStarted(true);
+    setStarting(false);
+  }
+
+  if (!started) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="bg-card border border-card-border rounded-2xl p-6 sm:p-10 text-center"
+        >
+          <div className="mx-auto w-20 h-20 rounded-full border-2 border-dashed border-primary bg-primary/[0.07] flex items-center justify-center">
+            <Target size={30} className="text-primary" strokeWidth={2} />
+          </div>
+          <h1 className="mt-5 text-2xl sm:text-3xl font-bold">מבחן רמה</h1>
+          <p className="mt-3 text-muted leading-relaxed">
+            {questions.length} שאלות קצרות שבודקות אוצר מילים, דקדוק, קריאה והאזנה — ובסוף אפשרות לדגימת כתיבה
+            קצרה. לוקח פחות מ־10 דקות, ובסיום תקבלו את רמת ה-CEFR שלכם, לפי תחום.
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleStart}
+            disabled={starting}
+            className="mt-8 w-full sm:w-auto px-10 py-3.5 rounded-xl bg-primary text-primary-ink font-medium text-lg disabled:opacity-60 hover:bg-primary-hover transition-colors"
+          >
+            {starting ? "מתחילים..." : "התחילו את המבחן"}
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
@@ -91,12 +128,21 @@ export default function PlacementPage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.1, type: "spring", bounce: 0.4 }}
-          className="mt-8 bg-card border border-card-border rounded-2xl p-6 sm:p-8 text-center"
+          className="mt-8 flex flex-col items-center"
         >
-          <p className="text-sm text-muted">רמת האנגלית שלכם</p>
-          <EnglishText as="p" className="mt-1 text-5xl font-bold text-primary">
-            {result.overallCefr}
-          </EnglishText>
+          {/* The big payoff moment — your CEFR level, stamped like the
+              landing page's passport badges, just larger for once. */}
+          <motion.div
+            initial={{ rotate: 0 }}
+            animate={{ rotate: -6 }}
+            transition={{ delay: 0.35, duration: 0.4, ease: "easeOut" }}
+            className="w-36 h-36 sm:w-40 sm:h-40 rounded-full border-[3px] border-dashed border-accent bg-accent/[0.07] flex flex-col items-center justify-center"
+          >
+            <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-accent-hover">רמתכם</span>
+            <EnglishText as="span" className="text-4xl sm:text-5xl font-extrabold text-accent-hover leading-none mt-1">
+              {result.overallCefr}
+            </EnglishText>
+          </motion.div>
         </motion.div>
 
         <motion.div
@@ -125,9 +171,7 @@ export default function PlacementPage() {
                       <>
                         <td className="p-3 text-muted">{s.percentCorrect}%</td>
                         <td className="p-3">
-                          <EnglishText as="span" className="font-bold text-primary">
-                            {s.cefrLevel}
-                          </EnglishText>
+                          <CefrBadge level={s.cefrLevel as CefrLevel} />
                         </td>
                       </>
                     ) : (

@@ -83,6 +83,7 @@
   --color-muted: var(--muted);
   --font-sans: var(--font-rubik);
   --font-content: var(--font-jakarta);
+  --font-pen: var(--font-caveat);
 }
 
 body {

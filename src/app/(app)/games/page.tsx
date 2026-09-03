@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Zap, PenTool, Sparkles, Flame, BookOpenCheck } from "lucide-react";
+import { Zap, PenTool, Sparkles, Flame, BookOpenCheck, Link2, Hand, Brain, Trophy, ChevronLeft } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import ContentCard from "@/components/ContentCard";
+import MotionLink from "@/components/MotionLink";
 
 const GAME_MODES = [
   {
@@ -35,6 +36,27 @@ const GAME_MODES = [
     body: "מוצגת מילה עם אותיות חסרות — השלימו אותה נכון",
     href: "/games/spelling",
     tone: "primary" as const,
+  },
+  {
+    icon: Link2,
+    title: "משחק התאמה",
+    body: "גררו כל מילה לזוג שלה — תרגום, הפכים ומשפטים, נגד השעון",
+    href: "/games/match",
+    tone: "accent" as const,
+  },
+  {
+    icon: Hand,
+    title: "תפוס את המילה",
+    body: "מילה נופלת מלמעלה — תפסו את התרגום הנכון לפני שהיא נוחתת",
+    href: "/games/catch",
+    tone: "primary" as const,
+  },
+  {
+    icon: Brain,
+    title: "זיכרון",
+    body: "הפכו קלפים ומצאו את כל זוגות המילה-תרגום בכמה שפחות ניסיונות",
+    href: "/games/memory",
+    tone: "accent" as const,
   },
 ];
 
@@ -73,9 +95,26 @@ export default function GamesHubPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">תרגול משחקי</span>
         <h1 className="text-3xl font-bold">משחקי אוצר מילים</h1>
         <p className="mt-2 text-muted">אותן מילים שאתם לומדים, בכמה דרכים — אם טעיתם במילה, היא תחזור אליכם שוב.</p>
       </motion.div>
+
+      <MotionLink
+        whileHover={{ y: -2 }}
+        whileTap={{ scale: 0.98 }}
+        href="/games/leaderboard"
+        className="mt-6 flex items-center gap-4 bg-gradient-to-l from-primary/10 to-accent/10 border border-primary/25 rounded-2xl p-5 hover:border-primary/45 hover:shadow-md transition-all"
+      >
+        <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+          <Trophy size={22} />
+        </span>
+        <div className="flex-1 min-w-0">
+          <h2 className="font-bold">לוח המובילים השבועי</h2>
+          <p className="mt-0.5 text-sm text-muted">מי צבר הכי הרבה XP השבוע — מכל התרגול והמשחקים</p>
+        </div>
+        <ChevronLeft size={18} className="text-muted shrink-0" />
+      </MotionLink>
 
       {stats && stats.totalSessions > 0 && (
         <motion.div

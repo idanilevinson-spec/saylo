@@ -7,8 +7,10 @@ import { Phone } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import VoiceConversationPanel from "@/components/VoiceConversationPanel";
+import SayloAvatar from "@/components/SayloAvatar";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
+import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
 import type { ConversationMessage, ConversationScore } from "@/types/database";
 
 export default function SpeakingChatPage() {
@@ -22,6 +24,7 @@ export default function SpeakingChatPage() {
   const [ending, setEnding] = useState(false);
   const [voiceMode, setVoiceMode] = useState(startInVoiceMode);
   const [score, setScore] = useState<ConversationScore | null>(null);
+  const [teacherGender] = useState<VoicePref>(() => loadVoicePref());
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -189,17 +192,24 @@ export default function SpeakingChatPage() {
               initial={{ opacity: 0, y: 10, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.25 }}
-              className={`flex ${m.role === "user" ? "justify-start" : "justify-end"}`}
+              className={`flex items-end gap-2 ${m.role === "user" ? "justify-start" : "justify-end"}`}
             >
-              <div
-                className={`max-w-[80%] px-4 py-2.5 rounded-2xl ${
-                  m.role === "user" ? "bg-primary text-primary-ink" : "bg-card border border-card-border"
-                }`}
-              >
-                <EnglishText as="p" className="text-left leading-relaxed">
-                  {m.content}
-                </EnglishText>
-              </div>
+              {m.role === "user" ? (
+                <div className="max-w-[80%] px-4 py-2.5 rounded-2xl bg-primary text-primary-ink">
+                  <EnglishText as="p" className="text-left leading-relaxed">
+                    {m.content}
+                  </EnglishText>
+                </div>
+              ) : (
+                <>
+                  <div className="max-w-[80%] px-4 py-2.5 rounded-2xl bg-card border border-card-border">
+                    <EnglishText as="p" className="text-left leading-relaxed">
+                      {m.content}
+                    </EnglishText>
+                  </div>
+                  <SayloAvatar expression="idle" gender={teacherGender} size={28} className="shrink-0" />
+                </>
+              )}
             </motion.div>
           ))}
         </AnimatePresence>

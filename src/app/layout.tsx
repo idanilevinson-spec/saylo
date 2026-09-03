@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Rubik, Plus_Jakarta_Sans } from "next/font/google";
+import { Rubik, Plus_Jakarta_Sans, Caveat } from "next/font/google";
 import Script from "next/script";
 import { MotionConfig } from "framer-motion";
 import "./globals.css";
@@ -16,6 +16,14 @@ const rubik = Rubik({
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin"],
+});
+
+// Used sparingly on the landing page for the AI tutor's handwritten-style
+// correction marks (the "teacher's pen" motif) — never for body copy.
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+  weight: ["600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -47,7 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="he"
       dir="rtl"
-      className={`${rubik.variable} ${jakarta.variable} h-full antialiased`}
+      className={`${rubik.variable} ${jakarta.variable} ${caveat.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

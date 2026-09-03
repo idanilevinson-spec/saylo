@@ -12,9 +12,12 @@ import ScrollProgress from "@/components/ScrollProgress";
 
 const AUTHED_LINKS = [
   { href: "/dashboard", label: "לוח בקרה" },
+  { href: "/placement", label: "מבחן רמה" },
   { href: "/learn", label: "מסלול לימוד" },
   { href: "/vocabulary", label: "אוצר מילים" },
   { href: "/grammar", label: "דקדוק" },
+  { href: "/reading", label: "קריאה" },
+  { href: "/games", label: "משחקים" },
 ];
 
 export default function Navbar() {

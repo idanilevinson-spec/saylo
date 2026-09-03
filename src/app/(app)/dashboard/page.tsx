@@ -55,7 +55,7 @@ const MODULES = [
   { icon: PenLine, title: "דקדוק", body: "מסלול מלא מ-A1 עד C2", href: "/grammar", available: true },
   { icon: Brain, title: "חזרה חכמה", body: "המילים שהגיע זמנן", href: "/review", available: true },
   { icon: Gamepad2, title: "משחקי אוצר מילים", body: "סיבוב מהירות, איות ואתגר יומי", href: "/games", available: true },
-  { icon: BookOpenText, title: "קריאה", body: "טקסטים עם מילון בלחיצה", href: "/reading", available: true },
+  { icon: BookOpenText, title: "הבנת הנקרא", body: "סיפורים עם שאלות ומשוב AI", href: "/reading", available: true },
   { icon: Headphones, title: "האזנה", body: "הקשיבו ובדקו את עצמכם", href: "/listening", available: true },
   { icon: NotebookPen, title: "כתיבה", body: "משוב אישי מ-AI על מה שכתבתם", href: "/writing", available: true },
   { icon: Quote, title: "ניבים וביטויים", body: "אנגלית שאנשים באמת מדברים", href: "/idioms", available: true },
@@ -141,38 +141,39 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      <motion.h1
+      {/* Boarding-pass header: greeting on one side, today's "flight
+          details" (streak/XP/hearts) on the other, split by a dashed
+          perforation — the same ticket motif as the landing page's
+          pricing card, carried into daily use without its decoration. */}
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="text-3xl sm:text-4xl font-extrabold tracking-tight"
+        className="relative bg-card border border-card-border rounded-2xl overflow-hidden sm:flex sm:items-stretch"
       >
-        {greeting()}, {profile.display_name} 👋
-      </motion.h1>
-
-      {stats && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.05 }}
-          className="mt-4 flex flex-wrap items-center gap-3 text-sm"
-        >
-          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 text-accent-hover font-bold">
-            <Flame size={16} className="fill-current" /> {stats.currentStreak} ימים ברצף
-          </span>
-          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-bold">
-            <Star size={16} className="fill-current" /> {stats.totalXp} XP · רמה {stats.level}
-          </span>
-          {hearts && (
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-danger-ink text-danger font-bold">
-              <Heart size={16} className="fill-current" /> {hearts.current}/{hearts.max} לבבות
-            </span>
-          )}
-          <Link href="/progress" className="text-primary hover:underline">
+        <div className="p-6 sm:p-7 sm:flex-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            {greeting()}, {profile.display_name} 👋
+          </h1>
+          <Link href="/progress" className="mt-2 inline-block text-sm text-primary hover:underline">
             כל ההתקדמות שלי ←
           </Link>
-        </motion.div>
-      )}
+        </div>
+
+        {stats && (
+          <div className="border-t sm:border-t-0 sm:border-e border-dashed border-card-border sm:w-px" aria-hidden="true" />
+        )}
+
+        {stats && (
+          <div className="flex divide-x divide-x-reverse divide-card-border sm:divide-none">
+            <StatField icon={Flame} tone="accent" value={String(stats.currentStreak)} label="רצף ימים" />
+            <StatField icon={Star} tone="primary" value={String(stats.totalXp)} label={`XP · רמה ${stats.level}`} />
+            {hearts && (
+              <StatField icon={Heart} tone="danger" value={`${hearts.current}/${hearts.max}`} label="לבבות" />
+            )}
+          </div>
+        )}
+      </motion.div>
 
       {stats !== null && <SubscriptionBanner subscription={subscription} />}
 
@@ -292,11 +293,14 @@ function RadialProgress({ percent }: { percent: number }) {
   const offset = circumference * (1 - percent / 100);
 
   return (
-    <svg viewBox="0 0 64 64" className="w-16 h-16 shrink-0 -rotate-90">
-      <circle cx="32" cy="32" r={radius} fill="none" stroke="var(--background-2)" strokeWidth="7" />
+    <svg viewBox="0 0 72 72" className="w-[72px] h-[72px] shrink-0 -rotate-90">
+      {/* Dashed outer ring echoes the CEFR "passport stamps" from the
+          landing page — today's goal as a stamp waiting to be completed. */}
+      <circle cx="36" cy="36" r={radius + 6} fill="none" stroke="var(--card-border)" strokeWidth="1.5" strokeDasharray="3 4" />
+      <circle cx="36" cy="36" r={radius} fill="none" stroke="var(--background-2)" strokeWidth="7" />
       <motion.circle
-        cx="32"
-        cy="32"
+        cx="36"
+        cy="36"
         r={radius}
         fill="none"
         stroke="var(--primary)"
@@ -308,5 +312,30 @@ function RadialProgress({ percent }: { percent: number }) {
         transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
       />
     </svg>
+  );
+}
+
+function StatField({
+  icon: Icon,
+  tone,
+  value,
+  label,
+}: {
+  icon: typeof Flame;
+  tone: "accent" | "primary" | "danger";
+  value: string;
+  label: string;
+}) {
+  const toneClass =
+    tone === "accent" ? "text-accent-hover" : tone === "primary" ? "text-primary" : "text-danger";
+
+  return (
+    <div className="px-5 py-4 sm:py-6 flex flex-col items-center justify-center text-center min-w-[92px]">
+      <span className={`flex items-center gap-1 font-extrabold text-lg ${toneClass}`}>
+        <Icon size={15} className="fill-current" />
+        {value}
+      </span>
+      <span className="mt-0.5 text-[11px] text-muted">{label}</span>
+    </div>
   );
 }

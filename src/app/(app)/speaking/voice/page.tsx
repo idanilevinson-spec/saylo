@@ -106,6 +106,9 @@ export default function VoiceConversationHubPage() {
     <PremiumGate featureName="שיחה עם נציג AI">
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="animate-fade-up">
+          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">
+            תרגול חי
+          </span>
           <h1 className="text-3xl font-bold">שיחה עם נציג AI</h1>
           <p className="mt-2 text-muted">
             שיחה קולית חופשית עם ה-AI — כמו שיחת טלפון. בחרו נושא, או פתחו שיחה חופשית על מה שבא לכם.
