@@ -177,6 +177,7 @@ export default function SpeedRoundPage() {
   return (
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-12">
+        <h1 className="sr-only">סיבוב מהירות</h1>
         <div className="flex items-center justify-between text-sm text-muted mb-2">
           <span>
             שאלה {index + 1} מתוך {items.length}

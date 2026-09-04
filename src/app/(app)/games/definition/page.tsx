@@ -119,6 +119,7 @@ export default function DefinitionGamePage() {
   return (
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-12">
+        <h1 className="sr-only">זיהוי לפי הגדרה</h1>
         <p className="text-sm text-muted mb-4">
           שאלה {index + 1} מתוך {items.length}
         </p>

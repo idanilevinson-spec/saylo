@@ -166,6 +166,7 @@ export default function MemoryGamePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
+      <h1 className="sr-only">משחק הזיכרון</h1>
       <p className="text-sm text-muted mb-4 text-center">
         {matchedVocabIds.size} מתוך {pairTotal} זוגות · {comparisons} ניסיונות
       </p>

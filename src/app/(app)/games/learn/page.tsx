@@ -247,6 +247,7 @@ function LearnModePageInner() {
   return (
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-10">
+        <h1 className="sr-only">סבב הלמידה</h1>
         <div className="flex items-center justify-between text-sm text-muted mb-6">
           <span>
             {masteredWords.length} מתוך {total} מילים בשליטה

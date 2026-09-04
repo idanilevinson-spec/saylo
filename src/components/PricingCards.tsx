@@ -55,7 +55,7 @@ export default function PricingCards() {
                 {plan.badge}
               </span>
             )}
-            <h3 className="font-bold text-lg">{plan.label}</h3>
+            <h2 className="font-bold text-lg">{plan.label}</h2>
             <div className="mt-4">
               <EnglishText as="span" className="text-3xl font-bold">
                 ₪{monthlyEquivalent(plan)}
@@ -98,7 +98,7 @@ export default function PricingCards() {
         transition={{ duration: 0.4 }}
         className="max-w-3xl mx-auto mt-14 bg-background-2 border border-card-border rounded-2xl p-6"
       >
-        <h3 className="font-bold mb-3">מה כלול בכל המסלולים בתשלום?</h3>
+        <h2 className="font-bold mb-3">מה כלול בכל המסלולים בתשלום?</h2>
         <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted">
           {[
             "מבחן רמה ומסלול לימוד אישי",

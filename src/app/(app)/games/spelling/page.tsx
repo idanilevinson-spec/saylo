@@ -126,6 +126,7 @@ export default function SpellingChallengePage() {
   return (
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-12">
+        <h1 className="sr-only">אתגר האיות</h1>
         <p className="text-sm text-muted mb-4">
           מילה {index + 1} מתוך {items.length}
         </p>

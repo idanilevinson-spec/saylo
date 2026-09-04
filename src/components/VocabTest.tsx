@@ -278,6 +278,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
   return (
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-10">
+        <h1 className="sr-only">מבחן תרגול</h1>
         <div className="flex items-center justify-between mb-6">
           <span className="text-sm text-muted">
             שאלה {stepIndex + 1} מתוך {steps.length}

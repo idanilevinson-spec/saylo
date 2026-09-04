@@ -172,6 +172,7 @@ export default function DailyChallengePage() {
   return (
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-12">
+        <h1 className="sr-only">האתגר היומי</h1>
         <div className="flex items-center justify-between text-sm text-muted mb-4">
           <span>
             שאלה {index + 1} מתוך {items.length}

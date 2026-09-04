@@ -313,6 +313,7 @@ export default function MatchGamePage() {
   return (
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-10">
+        <h1 className="sr-only">משחק ההתאמה</h1>
         <div className="flex items-center justify-between mb-2">
           <div>
             <span className="text-xs font-bold tracking-[0.14em] uppercase text-accent-hover">
