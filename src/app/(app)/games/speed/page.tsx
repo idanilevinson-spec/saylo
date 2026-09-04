@@ -99,6 +99,10 @@ export default function SpeedRoundPage() {
       playIncorrectSound();
     }
 
+    // A wrong (or timed-out) answer needs a beat to actually read which
+    // option was correct; a right answer doesn't need to linger at all —
+    // in a game built around pace, pausing exactly as long either way
+    // dragged down the fast path for no reason.
     setTimeout(async () => {
       if (index + 1 >= items.length) {
         await supabase.from("vocabulary_game_sessions").insert({
@@ -118,7 +122,7 @@ export default function SpeedRoundPage() {
         setWasCorrect(null);
         setTimedOut(false);
       }
-    }, 900);
+    }, res.isCorrect ? 350 : 700);
   }
 
   if (loading || items === null) {
@@ -172,7 +176,7 @@ export default function SpeedRoundPage() {
 
   return (
     <HeartsGate>
-      <div className="max-w-xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between text-sm text-muted mb-2">
           <span>
             שאלה {index + 1} מתוך {items.length}

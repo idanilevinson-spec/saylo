@@ -8,6 +8,7 @@ import { getDailyReview } from "@/lib/srs/queue";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import { supabase } from "@/lib/supabase/browserClient";
+import { shuffle } from "@/lib/utils/shuffle";
 import IconBadge from "@/components/IconBadge";
 import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
@@ -20,15 +21,6 @@ interface Card {
   vocabularyItemId: string;
   label: string;
   isEnglish: boolean;
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 type Phase = "loading" | "empty" | "playing" | "finished";
@@ -51,6 +43,7 @@ export default function MemoryGamePage() {
   // plain ref.
   const comparisonsRef = useRef(0);
   const matchesRef = useRef(0);
+  const xpAwardedRef = useRef(0);
 
   useEffect(() => {
     if (!profile) return;
@@ -93,7 +86,14 @@ export default function MemoryGamePage() {
           const nextMatched = new Set(matchedVocabIds);
           nextMatched.add(first.vocabularyItemId);
           setMatchedVocabIds(nextMatched);
-          if (profile) recordGameAnswer(profile.id, first.vocabularyItemId, true, "vocab_game_memory");
+          if (profile) {
+            try {
+              const res = await recordGameAnswer(profile.id, first.vocabularyItemId, true, "vocab_game_memory");
+              xpAwardedRef.current += res.xpAwarded;
+            } catch (err) {
+              console.error("recordGameAnswer failed", err);
+            }
+          }
 
           if (nextMatched.size === pairTotal) {
             playCompleteSound();
@@ -104,7 +104,7 @@ export default function MemoryGamePage() {
                 game_type: "memory",
                 total_questions: comparisonsRef.current,
                 correct_count: matchesRef.current,
-                xp_awarded: 0,
+                xp_awarded: xpAwardedRef.current,
               });
             }
           }
@@ -165,12 +165,12 @@ export default function MemoryGamePage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-10">
+    <div className="max-w-3xl mx-auto px-4 py-10">
       <p className="text-sm text-muted mb-4 text-center">
         {matchedVocabIds.size} מתוך {pairTotal} זוגות · {comparisons} ניסיונות
       </p>
 
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-4">
         {cards.map((card) => {
           const isMatched = matchedVocabIds.has(card.vocabularyItemId);
           const isFlipped = isMatched || flipped.includes(card.id);
@@ -179,7 +179,7 @@ export default function MemoryGamePage() {
               key={card.id}
               onClick={() => handleFlip(card)}
               disabled={isMatched || locked}
-              className="relative h-20 [perspective:600px]"
+              className="relative h-28 [perspective:600px]"
               whileTap={!isFlipped ? { scale: 0.96 } : undefined}
             >
               <motion.div
@@ -191,10 +191,10 @@ export default function MemoryGamePage() {
                   className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center [backface-visibility:hidden]"
                   aria-hidden="true"
                 >
-                  <span className="w-2 h-2 rounded-full bg-white/70" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-white/70" />
                 </div>
                 <div
-                  className={`absolute inset-0 rounded-xl border flex items-center justify-center px-1.5 text-center text-xs font-bold [backface-visibility:hidden] [transform:rotateY(180deg)] ${
+                  className={`absolute inset-0 rounded-xl border flex items-center justify-center px-2 text-center text-sm font-bold [backface-visibility:hidden] [transform:rotateY(180deg)] ${
                     isMatched ? "border-success/40 bg-success/10" : "border-card-border bg-card"
                   }`}
                 >

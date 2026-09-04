@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/browserClient";
 import { getDailyReview } from "@/lib/srs/queue";
+import { shuffle } from "@/lib/utils/shuffle";
 
 export type MatchRoundType = "translation" | "opposites" | "sentences";
 
@@ -10,15 +11,6 @@ export interface MatchPair {
   /** What it pairs with — Hebrew translation, English opposite, or a
    *  blanked example sentence, depending on round type. */
   target: string;
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 // Same word source as Speed Round / Spelling Challenge (SRS-due first,

@@ -25,6 +25,7 @@ export default function DefinitionGamePage() {
   const [correctCount, setCorrectCount] = useState(0);
   const [finished, setFinished] = useState(false);
   const correctCountRef = useRef(0);
+  const xpAwardedRef = useRef(0);
 
   useEffect(() => {
     if (!profile) return;
@@ -45,7 +46,8 @@ export default function DefinitionGamePage() {
     } else {
       playIncorrectSound();
     }
-    await recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_definition");
+    const res = await recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_definition");
+    xpAwardedRef.current += res.xpAwarded;
 
     setTimeout(async () => {
       if (index + 1 >= items.length) {
@@ -54,7 +56,7 @@ export default function DefinitionGamePage() {
           game_type: "definition",
           total_questions: items.length,
           correct_count: correctCountRef.current,
-          xp_awarded: 0,
+          xp_awarded: xpAwardedRef.current,
         });
         playCompleteSound();
         setFinished(true);
@@ -116,7 +118,7 @@ export default function DefinitionGamePage() {
 
   return (
     <HeartsGate>
-      <div className="max-w-xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-12">
         <p className="text-sm text-muted mb-4">
           שאלה {index + 1} מתוך {items.length}
         </p>

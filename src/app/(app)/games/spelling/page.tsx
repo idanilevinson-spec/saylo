@@ -25,11 +25,19 @@ export default function SpellingChallengePage() {
   const [correctCount, setCorrectCount] = useState(0);
   const [finished, setFinished] = useState(false);
   const correctCountRef = useRef(0);
+  const xpAwardedRef = useRef(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!profile) return;
     getDailyReview(profile.id, ROUND_SIZE).then(setItems);
   }, [profile]);
+
+  // Auto-focus the input for every new word so the learner can keep
+  // typing without having to click into the field each round.
+  useEffect(() => {
+    if (!locked) inputRef.current?.focus();
+  }, [index, locked]);
 
   async function handleSubmit() {
     if (!profile || !items || locked || !input.trim()) return;
@@ -44,7 +52,8 @@ export default function SpellingChallengePage() {
     } else {
       playIncorrectSound();
     }
-    await recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_spelling");
+    const res = await recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_spelling");
+    xpAwardedRef.current += res.xpAwarded;
 
     setTimeout(async () => {
       if (index + 1 >= items.length) {
@@ -53,7 +62,7 @@ export default function SpellingChallengePage() {
           game_type: "spelling",
           total_questions: items.length,
           correct_count: correctCountRef.current,
-          xp_awarded: 0,
+          xp_awarded: xpAwardedRef.current,
         });
         playCompleteSound();
         setFinished(true);
@@ -116,7 +125,7 @@ export default function SpellingChallengePage() {
 
   return (
     <HeartsGate>
-      <div className="max-w-xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-12">
         <p className="text-sm text-muted mb-4">
           מילה {index + 1} מתוך {items.length}
         </p>
@@ -142,6 +151,7 @@ export default function SpellingChallengePage() {
           </p>
 
           <input
+            ref={inputRef}
             type="text"
             dir="ltr"
             aria-label={`השלימו את המילה עבור ${item.translationHe}`}

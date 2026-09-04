@@ -142,7 +142,16 @@ export interface ExerciseAttempt {
   created_at: string;
 }
 
-export type VocabularyGameType = "speed_round" | "spelling" | "daily_challenge" | "definition";
+export type VocabularyGameType =
+  | "speed_round"
+  | "spelling"
+  | "daily_challenge"
+  | "definition"
+  | "match"
+  | "word_catch"
+  | "memory"
+  | "learn"
+  | "test";
 
 export interface VocabularyGameSession {
   id: string;
@@ -151,6 +160,8 @@ export interface VocabularyGameSession {
   total_questions: number;
   correct_count: number;
   xp_awarded: number;
+  /** Per-question review data — only populated by Test Mode today. */
+  answers: Record<string, unknown>[] | null;
   created_at: string;
 }
 

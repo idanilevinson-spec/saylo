@@ -13,6 +13,7 @@ export interface GameAnswerResult {
   currentStreak: number;
   newBadges: Badge[];
   heartsRemaining: number | null;
+  repetitions: number;
 }
 
 const XP_CORRECT = 10;
@@ -31,7 +32,7 @@ export async function recordGameAnswer(
   isCorrect: boolean,
   xpSource: string
 ): Promise<GameAnswerResult> {
-  await updateSrsForVocabularyItem(profileId, vocabularyItemId, isCorrect);
+  const srsResult = await updateSrsForVocabularyItem(profileId, vocabularyItemId, isCorrect);
 
   const xpAmount = isCorrect ? XP_CORRECT : XP_ATTEMPT;
   const [{ totalXp }, streak, { count }] = await Promise.all([
@@ -62,5 +63,6 @@ export async function recordGameAnswer(
     currentStreak: streak.current_streak,
     newBadges,
     heartsRemaining,
+    repetitions: srsResult.repetitions,
   };
 }

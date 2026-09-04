@@ -35,7 +35,7 @@ const WIDE_FEATURE = {
 };
 
 const SMALL_FEATURES_2 = [
-  { icon: Gamepad2, title: "גיימיפיקציה", body: "XP, רצף ימים ותגי הישג.", href: "/games" },
+  { icon: Gamepad2, title: "לומדים דרך משחק", body: "XP, רצף ימים ותגי הישג.", href: "/games" },
   { icon: Target, title: "מסלולים לפי מטרה", body: "עבודה, טיולים, ראיונות או לימודים.", href: "/learn" },
 ];
 

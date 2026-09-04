@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/browserClient";
+import { shuffle } from "@/lib/utils/shuffle";
 
 export interface DefinitionGameItem {
   vocabularyItemId: string;
@@ -7,15 +8,6 @@ export interface DefinitionGameItem {
   definitionEn: string;
   options: string[];
   correctIndex: number;
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 // Same "SRS-due first, then new" prioritization as getDailyReview
@@ -35,26 +27,33 @@ export async function getDefinitionGameWords(profileId: string, limit = 10): Pro
 
   const poolIds = new Set(pool.map((p) => p.id));
 
-  const { data: dueSrs } = await supabase
-    .from("srs_items")
-    .select("vocabulary_item_id")
-    .eq("profile_id", profileId)
-    .in("vocabulary_item_id", [...poolIds])
-    .lte("due_at", new Date().toISOString())
-    .order("due_at")
-    .limit(limit);
+  // Both queries only depend on profileId, not on each other, so they
+  // run together instead of one-after-the-other — this fetch reruns on
+  // every "play again" click.
+  const [{ data: dueSrs }, { data: allSrs }] = await Promise.all([
+    supabase
+      .from("srs_items")
+      .select("vocabulary_item_id")
+      .eq("profile_id", profileId)
+      .in("vocabulary_item_id", [...poolIds])
+      .lte("due_at", new Date().toISOString())
+      .order("due_at")
+      .limit(limit),
+    supabase.from("srs_items").select("vocabulary_item_id").eq("profile_id", profileId),
+  ]);
 
   const dueIds = (dueSrs ?? []).map((d) => d.vocabulary_item_id);
   const remaining = limit - dueIds.length;
 
   let extraIds: string[] = [];
   if (remaining > 0) {
-    const { data: allSrs } = await supabase.from("srs_items").select("vocabulary_item_id").eq("profile_id", profileId);
     const knownIds = new Set((allSrs ?? []).map((s) => s.vocabulary_item_id));
     extraIds = shuffle(pool.map((p) => p.id).filter((id) => !knownIds.has(id) && !dueIds.includes(id))).slice(0, remaining);
   }
 
-  const selectedIds = [...dueIds, ...extraIds].slice(0, limit);
+  // Shuffled so due items (always listed due_at-ascending) don't show up
+  // in the same order every time this game is replayed in one sitting.
+  const selectedIds = shuffle([...dueIds, ...extraIds]).slice(0, limit);
   const byId = new Map(pool.map((p) => [p.id, p]));
 
   return selectedIds

@@ -2,7 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Zap, PenTool, Sparkles, Flame, BookOpenCheck, Link2, Hand, Brain, Trophy, ChevronLeft } from "lucide-react";
+import {
+  Zap,
+  PenTool,
+  Sparkles,
+  Flame,
+  BookOpenCheck,
+  Link2,
+  Hand,
+  Brain,
+  Trophy,
+  ChevronLeft,
+  GraduationCap,
+  ClipboardCheck,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import ContentCard from "@/components/ContentCard";
@@ -100,11 +113,43 @@ export default function GamesHubPage() {
         <p className="mt-2 text-muted">אותן מילים שאתם לומדים, בכמה דרכים — אם טעיתם במילה, היא תחזור אליכם שוב.</p>
       </motion.div>
 
+      <div className="mt-6 grid sm:grid-cols-2 gap-4">
+        <MotionLink
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          href="/games/learn"
+          className="flex flex-col gap-3 bg-gradient-to-br from-success/10 to-primary/10 border border-success/25 rounded-2xl p-5 hover:border-success/45 hover:shadow-md transition-all"
+        >
+          <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-success/15 text-success">
+            <GraduationCap size={22} />
+          </span>
+          <div>
+            <h2 className="font-bold">למידה</h2>
+            <p className="mt-0.5 text-sm text-muted">סבב אדפטיבי שמתקדם איתכם — שאלות קלות יותר למילים חדשות, קשות יותר למילים שכבר מוכרות</p>
+          </div>
+        </MotionLink>
+
+        <MotionLink
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          href="/games/test"
+          className="flex flex-col gap-3 bg-gradient-to-br from-accent/10 to-primary/10 border border-accent/25 rounded-2xl p-5 hover:border-accent/45 hover:shadow-md transition-all"
+        >
+          <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent-hover">
+            <ClipboardCheck size={22} />
+          </span>
+          <div>
+            <h2 className="font-bold">מבחן תרגול</h2>
+            <p className="mt-0.5 text-sm text-muted">מבחן מלא לפי נושא — רב-ברירה, השלמת מילה ונכון/לא נכון, עם סיכום וציון בסוף</p>
+          </div>
+        </MotionLink>
+      </div>
+
       <MotionLink
         whileHover={{ y: -2 }}
         whileTap={{ scale: 0.98 }}
         href="/games/leaderboard"
-        className="mt-6 flex items-center gap-4 bg-gradient-to-l from-primary/10 to-accent/10 border border-primary/25 rounded-2xl p-5 hover:border-primary/45 hover:shadow-md transition-all"
+        className="mt-4 flex items-center gap-4 bg-gradient-to-l from-primary/10 to-accent/10 border border-primary/25 rounded-2xl p-5 hover:border-primary/45 hover:shadow-md transition-all"
       >
         <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
           <Trophy size={22} />

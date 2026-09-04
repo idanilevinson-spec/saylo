@@ -43,6 +43,7 @@ export default function DailyChallengePage() {
   const [finished, setFinished] = useState(false);
   const [alreadyDoneToday, setAlreadyDoneToday] = useState(false);
   const correctCountRef = useRef(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!profile) return;
@@ -63,6 +64,13 @@ export default function DailyChallengePage() {
   }, [profile]);
 
   const modes = useMemo(() => (items ? items.map((it) => modeFor(it.vocabularyItemId)) : []), [items]);
+
+  // Auto-focus the spelling input for every new round of that type, same
+  // as Spelling Challenge — otherwise the learner has to click in every
+  // single time this mode comes up.
+  useEffect(() => {
+    if (!locked && modes[index] === "spelling") inputRef.current?.focus();
+  }, [index, locked, modes]);
 
   async function finishRound(finalCorrect: number) {
     if (!profile || !items) return;
@@ -163,7 +171,7 @@ export default function DailyChallengePage() {
 
   return (
     <HeartsGate>
-      <div className="max-w-xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between text-sm text-muted mb-4">
           <span>
             שאלה {index + 1} מתוך {items.length}
@@ -217,6 +225,7 @@ export default function DailyChallengePage() {
                 {maskWord(item.headword)}
               </p>
               <input
+                ref={inputRef}
                 type="text"
                 dir="ltr"
                 aria-label={`השלימו את המילה עבור ${item.translationHe}`}

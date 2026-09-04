@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
-import { Target } from "lucide-react";
+import { Target, GraduationCap, ClipboardCheck } from "lucide-react";
 import SpeakButton from "@/components/SpeakButton";
 import PronunciationRecorder from "@/components/PronunciationRecorder";
 import MotionLink from "@/components/MotionLink";
@@ -50,16 +50,34 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
             <h1 className="text-3xl font-bold">{topic.name_he}</h1>
             <CefrBadge level={topic.cefr_level} />
           </div>
-          {firstExercise && (
+          <div className="flex flex-wrap items-center gap-2">
+            {firstExercise && (
+              <MotionLink
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                href={`/practice/${firstExercise.id}`}
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+              >
+                תרגלו את הנושא <Target size={16} />
+              </MotionLink>
+            )}
             <MotionLink
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              href={`/practice/${firstExercise.id}`}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+              href={`/games/learn?topic=${topic.slug}`}
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-success/30 bg-success/5 text-success font-medium hover:bg-success/10 transition-colors"
             >
-              תרגלו את הנושא <Target size={16} />
+              למדו את הנושא <GraduationCap size={16} />
             </MotionLink>
-          )}
+            <MotionLink
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              href={`/games/test?topic=${topic.slug}`}
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-accent/30 bg-accent/5 text-accent-hover font-medium hover:bg-accent/10 transition-colors"
+            >
+              מבחן נושא <ClipboardCheck size={16} />
+            </MotionLink>
+          </div>
         </div>
         <EnglishText as="p" className="mt-1 text-muted">
           {topic.name_en}

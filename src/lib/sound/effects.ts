@@ -45,6 +45,15 @@ export function playIncorrectSound(): void {
   playTone(ctx, 220, now, 0.22, 0.1); // A3 — soft, not harsh
 }
 
+export function playLevelUpSound(): void {
+  const ctx = getContext();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  playTone(ctx, 392.0, now, 0.1, 0.12); // G4
+  playTone(ctx, 523.25, now + 0.08, 0.1, 0.12); // C5
+  playTone(ctx, 659.25, now + 0.16, 0.2, 0.15); // E5
+}
+
 export function playCompleteSound(): void {
   const ctx = getContext();
   if (!ctx) return;

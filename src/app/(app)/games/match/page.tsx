@@ -8,6 +8,7 @@ import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { getMatchPairs, type MatchPair, type MatchRoundType } from "@/lib/games/matchContent";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import { supabase } from "@/lib/supabase/browserClient";
+import { shuffle } from "@/lib/utils/shuffle";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import MotionLink from "@/components/MotionLink";
@@ -29,15 +30,6 @@ const LEVELS: LevelConfig[] = [
 
 const DRAG_THRESHOLD = 8;
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function lineCoords(el: HTMLElement | undefined, containerRect: DOMRect) {
   if (!el) return null;
   const r = el.getBoundingClientRect();
@@ -49,6 +41,12 @@ function lineCoords(el: HTMLElement | undefined, containerRect: DOMRect) {
 
 type Phase = "loading" | "empty" | "playing" | "levelUp" | "finished";
 
+// A drag/tap can now originate from either column — "source" (id = pair
+// id) or "target" (id = the target's display value) — so selection and
+// drag state are tracked generically instead of assuming the right-hand
+// column is always where interaction starts.
+type Endpoint = { side: "source"; id: string } | { side: "target"; id: string };
+
 export default function MatchGamePage() {
   const { profile, loading: authLoading } = useAuth();
   const [phase, setPhase] = useState<Phase>("loading");
@@ -56,18 +54,20 @@ export default function MatchGamePage() {
   const [pairs, setPairs] = useState<MatchPair[]>([]);
   const [targetOrder, setTargetOrder] = useState<string[]>([]);
   const [matchedIds, setMatchedIds] = useState<Set<string>>(new Set());
-  const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
+  const [selectedEndpoint, setSelectedEndpoint] = useState<Endpoint | null>(null);
   const [wrongPulse, setWrongPulse] = useState<{ sourceId: string; target: string } | null>(null);
   const [dragLine, setDragLine] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
 
   const correctCountRef = useRef(0);
   const totalAttemptsRef = useRef(0);
+  const xpAwardedRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const sourceRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const targetRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const dragStateRef = useRef<{ sourceId: string; startX: number; startY: number; isDragging: boolean } | null>(null);
+  const dragStateRef = useRef<{ endpoint: Endpoint; startX: number; startY: number; isDragging: boolean } | null>(null);
   const matchedIdsRef = useRef<Set<string>>(new Set());
+  const selectedEndpointRef = useRef<Endpoint | null>(null);
 
   const level = LEVELS[levelIndex];
 
@@ -95,7 +95,8 @@ export default function MatchGamePage() {
     setTargetOrder(shuffle(found.pairs.map((p) => p.target)));
     setMatchedIds(new Set());
     matchedIdsRef.current = new Set();
-    setSelectedSourceId(null);
+    setSelectedEndpoint(null);
+    selectedEndpointRef.current = null;
     setTimeLeft(found.cfg.seconds);
     setPhase("playing");
   }
@@ -126,7 +127,7 @@ export default function MatchGamePage() {
         game_type: "match",
         total_questions: totalAttemptsRef.current,
         correct_count: correctCountRef.current,
-        xp_awarded: 0,
+        xp_awarded: xpAwardedRef.current,
       });
     }
   }
@@ -146,8 +147,14 @@ export default function MatchGamePage() {
       next.add(sourceId);
       matchedIdsRef.current = next;
       setMatchedIds(next);
-      setSelectedSourceId(null);
-      recordGameAnswer(profile.id, sourceId, true, "vocab_game_match");
+      setSelectedEndpoint(null);
+      selectedEndpointRef.current = null;
+      try {
+        const res = await recordGameAnswer(profile.id, sourceId, true, "vocab_game_match");
+        xpAwardedRef.current += res.xpAwarded;
+      } catch (err) {
+        console.error("recordGameAnswer failed", err);
+      }
 
       if (next.size === pairs.length) {
         setPhase("levelUp");
@@ -162,8 +169,14 @@ export default function MatchGamePage() {
     } else {
       playIncorrectSound();
       setWrongPulse({ sourceId, target: targetValue });
-      setSelectedSourceId(null);
-      recordGameAnswer(profile.id, sourceId, false, "vocab_game_match");
+      setSelectedEndpoint(null);
+      selectedEndpointRef.current = null;
+      try {
+        const res = await recordGameAnswer(profile.id, sourceId, false, "vocab_game_match");
+        xpAwardedRef.current += res.xpAwarded;
+      } catch (err) {
+        console.error("recordGameAnswer failed", err);
+      }
       setTimeout(() => setWrongPulse(null), 450);
     }
   }
@@ -178,9 +191,17 @@ export default function MatchGamePage() {
   const attemptMatchRef = useRef(attemptMatch);
   attemptMatchRef.current = attemptMatch;
 
-  function handleSourcePointerDown(sourceId: string, e: React.PointerEvent) {
-    if (matchedIds.has(sourceId) || phase !== "playing") return;
-    dragStateRef.current = { sourceId, startX: e.clientX, startY: e.clientY, isDragging: false };
+  function isEndpointMatched(endpoint: Endpoint): boolean {
+    if (endpoint.side === "source") return matchedIds.has(endpoint.id);
+    return pairs.some((p) => matchedIds.has(p.id) && p.target === endpoint.id);
+  }
+
+  // Bound to both columns now — either side can start a drag or a tap,
+  // and the other side completes it, matching how a real user naturally
+  // expects a two-column matching game to work.
+  function handleEndpointPointerDown(endpoint: Endpoint, e: React.PointerEvent) {
+    if (isEndpointMatched(endpoint) || phase !== "playing") return;
+    dragStateRef.current = { endpoint, startX: e.clientX, startY: e.clientY, isDragging: false };
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", handlePointerUp);
   }
@@ -196,7 +217,8 @@ export default function MatchGamePage() {
     }
     if (dragStateRef.current?.isDragging) {
       const rect = container.getBoundingClientRect();
-      const start = lineCoords(sourceRefs.current.get(drag.sourceId), rect);
+      const refMap = drag.endpoint.side === "source" ? sourceRefs.current : targetRefs.current;
+      const start = lineCoords(refMap.get(drag.endpoint.id), rect);
       if (start) {
         setDragLine({ x1: start.x, y1: start.y, x2: e.clientX - rect.left, y2: e.clientY - rect.top });
       }
@@ -213,19 +235,35 @@ export default function MatchGamePage() {
 
     if (drag.isDragging) {
       const el = document.elementFromPoint(e.clientX, e.clientY);
-      const targetEl = el?.closest<HTMLElement>("[data-target-value]");
-      const targetValue = targetEl?.dataset.targetValue;
-      if (targetValue) attemptMatchRef.current(drag.sourceId, targetValue);
+      if (drag.endpoint.side === "source") {
+        const targetEl = el?.closest<HTMLElement>("[data-target-value]");
+        const targetValue = targetEl?.dataset.targetValue;
+        if (targetValue) attemptMatchRef.current(drag.endpoint.id, targetValue);
+      } else {
+        const sourceEl = el?.closest<HTMLElement>("[data-source-id]");
+        const sourceId = sourceEl?.dataset.sourceId;
+        if (sourceId) attemptMatchRef.current(sourceId, drag.endpoint.id);
+      }
     } else {
-      setSelectedSourceId((cur) => (cur === drag.sourceId ? null : drag.sourceId));
+      const current = selectedEndpointRef.current;
+      if (current && current.side !== drag.endpoint.side) {
+        // A selection from the other column is already pending — this
+        // tap completes the pair, regardless of which side started it.
+        const sourceId = current.side === "source" ? current.id : drag.endpoint.id;
+        const targetValue = current.side === "target" ? current.id : drag.endpoint.id;
+        selectedEndpointRef.current = null;
+        setSelectedEndpoint(null);
+        attemptMatchRef.current(sourceId, targetValue);
+      } else if (current && current.side === drag.endpoint.side && current.id === drag.endpoint.id) {
+        selectedEndpointRef.current = null;
+        setSelectedEndpoint(null);
+      } else {
+        selectedEndpointRef.current = drag.endpoint;
+        setSelectedEndpoint(drag.endpoint);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  function handleTargetClick(targetValue: string) {
-    if (phase !== "playing" || !selectedSourceId) return;
-    attemptMatch(selectedSourceId, targetValue);
-  }
 
   if (authLoading || phase === "loading") {
     return <div className="max-w-2xl mx-auto px-4 py-24 text-center text-muted">טוען מילים...</div>;
@@ -274,7 +312,7 @@ export default function MatchGamePage() {
 
   return (
     <HeartsGate>
-      <div className="max-w-2xl mx-auto px-4 py-10">
+      <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-2">
           <div>
             <span className="text-xs font-bold tracking-[0.14em] uppercase text-accent-hover">
@@ -357,14 +395,15 @@ export default function MatchGamePage() {
                     ref={(el) => {
                       if (el) sourceRefs.current.set(p.id, el);
                     }}
-                    onPointerDown={(e) => handleSourcePointerDown(p.id, e)}
+                    data-source-id={p.id}
+                    onPointerDown={(e) => handleEndpointPointerDown({ side: "source", id: p.id }, e)}
                     animate={isWrong ? { x: [0, -6, 6, -4, 4, 0] } : {}}
                     transition={{ duration: 0.4 }}
                     style={{ touchAction: "none" }}
                     className={`select-none rounded-xl border px-3 py-2.5 text-sm cursor-pointer transition-colors ${
                       isMatched
                         ? "border-success/40 bg-success/10 opacity-70 cursor-default"
-                        : selectedSourceId === p.id
+                        : selectedEndpoint?.side === "source" && selectedEndpoint.id === p.id
                           ? "border-primary bg-primary/5"
                           : isWrong
                             ? "border-danger bg-danger/5"
@@ -387,15 +426,18 @@ export default function MatchGamePage() {
                       if (el) targetRefs.current.set(t, el);
                     }}
                     data-target-value={t}
-                    onClick={() => handleTargetClick(t)}
+                    onPointerDown={(e) => handleEndpointPointerDown({ side: "target", id: t }, e)}
                     animate={isWrong ? { x: [0, 6, -6, 4, -4, 0] } : {}}
                     transition={{ duration: 0.4 }}
+                    style={{ touchAction: "none" }}
                     className={`select-none rounded-xl border px-3 py-2.5 text-sm transition-colors ${
                       isMatched
-                        ? "border-success/40 bg-success/10 opacity-70"
-                        : isWrong
-                          ? "border-danger bg-danger/5 cursor-pointer"
-                          : "border-card-border bg-card hover:border-primary/40 cursor-pointer"
+                        ? "border-success/40 bg-success/10 opacity-70 cursor-default"
+                        : selectedEndpoint?.side === "target" && selectedEndpoint.id === t
+                          ? "border-primary bg-primary/5 cursor-pointer"
+                          : isWrong
+                            ? "border-danger bg-danger/5 cursor-pointer"
+                            : "border-card-border bg-card hover:border-primary/40 cursor-pointer"
                     }`}
                   >
                     {/^[a-zA-Z____]/.test(t) ? <EnglishText className="pointer-events-none">{t}</EnglishText> : t}
