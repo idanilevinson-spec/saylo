@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Bot } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
@@ -28,6 +29,14 @@ export default function LandingHero() {
         aria-hidden="true"
         className="absolute bottom-0 left-[8%] w-64 h-64 rounded-full bg-accent/20 blur-3xl pointer-events-none"
         style={{ y: blobAccentY }}
+      />
+      <Image
+        src="/logo-mark.png"
+        alt=""
+        aria-hidden="true"
+        width={420}
+        height={420}
+        className="absolute -bottom-20 -left-16 rotate-[8deg] opacity-[0.08] pointer-events-none select-none"
       />
 
       <div className="relative max-w-5xl mx-auto grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-14 items-center">
