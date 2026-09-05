@@ -81,6 +81,7 @@ export default function ReviewPage() {
   return (
     <HeartsGate>
       <div className="max-w-xl mx-auto px-4 py-12">
+        <h1 className="sr-only">חזרה חכמה</h1>
         <p className="text-sm text-muted mb-4">
           מילה {index + 1} מתוך {items.length}
         </p>

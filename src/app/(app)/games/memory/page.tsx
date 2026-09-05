@@ -180,6 +180,11 @@ export default function MemoryGamePage() {
               key={card.id}
               onClick={() => handleFlip(card)}
               disabled={isMatched || locked}
+              // backface-visibility only hides the back face visually — the
+              // text node is still in the DOM either way, so without this a
+              // screen reader can read every card's word before it's ever
+              // flipped, which gives away the whole game.
+              aria-label={isFlipped ? card.label : "כרטיס מוסתר, לחצו לחשיפה"}
               className="relative h-28 [perspective:600px]"
               whileTap={!isFlipped ? { scale: 0.96 } : undefined}
             >
@@ -195,6 +200,7 @@ export default function MemoryGamePage() {
                   <span className="w-2.5 h-2.5 rounded-full bg-white/70" />
                 </div>
                 <div
+                  aria-hidden="true"
                   className={`absolute inset-0 rounded-xl border flex items-center justify-center px-2 text-center text-sm font-bold [backface-visibility:hidden] [transform:rotateY(180deg)] ${
                     isMatched ? "border-success/40 bg-success/10" : "border-card-border bg-card"
                   }`}

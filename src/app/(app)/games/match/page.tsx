@@ -206,6 +206,35 @@ export default function MatchGamePage() {
     window.addEventListener("pointerup", handlePointerUp);
   }
 
+  // The tap-to-select half of the pointer-up logic below, pulled out so
+  // keyboard activation (Enter/Space) can reuse it — these cards are plain
+  // divs with only pointer handlers, so without this a keyboard or screen
+  // reader user has no way to play this game at all.
+  function handleEndpointTap(endpoint: Endpoint) {
+    const current = selectedEndpointRef.current;
+    if (current && current.side !== endpoint.side) {
+      const sourceId = current.side === "source" ? current.id : endpoint.id;
+      const targetValue = current.side === "target" ? current.id : endpoint.id;
+      selectedEndpointRef.current = null;
+      setSelectedEndpoint(null);
+      attemptMatchRef.current(sourceId, targetValue);
+    } else if (current && current.side === endpoint.side && current.id === endpoint.id) {
+      selectedEndpointRef.current = null;
+      setSelectedEndpoint(null);
+    } else {
+      selectedEndpointRef.current = endpoint;
+      setSelectedEndpoint(endpoint);
+    }
+  }
+
+  function handleEndpointKeyDown(endpoint: Endpoint, e: React.KeyboardEvent) {
+    if (isEndpointMatched(endpoint) || phase !== "playing") return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleEndpointTap(endpoint);
+    }
+  }
+
   const handlePointerMove = useCallback((e: PointerEvent) => {
     const drag = dragStateRef.current;
     const container = containerRef.current;
@@ -245,22 +274,7 @@ export default function MatchGamePage() {
         if (sourceId) attemptMatchRef.current(sourceId, drag.endpoint.id);
       }
     } else {
-      const current = selectedEndpointRef.current;
-      if (current && current.side !== drag.endpoint.side) {
-        // A selection from the other column is already pending — this
-        // tap completes the pair, regardless of which side started it.
-        const sourceId = current.side === "source" ? current.id : drag.endpoint.id;
-        const targetValue = current.side === "target" ? current.id : drag.endpoint.id;
-        selectedEndpointRef.current = null;
-        setSelectedEndpoint(null);
-        attemptMatchRef.current(sourceId, targetValue);
-      } else if (current && current.side === drag.endpoint.side && current.id === drag.endpoint.id) {
-        selectedEndpointRef.current = null;
-        setSelectedEndpoint(null);
-      } else {
-        selectedEndpointRef.current = drag.endpoint;
-        setSelectedEndpoint(drag.endpoint);
-      }
+      handleEndpointTap(drag.endpoint);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -398,10 +412,15 @@ export default function MatchGamePage() {
                     }}
                     data-source-id={p.id}
                     onPointerDown={(e) => handleEndpointPointerDown({ side: "source", id: p.id }, e)}
+                    onKeyDown={(e) => handleEndpointKeyDown({ side: "source", id: p.id }, e)}
+                    role="button"
+                    tabIndex={isMatched ? -1 : 0}
+                    aria-pressed={selectedEndpoint?.side === "source" && selectedEndpoint.id === p.id}
+                    aria-disabled={isMatched}
                     animate={isWrong ? { x: [0, -6, 6, -4, 4, 0] } : {}}
                     transition={{ duration: 0.4 }}
                     style={{ touchAction: "none" }}
-                    className={`select-none rounded-xl border px-3 py-2.5 text-sm cursor-pointer transition-colors ${
+                    className={`select-none rounded-xl border px-3 py-2.5 text-sm cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched
                         ? "border-success/40 bg-success/10 opacity-70 cursor-default"
                         : selectedEndpoint?.side === "source" && selectedEndpoint.id === p.id
@@ -428,10 +447,15 @@ export default function MatchGamePage() {
                     }}
                     data-target-value={t}
                     onPointerDown={(e) => handleEndpointPointerDown({ side: "target", id: t }, e)}
+                    onKeyDown={(e) => handleEndpointKeyDown({ side: "target", id: t }, e)}
+                    role="button"
+                    tabIndex={isMatched ? -1 : 0}
+                    aria-pressed={selectedEndpoint?.side === "target" && selectedEndpoint.id === t}
+                    aria-disabled={isMatched}
                     animate={isWrong ? { x: [0, 6, -6, 4, -4, 0] } : {}}
                     transition={{ duration: 0.4 }}
                     style={{ touchAction: "none" }}
-                    className={`select-none rounded-xl border px-3 py-2.5 text-sm transition-colors ${
+                    className={`select-none rounded-xl border px-3 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched
                         ? "border-success/40 bg-success/10 opacity-70 cursor-default"
                         : selectedEndpoint?.side === "target" && selectedEndpoint.id === t
