@@ -96,6 +96,7 @@ export default function AdminExercisesPage() {
         <h2 className="font-bold">תרגילים {exercises ? `(${exercises.length})` : ""}</h2>
         <div className="flex items-center gap-3">
           <select
+            aria-label="סינון לפי סטטוס"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as ContentStatus | "all")}
             className="px-2 py-1.5 rounded border border-card-border bg-card text-sm"
@@ -128,6 +129,7 @@ export default function AdminExercisesPage() {
         <div className="mt-3 p-3 rounded-lg bg-background-2 space-y-2">
           <div className="flex gap-2">
             <select
+              aria-label="תחום מיומנות"
               value={form.skill_area}
               onChange={(e) => setForm({ ...form, skill_area: e.target.value as SkillArea })}
               className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
@@ -139,6 +141,7 @@ export default function AdminExercisesPage() {
               ))}
             </select>
             <select
+              aria-label="רמת CEFR"
               value={form.cefr_level}
               onChange={(e) => setForm({ ...form, cefr_level: e.target.value as CefrLevel })}
               className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
@@ -167,6 +170,7 @@ export default function AdminExercisesPage() {
           />
           {optionsList.length > 0 && (
             <select
+              aria-label="תשובה נכונה"
               value={form.correctIndex}
               onChange={(e) => setForm({ ...form, correctIndex: Number(e.target.value) })}
               className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"

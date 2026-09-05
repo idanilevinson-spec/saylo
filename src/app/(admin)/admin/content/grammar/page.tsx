@@ -149,6 +149,7 @@ export default function AdminGrammarPage() {
             />
             <div className="flex gap-2">
               <select
+                aria-label="רמת CEFR"
                 value={topicForm.cefr_level}
                 onChange={(e) => setTopicForm({ ...topicForm, cefr_level: e.target.value as CefrLevel })}
                 className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
@@ -160,6 +161,7 @@ export default function AdminGrammarPage() {
                 ))}
               </select>
               <select
+                aria-label="סטטוס"
                 value={topicForm.status}
                 onChange={(e) => setTopicForm({ ...topicForm, status: e.target.value as ContentStatus })}
                 className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
@@ -238,6 +240,7 @@ export default function AdminGrammarPage() {
                 />
                 <div className="flex gap-2">
                   <select
+                    aria-label="רמת CEFR"
                     value={lessonForm.cefr_level}
                     onChange={(e) => setLessonForm({ ...lessonForm, cefr_level: e.target.value as CefrLevel })}
                     className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
@@ -249,6 +252,7 @@ export default function AdminGrammarPage() {
                     ))}
                   </select>
                   <select
+                    aria-label="סטטוס"
                     value={lessonForm.status}
                     onChange={(e) => setLessonForm({ ...lessonForm, status: e.target.value as ContentStatus })}
                     className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"

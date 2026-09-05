@@ -38,7 +38,7 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold">ניהול המערכת</h1>
-      <nav className="mt-4 flex flex-wrap items-center gap-1 bg-card/60 border border-card-border rounded-xl p-1 w-fit">
+      <nav aria-label="ניהול המערכת" className="mt-4 flex flex-wrap items-center gap-1 bg-card/60 border border-card-border rounded-xl p-1 w-fit">
         {TABS.map((tab) => (
           <Link key={tab.href} href={tab.href} className={tabClass(tab.href)}>
             {tab.label}

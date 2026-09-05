@@ -92,6 +92,7 @@ export default function AdminListeningPage() {
           />
           <div className="flex gap-2">
             <select
+              aria-label="רמת CEFR"
               value={form.cefr_level}
               onChange={(e) => setForm({ ...form, cefr_level: e.target.value as CefrLevel })}
               className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
@@ -103,6 +104,7 @@ export default function AdminListeningPage() {
               ))}
             </select>
             <select
+              aria-label="סטטוס"
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value as ContentStatus })}
               className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
