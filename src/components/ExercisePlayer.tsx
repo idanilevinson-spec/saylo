@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
+import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import type { Exercise } from "@/types/database";
 import McqQuestion from "@/components/McqQuestion";
@@ -81,6 +82,11 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                 {result.isCorrect ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
                 {result.isCorrect ? "תשובה נכונה!" : "לא בדיוק"}
               </p>
+              {!result.isCorrect && (
+                <p className="mt-1 text-sm text-danger">
+                  התשובה הנכונה: <span className="font-medium">{correctAnswerLabel(exercise.type, exercise.content)}</span>
+                </p>
+              )}
               <p className="mt-1 text-sm text-muted">
                 +{result.xpAwarded} XP · רצף {result.currentStreak} ימים
               </p>

@@ -18,19 +18,25 @@ export default function McqQuestion({ content, disabled, onSubmit }: McqQuestion
     <div>
       <p className="font-medium text-lg">{c.prompt}</p>
       <div className="mt-4 space-y-2">
-        {c.options.map((option, i) => (
-          <button
-            key={i}
-            disabled={disabled}
-            onClick={() => setSelected(i)}
-            aria-pressed={selected === i}
-            className={`w-full text-right px-4 py-3 rounded-xl border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
-              selected === i ? "border-primary bg-primary/5" : "border-card-border hover:border-primary/40"
-            } disabled:opacity-70`}
-          >
-            <EnglishText>{option}</EnglishText>
-          </button>
-        ))}
+        {c.options.map((option, i) => {
+          const isCorrectOption = i === c.correctIndex;
+          const isSelected = selected === i;
+          let stateClass = "border-card-border hover:border-primary/40";
+          if (disabled && isCorrectOption) stateClass = "border-success bg-success/10";
+          else if (disabled && isSelected && !isCorrectOption) stateClass = "border-danger bg-danger/10";
+          else if (isSelected) stateClass = "border-primary bg-primary/5";
+          return (
+            <button
+              key={i}
+              disabled={disabled}
+              onClick={() => setSelected(i)}
+              aria-pressed={selected === i}
+              className={`w-full text-right px-4 py-3 rounded-xl border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
+            >
+              <EnglishText>{option}</EnglishText>
+            </button>
+          );
+        })}
       </div>
       {!disabled && (
         <button

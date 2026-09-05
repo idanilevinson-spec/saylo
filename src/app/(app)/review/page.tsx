@@ -7,6 +7,7 @@ import { PartyPopper, CheckCircle2, XCircle, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
 import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
+import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import McqQuestion from "@/components/McqQuestion";
 import HeartsGate from "@/components/HeartsGate";
@@ -107,6 +108,12 @@ export default function ReviewPage() {
                   {result.isCorrect ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
                   {result.isCorrect ? "תשובה נכונה!" : "לא בדיוק"}
                 </p>
+                {!result.isCorrect && (
+                  <p className="mt-1 text-sm text-danger">
+                    התשובה הנכונה:{" "}
+                    <span className="font-medium">{correctAnswerLabel(current.exercise.type, current.exercise.content)}</span>
+                  </p>
+                )}
                 <p className="mt-1 text-sm text-muted">+{result.xpAwarded} XP</p>
                 {result.heartsRemaining !== null && (
                   <p className="mt-1 flex items-center gap-1.5 text-sm text-danger">

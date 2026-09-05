@@ -251,7 +251,11 @@ export default function DailyChallengePage() {
 
           {wasCorrect !== null && (
             <p role="status" className={`mt-4 text-center font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
-              {wasCorrect ? "כל הכבוד!" : mode === "spelling" ? `לא בדיוק — המילה היא "${item.headword}"` : "לא בדיוק"}
+              {wasCorrect
+                ? "כל הכבוד!"
+                : mode === "spelling"
+                  ? `לא בדיוק — המילה היא "${item.headword}"`
+                  : `לא בדיוק — התשובה הנכונה: "${mcqContent?.options[mcqContent.correctIndex]}"`}
             </p>
           )}
         </motion.div>

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Timer, ChevronDown, ChevronUp, Sparkles, Trophy, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { recordAttempt } from "@/lib/exercises/recordAttempt";
+import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import McqQuestion from "@/components/McqQuestion";
 import ReadingResponseForm from "@/components/ReadingResponseForm";
@@ -366,6 +367,14 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
                     {lastCorrect ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
                     {lastCorrect ? "תשובה נכונה!" : "לא בדיוק"}
                   </div>
+                  {!lastCorrect && (
+                    <p className="mt-1 text-sm text-danger">
+                      התשובה הנכונה:{" "}
+                      <span className="font-medium">
+                        {correctAnswerLabel(currentExercise.type, currentExercise.content)}
+                      </span>
+                    </p>
+                  )}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}

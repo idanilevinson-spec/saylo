@@ -407,6 +407,12 @@ export default function VocabTest({ steps }: VocabTestProps) {
                   {lastCorrect ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
                   {lastCorrect ? "תשובה נכונה!" : "לא בדיוק"}
                 </div>
+                {!lastCorrect && outcomes.length > 0 && (
+                  <p className="mt-1 text-center text-sm text-danger">
+                    התשובה הנכונה:{" "}
+                    <span className="font-medium">{outcomes[outcomes.length - 1].correctLabel}</span>
+                  </p>
+                )}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
