@@ -137,6 +137,29 @@ h2 {
   }
 }
 
+/* A slow light-sweep across the hero's gradient headline — the kind of
+   quiet, premium detail that reads as polish rather than decoration. */
+@keyframes gradient-shimmer {
+  0%, 15% {
+    background-position: 0% 50%;
+  }
+  50%, 65% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.animate-gradient-shimmer {
+  background-size: 220% 100%;
+  animation: gradient-shimmer 6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-gradient-shimmer {
+    animation: none;
+  }
+}
+
 /* All English learning content renders through the EnglishText component,
    which applies this class — keeps it visually distinct from Hebrew UI chrome
    so learners never confuse "what the app says" with "what they're learning". */

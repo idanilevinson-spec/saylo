@@ -1,34 +1,67 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
+import type { MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bot } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import MagneticButton from "@/components/MagneticButton";
 
 export default function LandingHero() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
-  const y = useTransform(scrollYProgress, [0, 1], [0, 40]);
-  const blobPrimaryY = useTransform(scrollYProgress, [0, 1], [0, 60]);
-  const blobAccentY = useTransform(scrollYProgress, [0, 1], [0, -50]);
-  const cardRotate = useTransform(scrollYProgress, [0, 1], [-2.2, 0.8]);
-  const cardY = useTransform(scrollYProgress, [0, 1], [0, -14]);
-  const stampRotate = useTransform(scrollYProgress, [0, 1], [-11, -5]);
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 300, damping: 40, restDelta: 0.001 });
+  const opacity = useTransform(smoothProgress, [0, 1], [1, 0]);
+  const y = useTransform(smoothProgress, [0, 1], [0, 40]);
+  const blobPrimaryY = useTransform(smoothProgress, [0, 1], [0, 60]);
+  const blobAccentY = useTransform(smoothProgress, [0, 1], [0, -50]);
+  const cardRotate = useTransform(smoothProgress, [0, 1], [-2.2, 0.8]);
+  const cardY = useTransform(smoothProgress, [0, 1], [0, -14]);
+  const stampRotate = useTransform(smoothProgress, [0, 1], [-11, -5]);
+
+  // A gentle cursor-parallax on the two ambient glows — the blobs drift
+  // toward the pointer at different rates, giving the hero a subtle sense
+  // of depth that only shows up once you actually move the mouse.
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const pointerXSpring = useSpring(pointerX, { stiffness: 60, damping: 20, mass: 0.6 });
+  const pointerYSpring = useSpring(pointerY, { stiffness: 60, damping: 20, mass: 0.6 });
+  const blobPrimaryX = useTransform(pointerXSpring, [-1, 1], [-18, 18]);
+  const blobPrimaryYPointer = useTransform(pointerYSpring, [-1, 1], [-18, 18]);
+  const blobAccentX = useTransform(pointerXSpring, [-1, 1], [14, -14]);
+  const blobAccentYPointer = useTransform(pointerYSpring, [-1, 1], [14, -14]);
+  const blobPrimaryYCombined = useTransform([blobPrimaryY, blobPrimaryYPointer], ([a, b]: number[]) => a + b);
+  const blobAccentYCombined = useTransform([blobAccentY, blobAccentYPointer], ([a, b]: number[]) => a + b);
+
+  function onPointerMove(e: MouseEvent<HTMLElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    pointerX.set(((e.clientX - rect.left) / rect.width) * 2 - 1);
+    pointerY.set(((e.clientY - rect.top) / rect.height) * 2 - 1);
+  }
+
+  function onPointerLeave() {
+    pointerX.set(0);
+    pointerY.set(0);
+  }
 
   return (
-    <section ref={ref} className="relative overflow-hidden px-4 pt-16 pb-20 sm:pt-24 sm:pb-28">
+    <section
+      ref={ref}
+      onMouseMove={onPointerMove}
+      onMouseLeave={onPointerLeave}
+      className="relative overflow-hidden px-4 pt-16 pb-20 sm:pt-24 sm:pb-28"
+    >
       <motion.div
         aria-hidden="true"
         className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-primary/20 blur-3xl pointer-events-none"
-        style={{ y: blobPrimaryY }}
+        style={{ y: blobPrimaryYCombined, x: blobPrimaryX }}
       />
       <motion.div
         aria-hidden="true"
         className="absolute bottom-0 left-[8%] w-64 h-64 rounded-full bg-accent/20 blur-3xl pointer-events-none"
-        style={{ y: blobAccentY }}
+        style={{ y: blobAccentYCombined, x: blobAccentX }}
       />
       <Image
         src="/logo-watermark.png"
@@ -58,7 +91,7 @@ export default function LandingHero() {
           >
             האנגלית שתמיד רצית,
             <br />
-            <span className="bg-gradient-to-l from-primary to-accent bg-clip-text text-transparent">
+            <span className="animate-gradient-shimmer bg-gradient-to-l from-primary to-accent bg-clip-text text-transparent">
               סוף סוף מובנת
             </span>
           </motion.h1>
@@ -79,22 +112,26 @@ export default function LandingHero() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-3"
           >
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                href="/signup"
-                className="block px-8 py-3.5 rounded-xl bg-primary text-primary-ink font-medium text-lg hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
-              >
-                התחילו ללמוד בחינם
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                href="/pricing"
-                className="block px-8 py-3.5 rounded-xl bg-card border border-card-border font-medium text-lg hover:bg-background-2 transition-colors"
-              >
-                לצפייה במסלולים
-              </Link>
-            </motion.div>
+            <MagneticButton>
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Link
+                  href="/signup"
+                  className="block px-8 py-3.5 rounded-xl bg-primary text-primary-ink font-medium text-lg hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+                >
+                  התחילו ללמוד בחינם
+                </Link>
+              </motion.div>
+            </MagneticButton>
+            <MagneticButton>
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Link
+                  href="/pricing"
+                  className="block px-8 py-3.5 rounded-xl bg-card border border-card-border font-medium text-lg hover:bg-background-2 transition-colors"
+                >
+                  לצפייה במסלולים
+                </Link>
+              </motion.div>
+            </MagneticButton>
           </motion.div>
         </motion.div>
 
