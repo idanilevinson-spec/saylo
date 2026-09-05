@@ -78,6 +78,7 @@ export default function DashboardPage() {
   );
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [hearts, setHearts] = useState<{ current: number; max: number } | null>(null);
+  const [placementDone, setPlacementDone] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!loading && !profile) {
@@ -98,7 +99,13 @@ export default function DashboardPage() {
         .select("amount")
         .eq("profile_id", profile.id)
         .gte("created_at", startOfToday.toISOString()),
-    ]).then(([xpRes, streakRes, subRes, todayXpRes]) => {
+      supabase
+        .from("placement_tests")
+        .select("id")
+        .eq("profile_id", profile.id)
+        .eq("status", "completed")
+        .limit(1),
+    ]).then(([xpRes, streakRes, subRes, todayXpRes, placementRes]) => {
       setStats({
         totalXp: xpRes.data?.total_xp ?? 0,
         level: xpRes.data?.current_level ?? 1,
@@ -106,6 +113,7 @@ export default function DashboardPage() {
         todayXp: (todayXpRes.data ?? []).reduce((sum, e) => sum + e.amount, 0),
       });
       setSubscription(subRes.data ?? null);
+      setPlacementDone((placementRes.data?.length ?? 0) > 0);
     });
   }, [profile]);
 
@@ -174,6 +182,33 @@ export default function DashboardPage() {
           </div>
         )}
       </motion.div>
+
+      {placementDone === false && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+          className="mt-6"
+        >
+          <Link
+            href="/placement"
+            className="group relative flex items-center gap-5 overflow-hidden rounded-2xl border-2 border-dashed border-accent bg-accent/[0.07] p-6 transition-colors hover:bg-accent/[0.11]"
+          >
+            <span className="inline-flex w-14 h-14 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent-hover">
+              <Target size={26} strokeWidth={2} />
+            </span>
+            <div className="min-w-0">
+              <h2 className="font-bold text-lg">התחילו כאן: מבחן הרמה שלכם</h2>
+              <p className="mt-1 text-sm text-muted">
+                פחות מ־10 דקות, ובסיומן נדע בדיוק איפה להתחיל ולבנות לכם מסלול שמתאים לרמה שלכם.
+              </p>
+            </div>
+            <span className="ms-auto shrink-0 text-accent-hover font-medium hidden sm:block group-hover:translate-x-[-4px] transition-transform">
+              בואו נתחיל ←
+            </span>
+          </Link>
+        </motion.div>
+      )}
 
       {stats !== null && <SubscriptionBanner subscription={subscription} />}
 

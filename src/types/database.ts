@@ -151,7 +151,8 @@ export type VocabularyGameType =
   | "word_catch"
   | "memory"
   | "learn"
-  | "test";
+  | "test"
+  | "idioms";
 
 export interface VocabularyGameSession {
   id: string;
