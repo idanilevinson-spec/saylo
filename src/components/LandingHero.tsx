@@ -31,12 +31,12 @@ export default function LandingHero() {
         style={{ y: blobAccentY }}
       />
       <Image
-        src="/logo-mark.png"
+        src="/logo-watermark.png"
         alt=""
         aria-hidden="true"
-        width={420}
-        height={420}
-        className="absolute -bottom-20 -left-16 rotate-[8deg] opacity-[0.08] pointer-events-none select-none"
+        width={480}
+        height={415}
+        className="absolute top-1/2 -translate-y-1/2 -left-24 rotate-[6deg] opacity-[0.08] pointer-events-none select-none"
       />
 
       <div className="relative max-w-5xl mx-auto grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-14 items-center">
