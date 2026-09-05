@@ -127,7 +127,7 @@ export default function PronunciationRecorder({ targetPhrase }: { targetPhrase: 
 
       {status === "error" && (
         <div className="text-sm">
-          <p className="text-danger">{errorMessage}</p>
+          <p role="alert" className="text-danger">{errorMessage}</p>
           <button onClick={startRecording} className="mt-1 text-primary hover:underline">
             נסו שוב
           </button>

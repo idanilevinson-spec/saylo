@@ -178,7 +178,7 @@ export default function AdminExercisesPage() {
               ))}
             </select>
           )}
-          {formError && <p className="text-sm text-danger">{formError}</p>}
+          {formError && <p role="alert" className="text-sm text-danger">{formError}</p>}
           <div className="flex gap-2">
             <button onClick={createMcq} className="px-3 py-1.5 rounded-lg bg-primary text-primary-ink text-sm font-medium">
               שמירה כטיוטה

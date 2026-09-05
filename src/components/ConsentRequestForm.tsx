@@ -83,7 +83,7 @@ export default function ConsentRequestForm({ status }: ConsentRequestFormProps) 
         placeholder="parent@example.com"
         className="mt-4 w-full px-4 py-2.5 rounded-xl border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
       />
-      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-sm text-danger">{error}</p>}
       <button
         onClick={handleSubmit}
         disabled={!email.trim() || submitting}

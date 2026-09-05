@@ -33,7 +33,7 @@ export default function PricingCards() {
 
   return (
     <section className="px-4 py-12">
-      {error && <p className="max-w-md mx-auto mb-6 text-center text-sm text-danger">{error}</p>}
+      {error && <p role="alert" className="max-w-md mx-auto mb-6 text-center text-sm text-danger">{error}</p>}
 
       <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
         {PRICING_PLANS.map((plan, i) => (

@@ -100,7 +100,7 @@ export default function ResetPasswordConfirmPage() {
           />
         </div>
 
-        {error && <p className="text-sm text-danger">{error}</p>}
+        {error && <p role="alert" className="text-sm text-danger">{error}</p>}
 
         <motion.button
           whileHover={{ scale: 1.02 }}

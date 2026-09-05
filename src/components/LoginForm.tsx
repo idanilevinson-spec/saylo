@@ -76,7 +76,7 @@ export default function LoginForm() {
           />
         </div>
 
-        {error && <p className="text-sm text-danger">{error}</p>}
+        {error && <p role="alert" className="text-sm text-danger">{error}</p>}
 
         <div className="text-left">
           <Link href="/reset-password" className="text-sm text-primary">

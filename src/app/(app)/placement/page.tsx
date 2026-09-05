@@ -271,7 +271,7 @@ export default function PlacementPage() {
             className="mt-4 w-full px-4 py-3 rounded-xl border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
 
-          {error && <p className="mt-4 text-sm text-danger">{error}</p>}
+          {error && <p role="alert" className="mt-4 text-sm text-danger">{error}</p>}
 
           <div className="mt-6 flex gap-3">
             <motion.button
@@ -356,7 +356,7 @@ export default function PlacementPage() {
           ))}
         </div>
 
-        {error && <p className="mt-4 text-sm text-danger">{error}</p>}
+        {error && <p role="alert" className="mt-4 text-sm text-danger">{error}</p>}
 
         <motion.button
           whileHover={selected !== null ? { scale: 1.02 } : undefined}

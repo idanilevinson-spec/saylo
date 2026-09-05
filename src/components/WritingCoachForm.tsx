@@ -131,7 +131,7 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
         placeholder="Write your answer here in English..."
         className="w-full px-4 py-3 rounded-xl border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
       />
-      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-sm text-danger">{error}</p>}
       <button
         onClick={handleSubmit}
         disabled={!text.trim() || submitting}

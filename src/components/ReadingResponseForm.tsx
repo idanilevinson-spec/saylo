@@ -151,7 +151,7 @@ export default function ReadingResponseForm({
         placeholder="Write your answer here in English..."
         className="mt-4 w-full px-4 py-3 rounded-xl border border-card-border bg-background font-content focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
       />
-      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-sm text-danger">{error}</p>}
       <button
         onClick={handleSubmit}
         disabled={!text.trim() || submitting}
