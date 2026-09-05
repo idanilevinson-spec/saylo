@@ -34,6 +34,7 @@ export default function MemoryGamePage() {
   const [locked, setLocked] = useState(false);
   const [pairTotal, setPairTotal] = useState(PAIR_COUNT);
   const [comparisons, setComparisons] = useState(0);
+  const [announcement, setAnnouncement] = useState("");
 
   // comparisonsRef mirrors the state above for the async setTimeout
   // callback below, which needs the *authoritative* just-incremented
@@ -86,6 +87,7 @@ export default function MemoryGamePage() {
           const nextMatched = new Set(matchedVocabIds);
           nextMatched.add(first.vocabularyItemId);
           setMatchedVocabIds(nextMatched);
+          setAnnouncement(`זוג נמצא! ${first.label} = ${second?.label}`);
           if (profile) {
             try {
               const res = await recordGameAnswer(profile.id, first.vocabularyItemId, true, "vocab_game_memory");
@@ -113,6 +115,7 @@ export default function MemoryGamePage() {
           // couldn't have known what was under the other card) — flip
           // back without spending a heart, unlike a real wrong answer.
           playIncorrectSound();
+          setAnnouncement("לא זוג, מנסים שוב");
         }
         setFlipped([]);
         setLocked(false);
@@ -167,6 +170,9 @@ export default function MemoryGamePage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
       <h1 className="sr-only">משחק הזיכרון</h1>
+      <p role="status" className="sr-only">
+        {announcement}
+      </p>
       <p className="text-sm text-muted mb-4 text-center">
         {matchedVocabIds.size} מתוך {pairTotal} זוגות · {comparisons} ניסיונות
       </p>

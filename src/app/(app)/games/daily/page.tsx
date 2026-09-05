@@ -250,7 +250,7 @@ export default function DailyChallengePage() {
           )}
 
           {wasCorrect !== null && (
-            <p className={`mt-4 text-center font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
+            <p role="status" className={`mt-4 text-center font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
               {wasCorrect ? "כל הכבוד!" : mode === "spelling" ? `לא בדיוק — המילה היא "${item.headword}"` : "לא בדיוק"}
             </p>
           )}

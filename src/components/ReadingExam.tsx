@@ -358,6 +358,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
               {answeredThisStep && lastCorrect !== null && (
                 <>
                   <div
+                    role="status"
                     className={`mt-4 flex items-center gap-1.5 text-sm font-medium ${
                       lastCorrect ? "text-success" : "text-danger"
                     }`}

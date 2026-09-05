@@ -351,7 +351,7 @@ function LearnModePageInner() {
               )}
 
               {wasCorrect !== null && (
-                <p className={`mt-4 text-center font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
+                <p role="status" className={`mt-4 text-center font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
                   {wasCorrect
                     ? "כל הכבוד!"
                     : question.type === "recall"

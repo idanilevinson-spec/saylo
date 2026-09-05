@@ -161,7 +161,7 @@ export default function DefinitionGamePage() {
           </div>
 
           {wasCorrect !== null && (
-            <p className={`mt-4 font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
+            <p role="status" className={`mt-4 font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
               {wasCorrect ? "כל הכבוד!" : `לא בדיוק — המילה היא "${item.headword}" (${item.translationHe})`}
             </p>
           )}

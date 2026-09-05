@@ -399,6 +399,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
             {answeredThisStep && lastCorrect !== null && (
               <>
                 <div
+                  role="status"
                   className={`mt-4 flex items-center justify-center gap-1.5 text-sm font-medium ${
                     lastCorrect ? "text-success" : "text-danger"
                   }`}

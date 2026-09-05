@@ -401,9 +401,15 @@ export default function WordCatchPage() {
           חצים ⇄ להזזת המילה הנופלת · חץ ⇣ להאצת הנפילה · אפשר גם ללחוץ ישירות
         </p>
 
-        {result === "missed" && (
-          <p className="mt-4 text-center text-sm text-danger">
-            <EnglishText>{item.headword}</EnglishText> = {item.translationHe}
+        {result && (
+          <p role="status" className={`mt-4 text-center text-sm ${result === "caught" ? "text-success" : "text-danger"}`}>
+            {result === "caught" ? (
+              "תפסתם נכון!"
+            ) : (
+              <>
+                <EnglishText>{item.headword}</EnglishText> = {item.translationHe}
+              </>
+            )}
           </p>
         )}
       </div>

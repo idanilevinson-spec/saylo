@@ -56,6 +56,7 @@ export default function MatchGamePage() {
   const [matchedIds, setMatchedIds] = useState<Set<string>>(new Set());
   const [selectedEndpoint, setSelectedEndpoint] = useState<Endpoint | null>(null);
   const [wrongPulse, setWrongPulse] = useState<{ sourceId: string; target: string } | null>(null);
+  const [announcement, setAnnouncement] = useState("");
   const [dragLine, setDragLine] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
 
@@ -149,6 +150,7 @@ export default function MatchGamePage() {
       setMatchedIds(next);
       setSelectedEndpoint(null);
       selectedEndpointRef.current = null;
+      setAnnouncement(`נכון! ${pair.source} = ${pair.target}`);
       try {
         const res = await recordGameAnswer(profile.id, sourceId, true, "vocab_game_match");
         xpAwardedRef.current += res.xpAwarded;
@@ -171,6 +173,7 @@ export default function MatchGamePage() {
       setWrongPulse({ sourceId, target: targetValue });
       setSelectedEndpoint(null);
       selectedEndpointRef.current = null;
+      setAnnouncement("לא נכון, נסו שוב");
       try {
         const res = await recordGameAnswer(profile.id, sourceId, false, "vocab_game_match");
         xpAwardedRef.current += res.xpAwarded;
@@ -328,6 +331,9 @@ export default function MatchGamePage() {
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-10">
         <h1 className="sr-only">משחק ההתאמה</h1>
+        <p role="status" className="sr-only">
+          {announcement}
+        </p>
         <div className="flex items-center justify-between mb-2">
           <div>
             <span className="text-xs font-bold tracking-[0.14em] uppercase text-accent-hover">
