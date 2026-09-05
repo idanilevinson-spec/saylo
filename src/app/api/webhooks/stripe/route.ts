@@ -45,6 +45,9 @@ export async function POST(request: Request) {
           stripe_customer_id: (session.customer as string) ?? null,
           stripe_subscription_id: subscription.id,
           current_period_end: periodEndIso(subscription),
+          // A fresh checkout always starts a subscription un-canceled, even
+          // if this profile_id had a previous, since-canceled subscription.
+          cancel_at_period_end: false,
           updated_at: new Date().toISOString(),
         });
       }
@@ -57,7 +60,12 @@ export async function POST(request: Request) {
         const status = subscription.status === "past_due" ? "past_due" : "active";
         await supabaseAdmin
           .from("subscriptions")
-          .update({ status, current_period_end: periodEndIso(subscription), updated_at: new Date().toISOString() })
+          .update({
+            status,
+            current_period_end: periodEndIso(subscription),
+            cancel_at_period_end: subscription.cancel_at_period_end,
+            updated_at: new Date().toISOString(),
+          })
           .eq("profile_id", profileId);
       }
       break;
@@ -68,7 +76,7 @@ export async function POST(request: Request) {
       if (profileId) {
         await supabaseAdmin
           .from("subscriptions")
-          .update({ status: "canceled", updated_at: new Date().toISOString() })
+          .update({ status: "canceled", cancel_at_period_end: false, updated_at: new Date().toISOString() })
           .eq("profile_id", profileId);
       }
       break;
