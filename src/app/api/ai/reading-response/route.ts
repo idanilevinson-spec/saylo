@@ -109,7 +109,7 @@ export async function POST(request: Request) {
   }
 
   await logAiUsage(supabase, user.id, "reading_response", message.usage.input_tokens, message.usage.output_tokens);
-  await setSkillLevelFromScore(supabase, user.id, "reading", score);
+  await setSkillLevelFromScore(supabase, user.id, "reading", score, text.cefr_level);
 
   return NextResponse.json({ response });
 }

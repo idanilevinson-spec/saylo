@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     .single();
 
   await logAiUsage(supabase, user.id, "writing_coach", message.usage.input_tokens, message.usage.output_tokens);
-  await setSkillLevelFromScore(supabase, user.id, "writing", parsed.overallScore ?? 0);
+  await setSkillLevelFromScore(supabase, user.id, "writing", parsed.overallScore ?? 0, prompt.cefr_level);
 
   return NextResponse.json({ submission, feedback });
 }

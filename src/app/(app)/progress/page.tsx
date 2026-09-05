@@ -332,9 +332,11 @@ export default function ProgressPage() {
 
 function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillArea, CefrLevel>> }) {
   const assessed = (Object.keys(SKILL_META) as SkillArea[]).filter((s) => skillLevels[s]);
-  const weakestRank = assessed.length
-    ? Math.min(...assessed.map((s) => CEFR_ORDER.indexOf(skillLevels[s] as CefrLevel)))
-    : -1;
+  // "Weakest" only means something once there's at least one other skill to
+  // compare against — with a single assessed skill it trivially "wins" the
+  // minimum and would get flagged as a weak spot even at C2.
+  const weakestRank =
+    assessed.length >= 2 ? Math.min(...assessed.map((s) => CEFR_ORDER.indexOf(skillLevels[s] as CefrLevel))) : -1;
   const weakestSkills = assessed.filter((s) => CEFR_ORDER.indexOf(skillLevels[s] as CefrLevel) === weakestRank);
 
   return (

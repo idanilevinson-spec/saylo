@@ -12,7 +12,7 @@ export function buildReadingResponsePrompt(
 ): string {
   const levelNote = readerLevel
     ? `The reader's tested English level is ${readerLevel} (CEFR) — calibrate your expectations for sentence complexity, vocabulary range, and grammatical accuracy to that level, not to a native-speaker standard.`
-    : "The reader's level is not yet known — grade with a broad, encouraging standard.";
+    : "The reader's level is not yet known — grade with a broad, encouraging standard, and do not state or imply any specific CEFR level (A1-C2) in your feedback.";
 
   return `You are an English reading-comprehension coach for a Hebrew-speaking learner. ${levelNote}
 
