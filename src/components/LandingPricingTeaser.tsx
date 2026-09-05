@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import EnglishText from "@/components/EnglishText";
+import MagneticButton from "@/components/MagneticButton";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
 
 const bestValue = PRICING_PLANS[PRICING_PLANS.length - 1];
@@ -43,14 +44,16 @@ export default function LandingPricingTeaser() {
             </EnglishText>
             לחודש במסלול השנתי
           </p>
-          <motion.div className="mt-8 inline-block" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-            <Link
-              href="/pricing"
-              className="block px-8 py-3.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
-            >
-              לכל המסלולים
-            </Link>
-          </motion.div>
+          <MagneticButton className="mt-8 inline-block">
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                href="/pricing"
+                className="block px-8 py-3.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+              >
+                לכל המסלולים
+              </Link>
+            </motion.div>
+          </MagneticButton>
         </motion.div>
       </div>
     </section>

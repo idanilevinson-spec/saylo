@@ -5,7 +5,7 @@ import { useRef } from "react";
 import type { MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bot } from "lucide-react";
+import { Bot, Plane } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MagneticButton from "@/components/MagneticButton";
 
@@ -63,6 +63,38 @@ export default function LandingHero() {
         className="absolute bottom-0 left-[8%] w-64 h-64 rounded-full bg-accent/20 blur-3xl pointer-events-none"
         style={{ y: blobAccentYCombined, x: blobAccentX }}
       />
+
+      {/* The dashed flight path draws itself in once on load — the same
+          "your journey" metaphor as the passport stamp and the boarding-pass
+          steps section further down, made literal right in the hero. */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.35]"
+      >
+        <motion.path
+          d="M 4 92 C 30 78, 34 46, 58 34 S 88 14, 94 8"
+          fill="none"
+          stroke="var(--accent)"
+          strokeWidth="0.35"
+          strokeDasharray="1.6 2.2"
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 1.8, delay: 0.4, ease: "easeInOut" }}
+        />
+      </svg>
+      <motion.span
+        aria-hidden="true"
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 0.45, scale: 1 }}
+        transition={{ duration: 0.4, delay: 2.1 }}
+        className="absolute rotate-[-38deg] text-accent-hover"
+        style={{ top: "5%", left: "91%" }}
+      >
+        <Plane size={18} strokeWidth={2} />
+      </motion.span>
       <Image
         src="/logo-watermark.png"
         alt=""
