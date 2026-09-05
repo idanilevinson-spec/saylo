@@ -45,6 +45,7 @@ export default function FillBlankQuestion({ content, disabled, onSubmit }: FillB
 
   return (
     <div>
+      <p className="font-medium text-lg mb-3">השלימו את החלק החסר במשפט</p>
       <p dir="ltr" className="font-content text-lg leading-relaxed text-left">
         {before}
         {typedMode ? (

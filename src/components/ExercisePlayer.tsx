@@ -22,9 +22,10 @@ interface ExercisePlayerProps {
   nextHref: string | null;
   backHref: string;
   backLabel: string;
+  progress?: { current: number; total: number } | null;
 }
 
-export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel }: ExercisePlayerProps) {
+export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel, progress }: ExercisePlayerProps) {
   const { profile } = useAuth();
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -43,9 +44,16 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
   return (
     <HeartsGate>
       <div className="max-w-xl mx-auto px-4 py-12">
-        <Link href={backHref} className="text-sm text-primary">
-          ← {backLabel}
-        </Link>
+        <div className="flex items-center justify-between gap-3">
+          <Link href={backHref} className="text-sm text-primary">
+            ← {backLabel}
+          </Link>
+          {progress && (
+            <p className="text-sm text-muted">
+              שאלה {progress.current} מתוך {progress.total}
+            </p>
+          )}
+        </div>
 
         <motion.div
           key={exercise.id}

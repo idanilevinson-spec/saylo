@@ -65,6 +65,15 @@ export default async function PracticePage({ params }: PageProps) {
   const currentIndex = siblings.findIndex((s) => s.id === exercise.id);
   const nextHref =
     currentIndex >= 0 && currentIndex < siblings.length - 1 ? `/practice/${siblings[currentIndex + 1].id}` : null;
+  const progress = currentIndex >= 0 && siblings.length > 1 ? { current: currentIndex + 1, total: siblings.length } : null;
 
-  return <ExercisePlayer exercise={exercise} nextHref={nextHref} backHref={backHref} backLabel={backLabel} />;
+  return (
+    <ExercisePlayer
+      exercise={exercise}
+      nextHref={nextHref}
+      backHref={backHref}
+      backLabel={backLabel}
+      progress={progress}
+    />
+  );
 }
