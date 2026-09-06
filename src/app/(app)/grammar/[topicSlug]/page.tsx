@@ -70,14 +70,34 @@ export default async function GrammarTopicPage({ params }: PageProps) {
         </EnglishText>
       </div>
 
-      <div className="mt-8 space-y-10">
-        {lessons.map((lesson) => (
-          <article key={lesson.id} className="bg-card border border-card-border rounded-2xl p-6 sm:p-8">
-            <h2 className="text-xl font-bold mb-4">{lesson.title_he}</h2>
-            <GrammarLessonContent bodyMd={lesson.body_md} />
-          </article>
-        ))}
-      </div>
+      {lessons.length > 0 && (
+        <>
+          <span className="mt-8 block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover">
+            הסבר מהמורה
+          </span>
+          <div className="mt-2 space-y-10">
+            {lessons.map((lesson) => (
+              <article key={lesson.id} className="bg-card border border-card-border rounded-2xl p-6 sm:p-8">
+                <h2 className="text-xl font-bold mb-4">{lesson.title_he}</h2>
+                <GrammarLessonContent bodyMd={lesson.body_md} />
+              </article>
+            ))}
+          </div>
+
+          {firstExercise && (
+            <div className="mt-8 text-center">
+              <MotionLink
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                href={`/practice/${firstExercise.id}`}
+                className="inline-flex items-center gap-1.5 px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+              >
+                מוכנים? בואו נתרגל <Target size={16} />
+              </MotionLink>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

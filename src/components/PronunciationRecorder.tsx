@@ -163,7 +163,7 @@ function ScorePill({ label, value, highlight }: { label: string; value: number; 
   return (
     <div
       className={`rounded-xl p-2 text-center ${
-        highlight ? "bg-primary text-primary-ink" : "bg-background-2"
+        highlight ? "bg-primary text-primary-ink" : "bg-background-2 border border-card-border"
       }`}
     >
       <p className="font-bold">{value}</p>

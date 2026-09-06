@@ -8,9 +8,11 @@ import SpeakButton from "@/components/SpeakButton";
 import PronunciationRecorder from "@/components/PronunciationRecorder";
 import MotionLink from "@/components/MotionLink";
 import ContentCard from "@/components/ContentCard";
+import TeacherExplanationCard from "@/components/TeacherExplanationCard";
 import { getVocabularyTopicBySlug, listVocabularyItems } from "@/lib/content/vocabulary";
 import { createClient } from "@/lib/supabase/serverClient";
 import { seededShuffle, dailySeed } from "@/lib/utils/shuffle";
+import { getVocabularyTopicIntro } from "@/lib/ai/topicIntro";
 
 interface PageProps {
   params: Promise<{ topicSlug: string }>;
@@ -43,6 +45,8 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
   const firstExercise = exerciseIds?.length
     ? seededShuffle(exerciseIds, dailySeed(topic.id))[0]
     : null;
+
+  const intro = await getVocabularyTopicIntro(supabase, topic, items.slice(0, 6));
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
@@ -90,14 +94,20 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
         </EnglishText>
       </div>
 
+      {intro && (
+        <div className="mt-6">
+          <TeacherExplanationCard text={intro} />
+        </div>
+      )}
+
       <div className="mt-8 space-y-3">
         {items.map((item, i) => (
           <ContentCard
             key={item.id}
             index={i}
-            className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6"
+            className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6"
           >
-            <div className="sm:w-40 shrink-0">
+            <div className="md:w-40 shrink-0">
               <div className="flex items-center gap-2">
                 <EnglishText as="p" className="text-xl font-bold text-primary">
                   {item.headword}
