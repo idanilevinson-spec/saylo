@@ -6,6 +6,7 @@ import { PhoneOff, Keyboard } from "lucide-react";
 import { speak as browserSpeak } from "@/lib/speech/browserTts";
 import SayloAvatar, { type AvatarExpression } from "@/components/SayloAvatar";
 import { loadVoicePref, saveVoicePref, NEURAL_VOICE, type VoicePref } from "@/lib/speech/voicePref";
+import type { SpeechRecognizer } from "microsoft-cognitiveservices-speech-sdk";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
 
@@ -39,6 +40,22 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   const [viseme, setViseme] = useState<number | undefined>(undefined);
   const silentTurnsRef = useRef(0);
   const voicePrefRef = useRef<VoicePref>(voicePref);
+  // Tracks whichever recognizer is currently listening, so the effect's
+  // cleanup can actually close the mic if the component unmounts (or this
+  // effect re-runs) mid-listen, instead of leaving it capturing in the
+  // background until Azure's own callback eventually fires.
+  const activeRecognizerRef = useRef<SpeechRecognizer | null>(null);
+
+  // Azure throws if close() runs twice on the same recognizer (e.g. the
+  // effect's cleanup and recognizeOnceAsync's own callback both racing to
+  // close it) — swallow that specific race instead of crashing the page.
+  function safeClose(recognizer: SpeechRecognizer) {
+    try {
+      recognizer.close();
+    } catch {
+      // already disposed — fine to ignore
+    }
+  }
 
   function selectVoice(pref: VoicePref) {
     setVoicePref(pref);
@@ -85,6 +102,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         speechConfig.speechRecognitionLanguage = "en-US";
         const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
         const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+        activeRecognizerRef.current = recognizer;
 
         // Only now is the mic actually capturing — flip the UI to
         // "listening" right here, not before this async setup ran.
@@ -92,7 +110,8 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
         recognizer.recognizeOnceAsync(
           async (result) => {
-            recognizer.close();
+            safeClose(recognizer);
+            if (activeRecognizerRef.current === recognizer) activeRecognizerRef.current = null;
             if (cancelled) return;
 
             if (result.reason !== sdk.ResultReason.RecognizedSpeech || !result.text.trim()) {
@@ -119,7 +138,8 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
             speakReply(reply);
           },
           (err) => {
-            recognizer.close();
+            safeClose(recognizer);
+            if (activeRecognizerRef.current === recognizer) activeRecognizerRef.current = null;
             if (cancelled) return;
             setErrorMessage(
               String(err).includes("Permission denied") || String(err).includes("NotAllowedError")
@@ -197,6 +217,8 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     return () => {
       cancelled = true;
       window.speechSynthesis?.cancel();
+      if (activeRecognizerRef.current) safeClose(activeRecognizerRef.current);
+      activeRecognizerRef.current = null;
     };
   }, [onSend, restartTick, ending]);
 

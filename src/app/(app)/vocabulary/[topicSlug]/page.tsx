@@ -114,11 +114,6 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
                 </EnglishText>
                 <SpeakButton text={item.headword} />
               </div>
-              {item.ipa && (
-                <EnglishText as="p" className="text-sm text-muted">
-                  {item.ipa}
-                </EnglishText>
-              )}
             </div>
             <div className="flex-1">
               <p className="font-medium">{item.translation_he}</p>
