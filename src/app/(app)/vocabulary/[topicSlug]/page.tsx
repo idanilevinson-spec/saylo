@@ -10,6 +10,7 @@ import MotionLink from "@/components/MotionLink";
 import ContentCard from "@/components/ContentCard";
 import { getVocabularyTopicBySlug, listVocabularyItems } from "@/lib/content/vocabulary";
 import { createClient } from "@/lib/supabase/serverClient";
+import { seededShuffle, dailySeed } from "@/lib/utils/shuffle";
 
 interface PageProps {
   params: Promise<{ topicSlug: string }>;
@@ -29,14 +30,19 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
   const items = await listVocabularyItems(topic.id);
 
   const supabase = await createClient();
-  const { data: firstExercise } = await supabase
+  const { data: exerciseIds } = await supabase
     .from("exercises")
     .select("id")
     .eq("topic_id", topic.id)
     .eq("status", "published")
-    .order("sort_order")
-    .limit(1)
-    .maybeSingle();
+    .order("sort_order");
+  // Shuffled with a seed that changes daily, so repeated practice of the
+  // same topic doesn't always start on the identical first exercise —
+  // practice/[exerciseId] applies the same seed to keep the "next
+  // exercise" chain consistent with this order for the rest of the day.
+  const firstExercise = exerciseIds?.length
+    ? seededShuffle(exerciseIds, dailySeed(topic.id))[0]
+    : null;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">

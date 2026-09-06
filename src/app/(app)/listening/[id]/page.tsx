@@ -8,6 +8,7 @@ import MotionLink from "@/components/MotionLink";
 import { Target } from "lucide-react";
 import { getListeningClip } from "@/lib/content/listening";
 import { createClient } from "@/lib/supabase/serverClient";
+import { seededShuffle, dailySeed } from "@/lib/utils/shuffle";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -25,14 +26,19 @@ export default async function ListeningClipPage({ params }: PageProps) {
   if (!clip) notFound();
 
   const supabase = await createClient();
-  const { data: firstExercise } = await supabase
+  const { data: exerciseIds } = await supabase
     .from("exercises")
     .select("id")
     .eq("listening_clip_id", clip.id)
     .eq("status", "published")
-    .order("sort_order")
-    .limit(1)
-    .maybeSingle();
+    .order("sort_order");
+  // Shuffled with a seed that changes daily, so repeated practice of the
+  // same clip doesn't always start on the identical first exercise —
+  // practice/[exerciseId] applies the same seed to keep the "next
+  // exercise" chain consistent with this order for the rest of the day.
+  const firstExercise = exerciseIds?.length
+    ? seededShuffle(exerciseIds, dailySeed(clip.id))[0]
+    : null;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">

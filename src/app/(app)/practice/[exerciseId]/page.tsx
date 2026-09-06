@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/serverClient";
 import ExercisePlayer from "@/components/ExercisePlayer";
+import { seededShuffle, dailySeed } from "@/lib/utils/shuffle";
 import type { Exercise } from "@/types/database";
 
 interface PageProps {
@@ -34,7 +35,10 @@ async function resolveParent(supabase: SupabaseClient, exercise: Exercise) {
     supabase.from("exercises").select("id").eq(parentColumn, parentId).eq("status", "published").order("sort_order"),
   ]);
 
-  const siblings = siblingRows ?? [];
+  // Same seed (parent id + today's date) as the topic/lesson/clip page's
+  // "first exercise" link, so this sequence and that link always agree on
+  // ordering for the rest of the day while still varying day to day.
+  const siblings = siblingRows?.length ? seededShuffle(siblingRows, dailySeed(parentId)) : [];
   if (!parent) {
     return { siblings, backHref: "/learn", backLabel: "מסלול הלימוד" };
   }

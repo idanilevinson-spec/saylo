@@ -7,6 +7,7 @@ import ReadingExam from "@/components/ReadingExam";
 import { getReadingText } from "@/lib/content/reading";
 import { getVocabularyLookupMap } from "@/lib/content/vocabulary";
 import { createClient } from "@/lib/supabase/serverClient";
+import { shuffle } from "@/lib/utils/shuffle";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -67,7 +68,7 @@ export default async function ReadingTextPage({ params }: PageProps) {
 
       <ReadingExam
         text={text}
-        exercises={exercises ?? []}
+        exercises={shuffle(exercises ?? [])}
         openQuestions={openQuestions ?? []}
         vocabByWord={vocabByWord}
       />
