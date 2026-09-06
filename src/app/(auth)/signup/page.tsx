@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase/browserClient";
 import { deriveAgeBand } from "@/lib/auth/ageBand";
+import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -54,6 +55,11 @@ export default function SignupPage() {
         setLoading(false);
         return;
       }
+
+      const trialEndsAt = new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000).toISOString();
+      await supabase
+        .from("subscriptions")
+        .insert({ profile_id: data.user.id, status: "trialing", trial_ends_at: trialEndsAt });
 
       router.push("/dashboard");
       return;
