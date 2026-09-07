@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { israelWeekStart, israelMonthStart } from "./buildScoreSummary";
+import { israelWeekStart, israelMonthStart, isLastDayOfIsraelMonth } from "./buildScoreSummary";
 
 function israelParts(d: Date) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -39,6 +39,25 @@ describe("israelWeekStart", () => {
     expect(start.getTime()).toBeLessThanOrEqual(now.getTime());
     // Never more than 7 days back, plus a generous DST-shift buffer.
     expect(now.getTime() - start.getTime()).toBeLessThan(8 * 24 * 60 * 60 * 1000);
+  });
+});
+
+describe("isLastDayOfIsraelMonth", () => {
+  it("is true on the last day of a 31-day month", () => {
+    expect(isLastDayOfIsraelMonth(new Date("2026-01-31T08:00:00Z"))).toBe(true);
+  });
+
+  it("is false mid-month", () => {
+    expect(isLastDayOfIsraelMonth(new Date("2026-01-15T08:00:00Z"))).toBe(false);
+  });
+
+  it("handles a leap-year February correctly", () => {
+    expect(isLastDayOfIsraelMonth(new Date("2028-02-28T08:00:00Z"))).toBe(false);
+    expect(isLastDayOfIsraelMonth(new Date("2028-02-29T08:00:00Z"))).toBe(true);
+  });
+
+  it("is true on the last day of a 30-day month", () => {
+    expect(isLastDayOfIsraelMonth(new Date("2026-04-30T08:00:00Z"))).toBe(true);
   });
 });
 

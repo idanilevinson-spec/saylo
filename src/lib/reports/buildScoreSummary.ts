@@ -88,6 +88,16 @@ export function israelMonthStart(now: Date = new Date()): Date {
   return israelMidnightUtc(year, month, 1);
 }
 
+// The monthly report cron has no clean cron-syntax way to fire only on
+// "the last day of the month" (lengths vary, leap years move Feb) — so
+// instead it runs daily and asks this on each run, sending only when
+// today's Israel-local calendar date rolls into a new month tomorrow.
+export function isLastDayOfIsraelMonth(now: Date = new Date()): boolean {
+  const today = israelDateParts(now);
+  const tomorrow = israelDateParts(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+  return tomorrow.month !== today.month;
+}
+
 function rangeStart(range: ScoreRange, now: Date = new Date()): Date | null {
   if (range === "week") return israelWeekStart(now);
   if (range === "month") return israelMonthStart(now);

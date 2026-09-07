@@ -27,6 +27,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { profile, loading, signOut, refreshProfile } = useAuth();
   const [savingEmailPref, setSavingEmailPref] = useState(false);
+  const [savingReportPref, setSavingReportPref] = useState<"weekly" | "monthly" | null>(null);
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [planLabel, setPlanLabel] = useState<string | null>(null);
@@ -43,6 +44,17 @@ export default function ProfilePage() {
       .eq("id", profile.id);
     await refreshProfile();
     setSavingEmailPref(false);
+  }
+
+  async function toggleReportPref(field: "weekly_report_enabled" | "monthly_report_enabled", key: "weekly" | "monthly") {
+    if (!profile || savingReportPref) return;
+    setSavingReportPref(key);
+    await supabase
+      .from("profiles")
+      .update({ [field]: !profile[field] })
+      .eq("id", profile.id);
+    await refreshProfile();
+    setSavingReportPref(null);
   }
 
   useEffect(() => {
@@ -298,6 +310,26 @@ export default function ProfilePage() {
             checked={profile.email_reminders_enabled}
             onChange={toggleEmailReminders}
             disabled={savingEmailPref}
+            className="w-5 h-5 accent-primary"
+          />
+        </label>
+        <label className="flex items-center justify-between cursor-pointer">
+          <span className="text-sm">דוח שבועי במייל</span>
+          <input
+            type="checkbox"
+            checked={profile.weekly_report_enabled}
+            onChange={() => toggleReportPref("weekly_report_enabled", "weekly")}
+            disabled={savingReportPref === "weekly"}
+            className="w-5 h-5 accent-primary"
+          />
+        </label>
+        <label className="flex items-center justify-between cursor-pointer">
+          <span className="text-sm">דוח חודשי במייל</span>
+          <input
+            type="checkbox"
+            checked={profile.monthly_report_enabled}
+            onChange={() => toggleReportPref("monthly_report_enabled", "monthly")}
+            disabled={savingReportPref === "monthly"}
             className="w-5 h-5 accent-primary"
           />
         </label>

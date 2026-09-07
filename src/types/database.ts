@@ -12,6 +12,8 @@ export interface Profile {
   is_admin: boolean;
   email_reminders_enabled: boolean;
   push_reminders_enabled: boolean;
+  weekly_report_enabled: boolean;
+  monthly_report_enabled: boolean;
   created_at: string;
   updated_at: string;
 }

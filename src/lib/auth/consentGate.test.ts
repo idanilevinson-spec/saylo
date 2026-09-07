@@ -13,6 +13,8 @@ function makeProfile(age_band: AgeBand, parental_consent_status: ParentalConsent
     is_admin: false,
     email_reminders_enabled: true,
     push_reminders_enabled: true,
+    weekly_report_enabled: false,
+    monthly_report_enabled: false,
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
   };
