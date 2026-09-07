@@ -165,6 +165,16 @@ export default function VocabTest({ steps }: VocabTestProps) {
     }
   }
 
+  // A correct answer moves on by itself after a beat, so it doesn't feel
+  // abrupt. A wrong answer keeps "השאלה הבאה" as a deliberate click, so
+  // the learner has to actually look at what they got wrong.
+  useEffect(() => {
+    if (!answeredThisStep || lastCorrect !== true) return;
+    const timer = setTimeout(nextStep, 1100);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [answeredThisStep, lastCorrect]);
+
   if (phase === "intro") {
     return (
       <div className="max-w-xl mx-auto px-4 py-12 text-center">

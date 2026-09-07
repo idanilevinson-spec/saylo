@@ -26,6 +26,23 @@ export default function ReviewPage() {
     }
   }, [profile]);
 
+  function goNext() {
+    if (index + 1 >= items!.length) playCompleteSound();
+    setResult(null);
+    setIndex((i) => i + 1);
+  }
+
+  // A correct answer moves on by itself after a beat, so it doesn't feel
+  // abrupt. A wrong answer keeps "המילה הבאה" as a deliberate click, so
+  // the learner has to actually look at what they got wrong. Declared
+  // above the early returns below — Hooks can't run conditionally.
+  useEffect(() => {
+    if (!result?.isCorrect) return;
+    const timer = setTimeout(goNext, 1100);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
+
   if (authLoading || items === null) {
     return <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>;
   }
@@ -124,11 +141,7 @@ export default function ReviewPage() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => {
-                  if (index + 1 >= items.length) playCompleteSound();
-                  setResult(null);
-                  setIndex((i) => i + 1);
-                }}
+                onClick={goNext}
                 className="mt-6 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
               >
                 {index + 1 < items.length ? "המילה הבאה →" : "סיום"}

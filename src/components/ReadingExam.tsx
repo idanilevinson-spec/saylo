@@ -152,6 +152,18 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
     }
   }
 
+  // A correct MCQ answer moves on by itself after a beat, so it doesn't
+  // feel abrupt. A wrong answer keeps "השאלה הבאה" as a deliberate click,
+  // so the learner has to actually look at what they got wrong. Open
+  // questions are excluded — their AI grade is a 0-100 score, not a
+  // binary right/wrong, so there's no "correct" to auto-advance on.
+  useEffect(() => {
+    if (!answeredThisStep || lastCorrect !== true || !currentExercise) return;
+    const timer = setTimeout(() => nextStep(), 1100);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [answeredThisStep, lastCorrect, currentExercise]);
+
   if (!hasExam) {
     return (
       <>

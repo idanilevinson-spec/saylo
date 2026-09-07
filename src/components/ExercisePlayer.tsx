@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
@@ -27,6 +28,7 @@ interface ExercisePlayerProps {
 
 export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel, progress }: ExercisePlayerProps) {
   const { profile } = useAuth();
+  const router = useRouter();
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -40,6 +42,16 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
     else playIncorrectSound();
     if (!nextHref) setTimeout(playCompleteSound, 350);
   }
+
+  // A correct answer moves on by itself — the feedback is still shown
+  // for a beat first, so it doesn't feel abrupt. A wrong answer keeps the
+  // "next exercise" click as a deliberate gate, so the learner has to
+  // actually look at what they got wrong before moving past it.
+  useEffect(() => {
+    if (!result?.isCorrect || !nextHref) return;
+    const timer = setTimeout(() => router.push(nextHref), 1100);
+    return () => clearTimeout(timer);
+  }, [result, nextHref, router]);
 
   return (
     <HeartsGate>
