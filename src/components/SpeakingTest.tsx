@@ -267,6 +267,14 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
                   {o.feedbackHe}
                 </p>
               )}
+              {o.step.type === "open" && !o.isCorrect && (
+                <p className="mt-1.5 text-sm">
+                  <span className="text-muted">דוגמה לתשובה טובה: </span>
+                  <EnglishText as="span" className="text-success">
+                    {o.step.modelAnswerEn}
+                  </EnglishText>
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -426,6 +434,14 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
                   <p className="mt-2 text-sm leading-relaxed">
                     {lastScore !== null && <span className="font-medium">{lastScore}/100 · </span>}
                     {lastFeedback}
+                  </p>
+                )}
+                {step.type === "open" && !lastCorrect && (
+                  <p className="mt-2 text-sm">
+                    <span className="text-muted">דוגמה לתשובה טובה: </span>
+                    <EnglishText as="span" className="font-medium">
+                      {step.modelAnswerEn}
+                    </EnglishText>
                   </p>
                 )}
                 <motion.button

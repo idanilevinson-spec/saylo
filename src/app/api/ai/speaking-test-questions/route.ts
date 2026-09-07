@@ -33,13 +33,13 @@ export async function POST(request: Request) {
 
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    max_tokens: 400,
+    max_tokens: 700,
     messages: [
       { role: "user", content: buildSpeakingTestQuestionsPrompt(level, QUESTION_COUNT, topicNameEn) },
     ],
   });
   const raw = extractText(message);
-  const parsed = parseJsonResponse<{ questions: string[] }>(raw);
+  const parsed = parseJsonResponse<{ questions: { questionEn: string; modelAnswerEn: string }[] }>(raw);
 
   await logAiUsage(supabase, user.id, "speaking_test_questions", message.usage.input_tokens, message.usage.output_tokens);
 
