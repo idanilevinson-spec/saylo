@@ -21,6 +21,7 @@ import {
   Heart,
   Sparkles,
   Gamepad2,
+  Mic,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -55,6 +56,7 @@ const MODULES = [
   { icon: PenLine, title: "דקדוק", body: "מסלול מלא מ-A1 עד C2", href: "/grammar", available: true },
   { icon: Brain, title: "חזרה חכמה", body: "המילים שהגיע זמנן", href: "/review", available: true },
   { icon: Gamepad2, title: "משחקי אוצר מילים", body: "סיבוב מהירות, איות ואתגר יומי", href: "/games", available: true },
+  { icon: Mic, title: "מבחן דיבור", body: "עונים בקול על מילים ושאלות פתוחות, מדורג ע\"י AI", href: "/speaking-test", available: true },
   { icon: BookOpenText, title: "הבנת הנקרא", body: "סיפורים עם שאלות ומשוב AI", href: "/reading", available: true },
   { icon: Headphones, title: "האזנה", body: "הקשיבו ובדקו את עצמכם", href: "/listening", available: true },
   { icon: NotebookPen, title: "כתיבה", body: "משוב אישי מ-AI על מה שכתבתם", href: "/writing", available: true },

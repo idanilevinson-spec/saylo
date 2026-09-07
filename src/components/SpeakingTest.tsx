@@ -105,6 +105,36 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
     }
   }
 
+  // Same "don't know it — skip" escape hatch as McqQuestion: marks the step
+  // wrong and reveals the answer instead of leaving the learner stuck with
+  // nothing to say into the mic.
+  function skipStep() {
+    if (graded) return;
+    recognition.dismiss();
+    gradedTranscriptRef.current = "__skipped__";
+    setGraded(true);
+    setLastCorrect(false);
+    setLastScore(null);
+    setLastFeedback(null);
+    playIncorrectSound();
+    setOutcomes((prev) => [...prev, { step, transcript: "", isCorrect: false, score: null, feedbackHe: null }]);
+
+    if (!profile) return;
+    if (step.type === "vocab") {
+      const pending = recordGameAnswer(profile.id, step.vocabularyItemId, false, "vocab_game_speaking").then(
+        (res) => {
+          xpAwardedRef.current += res.xpAwarded;
+        }
+      );
+      pendingRef.current.push(pending);
+    } else {
+      const pending = awardXp(profile.id, "speaking_test_open", XP_ATTEMPT).then(() => {
+        xpAwardedRef.current += XP_ATTEMPT;
+      });
+      pendingRef.current.push(pending);
+    }
+  }
+
   // Fires once per step, the moment a transcript is ready — guarded by
   // gradedTranscriptRef so a re-render (e.g. from the grading fetch itself
   // resolving) can't trigger a second, duplicate grading pass.
@@ -245,7 +275,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
           <MotionLink
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            href="/games/speaking-test"
+            href="/speaking-test"
             className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
           >
             מבחן נוסף
@@ -253,10 +283,10 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
           <MotionLink
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            href="/games"
+            href="/dashboard"
             className="px-6 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors"
           >
-            חזרה למשחקים
+            חזרה ללוח הבקרה
           </MotionLink>
         </div>
       </div>
@@ -363,6 +393,15 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
 
               {grading && <span className="text-sm text-muted">מנתח את התשובה...</span>}
             </div>
+
+            {!graded && !grading && (
+              <button
+                onClick={skipStep}
+                className="mt-4 px-4 py-2 rounded-xl border border-card-border text-sm text-muted font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              >
+                לא יודע/ת · דלגו
+              </button>
+            )}
 
             {graded && !grading && lastCorrect !== null && (
               <>
