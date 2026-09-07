@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   GraduationCap,
   ClipboardCheck,
+  Mic,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -144,6 +145,22 @@ export default function GamesHubPage() {
           </div>
         </MotionLink>
       </div>
+
+      <MotionLink
+        whileHover={{ y: -2 }}
+        whileTap={{ scale: 0.98 }}
+        href="/games/speaking-test"
+        className="mt-4 flex items-center gap-4 bg-gradient-to-l from-danger-ink to-primary/10 border border-danger/25 rounded-2xl p-5 hover:border-danger/45 hover:shadow-md transition-all"
+      >
+        <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-danger-ink text-danger">
+          <Mic size={22} />
+        </span>
+        <div className="flex-1 min-w-0">
+          <h2 className="font-bold">מבחן דיבור</h2>
+          <p className="mt-0.5 text-sm text-muted">עונים בקול על שאלות מילים ושאלות פתוחות — מבחן ההגייה עם AI מקשיב</p>
+        </div>
+        <ChevronLeft size={18} className="text-muted shrink-0" />
+      </MotionLink>
 
       <MotionLink
         whileHover={{ y: -2 }}
