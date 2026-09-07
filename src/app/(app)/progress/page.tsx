@@ -19,11 +19,17 @@ import { supabase } from "@/lib/supabase/browserClient";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
+import { buildScoreSummary, type ScoreRange, type ScoreSummary } from "@/lib/reports/buildScoreSummary";
 import type { CefrLevel, SkillArea } from "@/types/database";
 
 const CEFR_ORDER: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
-const DAYS = 14;
+const RANGE_LABELS: Record<ScoreRange, string> = { week: "השבוע", month: "החודש", all: "הכל" };
+// The two daily charts need a concrete day count to bucket by — "all" is
+// capped at 90 rather than actually unbounded, since a bar per day forever
+// stops being a readable chart; buildScoreSummary's own "all" range (used
+// for the test-history list below) has no such cap.
+const RANGE_CHART_DAYS: Record<ScoreRange, number> = { week: 7, month: 30, all: 90 };
 
 const SKILL_META: Record<SkillArea, { label: string; icon: typeof BookOpen }> = {
   vocabulary: { label: "אוצר מילים", icon: BookOpen },
@@ -44,12 +50,16 @@ interface ProgressData {
   level: number;
   currentStreak: number;
   longestStreak: number;
-  dailyXp: number[];
-  dailyAccuracy: (number | null)[];
   skillAccuracy: Partial<Record<SkillArea, { correct: number; total: number }>>;
   skillLevels: Partial<Record<SkillArea, CefrLevel>>;
   conversationScores: number[];
   badges: { name_he: string; description_he: string; earned_at: string }[];
+}
+
+interface ChartData {
+  buckets: DayBucket[];
+  dailyXp: number[];
+  dailyAccuracy: (number | null)[];
 }
 
 function lastNDays(n: number): DayBucket[] {
@@ -68,13 +78,14 @@ function lastNDays(n: number): DayBucket[] {
 export default function ProgressPage() {
   const { profile, loading: authLoading } = useAuth();
   const [data, setData] = useState<ProgressData | null>(null);
+  const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [range, setRange] = useState<ScoreRange>("week");
+  const [summary, setSummary] = useState<ScoreSummary | null>(null);
 
+  // Lifetime stats — not range-dependent, so they load once per profile
+  // rather than refetching every time the range toggle below changes.
   useEffect(() => {
     if (!profile) return;
-    const buckets = lastNDays(DAYS);
-    const since = new Date();
-    since.setDate(since.getDate() - (DAYS - 1));
-    since.setHours(0, 0, 0, 0);
 
     Promise.all([
       supabase.from("user_xp").select("total_xp, current_level").eq("profile_id", profile.id).maybeSingle(),
@@ -83,16 +94,6 @@ export default function ProgressPage() {
         .select("current_streak, longest_streak")
         .eq("profile_id", profile.id)
         .maybeSingle(),
-      supabase
-        .from("xp_events")
-        .select("amount, created_at")
-        .eq("profile_id", profile.id)
-        .gte("created_at", since.toISOString()),
-      supabase
-        .from("exercise_attempts")
-        .select("is_correct, created_at, exercises(skill_area)")
-        .eq("profile_id", profile.id)
-        .gte("created_at", since.toISOString()),
       supabase
         .from("exercise_attempts")
         .select("is_correct, exercises(skill_area)")
@@ -110,20 +111,7 @@ export default function ProgressPage() {
         .select("earned_at, badges(name_he, description_he)")
         .eq("profile_id", profile.id)
         .order("earned_at", { ascending: false }),
-    ]).then(([xpRes, streakRes, xpEventsRes, attemptsRes, allTimeAttemptsRes, skillLevelsRes, conversationsRes, badgesRes]) => {
-      const dailyXp = buckets.map((b) =>
-        (xpEventsRes.data ?? [])
-          .filter((e) => e.created_at.slice(0, 10) === b.date)
-          .reduce((sum, e) => sum + e.amount, 0)
-      );
-
-      const dailyAccuracy = buckets.map((b) => {
-        const dayAttempts = (attemptsRes.data ?? []).filter((a) => a.created_at.slice(0, 10) === b.date);
-        if (dayAttempts.length === 0) return null;
-        const correct = dayAttempts.filter((a) => a.is_correct).length;
-        return Math.round((correct / dayAttempts.length) * 100);
-      });
-
+    ]).then(([xpRes, streakRes, allTimeAttemptsRes, skillLevelsRes, conversationsRes, badgesRes]) => {
       const skillAccuracy: ProgressData["skillAccuracy"] = {};
       for (const a of allTimeAttemptsRes.data ?? []) {
         const area = (a.exercises as unknown as { skill_area: SkillArea } | null)?.skill_area;
@@ -153,8 +141,6 @@ export default function ProgressPage() {
         level: xpRes.data?.current_level ?? 1,
         currentStreak: streakRes.data?.current_streak ?? 0,
         longestStreak: streakRes.data?.longest_streak ?? 0,
-        dailyXp,
-        dailyAccuracy,
         skillAccuracy,
         skillLevels,
         conversationScores,
@@ -163,7 +149,50 @@ export default function ProgressPage() {
     });
   }, [profile]);
 
-  if (authLoading || !profile || !data) {
+  // Charts + test-history list — both driven by the range toggle, so they
+  // refetch whenever it changes; buildScoreSummary is the same function the
+  // weekly/monthly report emails use, so these numbers and the mailed ones
+  // can never drift apart.
+  useEffect(() => {
+    if (!profile) return;
+    const days = RANGE_CHART_DAYS[range];
+    const buckets = lastNDays(days);
+    const since = new Date();
+    since.setDate(since.getDate() - (days - 1));
+    since.setHours(0, 0, 0, 0);
+
+    Promise.all([
+      supabase
+        .from("xp_events")
+        .select("amount, created_at")
+        .eq("profile_id", profile.id)
+        .gte("created_at", since.toISOString()),
+      supabase
+        .from("exercise_attempts")
+        .select("is_correct, created_at, exercises(skill_area)")
+        .eq("profile_id", profile.id)
+        .gte("created_at", since.toISOString()),
+    ]).then(([xpEventsRes, attemptsRes]) => {
+      const dailyXp = buckets.map((b) =>
+        (xpEventsRes.data ?? [])
+          .filter((e) => e.created_at.slice(0, 10) === b.date)
+          .reduce((sum, e) => sum + e.amount, 0)
+      );
+
+      const dailyAccuracy = buckets.map((b) => {
+        const dayAttempts = (attemptsRes.data ?? []).filter((a) => a.created_at.slice(0, 10) === b.date);
+        if (dayAttempts.length === 0) return null;
+        const correct = dayAttempts.filter((a) => a.is_correct).length;
+        return Math.round((correct / dayAttempts.length) * 100);
+      });
+
+      setChartData({ buckets, dailyXp, dailyAccuracy });
+    });
+
+    buildScoreSummary(supabase, profile.id, range).then(setSummary);
+  }, [profile, range]);
+
+  if (authLoading || !profile || !data || !chartData) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="h-9 w-48 rounded-lg bg-background-2 animate-pulse" />
@@ -175,8 +204,6 @@ export default function ProgressPage() {
       </div>
     );
   }
-
-  const buckets = lastNDays(DAYS);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
@@ -215,7 +242,24 @@ export default function ProgressPage() {
         </div>
       </motion.div>
 
-      <div className="mt-6 grid sm:grid-cols-2 gap-4">
+      <div className="mt-6 flex items-center justify-end">
+        <div className="flex items-center gap-1 bg-card/60 border border-card-border rounded-xl p-1">
+          {(Object.keys(RANGE_LABELS) as ScoreRange[]).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              aria-pressed={range === r}
+              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                range === r ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground hover:bg-background-2"
+              }`}
+            >
+              {RANGE_LABELS[r]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-3 grid sm:grid-cols-2 gap-4">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -223,8 +267,8 @@ export default function ProgressPage() {
           className="bg-card border border-card-border rounded-2xl p-6"
         >
           <h2 className="font-bold">XP לפי יום</h2>
-          <p className="text-xs text-muted mt-0.5">14 הימים האחרונים</p>
-          <XpBarChart buckets={buckets} values={data.dailyXp} />
+          <p className="text-xs text-muted mt-0.5">{RANGE_CHART_DAYS[range]} הימים האחרונים</p>
+          <XpBarChart buckets={chartData.buckets} values={chartData.dailyXp} />
         </motion.div>
 
         <motion.div
@@ -234,10 +278,12 @@ export default function ProgressPage() {
           className="bg-card border border-card-border rounded-2xl p-6"
         >
           <h2 className="font-bold">אחוז הצלחה בתרגילים</h2>
-          <p className="text-xs text-muted mt-0.5">14 הימים האחרונים</p>
-          <AccuracyLineChart buckets={buckets} values={data.dailyAccuracy} />
+          <p className="text-xs text-muted mt-0.5">{RANGE_CHART_DAYS[range]} הימים האחרונים</p>
+          <AccuracyLineChart buckets={chartData.buckets} values={chartData.dailyAccuracy} />
         </motion.div>
       </div>
+
+      <ScoreHistoryPanel summary={summary} />
 
       <SkillLevelsPanel skillLevels={data.skillLevels} />
 
@@ -327,6 +373,73 @@ export default function ProgressPage() {
         )}
       </motion.div>
     </div>
+  );
+}
+
+function ScoreHistoryPanel({ summary }: { summary: ScoreSummary | null }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.18 }}
+      className="mt-4 bg-card border border-card-border rounded-2xl p-6"
+    >
+      <h2 className="font-bold">היסטוריית מבחנים</h2>
+      <p className="text-xs text-muted mt-0.5">כל התרגולים, המבחנים והשיחות עם ה-AI בטווח שנבחר למעלה</p>
+
+      {!summary ? (
+        <div className="mt-5 h-24 rounded-xl bg-background-2 animate-pulse" />
+      ) : (
+        <>
+          <div className="mt-5 grid grid-cols-3 gap-3 text-center">
+            <div className="rounded-xl bg-background-2 p-3">
+              <EnglishText as="p" className="text-2xl font-bold">
+                {summary.testsCount}
+              </EnglishText>
+              <p className="text-xs text-muted mt-0.5">פעילויות</p>
+            </div>
+            <div className="rounded-xl bg-background-2 p-3">
+              <p className="text-2xl font-bold">{summary.averageScore !== null ? `${summary.averageScore}%` : "—"}</p>
+              <p className="text-xs text-muted mt-0.5">ציון ממוצע</p>
+            </div>
+            <div className="rounded-xl bg-background-2 p-3">
+              <EnglishText as="p" className="text-2xl font-bold">
+                {summary.xpEarned}
+              </EnglishText>
+              <p className="text-xs text-muted mt-0.5">XP נצבר</p>
+            </div>
+          </div>
+
+          {summary.items.length === 0 ? (
+            <p className="mt-5 py-4 text-center text-sm text-muted">אין עדיין פעילות בטווח הזה</p>
+          ) : (
+            <div className="mt-5 space-y-2">
+              {summary.items.map((item) => (
+                <div key={item.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-background-2">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate">{item.typeLabel}</p>
+                    <p className="text-xs text-muted mt-0.5">
+                      {new Date(item.createdAt).toLocaleDateString("he-IL", {
+                        day: "numeric",
+                        month: "numeric",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                  <span
+                    className={`shrink-0 text-sm font-medium ${
+                      item.scorePct === null ? "text-muted" : item.scorePct >= 60 ? "text-success" : "text-danger"
+                    }`}
+                  >
+                    {item.detail}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </motion.div>
   );
 }
 
