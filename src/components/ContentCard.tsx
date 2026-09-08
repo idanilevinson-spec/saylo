@@ -26,7 +26,7 @@ export default function ContentCard({ href, index = 0, className = "", children 
       transition={{ duration: 0.4, delay: Math.min(index, 8) * 0.05 }}
       whileHover={href ? { y: -5 } : undefined}
       whileTap={href ? { scale: 0.98 } : undefined}
-      className={`group relative h-full overflow-hidden bg-card border border-card-border rounded-2xl p-5 ${
+      className={`group relative h-full overflow-hidden bg-card border border-card-border rounded-lg p-5 ${
         href
           ? "hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-[box-shadow,border-color]"
           : ""
@@ -45,7 +45,7 @@ export default function ContentCard({ href, index = 0, className = "", children 
   return href ? (
     <Link
       href={href}
-      className="block h-full rounded-2xl focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+      className="block h-full rounded-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
     >
       {card}
     </Link>

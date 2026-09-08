@@ -117,7 +117,7 @@ export default function GamesHubPage() {
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
           href="/games/learn"
-          className="flex flex-col gap-3 bg-gradient-to-br from-success/10 to-primary/10 border border-success/25 rounded-2xl p-5 hover:border-success/45 hover:shadow-md transition-all"
+          className="flex flex-col gap-3 bg-gradient-to-br from-success/10 to-primary/10 border border-success/25 rounded-lg p-5 hover:border-success/45 hover:shadow-md transition-all"
         >
           <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-success/15 text-success">
             <GraduationCap size={22} />
@@ -132,7 +132,7 @@ export default function GamesHubPage() {
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
           href="/games/test"
-          className="flex flex-col gap-3 bg-gradient-to-br from-accent/10 to-primary/10 border border-accent/25 rounded-2xl p-5 hover:border-accent/45 hover:shadow-md transition-all"
+          className="flex flex-col gap-3 bg-gradient-to-br from-accent/10 to-primary/10 border border-accent/25 rounded-lg p-5 hover:border-accent/45 hover:shadow-md transition-all"
         >
           <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent-hover">
             <ClipboardCheck size={22} />
@@ -148,7 +148,7 @@ export default function GamesHubPage() {
         whileHover={{ y: -2 }}
         whileTap={{ scale: 0.98 }}
         href="/games/leaderboard"
-        className="mt-4 flex items-center gap-4 bg-gradient-to-l from-primary/10 to-accent/10 border border-primary/25 rounded-2xl p-5 hover:border-primary/45 hover:shadow-md transition-all"
+        className="mt-4 flex items-center gap-4 bg-gradient-to-l from-primary/10 to-accent/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-all"
       >
         <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
           <Trophy size={22} />
@@ -165,7 +165,7 @@ export default function GamesHubPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.05 }}
-          className="mt-6 flex items-center gap-6 bg-card border border-card-border rounded-2xl p-5"
+          className="mt-6 flex items-center gap-6 bg-card border border-card-border rounded-lg p-5"
         >
           <div className="flex items-center gap-1.5 text-accent-hover">
             <Flame size={18} />

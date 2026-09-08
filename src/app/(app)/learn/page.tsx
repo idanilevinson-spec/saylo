@@ -30,10 +30,10 @@ export default function LearnPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="h-9 w-56 rounded-lg bg-background-2 animate-pulse" />
-        <div className="mt-6 h-24 rounded-2xl bg-background-2 animate-pulse" />
+        <div className="mt-6 h-24 rounded-lg bg-background-2 animate-pulse" />
         <div className="mt-6 space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-16 rounded-2xl bg-background-2 animate-pulse" />
+            <div key={i} className="h-16 rounded-lg bg-background-2 animate-pulse" />
           ))}
         </div>
       </div>
@@ -56,7 +56,7 @@ export default function LearnPage() {
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
           href="/learn/today"
-          className="mt-6 flex items-center gap-4 p-5 rounded-2xl border border-accent/30 bg-accent/5 hover:border-accent/50 transition-colors"
+          className="mt-6 flex items-center gap-4 p-5 rounded-lg border border-accent/30 bg-accent/5 hover:border-accent/50 transition-colors"
         >
           <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent-hover">
             <Sparkles size={20} />

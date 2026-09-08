@@ -130,7 +130,7 @@ export default function AdminModerationPage() {
         ) : (
           <ul className="mt-3 space-y-2">
             {openReports.map((report) => (
-              <li key={report.id} className="bg-card border border-card-border rounded-2xl p-4 flex items-center justify-between gap-3">
+              <li key={report.id} className="bg-card border border-card-border rounded-lg p-4 flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium">
                     {report.target_type} · {report.target_id.slice(0, 8)}

@@ -61,7 +61,7 @@ export default function DailyLessonPage() {
         transition={{ duration: 0.4 }}
         className="text-center"
       >
-        <span className="inline-flex w-14 h-14 items-center justify-center rounded-2xl bg-accent/15 text-accent-hover">
+        <span className="inline-flex w-14 h-14 items-center justify-center rounded-lg bg-accent/15 text-accent-hover">
           <Sparkles size={26} />
         </span>
         <h1 className="mt-4 text-2xl font-bold">השיעור היומי שלכם</h1>
@@ -72,7 +72,7 @@ export default function DailyLessonPage() {
         initial={{ opacity: 0, y: 16, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.4, delay: 0.1, type: "spring", bounce: 0.35 }}
-        className="mt-8 bg-card border border-card-border rounded-2xl p-6 sm:p-8"
+        className="mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-8"
       >
         <div className="flex items-center gap-4">
           <span className="w-12 h-12 shrink-0 rounded-xl bg-primary/10 text-primary flex items-center justify-center">

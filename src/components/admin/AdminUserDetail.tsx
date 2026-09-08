@@ -81,7 +81,7 @@ export default function AdminUserDetail({ profileId }: { profileId: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-card border border-card-border rounded-2xl p-6 flex items-start justify-between flex-wrap gap-4">
+      <div className="bg-card border border-card-border rounded-lg p-6 flex items-start justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-xl font-bold">
             {profile.display_name}
@@ -103,7 +103,7 @@ export default function AdminUserDetail({ profileId }: { profileId: string }) {
       </div>
 
       <div className="grid sm:grid-cols-3 gap-4">
-        <div className="bg-card border border-card-border rounded-2xl p-5">
+        <div className="bg-card border border-card-border rounded-lg p-5">
           <p className="text-sm text-muted">מנוי</p>
           <p className="mt-2">{subscription ? <StatusBadge status={subscription.status} /> : "אין"}</p>
           {subscription?.trial_ends_at && (
@@ -112,12 +112,12 @@ export default function AdminUserDetail({ profileId }: { profileId: string }) {
             </p>
           )}
         </div>
-        <div className="bg-card border border-card-border rounded-2xl p-5">
+        <div className="bg-card border border-card-border rounded-lg p-5">
           <p className="text-sm text-muted">ניקוד ורמה</p>
           <p className="mt-2 text-2xl font-bold">{xp?.total_xp ?? 0} XP</p>
           <p className="text-xs text-muted">רמה {xp?.current_level ?? 1}</p>
         </div>
-        <div className="bg-card border border-card-border rounded-2xl p-5">
+        <div className="bg-card border border-card-border rounded-lg p-5">
           <p className="text-sm text-muted">רצף</p>
           <p className="mt-2 text-2xl font-bold flex items-center gap-1.5">
             {streak?.current_streak ?? 0} <Flame size={18} className="fill-current text-accent-hover" />
@@ -127,7 +127,7 @@ export default function AdminUserDetail({ profileId }: { profileId: string }) {
       </div>
 
       {profile.age_band !== "adult" && (
-        <div className="bg-card border border-card-border rounded-2xl p-6">
+        <div className="bg-card border border-card-border rounded-lg p-6">
           <h3 className="font-bold">אישור הורים</h3>
           <p className="mt-1 text-sm text-muted">
             סטטוס נוכחי: {CONSENT_LABELS[profile.parental_consent_status] ?? profile.parental_consent_status}

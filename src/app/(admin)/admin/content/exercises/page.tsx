@@ -91,7 +91,7 @@ export default function AdminExercisesPage() {
   const filtered = (exercises ?? []).filter((e) => statusFilter === "all" || e.status === statusFilter);
 
   return (
-    <div className="bg-card border border-card-border rounded-2xl p-5">
+    <div className="bg-card border border-card-border rounded-lg p-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h2 className="font-bold">תרגילים {exercises ? `(${exercises.length})` : ""}</h2>
         <div className="flex items-center gap-3">

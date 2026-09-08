@@ -109,7 +109,7 @@ function VocabTestPageInner() {
 
       <button
         onClick={() => generate()}
-        className="mt-6 w-full flex items-center gap-4 bg-gradient-to-l from-primary/10 to-accent/10 border border-primary/25 rounded-2xl p-5 hover:border-primary/45 hover:shadow-md transition-all text-right"
+        className="mt-6 w-full flex items-center gap-4 bg-gradient-to-l from-primary/10 to-accent/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-all text-right"
       >
         <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
           <Layers size={22} />
@@ -128,7 +128,7 @@ function VocabTestPageInner() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: i * 0.03 }}
             onClick={() => generate(topic.id)}
-            className="w-full flex items-center justify-between gap-3 bg-card border border-card-border rounded-2xl p-4 hover:border-primary/40 transition-colors text-right"
+            className="w-full flex items-center justify-between gap-3 bg-card border border-card-border rounded-lg p-4 hover:border-primary/40 transition-colors text-right"
           >
             <div>
               <p className="font-bold">{topic.name_he}</p>

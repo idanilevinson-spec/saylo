@@ -56,7 +56,7 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
 
   if (premiumRequired) {
     return (
-      <div className="bg-card border border-card-border rounded-2xl p-6 text-center">
+      <div className="bg-card border border-card-border rounded-lg p-6 text-center">
         <IconBadge icon={Crown} tone="accent" className="mx-auto" />
         <p className="font-bold">Writing Coach זמין למנויי פרימיום</p>
         <p className="mt-2 text-sm text-muted">תקופת הניסיון שלכם הסתיימה. שדרגו כדי להמשיך לקבל משוב על כתיבה.</p>
@@ -72,7 +72,7 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
 
   if (limitReached) {
     return (
-      <div className="bg-card border border-card-border rounded-2xl p-6 text-center">
+      <div className="bg-card border border-card-border rounded-lg p-6 text-center">
         <p className="font-bold">הגעתם למגבלת המשובים היומית</p>
         <p className="mt-2 text-sm text-muted">אפשר לשלוח עד 15 טקסטים ליום. נסו שוב בעוד עד 24 שעות.</p>
       </div>
@@ -82,14 +82,14 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
   if (feedback) {
     return (
       <div className="space-y-6">
-        <div className="bg-card border border-card-border rounded-2xl p-6">
+        <div className="bg-card border border-card-border rounded-lg p-6">
           <p className="text-sm text-muted">מה שכתבתם</p>
           <EnglishText as="p" className="mt-2 leading-relaxed text-left">
             {text}
           </EnglishText>
         </div>
 
-        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <p className="font-bold">משוב</p>
             <span className="px-3 py-1 rounded-full bg-primary text-primary-ink text-sm font-bold">
@@ -99,7 +99,7 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
           <p className="mt-3 leading-relaxed">{feedback.feedback_he}</p>
         </div>
 
-        <div className="bg-success/5 border border-success/20 rounded-2xl p-6">
+        <div className="bg-success/5 border border-success/20 rounded-lg p-6">
           <p className="font-bold text-success">גרסה משופרת</p>
           <EnglishText as="p" className="mt-2 leading-relaxed text-left">
             {feedback.improved_version}

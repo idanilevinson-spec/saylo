@@ -364,7 +364,7 @@ export default function MatchGamePage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 z-10 flex items-center justify-center bg-background/90 rounded-2xl"
+                className="absolute inset-0 z-10 flex items-center justify-center bg-background/90 rounded-lg"
               >
                 <p className="text-xl font-bold text-accent-hover">שלב הושלם! 🎉</p>
               </motion.div>

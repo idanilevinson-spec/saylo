@@ -29,7 +29,7 @@ export default async function ConsentPage({ params }: PageProps) {
     <div className="max-w-md mx-auto px-4 py-16">
       <h1 className="text-2xl font-bold text-center">בקשת אישור הורה</h1>
 
-      <div className="mt-6 bg-card border border-card-border rounded-2xl p-6">
+      <div className="mt-6 bg-card border border-card-border rounded-lg p-6">
         <p className="leading-relaxed">
           <strong>{info.minor_display_name}</strong> (גיל {info.minor_age}) מבקש/ת את אישורכם להשתמש בתכונת תרגול
           השיחה עם AI באתר <strong>Saylo</strong>.

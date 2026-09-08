@@ -35,7 +35,7 @@ export default function AdminContentHubPage() {
         <Link
           key={s.href}
           href={s.href}
-          className="bg-card border border-card-border rounded-2xl p-5 hover:border-primary/40 hover:shadow-md transition-all"
+          className="bg-card border border-card-border rounded-lg p-5 hover:border-primary/40 hover:shadow-md transition-all"
         >
           <p className="font-bold text-lg">{s.label}</p>
           <p className="mt-1 text-sm text-muted">{counts ? `${counts[s.table]} פריטים` : "טוען..."}</p>

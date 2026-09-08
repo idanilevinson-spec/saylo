@@ -272,7 +272,7 @@ function LearnModePageInner() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-background/90 rounded-2xl"
+                className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-background/90 rounded-lg"
               >
                 <p className="text-xl font-bold text-success">מילה בשליטה מלאה! 🎉</p>
                 {question && <EnglishText className="text-lg text-muted">{question.item.headword}</EnglishText>}
@@ -286,7 +286,7 @@ function LearnModePageInner() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="bg-card border border-card-border rounded-2xl p-6 sm:p-8"
+              className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
             >
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted">{remaining} מילים נשארו בסבב הזה</p>

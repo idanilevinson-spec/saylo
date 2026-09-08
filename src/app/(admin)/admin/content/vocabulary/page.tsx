@@ -132,7 +132,7 @@ export default function AdminVocabularyPage() {
 
   return (
     <div className="grid lg:grid-cols-[minmax(0,320px)_1fr] gap-6 items-start">
-      <div className="bg-card border border-card-border rounded-2xl p-5">
+      <div className="bg-card border border-card-border rounded-lg p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-bold">נושאים</h2>
           <button onClick={startNewTopic} className="text-sm text-primary font-medium hover:underline">
@@ -175,7 +175,7 @@ export default function AdminVocabularyPage() {
         {!selectedTopic ? (
           <p className="text-muted">בחרו נושא מהרשימה כדי לנהל את המילים בו.</p>
         ) : (
-          <div className="bg-card border border-card-border rounded-2xl p-5">
+          <div className="bg-card border border-card-border rounded-lg p-5">
             <div className="flex items-center justify-between">
               <h2 className="font-bold">מילים בנושא: {selectedTopic.name_he}</h2>
               <button onClick={startNewItem} className="text-sm text-primary font-medium hover:underline">

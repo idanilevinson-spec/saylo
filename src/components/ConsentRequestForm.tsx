@@ -54,7 +54,7 @@ export default function ConsentRequestForm({ status }: ConsentRequestFormProps) 
 
   if (link) {
     return (
-      <div className="bg-card border border-card-border rounded-2xl p-6 text-center">
+      <div className="bg-card border border-card-border rounded-lg p-6 text-center">
         <p className="font-bold">{status === "pending" ? "ממתינים לאישור ההורה" : "הבקשה נשלחה!"}</p>
         <p className="mt-2 text-sm text-muted">
           שלחו את הקישור הזה להורה או לאפוטרופוס שלכם כדי שיאשרו (עדיין אין לנו שליחת מייל אוטומטית, אז צריך להעביר את זה ידנית — בוואטסאפ, מייל, איך שנוח):
@@ -67,7 +67,7 @@ export default function ConsentRequestForm({ status }: ConsentRequestFormProps) 
   }
 
   return (
-    <div className="bg-card border border-card-border rounded-2xl p-6">
+    <div className="bg-card border border-card-border rounded-lg p-6">
       <p className="font-bold">נדרש אישור הורה</p>
       <p className="mt-2 text-sm text-muted">
         {status === "denied"

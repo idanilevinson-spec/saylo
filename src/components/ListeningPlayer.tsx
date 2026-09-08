@@ -13,7 +13,7 @@ export default function ListeningPlayer({ transcriptEn }: ListeningPlayerProps) 
   const [showTranscript, setShowTranscript] = useState(false);
 
   return (
-    <div className="bg-card border border-card-border rounded-2xl p-6 sm:p-8">
+    <div className="bg-card border border-card-border rounded-lg p-6 sm:p-8">
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => speak(transcriptEn, 1)}

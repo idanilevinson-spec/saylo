@@ -233,7 +233,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
           {outcomes.map((o, i) => (
             <div
               key={i}
-              className={`rounded-2xl border p-4 ${o.isCorrect ? "border-success/25 bg-success/5" : "border-danger/25 bg-danger/5"}`}
+              className={`rounded-lg border p-4 ${o.isCorrect ? "border-success/25 bg-success/5" : "border-danger/25 bg-danger/5"}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm text-muted">
@@ -326,7 +326,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-card border border-card-border rounded-2xl p-6 sm:p-8 text-center"
+            className="bg-card border border-card-border rounded-lg p-6 sm:p-8 text-center"
           >
             {step.type === "vocab" ? (
               <>

@@ -72,7 +72,7 @@ export default function ReadingResponseForm({
 
   if (premiumRequired) {
     return (
-      <div className="bg-card border border-card-border rounded-2xl p-6 text-center">
+      <div className="bg-card border border-card-border rounded-lg p-6 text-center">
         <IconBadge icon={Crown} tone="accent" className="mx-auto" />
         <p className="font-bold">שאלות הבנת נקרא פתוחות זמינות למנויי פרימיום</p>
         <p className="mt-2 text-sm text-muted">תקופת הניסיון שלכם הסתיימה. שדרגו כדי להמשיך לקבל משוב על תשובות פתוחות.</p>
@@ -88,7 +88,7 @@ export default function ReadingResponseForm({
 
   if (limitReached) {
     return (
-      <div className="bg-card border border-card-border rounded-2xl p-6 text-center">
+      <div className="bg-card border border-card-border rounded-lg p-6 text-center">
         <p className="font-bold">הגעתם למגבלת התשובות היומית</p>
         <p className="mt-2 text-sm text-muted">אפשר לשלוח עד 15 תשובות פתוחות ליום. נסו שוב בעוד עד 24 שעות.</p>
       </div>
@@ -103,7 +103,7 @@ export default function ReadingResponseForm({
         transition={{ duration: 0.35 }}
         className="space-y-4"
       >
-        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <p className="font-bold">משוב על ההבנה שלכם</p>
             <span className="px-3 py-1 rounded-full bg-primary text-primary-ink text-sm font-bold">
@@ -114,7 +114,7 @@ export default function ReadingResponseForm({
         </div>
 
         {result.model_answer_en && (
-          <div className="bg-success/5 border border-success/20 rounded-2xl p-6">
+          <div className="bg-success/5 border border-success/20 rounded-lg p-6">
             <p className="font-bold text-success">דוגמה לתשובה טובה</p>
             <EnglishText as="p" className="mt-2 leading-relaxed text-left">
               {result.model_answer_en}
@@ -136,7 +136,7 @@ export default function ReadingResponseForm({
   }
 
   return (
-    <div className="bg-card border border-card-border rounded-2xl p-6">
+    <div className="bg-card border border-card-border rounded-lg p-6">
       <p className="font-bold">שאלה פתוחה</p>
       <EnglishText as="p" className="mt-2 leading-relaxed">
         {questionEn}

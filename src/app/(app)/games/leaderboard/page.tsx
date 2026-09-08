@@ -56,7 +56,7 @@ export default function LeaderboardPage() {
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: i * 0.08 }}
-                    className={`flex flex-col items-center justify-end rounded-2xl border p-4 ${
+                    className={`flex flex-col items-center justify-end rounded-lg border p-4 ${
                       entry.rank === 1
                         ? "w-28 h-36 bg-card border-primary/40 shadow-lg"
                         : "w-24 h-28 bg-card border-card-border"
@@ -76,7 +76,7 @@ export default function LeaderboardPage() {
           )}
 
           {rest.length > 0 && (
-            <div className="mt-6 bg-card border border-card-border rounded-2xl divide-y divide-card-border overflow-hidden">
+            <div className="mt-6 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
               {rest.map((entry) => (
                 <div
                   key={entry.rank}
@@ -97,7 +97,7 @@ export default function LeaderboardPage() {
           )}
 
           {me && (
-            <div className="mt-4 flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5">
+            <div className="mt-4 flex items-center justify-between gap-3 px-4 py-3 rounded-lg border-2 border-dashed border-primary/40 bg-primary/5">
               <div className="flex items-center gap-3 min-w-0">
                 <EnglishText as="span" className="w-6 text-sm font-bold text-primary shrink-0">
                   {me.rank}

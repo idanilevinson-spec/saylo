@@ -353,7 +353,7 @@ export default function WordCatchPage() {
           <p className="text-sm font-bold text-accent-hover">{score} נק&apos;</p>
         </div>
 
-        <div className="relative h-96 rounded-2xl border border-card-border bg-background-2 overflow-hidden">
+        <div className="relative h-96 rounded-lg border border-card-border bg-background-2 overflow-hidden">
           <FallingWord key={round} headword={item.headword} lane={lane} fallSeconds={fallSeconds} onLanded={handleLanded} />
           <div
             aria-hidden="true"

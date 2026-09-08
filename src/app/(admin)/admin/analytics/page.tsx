@@ -122,11 +122,11 @@ export default function AdminAnalyticsPage() {
       <div>
         <h2 className="font-bold text-lg">הכנסה</h2>
         <div className="mt-3 grid sm:grid-cols-2 gap-4">
-          <div className="bg-card border border-card-border rounded-2xl p-5">
+          <div className="bg-card border border-card-border rounded-lg p-5">
             <p className="text-sm text-muted">הכנסה חודשית משוערת (MRR)</p>
             <p className="mt-2 text-3xl font-bold">₪{state.totalMrr}</p>
           </div>
-          <div className="bg-card border border-card-border rounded-2xl p-5">
+          <div className="bg-card border border-card-border rounded-lg p-5">
             <p className="text-sm text-muted">פילוח לפי מסלול</p>
             <ul className="mt-2 space-y-1 text-sm">
               {state.planBreakdown.length === 0 && <li className="text-muted">אין מנויים פעילים עדיין.</li>}
@@ -146,16 +146,16 @@ export default function AdminAnalyticsPage() {
       <div>
         <h2 className="font-bold text-lg">מעורבות ושימור</h2>
         <div className="mt-3 grid sm:grid-cols-3 gap-4">
-          <div className="bg-card border border-card-border rounded-2xl p-5">
+          <div className="bg-card border border-card-border rounded-lg p-5">
             <p className="text-sm text-muted">משתמשים פעילים (7 ימים)</p>
             <p className="mt-2 text-3xl font-bold">{state.activeLast7Days}</p>
             <p className="mt-1 text-xs text-muted">מתוך {state.totalUsers} משתמשים</p>
           </div>
-          <div className="bg-card border border-card-border rounded-2xl p-5">
+          <div className="bg-card border border-card-border rounded-lg p-5">
             <p className="text-sm text-muted">תרגילים בוצעו (7 ימים)</p>
             <p className="mt-2 text-3xl font-bold">{state.exerciseAttemptsLast7Days}</p>
           </div>
-          <div className="bg-card border border-card-border rounded-2xl p-5">
+          <div className="bg-card border border-card-border rounded-lg p-5">
             <p className="text-sm text-muted">שימור 30→7 ימים</p>
             <p className="mt-2 text-3xl font-bold">{state.retainedPct}%</p>
             <p className="mt-1 text-xs text-muted">ממשתמשים שנרשמו לפני 30+ ימים ועדיין פעילים</p>
@@ -165,7 +165,7 @@ export default function AdminAnalyticsPage() {
 
       <div>
         <h2 className="font-bold text-lg">משפך המרה</h2>
-        <div className="mt-3 bg-card border border-card-border rounded-2xl p-5 space-y-4">
+        <div className="mt-3 bg-card border border-card-border rounded-lg p-5 space-y-4">
           {state.funnel.map((step) => (
             <Bar key={step.label} label={step.label} count={step.count} max={funnelMax} />
           ))}

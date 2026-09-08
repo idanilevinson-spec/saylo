@@ -132,7 +132,7 @@ export default function DefinitionGamePage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-card border border-card-border rounded-2xl p-6 sm:p-8"
+          className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           <p className="text-sm text-muted">איזו מילה מתאימה להגדרה הבאה?</p>
           <EnglishText as="p" className="mt-2 font-medium text-lg leading-relaxed">

@@ -89,7 +89,7 @@ export default function PlacementPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-card border border-card-border rounded-2xl p-6 sm:p-10 text-center"
+          className="bg-card border border-card-border rounded-lg p-6 sm:p-10 text-center"
         >
           <div className="mx-auto w-20 h-20 rounded-full border-2 border-dashed border-primary bg-primary/[0.07] flex items-center justify-center">
             <Target size={30} className="text-primary" strokeWidth={2} />
@@ -150,7 +150,7 @@ export default function PlacementPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="mt-6 bg-card border border-card-border rounded-2xl p-6"
+          className="mt-6 bg-card border border-card-border rounded-lg p-6"
         >
           <p className="leading-relaxed">{result.summary}</p>
         </motion.div>
@@ -159,7 +159,7 @@ export default function PlacementPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
-          className="mt-6 bg-card border border-card-border rounded-2xl overflow-hidden"
+          className="mt-6 bg-card border border-card-border rounded-lg overflow-hidden"
         >
           <table className="w-full text-sm">
             <tbody>
@@ -256,7 +256,7 @@ export default function PlacementPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="bg-card border border-card-border rounded-2xl p-6 sm:p-8"
+          className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           <p className="font-medium text-lg">{WRITING_SAMPLE_PROMPT_HE}</p>
           <p className="mt-1 text-sm text-muted">
@@ -315,7 +315,7 @@ export default function PlacementPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="bg-card border border-card-border rounded-2xl p-6 sm:p-8"
+        className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
       >
         {question.skill_area === "listening" && question.audio_text ? (
           <div>

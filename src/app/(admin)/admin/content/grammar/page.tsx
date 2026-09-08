@@ -117,7 +117,7 @@ export default function AdminGrammarPage() {
 
   return (
     <div className="grid lg:grid-cols-[minmax(0,320px)_1fr] gap-6 items-start">
-      <div className="bg-card border border-card-border rounded-2xl p-5">
+      <div className="bg-card border border-card-border rounded-lg p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-bold">נושאי דקדוק</h2>
           <button onClick={startNewTopic} className="text-sm text-primary font-medium hover:underline">
@@ -215,7 +215,7 @@ export default function AdminGrammarPage() {
         {!selectedTopic ? (
           <p className="text-muted">בחרו נושא מהרשימה כדי לנהל את השיעורים בו.</p>
         ) : (
-          <div className="bg-card border border-card-border rounded-2xl p-5">
+          <div className="bg-card border border-card-border rounded-lg p-5">
             <div className="flex items-center justify-between">
               <h2 className="font-bold">שיעורים בנושא: {selectedTopic.name_he}</h2>
               <button onClick={startNewLesson} className="text-sm text-primary font-medium hover:underline">

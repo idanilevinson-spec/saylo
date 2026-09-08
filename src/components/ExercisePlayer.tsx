@@ -72,7 +72,7 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="mt-6 bg-card border border-card-border rounded-2xl p-6 sm:p-8"
+          className="mt-6 bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           {exercise.type === "mcq" && (
             <McqQuestion content={exercise.content} disabled={!!result} onSubmit={handleSubmit} />

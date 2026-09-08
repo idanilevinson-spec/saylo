@@ -168,7 +168,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
     return (
       <>
         <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
-        <div className="mt-3 bg-card border border-card-border rounded-2xl p-6 sm:p-8">
+        <div className="mt-3 bg-card border border-card-border rounded-lg p-6 sm:p-8">
           <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} />
         </div>
       </>
@@ -179,12 +179,12 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
     return (
       <>
         <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
-        <div className="mt-3 bg-card border border-card-border rounded-2xl p-6 sm:p-8">
+        <div className="mt-3 bg-card border border-card-border rounded-lg p-6 sm:p-8">
           <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} />
         </div>
 
         <h2 className="mt-8 text-lg font-bold text-muted">מבחן הבנה</h2>
-        <div className="mt-3 bg-card border border-card-border rounded-2xl p-6 text-center">
+        <div className="mt-3 bg-card border border-card-border rounded-lg p-6 text-center">
           <div className="inline-flex items-center gap-1.5 text-sm text-muted">
             <Timer size={15} />
             <span>
@@ -254,7 +254,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
         {openOutcomes.length > 0 && (
           <div className="mt-6 space-y-3 text-right">
             {openOutcomes.map((o, i) => (
-              <div key={i} className="bg-primary/5 border border-primary/20 rounded-2xl p-5">
+              <div key={i} className="bg-primary/5 border border-primary/20 rounded-lg p-5">
                 <div className="flex items-center justify-between">
                   <p className="font-bold text-sm">שאלה פתוחה {i + 1}</p>
                   <span className="px-2.5 py-0.5 rounded-full bg-primary text-primary-ink text-xs font-bold">
@@ -270,7 +270,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
           <p className="mt-4 text-sm text-muted">הזמן נגמר לפני שהספקתם לענות על כל השאלות הפתוחות — זה בסדר גמור, נסו שוב בפעם הבאה.</p>
         )}
 
-        <div className="mt-6 bg-accent/5 border border-accent/25 rounded-2xl p-6 text-right">
+        <div className="mt-6 bg-accent/5 border border-accent/25 rounded-lg p-6 text-right">
           <p className="font-bold flex items-center gap-1.5 text-accent-hover">
             <Sparkles size={16} /> סיכום כללי מה-AI
           </p>
@@ -341,7 +341,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
               transition={{ duration: 0.25 }}
               className="overflow-hidden"
             >
-              <div className="mt-3 bg-background-2 border border-card-border rounded-2xl p-5 sm:p-6 max-h-72 overflow-y-auto">
+              <div className="mt-3 bg-background-2 border border-card-border rounded-lg p-5 sm:p-6 max-h-72 overflow-y-auto">
                 <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} />
               </div>
             </motion.div>
@@ -353,7 +353,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mt-4 bg-card border border-card-border rounded-2xl p-6 sm:p-8"
+          className="mt-4 bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           {currentExercise && (
             <>

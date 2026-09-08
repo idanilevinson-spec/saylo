@@ -142,7 +142,7 @@ export default function IdiomsPracticePage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-card border border-card-border rounded-2xl p-6 sm:p-8"
+          className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           <p className="text-sm text-muted">איזה ביטוי מתאים למשמעות הבאה?</p>
           <p className="mt-2 font-pen text-2xl text-accent-hover">{item.promptHe}</p>

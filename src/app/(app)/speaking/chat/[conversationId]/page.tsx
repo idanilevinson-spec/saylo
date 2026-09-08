@@ -121,7 +121,7 @@ export default function SpeakingChatPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
-          className="mt-6 bg-card border border-card-border rounded-2xl p-6"
+          className="mt-6 bg-card border border-card-border rounded-lg p-6"
         >
           <p className="leading-relaxed">{score.feedback.generalSuggestionsHe}</p>
         </motion.div>
@@ -195,14 +195,14 @@ export default function SpeakingChatPage() {
               className={`flex items-end gap-2 ${m.role === "user" ? "justify-start" : "justify-end"}`}
             >
               {m.role === "user" ? (
-                <div className="max-w-[80%] px-4 py-2.5 rounded-2xl bg-primary text-primary-ink">
+                <div className="max-w-[80%] px-4 py-2.5 rounded-lg bg-primary text-primary-ink">
                   <EnglishText as="p" className="text-left leading-relaxed">
                     {m.content}
                   </EnglishText>
                 </div>
               ) : (
                 <>
-                  <div className="max-w-[80%] px-4 py-2.5 rounded-2xl bg-card border border-card-border">
+                  <div className="max-w-[80%] px-4 py-2.5 rounded-lg bg-card border border-card-border">
                     <EnglishText as="p" className="text-left leading-relaxed">
                       {m.content}
                     </EnglishText>
@@ -269,7 +269,7 @@ function ScoreTile({
       initial={{ opacity: 0, y: 16, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.35, delay, type: "spring", bounce: 0.4 }}
-      className={`rounded-2xl p-4 text-center ${highlight ? "bg-primary text-primary-ink" : "bg-card border border-card-border"}`}
+      className={`rounded-lg p-4 text-center ${highlight ? "bg-primary text-primary-ink" : "bg-card border border-card-border"}`}
     >
       <p className="text-2xl font-bold">{value}</p>
       <p className={`text-xs mt-1 ${highlight ? "opacity-90" : "text-muted"}`}>{label}</p>
@@ -279,7 +279,7 @@ function ScoreTile({
 
 function FeedbackList({ title, items, english }: { title: string; items: string[]; english?: boolean }) {
   return (
-    <div className="mt-4 bg-card border border-card-border rounded-2xl p-6">
+    <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
       <p className="font-bold">{title}</p>
       <ul className="mt-2 space-y-1.5">
         {items.map((item, i) => (

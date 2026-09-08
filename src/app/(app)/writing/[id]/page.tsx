@@ -40,7 +40,7 @@ export default async function WritingPromptPage({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="mt-6 bg-card border border-card-border rounded-2xl p-6">
+      <div className="mt-6 bg-card border border-card-border rounded-lg p-6">
         <EnglishText as="p" className="text-lg leading-relaxed text-left">
           {prompt.prompt_en}
         </EnglishText>

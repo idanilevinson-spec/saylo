@@ -142,7 +142,7 @@ export default function SpellingChallengePage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-card border border-card-border rounded-2xl p-6 sm:p-8 text-center"
+          className="bg-card border border-card-border rounded-lg p-6 sm:p-8 text-center"
         >
           <p className="text-sm text-muted">השלימו את המילה באנגלית עבור</p>
           <p className="mt-1 text-2xl font-bold">{item.translationHe}</p>

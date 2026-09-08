@@ -53,7 +53,7 @@ export default function AdminListeningPage() {
   }
 
   return (
-    <div className="bg-card border border-card-border rounded-2xl p-5">
+    <div className="bg-card border border-card-border rounded-lg p-5">
       <div className="flex items-center justify-between">
         <h2 className="font-bold">קטעי האזנה</h2>
         <button

@@ -81,7 +81,7 @@ export default function SpeakingPage() {
           whileTap={{ scale: 0.98 }}
           onClick={() => startConversation(null)}
           disabled={starting}
-          className="mt-8 w-full text-right bg-primary/5 border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-[border-color] disabled:opacity-60"
+          className="mt-8 w-full text-right bg-primary/5 border border-primary/20 rounded-lg p-5 hover:border-primary/40 transition-[border-color] disabled:opacity-60"
         >
           <span className="inline-flex w-10 h-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <MessageCircle size={20} />
@@ -102,7 +102,7 @@ export default function SpeakingPage() {
               whileTap={{ scale: 0.98 }}
               onClick={() => startConversation(s.id)}
               disabled={starting}
-              className="text-right bg-card border border-card-border rounded-2xl p-5 hover:border-primary/40 hover:shadow-md transition-[box-shadow,border-color] disabled:opacity-60"
+              className="text-right bg-card border border-card-border rounded-lg p-5 hover:border-primary/40 hover:shadow-md transition-[box-shadow,border-color] disabled:opacity-60"
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-bold">{s.title_he}</h3>

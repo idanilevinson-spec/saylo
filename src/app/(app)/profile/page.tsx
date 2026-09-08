@@ -142,7 +142,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.05 }}
-          className="mt-6 flex items-center justify-around bg-card border border-card-border rounded-2xl p-5"
+          className="mt-6 flex items-center justify-around bg-card border border-card-border rounded-lg p-5"
         >
           <div className="flex flex-col items-center gap-1">
             <span className="flex items-center gap-1 text-primary">
@@ -190,7 +190,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.08 }}
-          className="mt-4 bg-card border border-card-border rounded-2xl p-6 space-y-3"
+          className="mt-4 bg-card border border-card-border rounded-lg p-6 space-y-3"
         >
           <h2 className="font-bold text-sm text-muted flex items-center gap-1.5">
             <CreditCard size={14} /> המנוי שלי
@@ -300,7 +300,7 @@ export default function ProfilePage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="mt-4 bg-card border border-card-border rounded-2xl p-6 space-y-3"
+        className="mt-4 bg-card border border-card-border rounded-lg p-6 space-y-3"
       >
         <h2 className="font-bold text-sm text-muted">התראות</h2>
         <label className="flex items-center justify-between cursor-pointer">

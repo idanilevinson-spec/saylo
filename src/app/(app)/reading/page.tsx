@@ -41,7 +41,7 @@ export default async function ReadingPage() {
         </div>
       </div>
 
-      <div className="mt-8 bg-card border border-card-border rounded-2xl p-6">
+      <div className="mt-8 bg-card border border-card-border rounded-lg p-6">
         <p className="flex items-center gap-1.5 font-bold text-accent-hover">
           <Lightbulb size={16} /> טיפים לפני שמתחילים
         </p>

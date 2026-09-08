@@ -157,11 +157,11 @@ export default function DashboardPage() {
   if (loading || !profile) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-12">
-        <div className="h-24 rounded-2xl bg-background-2 animate-pulse" />
-        <div className="mt-6 h-28 rounded-2xl bg-background-2 animate-pulse" />
+        <div className="h-24 rounded-lg bg-background-2 animate-pulse" />
+        <div className="mt-6 h-28 rounded-lg bg-background-2 animate-pulse" />
         <div className="mt-8 space-y-6">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-40 rounded-2xl bg-background-2 animate-pulse" />
+            <div key={i} className="h-40 rounded-lg bg-background-2 animate-pulse" />
           ))}
         </div>
       </div>
@@ -173,13 +173,17 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      {/* Status strip: greeting beside today's numbers. */}
+      {/* Status strip: greeting beside today's numbers. The same
+          primary-colored top edge as every other plate on the site
+          (hero, correction demo, auth forms) — one recurring detail
+          instead of a device invented per surface. */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative bg-card border border-card-border rounded-2xl overflow-hidden sm:flex sm:items-stretch"
+        className="relative bg-card border border-card-border rounded-lg overflow-hidden sm:flex sm:items-stretch"
       >
+        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="p-6 sm:p-7 sm:flex-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             {greeting()}, {profile.display_name} 👋
@@ -213,9 +217,9 @@ export default function DashboardPage() {
         >
           <Link
             href="/placement"
-            className="group relative flex items-center gap-5 overflow-hidden rounded-2xl border border-accent/40 bg-accent/[0.07] p-6 transition-colors hover:bg-accent/[0.11]"
+            className="group relative flex items-center gap-5 overflow-hidden rounded-lg border border-accent/40 bg-accent/[0.07] p-6 transition-colors hover:bg-accent/[0.11]"
           >
-            <span className="inline-flex w-14 h-14 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent-hover">
+            <span className="inline-flex w-14 h-14 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent-hover">
               <Target size={26} strokeWidth={2} />
             </span>
             <div className="min-w-0">
@@ -244,7 +248,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="relative overflow-hidden rounded-2xl border border-card-border p-6 flex flex-col justify-between"
+          className="relative overflow-hidden rounded-lg border border-card-border p-6 flex flex-col justify-between"
         >
           <motion.div
             aria-hidden="true"
@@ -294,7 +298,7 @@ export default function DashboardPage() {
             >
               <Link
                 href={m.href}
-                className={`h-full flex items-center gap-4 rounded-2xl border p-5 transition-all hover:shadow-md ${
+                className={`h-full flex items-center gap-4 rounded-lg border p-5 transition-all hover:shadow-md ${
                   m.tone === "accent"
                     ? "bg-accent/10 border-accent/30 hover:border-accent/50"
                     : "bg-primary/10 border-primary/30 hover:border-primary/50"
@@ -326,7 +330,7 @@ export default function DashboardPage() {
             transition={{ duration: 0.4, delay: 0.3 + gi * 0.08 }}
           >
             <h2 className="text-sm font-bold text-muted mb-3">{group.title}</h2>
-            <div className="rounded-2xl border border-card-border bg-card overflow-hidden divide-y divide-card-border">
+            <div className="rounded-lg border border-card-border bg-card overflow-hidden divide-y divide-card-border">
               {group.items.map((m) => (
                 <Link
                   key={m.title}

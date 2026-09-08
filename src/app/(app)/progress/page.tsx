@@ -196,10 +196,10 @@ export default function ProgressPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="h-9 w-48 rounded-lg bg-background-2 animate-pulse" />
-        <div className="mt-6 h-40 rounded-2xl bg-background-2 animate-pulse" />
+        <div className="mt-6 h-40 rounded-lg bg-background-2 animate-pulse" />
         <div className="mt-6 grid sm:grid-cols-2 gap-4">
-          <div className="h-56 rounded-2xl bg-background-2 animate-pulse" />
-          <div className="h-56 rounded-2xl bg-background-2 animate-pulse" />
+          <div className="h-56 rounded-lg bg-background-2 animate-pulse" />
+          <div className="h-56 rounded-lg bg-background-2 animate-pulse" />
         </div>
       </div>
     );
@@ -221,7 +221,7 @@ export default function ProgressPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.05 }}
-        className="mt-6 relative overflow-hidden rounded-2xl border border-card-border p-6 sm:p-8"
+        className="mt-6 relative overflow-hidden rounded-lg border border-card-border p-6 sm:p-8"
       >
         <motion.div
           aria-hidden="true"
@@ -264,7 +264,7 @@ export default function ProgressPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="bg-card border border-card-border rounded-2xl p-6"
+          className="bg-card border border-card-border rounded-lg p-6"
         >
           <h2 className="font-bold">XP לפי יום</h2>
           <p className="text-xs text-muted mt-0.5">{RANGE_CHART_DAYS[range]} הימים האחרונים</p>
@@ -275,7 +275,7 @@ export default function ProgressPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15 }}
-          className="bg-card border border-card-border rounded-2xl p-6"
+          className="bg-card border border-card-border rounded-lg p-6"
         >
           <h2 className="font-bold">אחוז הצלחה בתרגילים</h2>
           <p className="text-xs text-muted mt-0.5">{RANGE_CHART_DAYS[range]} הימים האחרונים</p>
@@ -291,7 +291,7 @@ export default function ProgressPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="mt-4 bg-card border border-card-border rounded-2xl p-6"
+        className="mt-4 bg-card border border-card-border rounded-lg p-6"
       >
         <h2 className="font-bold">דיוק לפי תחום</h2>
         <p className="text-xs text-muted mt-0.5">מכל הזמנים</p>
@@ -330,7 +330,7 @@ export default function ProgressPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.25 }}
-          className="mt-4 bg-card border border-card-border rounded-2xl p-6"
+          className="mt-4 bg-card border border-card-border rounded-lg p-6"
         >
           <h2 className="font-bold">ציוני שיחות עם AI</h2>
           <p className="text-xs text-muted mt-0.5">10 השיחות האחרונות שסיימתם</p>
@@ -342,7 +342,7 @@ export default function ProgressPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
-        className="mt-4 bg-card border border-card-border rounded-2xl p-6"
+        className="mt-4 bg-card border border-card-border rounded-lg p-6"
       >
         <h2 className="font-bold">תגים שהרווחתם</h2>
         {data.badges.length === 0 ? (
@@ -382,7 +382,7 @@ function ScoreHistoryPanel({ summary }: { summary: ScoreSummary | null }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.18 }}
-      className="mt-4 bg-card border border-card-border rounded-2xl p-6"
+      className="mt-4 bg-card border border-card-border rounded-lg p-6"
     >
       <h2 className="font-bold">היסטוריית מבחנים</h2>
       <p className="text-xs text-muted mt-0.5">כל התרגולים, המבחנים והשיחות עם ה-AI בטווח שנבחר למעלה</p>
@@ -457,7 +457,7 @@ function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillAr
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.18 }}
-      className="mt-4 bg-card border border-card-border rounded-2xl p-6"
+      className="mt-4 bg-card border border-card-border rounded-lg p-6"
     >
       <h2 className="font-bold">חוזקות וחולשות</h2>
       <p className="text-xs text-muted mt-0.5">רמת CEFR נוכחית בכל תחום, מתעדכנת ככל שאתם מתרגלים</p>
