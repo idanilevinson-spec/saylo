@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MagneticButton from "@/components/MagneticButton";
+import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
 
 export default function LandingHero() {
   return (
@@ -102,36 +103,16 @@ export default function LandingHero() {
           </motion.div>
           </div>
 
-          {/* The live correction — the mechanism, dramatized. A real caption
-              card, not a chat bubble: the mistake captions in, strikes
-              through, and the fix captions in beneath it in the same
-              grammar the whole hero already taught you to read. Sits
-              beside the copy on desktop so it's inside the first
-              viewport, not scrolled past. */}
+          {/* The signature moment: not a screenshot of the product but the
+              product's real mechanism, playing live and looping through a
+              handful of real mistakes. Sits beside the copy on desktop so
+              it's inside the first viewport, not scrolled past. */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.9 }}
-            className="mt-14 lg:mt-0 rounded-2xl px-5 py-5 sm:px-7 sm:py-6 bg-black/40 backdrop-blur-md border-y border-white/10"
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="flex items-center gap-2 text-xs font-semibold text-[#4d9eff]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4d9eff] animate-pulse" />
-                מורה AI מתקן עכשיו
-              </span>
-              <EnglishText as="span" className="text-xs font-semibold tracking-wide text-[#f3efe4]/40">
-                B1
-              </EnglishText>
-            </div>
-            <div className="caption-stack">
-              <EnglishText as="p" className="caption-track-en text-lg leading-relaxed text-[#f3efe4]">
-                I <span className="line-through decoration-2 decoration-[#f87171]/70 text-[#f3efe4]/50">have went</span>{" "}
-                have gone to the store yesterday.
-              </EnglishText>
-              <p className="caption-track-he text-sm leading-relaxed text-[#5ee6e1]">
-                &quot;went&quot; לא מתחבר ל-have. הצורה הנכונה: <EnglishText as="span">gone</EnglishText>.
-              </p>
-            </div>
+            <LandingCorrectionDemo />
           </motion.div>
           </div>
         </div>
