@@ -30,7 +30,6 @@ export default async function WritingPage() {
           }}
         />
         <div className="animate-fade-up">
-          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">ביטוי בכתב</span>
           <h1 className="text-3xl font-bold">כתיבה</h1>
           <p className="mt-2 text-muted">כתבו טקסט קצר באנגלית, וקבלו משוב אישי ממורה ה-AI</p>
         </div>

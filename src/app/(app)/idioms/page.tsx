@@ -27,9 +27,8 @@ export default async function IdiomsPage() {
         />
         <div className="animate-fade-up flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">שפה יומיומית</span>
             <h1 className="text-3xl font-bold">ניבים ופעלים דו-מיליים</h1>
-            <p className="mt-2 text-muted">אנגלית שאנשים באמת מדברים — לא רק מה שכתוב בספר הדקדוק</p>
+            <p className="mt-2 text-muted">אנגלית שאנשים באמת מדברים, לא רק מה שכתוב בספר הדקדוק</p>
           </div>
           <MotionLink
             whileHover={{ scale: 1.03 }}

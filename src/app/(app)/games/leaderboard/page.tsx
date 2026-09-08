@@ -34,11 +34,10 @@ export default function LeaderboardPage() {
   return (
     <div className="max-w-xl mx-auto px-4 py-12">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">
-          {data.windowDays} הימים האחרונים
-        </span>
         <h1 className="text-3xl font-bold">לוח המובילים</h1>
-        <p className="mt-2 text-muted">מי צבר הכי הרבה XP השבוע — מכל התרגול והמשחקים ביחד</p>
+        <p className="mt-2 text-muted">
+          מי צבר הכי הרבה XP ב-{data.windowDays} הימים האחרונים, מכל התרגול והמשחקים ביחד
+        </p>
       </motion.div>
 
       {entries.length === 0 ? (

@@ -23,7 +23,6 @@ export default async function VocabularyPage() {
           }}
         />
         <div className="animate-fade-up">
-          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">בניית אוצר מילים</span>
           <h1 className="text-3xl font-bold">אוצר מילים</h1>
           <p className="mt-2 text-muted">בחרו נושא כדי להתחיל ללמוד מילים חדשות</p>
         </div>

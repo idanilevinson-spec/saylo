@@ -167,10 +167,8 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
   if (!hasExam) {
     return (
       <>
-        <span className="mt-8 block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover">
-          הטקסט
-        </span>
-        <div className="mt-2 bg-card border border-card-border rounded-2xl p-6 sm:p-8">
+        <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
+        <div className="mt-3 bg-card border border-card-border rounded-2xl p-6 sm:p-8">
           <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} />
         </div>
       </>
@@ -180,17 +178,13 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
   if (phase === "intro") {
     return (
       <>
-        <span className="mt-8 block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover">
-          01 · הטקסט
-        </span>
-        <div className="mt-2 bg-card border border-card-border rounded-2xl p-6 sm:p-8">
+        <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
+        <div className="mt-3 bg-card border border-card-border rounded-2xl p-6 sm:p-8">
           <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} />
         </div>
 
-        <span className="mt-8 block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover">
-          02 · מבחן הבנה
-        </span>
-        <div className="mt-2 bg-card border border-card-border rounded-2xl p-6 text-center">
+        <h2 className="mt-8 text-lg font-bold text-muted">מבחן הבנה</h2>
+        <div className="mt-3 bg-card border border-card-border rounded-2xl p-6 text-center">
           <div className="inline-flex items-center gap-1.5 text-sm text-muted">
             <Timer size={15} />
             <span>

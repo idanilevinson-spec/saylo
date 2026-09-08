@@ -336,7 +336,7 @@ export default function MatchGamePage() {
         </p>
         <div className="flex items-center justify-between mb-2">
           <div>
-            <span className="text-xs font-bold tracking-[0.14em] uppercase text-accent-hover">
+            <span className="font-bold text-accent-hover">
               שלב {levelIndex + 1} מתוך {LEVELS.length} · {level.label}
             </span>
             <p className="mt-1 text-sm text-muted">{level.instruction}</p>

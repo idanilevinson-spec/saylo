@@ -36,7 +36,6 @@ export default async function ReadingPage() {
           }}
         />
         <div className="animate-fade-up">
-          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">הבנת הנקרא</span>
           <h1 className="text-3xl font-bold">קריאה</h1>
           <p className="mt-2 text-muted">לחצו על כל מילה מוכרת בטקסט כדי לראות תרגום והגייה</p>
         </div>

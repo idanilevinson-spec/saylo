@@ -108,9 +108,8 @@ export default function GamesHubPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">תרגול משחקי</span>
         <h1 className="text-3xl font-bold">משחקי אוצר מילים</h1>
-        <p className="mt-2 text-muted">אותן מילים שאתם לומדים, בכמה דרכים — אם טעיתם במילה, היא תחזור אליכם שוב.</p>
+        <p className="mt-2 text-muted">אותן מילים שאתם לומדים, בכמה דרכים. אם טעיתם במילה, היא תחזור אליכם שוב.</p>
       </motion.div>
 
       <div className="mt-6 grid sm:grid-cols-2 gap-4">

@@ -23,7 +23,6 @@ export default async function ListeningPage() {
           }}
         />
         <div className="animate-fade-up">
-          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">אימון שמיעה</span>
           <h1 className="text-3xl font-bold">האזנה</h1>
           <p className="mt-2 text-muted">הקשיבו לקטע, נסו להבין בלי תמלול, ואז בדקו את עצמכם</p>
         </div>

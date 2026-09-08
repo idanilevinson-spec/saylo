@@ -23,7 +23,6 @@ export default async function GrammarPage() {
           }}
         />
         <div className="animate-fade-up">
-          <span className="block text-xs font-bold tracking-[0.14em] uppercase text-accent-hover mb-2">דיוק בשפה</span>
           <h1 className="text-3xl font-bold">דקדוק</h1>
           <p className="mt-2 text-muted">מסלול דקדוק מלא, שלב אחרי שלב</p>
         </div>
