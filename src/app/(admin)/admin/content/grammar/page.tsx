@@ -132,27 +132,27 @@ export default function AdminGrammarPage() {
               onChange={(e) => setTopicForm({ ...topicForm, slug: e.target.value })}
               placeholder="slug (למשל: present-simple)"
               dir="ltr"
-              className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+              className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             />
             <input
               value={topicForm.name_he}
               onChange={(e) => setTopicForm({ ...topicForm, name_he: e.target.value })}
               placeholder="שם בעברית"
-              className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+              className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             />
             <input
               value={topicForm.name_en}
               onChange={(e) => setTopicForm({ ...topicForm, name_en: e.target.value })}
               placeholder="Name in English"
               dir="ltr"
-              className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+              className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             />
             <div className="flex gap-2">
               <select
                 aria-label="רמת CEFR"
                 value={topicForm.cefr_level}
                 onChange={(e) => setTopicForm({ ...topicForm, cefr_level: e.target.value as CefrLevel })}
-                className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+                className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
               >
                 {CEFR_LEVELS.map((l) => (
                   <option key={l} value={l}>
@@ -164,7 +164,7 @@ export default function AdminGrammarPage() {
                 aria-label="סטטוס"
                 value={topicForm.status}
                 onChange={(e) => setTopicForm({ ...topicForm, status: e.target.value as ContentStatus })}
-                className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+                className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
               >
                 {STATUSES.map((s) => (
                   <option key={s} value={s}>
@@ -229,21 +229,21 @@ export default function AdminGrammarPage() {
                   value={lessonForm.title_he}
                   onChange={(e) => setLessonForm({ ...lessonForm, title_he: e.target.value })}
                   placeholder="כותרת השיעור"
-                  className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+                  className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
                 />
                 <textarea
                   value={lessonForm.body_md}
                   onChange={(e) => setLessonForm({ ...lessonForm, body_md: e.target.value })}
                   placeholder="תוכן השיעור (Markdown)"
                   rows={6}
-                  className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm font-mono"
+                  className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm font-mono"
                 />
                 <div className="flex gap-2">
                   <select
                     aria-label="רמת CEFR"
                     value={lessonForm.cefr_level}
                     onChange={(e) => setLessonForm({ ...lessonForm, cefr_level: e.target.value as CefrLevel })}
-                    className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+                    className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
                   >
                     {CEFR_LEVELS.map((l) => (
                       <option key={l} value={l}>
@@ -255,7 +255,7 @@ export default function AdminGrammarPage() {
                     aria-label="סטטוס"
                     value={lessonForm.status}
                     onChange={(e) => setLessonForm({ ...lessonForm, status: e.target.value as ContentStatus })}
-                    className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+                    className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
                   >
                     {STATUSES.map((s) => (
                       <option key={s} value={s}>

@@ -254,27 +254,27 @@ function TopicFormFields({
         onChange={(e) => setForm({ ...form, slug: e.target.value })}
         placeholder="slug (למשל: animals)"
         dir="ltr"
-        className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+        className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <input
         value={form.name_he}
         onChange={(e) => setForm({ ...form, name_he: e.target.value })}
         placeholder="שם בעברית"
-        className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+        className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <input
         value={form.name_en}
         onChange={(e) => setForm({ ...form, name_en: e.target.value })}
         placeholder="Name in English"
         dir="ltr"
-        className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+        className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <div className="flex gap-2">
         <select
           aria-label="רמת CEFR"
           value={form.cefr_level}
           onChange={(e) => setForm({ ...form, cefr_level: e.target.value as CefrLevel })}
-          className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+          className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
         >
           {CEFR_LEVELS.map((l) => (
             <option key={l} value={l}>
@@ -286,7 +286,7 @@ function TopicFormFields({
           aria-label="סטטוס"
           value={form.status}
           onChange={(e) => setForm({ ...form, status: e.target.value as ContentStatus })}
-          className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+          className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
         >
           {STATUSES.map((s) => (
             <option key={s} value={s}>
@@ -326,42 +326,42 @@ function ItemFormFields({
           onChange={(e) => setForm({ ...form, headword: e.target.value })}
           placeholder="Word"
           dir="ltr"
-          className="px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+          className="px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
         />
         <input
           value={form.ipa ?? ""}
           onChange={(e) => setForm({ ...form, ipa: e.target.value })}
           placeholder="IPA (אופציונלי)"
           dir="ltr"
-          className="px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+          className="px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
         />
       </div>
       <input
         value={form.translation_he}
         onChange={(e) => setForm({ ...form, translation_he: e.target.value })}
         placeholder="תרגום לעברית"
-        className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+        className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <input
         value={form.example_en}
         onChange={(e) => setForm({ ...form, example_en: e.target.value })}
         placeholder="Example sentence"
         dir="ltr"
-        className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+        className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <input
         value={form.part_of_speech ?? ""}
         onChange={(e) => setForm({ ...form, part_of_speech: e.target.value })}
         placeholder="חלק דיבר (אופציונלי, למשל noun)"
         dir="ltr"
-        className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+        className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <div className="flex gap-2">
         <select
           aria-label="רמת CEFR"
           value={form.cefr_level}
           onChange={(e) => setForm({ ...form, cefr_level: e.target.value as CefrLevel })}
-          className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+          className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
         >
           {CEFR_LEVELS.map((l) => (
             <option key={l} value={l}>
@@ -373,7 +373,7 @@ function ItemFormFields({
           aria-label="סטטוס"
           value={form.status}
           onChange={(e) => setForm({ ...form, status: e.target.value as ContentStatus })}
-          className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+          className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
         >
           {STATUSES.map((s) => (
             <option key={s} value={s}>

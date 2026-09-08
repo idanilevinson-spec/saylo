@@ -198,7 +198,7 @@ export default function AdminModerationPage() {
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
                             placeholder="סיבת הסימון"
-                            className="px-2 py-1 rounded border border-card-border bg-card text-xs w-40"
+                            className="px-2 py-1 rounded-lg border border-card-border bg-card text-xs w-40"
                           />
                           <button onClick={() => flagConversation(c.id)} className="text-xs text-primary hover:underline">
                             שליחה

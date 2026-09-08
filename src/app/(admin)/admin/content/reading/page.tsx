@@ -73,14 +73,14 @@ export default function AdminReadingPage() {
             value={form.title_he}
             onChange={(e) => setForm({ ...form, title_he: e.target.value })}
             placeholder="כותרת בעברית"
-            className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+            className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           />
           <input
             value={form.title_en}
             onChange={(e) => setForm({ ...form, title_en: e.target.value })}
             placeholder="Title in English"
             dir="ltr"
-            className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+            className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           />
           <textarea
             value={form.body_en}
@@ -88,14 +88,14 @@ export default function AdminReadingPage() {
             placeholder="Text body (English)"
             dir="ltr"
             rows={8}
-            className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+            className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           />
           <div className="flex gap-2">
             <select
               aria-label="רמת CEFR"
               value={form.cefr_level}
               onChange={(e) => setForm({ ...form, cefr_level: e.target.value as CefrLevel })}
-              className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+              className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             >
               {CEFR_LEVELS.map((l) => (
                 <option key={l} value={l}>
@@ -107,7 +107,7 @@ export default function AdminReadingPage() {
               aria-label="סטטוס"
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value as ContentStatus })}
-              className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+              className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             >
               {STATUSES.map((s) => (
                 <option key={s} value={s}>

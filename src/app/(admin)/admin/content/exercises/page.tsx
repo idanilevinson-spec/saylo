@@ -99,7 +99,7 @@ export default function AdminExercisesPage() {
             aria-label="סינון לפי סטטוס"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as ContentStatus | "all")}
-            className="px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+            className="px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           >
             <option value="all">כל הסטטוסים</option>
             {STATUSES.map((s) => (
@@ -132,7 +132,7 @@ export default function AdminExercisesPage() {
               aria-label="תחום מיומנות"
               value={form.skill_area}
               onChange={(e) => setForm({ ...form, skill_area: e.target.value as SkillArea })}
-              className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+              className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             >
               {SKILL_AREAS.map((s) => (
                 <option key={s} value={s}>
@@ -144,7 +144,7 @@ export default function AdminExercisesPage() {
               aria-label="רמת CEFR"
               value={form.cefr_level}
               onChange={(e) => setForm({ ...form, cefr_level: e.target.value as CefrLevel })}
-              className="flex-1 px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+              className="flex-1 px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             >
               {CEFR_LEVELS.map((l) => (
                 <option key={l} value={l}>
@@ -158,7 +158,7 @@ export default function AdminExercisesPage() {
             onChange={(e) => setForm({ ...form, prompt: e.target.value })}
             placeholder="שאלה (prompt)"
             dir="ltr"
-            className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+            className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           />
           <textarea
             value={form.optionsText}
@@ -166,14 +166,14 @@ export default function AdminExercisesPage() {
             placeholder={"אפשרויות תשובה — כל שורה אפשרות אחת"}
             dir="ltr"
             rows={4}
-            className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+            className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           />
           {optionsList.length > 0 && (
             <select
               aria-label="תשובה נכונה"
               value={form.correctIndex}
               onChange={(e) => setForm({ ...form, correctIndex: Number(e.target.value) })}
-              className="w-full px-2 py-1.5 rounded border border-card-border bg-card text-sm"
+              className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             >
               {optionsList.map((opt, i) => (
                 <option key={i} value={i}>
