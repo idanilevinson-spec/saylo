@@ -150,7 +150,7 @@ export default function LandingHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.9 }}
-            className="caption-bar mt-14 lg:mt-0 rounded-2xl px-5 py-5 sm:px-7 sm:py-6"
+            className="mt-14 lg:mt-0 rounded-2xl px-5 py-5 sm:px-7 sm:py-6 bg-black/40 backdrop-blur-md border-y border-white/10"
           >
             <div className="flex items-center justify-between mb-3">
               <span className="flex items-center gap-2 text-xs font-semibold text-[#f2a53c]">
