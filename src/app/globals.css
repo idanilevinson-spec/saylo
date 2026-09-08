@@ -3,24 +3,26 @@
 
 /* Design world: "Subtitle Culture" — understanding arrives as text locked to
    the moment of speech, the way a lifetime of subtitled film and TV is how
-   this audience actually learned English. Amber is the "English track" (the
+   this audience actually learned English. Blue is the "English track" (the
    active, spoken-right-now word — the way a subtitle highlights a
    translated idiom); teal is the "Hebrew track" (the correction/translation
-   running beneath it). The two never merge into one line, only stack — see
-   .caption-stack below. Light mode is the same grammar read on a bright
-   screen in daylight, not a different identity. See DESIGN.md. */
+   running beneath it) — both sampled from the real Saylo logo gradient
+   (public/logo-mark.png), not chosen freely. The two never merge into one
+   line, only stack — see .caption-stack below. Light mode is the same
+   grammar read on a bright screen in daylight, not a different identity.
+   See DESIGN.md. */
 :root {
   --background: #faf7f0;
   --background-2: #f1ebdf;
   --foreground: #211c14;
   --card: #ffffff;
   --card-border: #e4dbc8;
-  --primary: #c2790f;
-  --primary-hover: #a86209;
+  --primary: #0066d6;
+  --primary-hover: #0052ad;
   --primary-ink: #ffffff;
-  --accent: #0d7d78;
-  --accent-hover: #0a615d;
-  --accent-ink: #ffffff;
+  --accent: #00a19d;
+  --accent-hover: #008783;
+  --accent-ink: #04211f;
   --success: #16a34a;
   --success-ink: #f0fdf4;
   --danger: #ef4444;
@@ -39,9 +41,9 @@
     --foreground: #f3efe4;
     --card: #1c1d22;
     --card-border: #2e2f36;
-    --primary: #f2a53c;
-    --primary-hover: #f7bf6e;
-    --primary-ink: #241503;
+    --primary: #4d9eff;
+    --primary-hover: #7ab8ff;
+    --primary-ink: #04122b;
     --accent: #2dd4cf;
     --accent-hover: #5ee6e1;
     --accent-ink: #042e2c;
@@ -59,9 +61,9 @@
   --foreground: #f3efe4;
   --card: #1c1d22;
   --card-border: #2e2f36;
-  --primary: #f2a53c;
-  --primary-hover: #f7bf6e;
-  --primary-ink: #241503;
+  --primary: #4d9eff;
+  --primary-hover: #7ab8ff;
+  --primary-ink: #04122b;
   --accent: #2dd4cf;
   --accent-hover: #5ee6e1;
   --accent-ink: #042e2c;

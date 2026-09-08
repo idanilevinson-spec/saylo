@@ -10,7 +10,7 @@ The hero is always the cinema — near-black, letterboxed — regardless of the 
 
 ## Palette
 
-Two colors carry meaning, not decoration: **primary (amber)** is the "English track" — the active, spoken-right-now word, the way a subtitle highlights a translated idiom. **Accent (teal)** is the "Hebrew track" — the correction/translation running beneath it. They never merge into one line, only stack (see Components → `.caption-stack`).
+Two colors carry meaning, not decoration: **primary (blue)** is the "English track" — the active, spoken-right-now word, the way a subtitle highlights a translated idiom. **Accent (teal)** is the "Hebrew track" — the correction/translation running beneath it. Both are sampled directly from the real Saylo logo's gradient (`public/logo-mark.png` runs blue `#0b7ce5` → teal `#0ab1db`), not chosen freely — an early pass tried amber for primary and the user correctly sent it back for straying from the actual brand mark. They never merge into one line, only stack (see Components → `.caption-stack`).
 
 | Token | Dark (native) | Light (daylight translation) |
 |---|---|---|
@@ -18,9 +18,11 @@ Two colors carry meaning, not decoration: **primary (amber)** is the "English tr
 | `--background-2` | `#17181c` | `#f1ebdf` |
 | `--foreground` | `#f3efe4` (warm cream, never pure white) | `#211c14` (warm charcoal, never pure black) |
 | `--card` / `--card-border` | `#1c1d22` / `#2e2f36` | `#ffffff` / `#e4dbc8` |
-| `--primary` (English track) | `#f2a53c` | `#c2790f` |
-| `--accent` (Hebrew track) | `#2dd4cf` | `#0d7d78` |
+| `--primary` (English track) | `#4d9eff` | `#0066d6` |
+| `--accent` (Hebrew track) | `#2dd4cf` | `#00a19d` |
 | `--muted` | `#a39c8c` | `#6e6656` (5.3:1 on body) |
+
+The hero's demo card is hardcoded to these exact dark-mode hex values directly (`#4d9eff` / `#7ab8ff` hover / `#04122b` ink), not `var(--primary)` — it must stay dark regardless of site theme (see World, above), so it can't reference the theme-following token.
 
 Light mode is not a different identity — it's the same grammar read on a bright screen in daylight. Color strategy: **Committed** (primary/accent carry real page-scale meaning, not accents scattered on a neutral ground) on Persuade surfaces; tone down toward **Restrained** on dense Operate surfaces (app, admin) where scanability outranks expression — primary/accent still mark exactly one thing each (the active/correct state, the secondary/translation state), never decorative.
 

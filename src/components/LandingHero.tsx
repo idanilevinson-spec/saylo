@@ -74,7 +74,7 @@ export default function LandingHero() {
                 as="h1"
                 className="text-4xl sm:text-6xl font-bold leading-[1.05] text-[#f3efe4]"
               >
-                The English you always wanted<span className="text-[#f2a53c]">.</span>
+                The English you always wanted<span className="text-[#4d9eff]">.</span>
               </EnglishText>
             </motion.div>
             <motion.div
@@ -102,7 +102,7 @@ export default function LandingHero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.55 }}
-            className="mt-6 inline-block rounded-full bg-[#f2a53c]/10 border border-[#f2a53c]/30 px-4 py-1.5 text-sm font-medium text-[#f2a53c]"
+            className="mt-6 inline-block rounded-full bg-[#4d9eff]/10 border border-[#4d9eff]/30 px-4 py-1.5 text-sm font-medium text-[#4d9eff]"
           >
             3 ימים ראשונים חינם — בלי כרטיס אשראי
           </motion.div>
@@ -120,7 +120,7 @@ export default function LandingHero() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   href="/signup"
-                  className="flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#f2a53c] text-[#241503] font-bold text-lg hover:bg-[#f7bf6e] transition-colors"
+                  className="flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#4d9eff] text-[#04122b] font-bold text-lg hover:bg-[#7ab8ff] transition-colors"
                 >
                   <Play size={18} fill="currentColor" strokeWidth={0} />
                   התחילו ללמוד בחינם
@@ -153,8 +153,8 @@ export default function LandingHero() {
             className="mt-14 lg:mt-0 rounded-2xl px-5 py-5 sm:px-7 sm:py-6 bg-black/40 backdrop-blur-md border-y border-white/10"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="flex items-center gap-2 text-xs font-semibold text-[#f2a53c]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#f2a53c] animate-pulse" />
+              <span className="flex items-center gap-2 text-xs font-semibold text-[#4d9eff]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4d9eff] animate-pulse" />
                 מורה AI מתקן עכשיו
               </span>
               <EnglishText as="span" className="timecode text-xs text-[#f3efe4]/40">
