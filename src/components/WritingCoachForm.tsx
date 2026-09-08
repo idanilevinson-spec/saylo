@@ -62,7 +62,7 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
         <p className="mt-2 text-sm text-muted">תקופת הניסיון שלכם הסתיימה. שדרגו כדי להמשיך לקבל משוב על כתיבה.</p>
         <Link
           href="/pricing"
-          className="mt-4 inline-block px-6 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-4 inline-block px-6 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           לצפייה במסלולים
         </Link>
@@ -111,7 +111,7 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
             setFeedback(null);
             setText("");
           }}
-          className="w-full px-4 py-2.5 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors"
+          className="w-full px-4 py-2.5 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors"
         >
           כתבו שוב
         </button>
@@ -129,13 +129,13 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
         disabled={submitting}
         rows={8}
         placeholder="Write your answer here in English..."
-        className="w-full px-4 py-3 rounded-xl border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
+        className="w-full px-4 py-3 rounded-lg border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
       />
       {error && <p role="alert" className="mt-2 text-sm text-danger">{error}</p>}
       <button
         onClick={handleSubmit}
         disabled={!text.trim() || submitting}
-        className="mt-4 w-full px-4 py-3 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
+        className="mt-4 w-full px-4 py-3 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
       >
         {submitting ? "מנתח את הכתיבה שלכם..." : "קבלו משוב"}
       </button>

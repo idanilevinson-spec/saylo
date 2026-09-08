@@ -40,7 +40,7 @@ export default function ReorderQuestion({ content, disabled, onSubmit }: Reorder
 
       <div
         dir="ltr"
-        className="min-h-14 flex flex-wrap gap-2 p-3 rounded-xl border border-card-border bg-background-2"
+        className="min-h-14 flex flex-wrap gap-2 p-3 rounded-lg border border-card-border bg-background-2"
       >
         {picked.length === 0 && <span className="text-sm text-muted self-center">לחצו על מילים מהבנק למטה</span>}
         {picked.map((tokenIndex, i) => (
@@ -78,14 +78,14 @@ export default function ReorderQuestion({ content, disabled, onSubmit }: Reorder
           <button
             onClick={() => setPicked([])}
             disabled={picked.length === 0}
-            className="px-4 py-2.5 rounded-xl border border-card-border font-medium disabled:opacity-40 hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-4 py-2.5 rounded-lg border border-card-border font-medium disabled:opacity-40 hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             איפוס
           </button>
           <button
             onClick={() => picked.length === c.tokens.length && onSubmit({ order: picked })}
             disabled={picked.length !== c.tokens.length}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="flex-1 px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             בדיקה
           </button>

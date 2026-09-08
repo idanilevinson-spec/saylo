@@ -65,7 +65,7 @@ export default async function ListeningClipPage({ params }: PageProps) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           href={`/practice/${firstExercise.id}`}
-          className="mt-6 flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-6 flex items-center justify-center gap-1.5 px-5 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           בדקו את ההבנה שלכם <Target size={16} />
         </MotionLink>

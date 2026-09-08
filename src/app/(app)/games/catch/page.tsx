@@ -103,7 +103,7 @@ function FallingWord({
         initial={{ left: `${lanePercent(START_LANE)}%` }}
         animate={{ left: `${lanePercent(lane)}%` }}
         transition={{ duration: 0.15, ease: "easeOut" }}
-        className="absolute -translate-x-1/2 px-6 py-4 rounded-xl bg-card border border-primary/30 shadow-md"
+        className="absolute -translate-x-1/2 px-6 py-4 rounded-lg bg-card border border-primary/30 shadow-md"
       >
         <EnglishText className="text-3xl font-bold">{headword}</EnglishText>
       </motion.div>
@@ -304,7 +304,7 @@ export default function WordCatchPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/games/catch"
-            className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             עוד סיבוב
           </MotionLink>
@@ -312,7 +312,7 @@ export default function WordCatchPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/games"
-            className="px-6 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             חזרה למשחקים
           </MotionLink>
@@ -383,7 +383,7 @@ export default function WordCatchPage() {
                 disabled={!!result}
                 whileHover={!result ? { scale: 1.02 } : undefined}
                 whileTap={!result ? { scale: 0.97 } : undefined}
-                className={`px-3 py-5 rounded-xl border text-lg font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                className={`px-3 py-5 rounded-lg border text-lg font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                   isCorrectOpt
                     ? "border-success bg-success/10 text-success"
                     : isPicked

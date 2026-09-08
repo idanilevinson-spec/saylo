@@ -381,7 +381,7 @@ export default function PronunciationRecorder({ targetPhrase }: { targetPhrase: 
 function ScorePill({ label, value, highlight }: { label: string; value: number; highlight?: boolean }) {
   return (
     <div
-      className={`rounded-xl p-2 text-center ${
+      className={`rounded-lg p-2 text-center ${
         highlight ? "bg-primary text-primary-ink" : "bg-background-2 border border-card-border"
       }`}
     >

@@ -66,7 +66,7 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 href={`/practice/${firstExercise.id}`}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
               >
                 תרגלו את הנושא <Target size={16} />
               </MotionLink>
@@ -75,7 +75,7 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               href={`/games/learn?topic=${topic.slug}`}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-success/30 bg-success/5 text-success font-medium hover:bg-success/10 transition-colors"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg border border-success/30 bg-success/5 text-success font-medium hover:bg-success/10 transition-colors"
             >
               למדו את הנושא <GraduationCap size={16} />
             </MotionLink>
@@ -83,7 +83,7 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               href={`/games/test?topic=${topic.slug}`}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-accent/30 bg-accent/5 text-accent-hover font-medium hover:bg-accent/10 transition-colors"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg border border-accent/30 bg-accent/5 text-accent-hover font-medium hover:bg-accent/10 transition-colors"
             >
               מבחן נושא <ClipboardCheck size={16} />
             </MotionLink>

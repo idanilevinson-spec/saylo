@@ -86,7 +86,7 @@ export default function ProfileSetupPage() {
             value={nameValue}
             onChange={(e) => setDisplayName(e.target.value)}
             required
-            className="w-full px-4 py-2.5 rounded-xl border border-card-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
         <div>
@@ -99,7 +99,7 @@ export default function ProfileSetupPage() {
             value={age}
             onChange={(e) => setAge(e.target.value)}
             required
-            className="w-full px-4 py-2.5 rounded-xl border border-card-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
 
@@ -110,7 +110,7 @@ export default function ProfileSetupPage() {
           whileTap={{ scale: 0.97 }}
           type="submit"
           disabled={submitting}
-          className="w-full px-4 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
+          className="w-full px-4 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
         >
           {submitting ? "שומר..." : "המשך ללוח הבקרה"}
         </motion.button>

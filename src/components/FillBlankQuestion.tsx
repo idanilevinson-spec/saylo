@@ -131,7 +131,7 @@ export default function FillBlankQuestion({ content, disabled, onSubmit }: FillB
             }
           }}
           disabled={typedMode ? !text.trim() : !canSubmitBank}
-          className="mt-6 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           בדיקה
         </button>

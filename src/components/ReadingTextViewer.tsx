@@ -302,7 +302,7 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord }: ReadingTextVi
       </div>
 
       {popover && (
-        <div className="mt-6 p-4 rounded-xl bg-primary/5 border border-primary/20 flex items-start justify-between gap-4">
+        <div className="mt-6 p-4 rounded-lg bg-primary/5 border border-primary/20 flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <EnglishText as="span" className="font-bold text-lg">

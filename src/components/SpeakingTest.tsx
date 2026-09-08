@@ -207,7 +207,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => setPhase("exam")}
-          className="mt-6 px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="mt-6 px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           התחילו
         </motion.button>
@@ -284,7 +284,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/speaking-test"
-            className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
           >
             מבחן נוסף
           </MotionLink>
@@ -292,7 +292,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/dashboard"
-            className="px-6 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors"
+            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors"
           >
             חזרה ללוח הבקרה
           </MotionLink>
@@ -346,7 +346,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
               {recognition.status === "idle" && (
                 <button
                   onClick={recognition.start}
-                  className="flex items-center gap-2 px-5 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="flex items-center gap-2 px-5 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
                   <Mic size={16} /> התחילו לענות
                 </button>
@@ -361,7 +361,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
                   <motion.div
                     animate={{ scale: [1, 1.06, 1] }}
                     transition={{ duration: 1.1, repeat: Infinity }}
-                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-danger-ink text-danger font-medium"
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-danger-ink text-danger font-medium"
                   >
                     <Mic size={16} /> מקשיב... דברו עכשיו
                   </motion.div>
@@ -405,7 +405,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
             {!graded && !grading && (
               <button
                 onClick={skipStep}
-                className="mt-4 px-4 py-2 rounded-xl border border-card-border text-sm text-muted font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className="mt-4 px-4 py-2 rounded-lg border border-card-border text-sm text-muted font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 לא יודע/ת · דלגו
               </button>
@@ -448,7 +448,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={nextStep}
-                  className="mt-4 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="mt-4 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
                   {stepIndex + 1 < steps.length ? "השאלה הבאה →" : "סיום המבחן"}
                 </motion.button>

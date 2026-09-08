@@ -119,7 +119,7 @@ export default function ReviewPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
-                className={`mt-6 p-4 rounded-xl ${result.isCorrect ? "bg-success/10" : "bg-danger/10"}`}
+                className={`mt-6 p-4 rounded-lg ${result.isCorrect ? "bg-success/10" : "bg-danger/10"}`}
               >
                 <p className={`flex items-center gap-1.5 font-bold ${result.isCorrect ? "text-success" : "text-danger"}`}>
                   {result.isCorrect ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
@@ -142,7 +142,7 @@ export default function ReviewPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={goNext}
-                className="mt-6 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+                className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
               >
                 {index + 1 < items.length ? "המילה הבאה →" : "סיום"}
               </motion.button>

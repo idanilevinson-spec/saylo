@@ -140,7 +140,7 @@ export default function SpeakingChatPage() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           href="/speaking"
-          className="mt-6 block text-center px-5 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-6 block text-center px-5 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           לשיחה נוספת
         </MotionLink>
@@ -236,14 +236,14 @@ export default function SpeakingChatPage() {
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             disabled={sending}
             placeholder="Type in English..."
-            className="flex-1 px-4 py-2.5 rounded-xl border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
+            className="flex-1 px-4 py-2.5 rounded-lg border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
           />
           <motion.button
             whileHover={input.trim() && !sending ? { scale: 1.05 } : undefined}
             whileTap={input.trim() && !sending ? { scale: 0.95 } : undefined}
             onClick={handleSend}
             disabled={!input.trim() || sending}
-            className="px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
+            className="px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
           >
             שליחה
           </motion.button>

@@ -78,7 +78,7 @@ export default function ReadingResponseForm({
         <p className="mt-2 text-sm text-muted">תקופת הניסיון שלכם הסתיימה. שדרגו כדי להמשיך לקבל משוב על תשובות פתוחות.</p>
         <Link
           href="/pricing"
-          className="mt-4 inline-block px-6 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="mt-4 inline-block px-6 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           לצפייה במסלולים
         </Link>
@@ -127,7 +127,7 @@ export default function ReadingResponseForm({
             setResult(null);
             setText("");
           }}
-          className="w-full px-4 py-2.5 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="w-full px-4 py-2.5 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           נסו שוב
         </button>
@@ -149,13 +149,13 @@ export default function ReadingResponseForm({
         disabled={submitting}
         rows={5}
         placeholder="Write your answer here in English..."
-        className="mt-4 w-full px-4 py-3 rounded-xl border border-card-border bg-background font-content focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
+        className="mt-4 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-content focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
       />
       {error && <p role="alert" className="mt-2 text-sm text-danger">{error}</p>}
       <button
         onClick={handleSubmit}
         disabled={!text.trim() || submitting}
-        className="mt-4 w-full px-4 py-3 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        className="mt-4 w-full px-4 py-3 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
       >
         {submitting ? "מנתח את ההבנה שלכם..." : "בדקו את התשובה שלי"}
       </button>

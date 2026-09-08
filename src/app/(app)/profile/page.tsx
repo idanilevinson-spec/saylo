@@ -225,7 +225,7 @@ export default function ProfilePage() {
                   ביטול המנוי
                 </button>
               ) : (
-                <div className="bg-danger-ink border border-danger/30 rounded-xl p-4 space-y-3">
+                <div className="bg-danger-ink border border-danger/30 rounded-lg p-4 space-y-3">
                   <p className="text-sm">
                     בטוחים שברצונכם לבטל? תמשיכו ליהנות מהמנוי עד{" "}
                     <strong>{formatDate(subscription.current_period_end)}</strong> — התשלום שכבר בוצע לא מוחזר, ואחרי
@@ -346,7 +346,7 @@ export default function ProfilePage() {
           await signOut();
           router.push("/");
         }}
-        className="mt-6 w-full px-4 py-3 rounded-xl border border-card-border font-medium text-danger hover:bg-danger-ink transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        className="mt-6 w-full px-4 py-3 rounded-lg border border-card-border font-medium text-danger hover:bg-danger-ink transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
       >
         התנתקות
       </motion.button>

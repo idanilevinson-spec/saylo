@@ -17,19 +17,19 @@ export default function ListeningPlayer({ transcriptEn }: ListeningPlayerProps) 
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => speak(transcriptEn, 1)}
-          className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           <Volume2 size={16} /> השמעה
         </button>
         <button
           onClick={() => speak(transcriptEn, 0.6)}
-          className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors"
+          className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors"
         >
           <Turtle size={16} /> השמעה לאט
         </button>
         <button
           onClick={() => setShowTranscript((s) => !s)}
-          className="px-5 py-2.5 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors"
+          className="px-5 py-2.5 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors"
         >
           {showTranscript ? "הסתירו תמלול" : "הציגו תמלול"}
         </button>

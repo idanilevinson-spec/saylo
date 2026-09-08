@@ -104,7 +104,7 @@ export default function IdiomsPracticePage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/idioms/practice"
-            className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             עוד סיבוב
           </MotionLink>
@@ -112,7 +112,7 @@ export default function IdiomsPracticePage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/idioms"
-            className="px-6 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             חזרה לרשימת הניבים
           </MotionLink>
@@ -160,7 +160,7 @@ export default function IdiomsPracticePage() {
                   key={i}
                   disabled={locked}
                   onClick={() => submitAnswer(i)}
-                  className={`w-full text-right px-4 py-3 rounded-xl border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
+                  className={`w-full text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
                 >
                   <EnglishText>{option}</EnglishText>
                 </button>

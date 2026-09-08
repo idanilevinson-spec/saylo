@@ -34,7 +34,7 @@ export default async function IdiomsPage() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             href="/idioms/practice"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
           >
             תרגלו את הניבים <Gamepad2 size={16} />
           </MotionLink>

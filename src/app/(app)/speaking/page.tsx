@@ -68,7 +68,7 @@ export default function SpeakingPage() {
         </div>
 
         {limitReached && (
-          <div className="mt-6 p-4 rounded-xl bg-danger-ink text-danger text-sm">
+          <div className="mt-6 p-4 rounded-lg bg-danger-ink text-danger text-sm">
             הגעתם למגבלת 5 שיחות ליום. אפשר להתחיל שיחה חדשה בעוד עד 24 שעות — השיחות הישנות שלכם עדיין זמינות לצפייה.
           </div>
         )}

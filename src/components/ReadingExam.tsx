@@ -200,7 +200,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => startExam(true)}
-              className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
               התחילו את המבחן בזמן
             </motion.button>
@@ -208,7 +208,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => startExam(false)}
-              className="px-6 py-3 rounded-xl bg-background-2 text-foreground font-medium border border-card-border hover:bg-card-border/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              className="px-6 py-3 rounded-lg bg-background-2 text-foreground font-medium border border-card-border hover:bg-card-border/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
               תרגול ללא לחץ (ללא טיימר)
             </motion.button>
@@ -233,7 +233,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           {mcqCount > 0 && (
-            <span className="px-4 py-2 rounded-xl bg-card border border-card-border text-sm">
+            <span className="px-4 py-2 rounded-lg bg-card border border-card-border text-sm">
               <EnglishText as="span" className="font-bold">
                 {correctCount}/{mcqCount}
               </EnglishText>{" "}
@@ -241,7 +241,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
             </span>
           )}
           {avgOpenScore !== null && (
-            <span className="px-4 py-2 rounded-xl bg-card border border-card-border text-sm">
+            <span className="px-4 py-2 rounded-lg bg-card border border-card-border text-sm">
               ממוצע{" "}
               <EnglishText as="span" className="font-bold">
                 {avgOpenScore}/100
@@ -286,7 +286,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/reading"
-            className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             עוד טקסט
           </MotionLink>
@@ -385,7 +385,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={nextStep}
-                    className="mt-4 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                    className="mt-4 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   >
                     {stepIndex + 1 < totalSteps ? "השאלה הבאה →" : "סיום המבחן"}
                   </motion.button>
@@ -413,7 +413,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={nextStep}
-                  className="mt-4 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="mt-4 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
                   {stepIndex + 1 < totalSteps ? "השאלה הבאה →" : "סיום המבחן"}
                 </motion.button>

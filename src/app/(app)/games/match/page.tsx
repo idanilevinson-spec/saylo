@@ -310,7 +310,7 @@ export default function MatchGamePage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/games/match"
-            className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             עוד סיבוב
           </MotionLink>
@@ -318,7 +318,7 @@ export default function MatchGamePage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/games"
-            className="px-6 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             חזרה למשחקים
           </MotionLink>
@@ -426,7 +426,7 @@ export default function MatchGamePage() {
                     animate={isWrong ? { x: [0, -6, 6, -4, 4, 0] } : {}}
                     transition={{ duration: 0.4 }}
                     style={{ touchAction: "none" }}
-                    className={`select-none rounded-xl border px-3 py-2.5 text-sm cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                    className={`select-none rounded-lg border px-3 py-2.5 text-sm cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched
                         ? "border-success/40 bg-success/10 opacity-70 cursor-default"
                         : selectedEndpoint?.side === "source" && selectedEndpoint.id === p.id
@@ -461,7 +461,7 @@ export default function MatchGamePage() {
                     animate={isWrong ? { x: [0, 6, -6, 4, -4, 0] } : {}}
                     transition={{ duration: 0.4 }}
                     style={{ touchAction: "none" }}
-                    className={`select-none rounded-xl border px-3 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                    className={`select-none rounded-lg border px-3 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched
                         ? "border-success/40 bg-success/10 opacity-70 cursor-default"
                         : selectedEndpoint?.side === "target" && selectedEndpoint.id === t

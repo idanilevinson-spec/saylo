@@ -88,7 +88,7 @@ export default function PushSubscribeButton() {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
       onClick={status === "on" ? disable : enable}
-      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors"
+      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors"
     >
       {status === "on" ? (
         <>

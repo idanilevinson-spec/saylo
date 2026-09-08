@@ -35,7 +35,7 @@ export default function PremiumGate({ children, featureName }: PremiumGateProps)
         <p className="mt-2 text-muted">תקופת הניסיון שלכם הסתיימה. שדרגו כדי להמשיך וליהנות מכל התכונות.</p>
         <Link
           href="/pricing"
-          className="mt-6 inline-block px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-6 inline-block px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           לצפייה במסלולים
         </Link>

@@ -150,7 +150,7 @@ export default function MemoryGamePage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/games/memory"
-            className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             עוד סיבוב
           </MotionLink>
@@ -158,7 +158,7 @@ export default function MemoryGamePage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/games"
-            className="px-6 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             חזרה למשחקים
           </MotionLink>
@@ -200,14 +200,14 @@ export default function MemoryGamePage() {
                 className="relative w-full h-full [transform-style:preserve-3d]"
               >
                 <div
-                  className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center [backface-visibility:hidden]"
+                  className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center [backface-visibility:hidden]"
                   aria-hidden="true"
                 >
                   <span className="w-2.5 h-2.5 rounded-full bg-white/70" />
                 </div>
                 <div
                   aria-hidden="true"
-                  className={`absolute inset-0 rounded-xl border flex items-center justify-center px-2 text-center text-sm font-bold [backface-visibility:hidden] [transform:rotateY(180deg)] ${
+                  className={`absolute inset-0 rounded-lg border flex items-center justify-center px-2 text-center text-sm font-bold [backface-visibility:hidden] [transform:rotateY(180deg)] ${
                     isMatched ? "border-success/40 bg-success/10" : "border-card-border bg-card"
                   }`}
                 >

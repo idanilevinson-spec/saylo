@@ -358,7 +358,7 @@ export default function ProgressPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: 0.05 * i, type: "spring", bounce: 0.4 }}
-                className="flex items-center gap-3 p-3 rounded-xl bg-background-2"
+                className="flex items-center gap-3 p-3 rounded-lg bg-background-2"
               >
                 <span className="inline-flex w-10 h-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent-hover">
                   <Award size={18} />
@@ -388,21 +388,21 @@ function ScoreHistoryPanel({ summary }: { summary: ScoreSummary | null }) {
       <p className="text-xs text-muted mt-0.5">כל התרגולים, המבחנים והשיחות עם ה-AI בטווח שנבחר למעלה</p>
 
       {!summary ? (
-        <div className="mt-5 h-24 rounded-xl bg-background-2 animate-pulse" />
+        <div className="mt-5 h-24 rounded-lg bg-background-2 animate-pulse" />
       ) : (
         <>
           <div className="mt-5 grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-xl bg-background-2 p-3">
+            <div className="rounded-lg bg-background-2 p-3">
               <EnglishText as="p" className="text-2xl font-bold">
                 {summary.testsCount}
               </EnglishText>
               <p className="text-xs text-muted mt-0.5">פעילויות</p>
             </div>
-            <div className="rounded-xl bg-background-2 p-3">
+            <div className="rounded-lg bg-background-2 p-3">
               <p className="text-2xl font-bold">{summary.averageScore !== null ? `${summary.averageScore}%` : "—"}</p>
               <p className="text-xs text-muted mt-0.5">ציון ממוצע</p>
             </div>
-            <div className="rounded-xl bg-background-2 p-3">
+            <div className="rounded-lg bg-background-2 p-3">
               <EnglishText as="p" className="text-2xl font-bold">
                 {summary.xpEarned}
               </EnglishText>
@@ -415,7 +415,7 @@ function ScoreHistoryPanel({ summary }: { summary: ScoreSummary | null }) {
           ) : (
             <div className="mt-5 space-y-2">
               {summary.items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-background-2">
+                <div key={item.id} className="flex items-center justify-between gap-3 p-3 rounded-lg bg-background-2">
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{item.typeLabel}</p>
                     <p className="text-xs text-muted mt-0.5">
@@ -473,7 +473,7 @@ function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillAr
             return (
               <div
                 key={skill}
-                className={`flex items-center gap-3 p-3 rounded-xl border ${
+                className={`flex items-center gap-3 p-3 rounded-lg border ${
                   isWeakest ? "border-accent/50 bg-accent/5" : "border-card-border"
                 }`}
               >

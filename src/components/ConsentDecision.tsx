@@ -23,7 +23,7 @@ export default function ConsentDecision({ token, initialStatus }: ConsentDecisio
 
   if (status !== "pending") {
     return (
-      <div className="mt-6 text-center p-4 rounded-xl bg-background-2">
+      <div className="mt-6 text-center p-4 rounded-lg bg-background-2">
         {status === "granted" && (
           <p className="text-success font-bold flex items-center justify-center gap-1.5">
             <CheckCircle2 size={16} /> האישור ניתן. תודה!
@@ -39,14 +39,14 @@ export default function ConsentDecision({ token, initialStatus }: ConsentDecisio
       <button
         onClick={() => decide(true)}
         disabled={loading}
-        className="flex-1 px-4 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
+        className="flex-1 px-4 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
       >
         מאשר/ת
       </button>
       <button
         onClick={() => decide(false)}
         disabled={loading}
-        className="flex-1 px-4 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors disabled:opacity-50"
+        className="flex-1 px-4 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors disabled:opacity-50"
       >
         לא מאשר/ת
       </button>

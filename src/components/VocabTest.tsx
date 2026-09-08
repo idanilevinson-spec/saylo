@@ -188,7 +188,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => startTest(true)}
-            className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             התחילו את המבחן בזמן
           </motion.button>
@@ -196,7 +196,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => startTest(false)}
-            className="px-6 py-3 rounded-xl bg-background-2 text-foreground font-medium border border-card-border hover:bg-card-border/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg bg-background-2 text-foreground font-medium border border-card-border hover:bg-card-border/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             תרגול ללא לחץ (ללא טיימר)
           </motion.button>
@@ -264,7 +264,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/games/test"
-            className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             מבחן נוסף
           </MotionLink>
@@ -272,7 +272,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             href="/games"
-            className="px-6 py-3 rounded-xl border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             חזרה למשחקים
           </MotionLink>
@@ -344,7 +344,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
                         key={i}
                         disabled={answeredThisStep}
                         onClick={() => submitMcq(i)}
-                        className={`w-full text-right px-4 py-3 rounded-xl border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
+                        className={`w-full text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
                       >
                         <EnglishText>{option}</EnglishText>
                       </button>
@@ -367,13 +367,13 @@ export default function VocabTest({ steps }: VocabTestProps) {
                   onKeyDown={(e) => e.key === "Enter" && submitRecall()}
                   disabled={answeredThisStep}
                   placeholder="Type the word..."
-                  className="mt-6 w-full px-4 py-3 rounded-xl border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
+                  className="mt-6 w-full px-4 py-3 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
                 />
                 {!answeredThisStep && (
                   <button
                     onClick={submitRecall}
                     disabled={!input.trim()}
-                    className="mt-6 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                    className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   >
                     בדיקה
                   </button>
@@ -391,14 +391,14 @@ export default function VocabTest({ steps }: VocabTestProps) {
                   <button
                     disabled={answeredThisStep}
                     onClick={() => submitTrueFalse(true)}
-                    className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl border border-success/40 bg-success/5 hover:bg-success/10 font-medium text-success transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-50"
+                    className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-lg border border-success/40 bg-success/5 hover:bg-success/10 font-medium text-success transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-50"
                   >
                     <Check size={16} /> נכון
                   </button>
                   <button
                     disabled={answeredThisStep}
                     onClick={() => submitTrueFalse(false)}
-                    className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl border border-danger/40 bg-danger/5 hover:bg-danger/10 font-medium text-danger transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-50"
+                    className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-lg border border-danger/40 bg-danger/5 hover:bg-danger/10 font-medium text-danger transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-50"
                   >
                     <X size={16} /> לא נכון
                   </button>
@@ -427,7 +427,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={nextStep}
-                  className="mt-4 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="mt-4 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
                   {stepIndex + 1 < steps.length ? "השאלה הבאה →" : "סיום המבחן"}
                 </motion.button>

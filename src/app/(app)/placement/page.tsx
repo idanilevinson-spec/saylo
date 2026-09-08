@@ -104,7 +104,7 @@ export default function PlacementPage() {
             whileTap={{ scale: 0.97 }}
             onClick={handleStart}
             disabled={starting}
-            className="mt-8 w-full sm:w-auto px-10 py-3.5 rounded-xl bg-primary text-primary-ink font-medium text-lg disabled:opacity-60 hover:bg-primary-hover transition-colors"
+            className="mt-8 w-full sm:w-auto px-10 py-3.5 rounded-lg bg-primary text-primary-ink font-medium text-lg disabled:opacity-60 hover:bg-primary-hover transition-colors"
           >
             {starting ? "מתחילים..." : "התחילו את המבחן"}
           </motion.button>
@@ -191,7 +191,7 @@ export default function PlacementPage() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           href="/learn"
-          className="mt-6 block text-center px-5 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-6 block text-center px-5 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           למסלול הלימוד שלי
         </MotionLink>
@@ -269,7 +269,7 @@ export default function PlacementPage() {
             onChange={(e) => setWritingSample(e.target.value)}
             rows={5}
             placeholder="Write your answer here..."
-            className="mt-4 w-full px-4 py-3 rounded-xl border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="mt-4 w-full px-4 py-3 rounded-lg border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
 
           {error && <p role="alert" className="mt-4 text-sm text-danger">{error}</p>}
@@ -279,7 +279,7 @@ export default function PlacementPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => submitFinal("")}
-              className="px-4 py-2.5 rounded-xl border border-card-border font-medium hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              className="px-4 py-2.5 rounded-lg border border-card-border font-medium hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
               דילוג
             </motion.button>
@@ -288,7 +288,7 @@ export default function PlacementPage() {
               whileTap={writingSample.trim() ? { scale: 0.97 } : undefined}
               onClick={() => submitFinal(writingSample)}
               disabled={!writingSample.trim()}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
               סיום המבחן
             </motion.button>
@@ -323,13 +323,13 @@ export default function PlacementPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => speak(question.audio_text as string, 1)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 <Volume2 size={16} /> השמעה
               </button>
               <button
                 onClick={() => speak(question.audio_text as string, 0.6)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 <Turtle size={16} /> לאט
               </button>
@@ -348,7 +348,7 @@ export default function PlacementPage() {
               whileHover={{ x: -2 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setSelected(i)}
-              className={`w-full text-right px-4 py-3 rounded-xl border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+              className={`w-full text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                 selected === i ? "border-primary bg-primary/5" : "border-card-border hover:border-primary/40"
               }`}
             >
@@ -364,7 +364,7 @@ export default function PlacementPage() {
           whileTap={selected !== null ? { scale: 0.97 } : undefined}
           onClick={handleNext}
           disabled={selected === null}
-          className="mt-6 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           {isLast ? "לשלב האחרון →" : "הבא →"}
         </motion.button>

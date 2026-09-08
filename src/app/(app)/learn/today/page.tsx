@@ -94,7 +94,7 @@ export default function DailyLessonPage() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           href={topic.href}
-          className="mt-6 block text-center px-5 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-6 block text-center px-5 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           התחילו את השיעור →
         </MotionLink>

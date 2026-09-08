@@ -81,13 +81,13 @@ export default function ConsentRequestForm({ status }: ConsentRequestFormProps) 
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="parent@example.com"
-        className="mt-4 w-full px-4 py-2.5 rounded-xl border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+        className="mt-4 w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
       />
       {error && <p role="alert" className="mt-2 text-sm text-danger">{error}</p>}
       <button
         onClick={handleSubmit}
         disabled={!email.trim() || submitting}
-        className="mt-4 w-full px-4 py-2.5 rounded-xl bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
+        className="mt-4 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
       >
         {submitting ? "שולח..." : "שליחת בקשה"}
       </button>

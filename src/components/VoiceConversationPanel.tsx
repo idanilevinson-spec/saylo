@@ -313,7 +313,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       {!ending && (state === "paused" || state === "error") && (
         <button
           onClick={resume}
-          className="px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           {state === "paused" ? "המשך האזנה" : "נסו שוב"}
         </button>
@@ -323,7 +323,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         onClick={onEnd}
         disabled={ending || !canEnd}
         title={!canEnd ? "אמרו משהו קודם כדי לקבל משוב" : undefined}
-        className="mt-2 flex items-center gap-1.5 px-6 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
+        className="mt-2 flex items-center gap-1.5 px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
       >
         <PhoneOff size={16} /> סיום שיחה וקבלת משוב
       </button>
