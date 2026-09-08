@@ -16,6 +16,12 @@ export default function SiteFooter() {
           <Link href="/pricing" className="hover:text-foreground transition-colors">
             מסלולים
           </Link>
+          <Link href="/privacy" className="hover:text-foreground transition-colors">
+            פרטיות
+          </Link>
+          <Link href="/terms" className="hover:text-foreground transition-colors">
+            תנאי שימוש
+          </Link>
           <Link href="/login" className="hover:text-foreground transition-colors">
             התחברות
           </Link>

@@ -43,3 +43,11 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# iOS (Capacitor) — the Xcode project itself is committed, but not
+# CocoaPods' resolved output or per-user Xcode state, which Codemagic
+# regenerates on every cloud build.
+ios/App/Pods/
+ios/App/*.xcworkspace/xcuserdata/
+ios/App/*.xcodeproj/xcuserdata/
+ios/App/App/build/
