@@ -69,23 +69,14 @@ export default function LandingHero() {
             מבחן רמה אישי, מסלול לימוד שמתאים בדיוק לחוזקות ולחולשות שלכם, ומורה AI שזוכר כל מילה שקשה לכם.
           </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.55 }}
-            className="mt-6 inline-block rounded-full bg-[#4d9eff]/10 border border-[#4d9eff]/30 px-4 py-1.5 text-sm font-medium text-[#4d9eff]"
-          >
-            3 ימים ראשונים חינם — בלי כרטיס אשראי
-          </motion.div>
-
           {/* CTAs styled as a video player's own controls, sitting where a
               scrubber's play/next buttons would sit — not a generic button
               pair. */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.7 }}
-            className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
+            transition={{ duration: 0.6, delay: 1.55 }}
+            className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
           >
             <MagneticButton>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -104,7 +95,7 @@ export default function LandingHero() {
                   href="/pricing"
                   className="block px-7 py-3.5 rounded-full border border-[#f3efe4]/25 text-[#f3efe4] font-medium text-lg hover:bg-[#f3efe4]/5 transition-colors"
                 >
-                  לצפייה במסלולים
+                  לכל המסלולים
                 </Link>
               </motion.div>
             </MagneticButton>
@@ -138,7 +129,7 @@ export default function LandingHero() {
                 have gone to the store yesterday.
               </EnglishText>
               <p className="caption-track-he text-sm leading-relaxed text-[#5ee6e1]">
-                &quot;went&quot; לא מתחבר ל-have — הצורה הנכונה: <EnglishText as="span">gone</EnglishText>.
+                &quot;went&quot; לא מתחבר ל-have. הצורה הנכונה: <EnglishText as="span">gone</EnglishText>.
               </p>
             </div>
           </motion.div>

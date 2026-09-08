@@ -115,7 +115,7 @@ body {
 }
 .caption-track-en {
   direction: ltr;
-  text-align: start;
+  text-align: right;
 }
 .caption-track-he {
   direction: rtl;

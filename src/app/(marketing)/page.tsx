@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LandingHero from "@/components/LandingHero";
+import LandingTrustStrip from "@/components/LandingTrustStrip";
 import LandingSteps from "@/components/LandingSteps";
 import LandingFeatures from "@/components/LandingFeatures";
 import LandingLevels from "@/components/LandingLevels";
@@ -15,6 +16,7 @@ export default function HomePage() {
   return (
     <>
       <LandingHero />
+      <LandingTrustStrip />
       <LandingSteps />
       <LandingFeatures />
       <LandingLevels />

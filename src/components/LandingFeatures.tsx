@@ -23,14 +23,14 @@ const NOW_PLAYING = [
     icon: Phone,
     en: "Live call with your AI teacher.",
     title: "שיחה קולית עם מורה AI",
-    body: "תרגלו מצבים אמיתיים — ראיון עבודה, מסעדה, שדה תעופה — בשיחה קולית חופשית, כמו שיחת טלפון אמיתית עם מורה שמקשיב ומגיב אליכם.",
+    body: "תרגלו מצבים אמיתיים (ראיון עבודה, מסעדה, שדה תעופה) בשיחה קולית חופשית, כמו שיחת טלפון אמיתית עם מורה שמקשיב ומגיב אליכם.",
     href: "/speaking/voice",
   },
   {
     icon: MessageCircle,
     en: "Or type it out, at your pace.",
     title: "צ'אט עם מורה AI",
-    body: "מעדיפים להקליד? אותם תרחישים ואותו מורה, בשיחת טקסט בקצב שלכם — בלי לחץ, עם זמן לחשוב על כל תשובה.",
+    body: "מעדיפים להקליד? אותם תרחישים ואותו מורה, בשיחת טקסט בקצב שלכם, בלי לחץ ועם זמן לחשוב על כל תשובה.",
     href: "/speaking",
   },
 ];
@@ -40,7 +40,7 @@ const SCENES = [
   { icon: PenLine, title: "דקדוק מלא", body: "מסלול שלם מ-A1 ועד C2, בלי לדלג.", href: "/grammar" },
   { icon: Headphones, title: "האזנה", body: "שיחות, חדשות ופודקאסטים לפי רמה.", href: "/listening" },
   { icon: BookOpenText, title: "קריאה חכמה", body: "סיפורים לפי רמה, מבחן הבנה ושאלה פתוחה עם משוב AI.", href: "/reading" },
-  { icon: Brain, title: "חזרה חכמה", body: "המערכת זוכרת מה שכחתם, ומחזירה לכם בדיוק את זה ברגע הנכון — לא לפני, לא אחרי.", href: "/review" },
+  { icon: Brain, title: "חזרה חכמה", body: "המערכת זוכרת מה שכחתם, ומחזירה לכם בדיוק את זה ברגע הנכון: לא לפני, לא אחרי.", href: "/review" },
   { icon: Gamepad2, title: "לומדים דרך משחק", body: "XP, רצף ימים ותגי הישג.", href: "/games" },
   { icon: Target, title: "מסלולים לפי מטרה", body: "עבודה, טיולים, ראיונות או לימודים.", href: "/learn" },
 ];
@@ -71,7 +71,7 @@ export default function LandingFeatures() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center text-muted mb-14 max-w-lg mx-auto"
         >
-          לא עוד אתר לימוד רגיל — מערכת שלמה שמכירה אתכם ומתאימה את עצמה אליכם.
+          לא עוד אתר לימוד רגיל. מערכת שלמה שמכירה אתכם ומתאימה את עצמה אליכם.
         </motion.p>
 
         <div className="space-y-3 mb-3">

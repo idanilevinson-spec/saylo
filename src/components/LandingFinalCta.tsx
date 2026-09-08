@@ -17,7 +17,7 @@ export default function LandingFinalCta() {
       >
         <h2 className="text-3xl sm:text-4xl font-bold">מוכנים להתחיל?</h2>
         <p className="mt-4 text-muted text-lg leading-relaxed">
-          מבחן הרמה לוקח פחות מ־10 דקות. תדעו בדיוק איפה אתם עומדים — ולאן ללכת מכאן.
+          מבחן הרמה לוקח פחות מ־10 דקות. תדעו בדיוק איפה אתם עומדים, ולאן ללכת מכאן.
         </p>
         <MagneticButton className="mt-8 inline-block">
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
