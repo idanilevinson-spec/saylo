@@ -31,14 +31,14 @@ export default function Navbar() {
 
   const linkClass = (href: string) => {
     const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
-    return `px-3 py-2 rounded-lg text-sm transition-colors ${
+    return `shrink-0 whitespace-nowrap px-3 py-2 rounded-lg text-sm transition-colors ${
       active ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground hover:bg-background-2"
     }`;
   };
 
   const mobileLinkClass = (href: string) => {
     const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
-    return `px-3 py-2.5 rounded-lg text-sm transition-colors ${
+    return `whitespace-nowrap px-3 py-2.5 rounded-lg text-sm transition-colors ${
       active ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground hover:bg-background-2"
     }`;
   };
@@ -55,7 +55,7 @@ export default function Navbar() {
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <ScrollProgress />
-      <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
+      <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 leading-tight shrink-0" onClick={() => setMenuOpen(false)}>
           <Image src="/logo-mark.png" alt="" width={32} height={32} className="rounded-lg" />
           <span>
@@ -68,9 +68,9 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-1.5 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
           {session && (
-            <nav className="hidden md:flex items-center gap-1 bg-card/60 border border-card-border rounded-xl p-1">
+            <nav className="hidden md:flex items-center gap-1 bg-card/60 border border-card-border rounded-xl p-1 min-w-0 overflow-x-auto">
               {links.map((link) => (
                 <Link key={link.href} href={link.href} className={linkClass(link.href)}>
                   {link.label}
@@ -81,7 +81,7 @@ export default function Navbar() {
               </Link>
               <button
                 onClick={handleSignOut}
-                className="px-3 py-2 rounded-lg text-sm text-muted hover:text-danger transition-colors"
+                className="shrink-0 whitespace-nowrap px-3 py-2 rounded-lg text-sm text-muted hover:text-danger transition-colors"
               >
                 התנתקות
               </button>
