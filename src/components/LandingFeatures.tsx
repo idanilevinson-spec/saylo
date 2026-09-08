@@ -57,7 +57,7 @@ function SignalMeter() {
       {BAR_HEIGHTS.map((h, i) => (
         <motion.span
           key={i}
-          className="w-0.5 rounded-full bg-accent"
+          className="w-0.5 rounded-full bg-primary"
           initial={{ height: "20%" }}
           animate={{ height: [`${h * 0.3}%`, `${h}%`, `${h * 0.3}%`] }}
           transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut", delay: i * 0.1 }}
@@ -121,7 +121,7 @@ export default function LandingFeatures() {
                         not decoration borrowed for every card. */}
                     {f.voice && <SignalMeter />}
                   </div>
-                  <p className="mt-1 text-sm font-bold text-accent-hover">{f.title}</p>
+                  <p className="mt-1 text-sm font-bold text-primary-hover">{f.title}</p>
                   <p className="mt-1.5 text-sm text-muted leading-relaxed">{f.body}</p>
                 </div>
               </motion.div>

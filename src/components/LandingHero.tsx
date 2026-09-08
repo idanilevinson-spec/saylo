@@ -10,13 +10,10 @@ import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
 export default function LandingHero() {
   return (
     <section className="relative overflow-hidden bg-primary-soft">
-      {/* The two-tone studio frame: a teal field behind the live segment,
-          a blue field behind the headline plate. Softened tints, not flat
-          full-saturation color — a small button earns full intensity, a
-          whole section reads as glaring at the same strength. Desktop
-          only — on mobile the columns stack and a hard diagonal split
-          reads as noise. */}
-      <div aria-hidden="true" className="hidden lg:block absolute inset-y-0 end-0 w-[38%] bg-accent-soft" />
+      {/* One uniform blue field, the exact hue sampled from the real
+          Saylo logo — no second "channel" color. A softened tint, not
+          flat full-saturation: a small button earns full intensity, a
+          whole section reads as glaring at the same strength. */}
 
       {/* The studio ground breathes — a slow, quiet ambient wash rather
           than a flat digital field. Raised from the shader-portal
@@ -53,8 +50,7 @@ export default function LandingHero() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="relative bg-card rounded-lg shadow-2xl p-6 sm:p-9"
             >
-              {/* The card's color-coded edge, a broadcast-graphic detail:
-                  which "channel" (English) this plate belongs to. */}
+              {/* The card's edge, a broadcast-graphic detail. */}
               <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-primary" />
 
               <EnglishText as="h1" className="chyron text-4xl sm:text-6xl text-foreground">
@@ -62,7 +58,7 @@ export default function LandingHero() {
                 <br />
                 always wanted<span className="text-primary">.</span>
               </EnglishText>
-              <h2 className="mt-3 text-xl sm:text-2xl font-extrabold leading-snug text-accent-hover">
+              <h2 className="mt-3 text-xl sm:text-2xl font-extrabold leading-snug text-primary-hover">
                 סוף סוף, ברור.
               </h2>
               <p className="mt-5 max-w-xl text-muted leading-relaxed">
@@ -96,8 +92,8 @@ export default function LandingHero() {
 
             {/* The signature moment: not a screenshot of the product but
                 the product's real mechanism, playing live and looping
-                through a handful of real mistakes. Sits in the teal zone
-                on desktop, inside the first viewport, not scrolled past. */}
+                through a handful of real mistakes — inside the first
+                viewport on desktop, not scrolled past. */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}

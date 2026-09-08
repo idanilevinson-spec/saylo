@@ -22,7 +22,7 @@ const GROUP = Array.from({ length: 4 }, () => ITEMS).flat();
 
 export default function LandingTrustStrip() {
   return (
-    <div className="bg-accent-soft overflow-hidden">
+    <div className="bg-primary-soft overflow-hidden">
       <div className="flex items-stretch">
         <EnglishText
           as="span"

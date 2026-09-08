@@ -19,8 +19,8 @@ export default function LandingPricingTeaser() {
           transition={{ duration: 0.5 }}
           className="relative bg-card border border-card-border shadow-sm rounded-lg px-7 py-8 sm:px-10 sm:py-10 text-center"
         >
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-accent" />
-          <span className="inline-block px-2.5 py-1 rounded-md bg-accent text-accent-ink text-xs font-bold tracking-[0.04em]">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
+          <span className="inline-block px-2.5 py-1 rounded-md bg-primary text-primary-ink text-xs font-bold tracking-[0.04em]">
             {bestValue.badge}
           </span>
           <h2 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight">3 ימים חינם, בלי התחייבות</h2>
@@ -33,7 +33,7 @@ export default function LandingPricingTeaser() {
               </EnglishText>
               /mo
             </p>
-            <p className="caption-track-he text-sm text-accent">במסלול השנתי</p>
+            <p className="caption-track-he text-sm text-primary">במסלול השנתי</p>
           </div>
 
           <MagneticButton className="mt-8 inline-block">

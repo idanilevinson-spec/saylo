@@ -60,7 +60,7 @@ export default function LandingSteps() {
                 <EnglishText as="p" className="caption-track-en text-lg font-bold text-foreground">
                   {step.en}
                 </EnglishText>
-                <p className="mt-1 text-sm text-accent-hover font-bold">{step.title}</p>
+                <p className="mt-1 text-sm text-primary-hover font-bold">{step.title}</p>
                 <p className="mt-2 text-muted leading-relaxed max-w-md">{step.he}</p>
               </div>
             </motion.div>

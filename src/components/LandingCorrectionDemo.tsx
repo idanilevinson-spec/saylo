@@ -107,13 +107,13 @@ export default function LandingCorrectionDemo() {
       className="relative mt-6 lg:mt-0 bg-card rounded-lg shadow-2xl px-5 py-5 sm:px-7 sm:py-6"
       aria-live="off"
     >
-      {/* Color-coded edge matching the accent/Hebrew "channel," pairing
-          with the headline plate's primary edge. */}
-      <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-accent" />
+      {/* The plate's edge, matching the headline card's — one uniform
+          blue throughout, no second "channel" color. */}
+      <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-primary" />
 
       <div className="flex items-center justify-between mb-3">
-        <span className="flex items-center gap-2 text-xs font-bold text-accent-hover">
-          <span className="live-dot w-1.5 h-1.5 rounded-full bg-accent" />
+        <span className="flex items-center gap-2 text-xs font-bold text-primary-hover">
+          <span className="live-dot w-1.5 h-1.5 rounded-full bg-primary" />
           מורה AI מתקן עכשיו
         </span>
         <motion.span
@@ -168,7 +168,7 @@ export default function LandingCorrectionDemo() {
             initial={reduceMotion ? false : { opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35 }}
-            className="caption-track-he text-sm leading-relaxed text-accent-hover"
+            className="caption-track-he text-sm leading-relaxed text-primary-hover"
           >
             {example.he}
           </motion.p>
