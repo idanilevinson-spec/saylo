@@ -104,7 +104,7 @@ export default function LandingCorrectionDemo() {
 
   return (
     <div
-      className="relative mt-6 lg:mt-0 bg-background rounded-lg shadow-2xl px-5 py-5 sm:px-7 sm:py-6"
+      className="relative mt-6 lg:mt-0 bg-card rounded-lg shadow-2xl px-5 py-5 sm:px-7 sm:py-6"
       aria-live="off"
     >
       {/* Color-coded edge matching the accent/Hebrew "channel," pairing

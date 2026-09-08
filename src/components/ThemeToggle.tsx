@@ -11,11 +11,11 @@ const listeners = new Set<() => void>();
 // script in layout.tsx before React ever mounts), so we read it directly
 // instead of duplicating theme-resolution logic in a second place.
 function getSnapshot(): Theme {
-  return (document.documentElement.getAttribute("data-theme") as Theme | null) ?? "light";
+  return (document.documentElement.getAttribute("data-theme") as Theme | null) ?? "dark";
 }
 
 function getServerSnapshot(): Theme {
-  return "light";
+  return "dark";
 }
 
 function subscribe(callback: () => void) {

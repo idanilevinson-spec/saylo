@@ -8,6 +8,8 @@
 
 The old world's letterboxing and translucent glass are gone. In their place: bold, flat color-block fields (never gradients standing in for content, never glass standing in for a plate) and a genuine two-tone studio split behind the hero's headline and its live segment.
 
+**Dark is the first-visit default**, not a system-preference guess — the user asked for it directly, and the world genuinely reads better there (the near-black plates against the saturated color fields carry more of the "broadcast at night" charge than the daylight translation does). `layout.tsx`'s no-flash script now sets `data-theme="dark"` whenever no explicit choice is stored; a stored choice from the toggle still always wins. `manifest.ts` and `viewport.themeColor` were updated to the dark-mode primary/background to match. Light mode is preserved in full and reachable from the same toggle as before — this changes which theme a first-time visitor lands on, not whether light mode exists.
+
 ## Palette
 
 Same brand colors as before, used completely differently. Primary (blue) is the "on-air" field color and the English channel; accent (teal) is the second studio field and the Hebrew channel. Both still sampled directly from the real Saylo logo gradient (`public/logo-mark.png`, blue `#0b7ce5` → teal `#0ab1db`) — the logo itself was the one constraint the user pinned ("except the logo"), so the palette stays recognizably Saylo rather than drifting into generic broadcast red.

@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "לומדים אנגלית בקצב שלכם — מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם",
     start_url: "/dashboard",
     display: "standalone",
-    background_color: "#faf7f0",
-    theme_color: "#0066d6",
+    background_color: "#0b0c0f",
+    theme_color: "#4d9eff",
     lang: "he",
     dir: "rtl",
     icons: [

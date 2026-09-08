@@ -41,15 +41,18 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0066d6",
+  themeColor: "#4d9eff",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
-// Runs before first paint to set data-theme from the stored/preferred theme,
-// avoiding a flash of the wrong theme (React only sees the DOM after hydration).
-const noFlashThemeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`;
+// Runs before first paint to set data-theme from the stored theme,
+// avoiding a flash of the wrong theme (React only sees the DOM after
+// hydration). Dark is the deliberate first-visit default — the "On Air"
+// world reads best there — not a system-preference guess; a stored
+// explicit choice (from the toggle) always wins over it.
+const noFlashThemeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t="dark"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

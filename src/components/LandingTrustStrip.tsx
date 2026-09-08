@@ -13,6 +13,13 @@ const ITEMS = [
   "תרגול דיבור עם זיהוי קול אמיתי",
 ];
 
+// One "group" repeats the item set enough times to safely exceed any real
+// viewport width on its own (five short phrases don't fill a wide desktop
+// screen once). Rendering exactly two such groups, animated by exactly
+// one group-width, is what makes the loop seamless — too few repeats
+// leaves a visible gap of bare track before the seam.
+const GROUP = Array.from({ length: 4 }, () => ITEMS).flat();
+
 export default function LandingTrustStrip() {
   return (
     <div className="bg-accent overflow-hidden">
@@ -25,7 +32,7 @@ export default function LandingTrustStrip() {
         </EnglishText>
         <div className="flex-1 overflow-hidden py-2.5">
           <div className="ticker-track flex w-max gap-12 whitespace-nowrap">
-            {[...ITEMS, ...ITEMS].map((item, i) => (
+            {[...GROUP, ...GROUP].map((item, i) => (
               <span key={i} className="text-sm font-bold text-accent-ink">
                 {item}
               </span>

@@ -48,7 +48,7 @@ export default function LandingHero() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="relative bg-background rounded-lg shadow-2xl p-6 sm:p-9"
+              className="relative bg-card rounded-lg shadow-2xl p-6 sm:p-9"
             >
               {/* The card's color-coded edge, a broadcast-graphic detail:
                   which "channel" (English) this plate belongs to. */}
