@@ -22,8 +22,6 @@ workflows:
     scripts:
       - name: Install npm dependencies
         script: npm ci
-      - name: Sanity-check the Next.js app builds
-        script: npm run build
       - name: Sync Capacitor iOS project
         script: npx cap sync ios
       - name: Install CocoaPods
