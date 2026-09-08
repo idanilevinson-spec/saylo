@@ -71,6 +71,20 @@
   --muted: #a39c8c;
 }
 
+/* Softened field tints for large full-bleed areas (the hero, its studio
+   split, the ticker) — a flat, fully-saturated primary/accent works for a
+   small button or badge but reads as glaring across a whole section.
+   Blending toward the page's own background keeps the hue recognizable
+   while pulling the intensity down; small accents (buttons, the LIVE
+   dot, edge bars) stay at full saturation so they still read as the
+   focal point against the calmer field. References --primary/--accent
+   and --background directly, so it resolves correctly per theme without
+   needing its own redeclaration in each theme block. */
+:root {
+  --primary-soft: color-mix(in srgb, var(--primary) 45%, var(--background));
+  --accent-soft: color-mix(in srgb, var(--accent) 45%, var(--background));
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-background-2: var(--background-2);
@@ -80,9 +94,11 @@
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
   --color-success: var(--success);
   --color-success-ink: var(--success-ink);
   --color-danger: var(--danger);

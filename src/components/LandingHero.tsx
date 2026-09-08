@@ -9,11 +9,14 @@ import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
 
 export default function LandingHero() {
   return (
-    <section className="relative overflow-hidden bg-primary">
+    <section className="relative overflow-hidden bg-primary-soft">
       {/* The two-tone studio frame: a teal field behind the live segment,
-          a blue field behind the headline plate. Desktop only — on mobile
-          the columns stack and a hard diagonal split reads as noise. */}
-      <div aria-hidden="true" className="hidden lg:block absolute inset-y-0 end-0 w-[38%] bg-accent" />
+          a blue field behind the headline plate. Softened tints, not flat
+          full-saturation color — a small button earns full intensity, a
+          whole section reads as glaring at the same strength. Desktop
+          only — on mobile the columns stack and a hard diagonal split
+          reads as noise. */}
+      <div aria-hidden="true" className="hidden lg:block absolute inset-y-0 end-0 w-[38%] bg-accent-soft" />
 
       {/* The studio ground breathes — a slow, quiet ambient wash rather
           than a flat digital field. Raised from the shader-portal
@@ -37,8 +40,8 @@ export default function LandingHero() {
               element threaded through every section (that was the retired
               timecode mistake). */}
           <div className="flex items-center gap-2 mb-8">
-            <span aria-hidden="true" className="live-dot w-2 h-2 rounded-full bg-primary-ink" />
-            <EnglishText as="span" className="chyron text-xs text-primary-ink tracking-[0.15em]">
+            <span aria-hidden="true" className="live-dot w-2 h-2 rounded-full bg-primary" />
+            <EnglishText as="span" className="chyron text-xs text-foreground tracking-[0.15em]">
               Live
             </EnglishText>
           </div>
