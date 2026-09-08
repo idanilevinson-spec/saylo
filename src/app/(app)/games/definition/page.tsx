@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpenCheck, Trophy } from "lucide-react";
+import { BookOpenCheck, Trophy, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { getDefinitionGameWords, type DefinitionGameItem } from "@/lib/games/definitionWords";
@@ -152,9 +152,11 @@ export default function DefinitionGamePage() {
                   key={i}
                   disabled={locked}
                   onClick={() => submitAnswer(i)}
-                  className={`w-full text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
+                  className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
                 >
                   <EnglishText>{option}</EnglishText>
+                  {locked && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
+                  {locked && isSelected && !isCorrectOption && <XCircle size={18} className="text-danger shrink-0" />}
                 </button>
               );
             })}

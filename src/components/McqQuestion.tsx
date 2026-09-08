@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CheckCircle2, XCircle } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import { shuffle } from "@/lib/utils/shuffle";
 import type { McqContent, McqResponse } from "@/types/exercises";
@@ -38,9 +39,11 @@ export default function McqQuestion({ content, disabled, onSubmit }: McqQuestion
               disabled={disabled}
               onClick={() => setSelectedDisplayIndex(displayIndex)}
               aria-pressed={isSelected}
-              className={`w-full text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
+              className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
             >
               <EnglishText>{option}</EnglishText>
+              {disabled && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
+              {disabled && isSelected && !isCorrectOption && <XCircle size={18} className="text-danger shrink-0" />}
             </button>
           );
         })}
