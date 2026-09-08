@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone } from "lucide-react";
+import { ChevronDown, ChevronUp, Phone } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import PremiumGate from "@/components/PremiumGate";
@@ -33,6 +33,7 @@ function SpeakingChatInner() {
   const [ending, setEnding] = useState(false);
   const [voiceMode, setVoiceMode] = useState(startInVoiceMode);
   const [score, setScore] = useState<ConversationScore | null>(null);
+  const [showTranscript, setShowTranscript] = useState(false);
   const [teacherGender] = useState<VoicePref>(() => loadVoicePref());
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -143,6 +144,55 @@ function SpeakingChatInner() {
         )}
         {score.feedback.suggestedVocabulary.length > 0 && (
           <FeedbackList title="מילים שהיה כדאי להשתמש בהן" items={score.feedback.suggestedVocabulary} english />
+        )}
+
+        {/* Every turn — including a voice call's — was already being
+            transcribed and saved as it happened (the same recognized-speech
+            text that drove the AI's replies), just never shown back. This
+            is what makes that transcript actually usable: a full read-through
+            to see your own mistakes in context, or a screen worth screenshotting
+            when the conversation went well. */}
+        {messages && messages.length > 0 && (
+          <div className="mt-6">
+            <button
+              onClick={() => setShowTranscript((v) => !v)}
+              className="flex items-center gap-1 text-sm text-primary hover:underline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded"
+            >
+              {showTranscript ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+              {showTranscript ? "הסתירו את תמלול השיחה" : "הציגו את תמלול השיחה המלאה"}
+            </button>
+
+            <AnimatePresence initial={false}>
+              {showTranscript && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-3 bg-card border border-card-border rounded-lg p-5 sm:p-6 space-y-3 max-h-96 overflow-y-auto">
+                    {messages.map((m) => (
+                      <div key={m.id} className={`flex ${m.role === "user" ? "justify-start" : "justify-end"}`}>
+                        <div
+                          className={`max-w-[85%] px-4 py-2.5 rounded-lg ${
+                            m.role === "user" ? "bg-primary text-primary-ink" : "bg-background-2"
+                          }`}
+                        >
+                          <p className={`text-xs mb-0.5 ${m.role === "user" ? "opacity-80" : "text-muted"}`}>
+                            {m.role === "user" ? "אתם" : "מורה AI"}
+                          </p>
+                          <EnglishText as="p" className="text-left leading-relaxed">
+                            {m.content}
+                          </EnglishText>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
 
         <MotionLink
