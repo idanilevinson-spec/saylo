@@ -60,7 +60,7 @@ export default function SpeakingPage() {
   }
 
   return (
-    <PremiumGate featureName="דיבור עם AI">
+    <PremiumGate featureName="דיבור עם AI" requirePaid>
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="animate-fade-up">
           <h1 className="text-3xl font-bold">דיבור עם AI</h1>

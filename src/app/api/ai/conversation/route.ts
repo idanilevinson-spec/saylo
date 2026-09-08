@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/serverClient";
 import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
 import { buildConversationSystemPrompt } from "@/lib/ai/prompts/conversationPartner";
 import { logAiUsage } from "@/lib/ai/usageLog";
-import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
+import { isPaidServer } from "@/lib/subscriptions/requirePremium";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  if (!(await isPremiumServer(supabase, user.id))) {
+  if (!(await isPaidServer(supabase, user.id))) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
   }
 

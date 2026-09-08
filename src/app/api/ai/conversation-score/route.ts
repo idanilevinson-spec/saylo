@@ -4,6 +4,7 @@ import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/a
 import { buildConversationScoringPrompt, type TranscriptTurn } from "@/lib/ai/prompts/conversationScoring";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { setSkillLevelFromScore } from "@/lib/assessment/skillLevel";
+import { isPaidServer } from "@/lib/subscriptions/requirePremium";
 import type { ConversationFeedback } from "@/types/database";
 
 interface ScoringResult extends ConversationFeedback {
@@ -19,6 +20,9 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!(await isPaidServer(supabase, user.id))) {
+    return NextResponse.json({ error: "premium required" }, { status: 403 });
+  }
 
   const { conversationId } = (await request.json()) as { conversationId?: string };
   if (!conversationId) return NextResponse.json({ error: "missing conversationId" }, { status: 400 });

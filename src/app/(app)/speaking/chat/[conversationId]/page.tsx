@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Phone } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
+import PremiumGate from "@/components/PremiumGate";
 import VoiceConversationPanel from "@/components/VoiceConversationPanel";
 import SayloAvatar from "@/components/SayloAvatar";
 import { useAuth } from "@/context/AuthProvider";
@@ -14,6 +15,14 @@ import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
 import type { ConversationMessage, ConversationScore } from "@/types/database";
 
 export default function SpeakingChatPage() {
+  return (
+    <PremiumGate featureName="שיחה עם מורה AI" requirePaid>
+      <SpeakingChatInner />
+    </PremiumGate>
+  );
+}
+
+function SpeakingChatInner() {
   const { conversationId } = useParams<{ conversationId: string }>();
   const searchParams = useSearchParams();
   const startInVoiceMode = searchParams.get("mode") === "voice";

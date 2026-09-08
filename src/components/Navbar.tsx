@@ -17,6 +17,7 @@ const AUTHED_LINKS = [
   { href: "/vocabulary", label: "אוצר מילים" },
   { href: "/grammar", label: "דקדוק" },
   { href: "/reading", label: "קריאה" },
+  { href: "/speaking", label: "מורה AI" },
   { href: "/games", label: "משחקים" },
 ];
 
