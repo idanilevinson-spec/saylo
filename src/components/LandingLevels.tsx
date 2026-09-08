@@ -4,15 +4,15 @@ import { motion } from "framer-motion";
 import EnglishText from "@/components/EnglishText";
 
 // The CEFR ladder as a scrubber, not passport stamps — six chapter markers
-// on one continuous timeline, the same rail a video's chapter list uses.
-// Timecodes stand in for "how far the story has to run", not real minutes.
+// on one continuous rail. Order and position carry the progression; the
+// level code itself is the only label this needs.
 const LEVELS = [
-  { code: "A1", time: "00:00", label: "Beginner", he: "מתחילים" },
-  { code: "A2", time: "04:30", label: "Elementary", he: "בסיסי" },
-  { code: "B1", time: "09:15", label: "Intermediate", he: "בינוני" },
-  { code: "B2", time: "14:00", label: "Upper Int.", he: "בינוני-מתקדם" },
-  { code: "C1", time: "19:20", label: "Advanced", he: "מתקדם" },
-  { code: "C2", time: "24:00", label: "Proficiency", he: "שליטה מלאה" },
+  { code: "A1", label: "Beginner", he: "מתחילים" },
+  { code: "A2", label: "Elementary", he: "בסיסי" },
+  { code: "B1", label: "Intermediate", he: "בינוני" },
+  { code: "B2", label: "Upper Int.", he: "בינוני-מתקדם" },
+  { code: "C1", label: "Advanced", he: "מתקדם" },
+  { code: "C2", label: "Proficiency", he: "שליטה מלאה" },
 ];
 
 export default function LandingLevels() {
@@ -68,9 +68,6 @@ export default function LandingLevels() {
                       "w-3 h-3 rounded-full mb-2.5 " + (i <= 1 ? "bg-primary" : "bg-card-border")
                     }
                   />
-                  <EnglishText as="span" className="timecode text-[10px] sm:text-xs text-muted">
-                    {level.time}
-                  </EnglishText>
                   <EnglishText
                     as="span"
                     className={

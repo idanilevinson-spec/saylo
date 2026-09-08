@@ -93,7 +93,6 @@
   --color-muted: var(--muted);
   --font-sans: var(--font-rubik);
   --font-content: var(--font-jakarta);
-  --font-mono: var(--font-timecode);
 }
 
 body {
@@ -131,14 +130,6 @@ body {
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--card-border);
   border-bottom: 1px solid var(--card-border);
-}
-
-/* Timecode numerals — the one place monospace is earned (it is measurement,
-   not a technical costume). */
-.timecode {
-  font-family: var(--font-timecode), ui-monospace, monospace;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
 }
 
 /* A whisper-thin film-grain layer over the whole site — the kind of detail

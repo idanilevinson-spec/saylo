@@ -269,8 +269,8 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       </div>
 
       <div className="relative flex items-center justify-center w-64 h-64 sm:w-72 sm:h-72">
-        {/* A live-state ring, not a stamp — the same "recording" register
-            as the hero's REC/timecode readout, tinted by call state. */}
+        {/* A live-state ring, not a stamp — tinted by call state instead
+            of a fixed outline. */}
         <div
           aria-hidden="true"
           className={`absolute inset-[8%] rounded-full border-2 transition-colors duration-500 ${

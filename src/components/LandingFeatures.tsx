@@ -17,11 +17,10 @@ import { useAuth } from "@/context/AuthProvider";
 import EnglishText from "@/components/EnglishText";
 
 // Two "now playing" features up top, the rest as a scene list beneath —
-// timecoded rows of uneven weight, never the banned same-size icon grid.
+// rows of uneven weight, never the banned same-size icon grid.
 const NOW_PLAYING = [
   {
     icon: Phone,
-    time: "12:04",
     en: "Live call with your AI teacher.",
     title: "שיחה קולית עם מורה AI",
     body: "תרגלו מצבים אמיתיים — ראיון עבודה, מסעדה, שדה תעופה — בשיחה קולית חופשית, כמו שיחת טלפון אמיתית עם מורה שמקשיב ומגיב אליכם.",
@@ -29,7 +28,6 @@ const NOW_PLAYING = [
   },
   {
     icon: MessageCircle,
-    time: "12:47",
     en: "Or type it out, at your pace.",
     title: "צ'אט עם מורה AI",
     body: "מעדיפים להקליד? אותם תרחישים ואותו מורה, בשיחת טקסט בקצב שלכם — בלי לחץ, עם זמן לחשוב על כל תשובה.",
@@ -38,13 +36,13 @@ const NOW_PLAYING = [
 ];
 
 const SCENES = [
-  { icon: BookOpen, time: "13:10", title: "אוצר מילים לפי נושא", body: "ממספרים ובגדים ועד Business ו-Technology.", href: "/vocabulary" },
-  { icon: PenLine, time: "13:22", title: "דקדוק מלא", body: "מסלול שלם מ-A1 ועד C2, בלי לדלג.", href: "/grammar" },
-  { icon: Headphones, time: "13:35", title: "האזנה", body: "שיחות, חדשות ופודקאסטים לפי רמה.", href: "/listening" },
-  { icon: BookOpenText, time: "13:48", title: "קריאה חכמה", body: "סיפורים לפי רמה, מבחן הבנה ושאלה פתוחה עם משוב AI.", href: "/reading" },
-  { icon: Brain, time: "14:02", title: "חזרה חכמה", body: "המערכת זוכרת מה שכחתם, ומחזירה לכם בדיוק את זה ברגע הנכון — לא לפני, לא אחרי.", href: "/review" },
-  { icon: Gamepad2, time: "14:19", title: "לומדים דרך משחק", body: "XP, רצף ימים ותגי הישג.", href: "/games" },
-  { icon: Target, time: "14:31", title: "מסלולים לפי מטרה", body: "עבודה, טיולים, ראיונות או לימודים.", href: "/learn" },
+  { icon: BookOpen, title: "אוצר מילים לפי נושא", body: "ממספרים ובגדים ועד Business ו-Technology.", href: "/vocabulary" },
+  { icon: PenLine, title: "דקדוק מלא", body: "מסלול שלם מ-A1 ועד C2, בלי לדלג.", href: "/grammar" },
+  { icon: Headphones, title: "האזנה", body: "שיחות, חדשות ופודקאסטים לפי רמה.", href: "/listening" },
+  { icon: BookOpenText, title: "קריאה חכמה", body: "סיפורים לפי רמה, מבחן הבנה ושאלה פתוחה עם משוב AI.", href: "/reading" },
+  { icon: Brain, title: "חזרה חכמה", body: "המערכת זוכרת מה שכחתם, ומחזירה לכם בדיוק את זה ברגע הנכון — לא לפני, לא אחרי.", href: "/review" },
+  { icon: Gamepad2, title: "לומדים דרך משחק", body: "XP, רצף ימים ותגי הישג.", href: "/games" },
+  { icon: Target, title: "מסלולים לפי מטרה", body: "עבודה, טיולים, ראיונות או לימודים.", href: "/learn" },
 ];
 
 export default function LandingFeatures() {
@@ -91,14 +89,9 @@ export default function LandingFeatures() {
                   <f.icon size={20} strokeWidth={2.25} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-3">
-                    <EnglishText as="p" className="caption-track-en text-base sm:text-lg font-bold text-foreground">
-                      {f.en}
-                    </EnglishText>
-                    <EnglishText as="span" className="timecode text-xs text-muted shrink-0">
-                      {f.time}
-                    </EnglishText>
-                  </div>
+                  <EnglishText as="p" className="caption-track-en text-base sm:text-lg font-bold text-foreground">
+                    {f.en}
+                  </EnglishText>
                   <p className="mt-1 text-sm font-semibold text-accent">{f.title}</p>
                   <p className="mt-1.5 text-sm text-muted leading-relaxed">{f.body}</p>
                 </div>
@@ -121,9 +114,6 @@ export default function LandingFeatures() {
                 transition={{ duration: 0.35, delay: i * 0.04 }}
                 className="group flex items-center gap-4 px-5 py-4 bg-card hover:bg-background-2 transition-colors"
               >
-                <EnglishText as="span" className="timecode text-xs text-muted w-12 shrink-0">
-                  {f.time}
-                </EnglishText>
                 <span className="inline-flex w-8 h-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <f.icon size={16} strokeWidth={2} />
                 </span>

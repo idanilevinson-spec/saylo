@@ -140,7 +140,7 @@ export default function PlacementPage() {
             className="w-36 h-36 sm:w-40 sm:h-40 rounded-full bg-accent flex flex-col items-center justify-center shadow-lg shadow-accent/20"
           >
             <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-accent-ink/80">רמתכם</span>
-            <EnglishText as="span" className="timecode text-4xl sm:text-5xl font-extrabold text-accent-ink leading-none mt-1">
+            <EnglishText as="span" className="text-4xl sm:text-5xl font-extrabold text-accent-ink leading-none mt-1">
               {result.overallCefr}
             </EnglishText>
           </motion.div>

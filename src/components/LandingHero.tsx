@@ -1,29 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MagneticButton from "@/components/MagneticButton";
 
-// Signature interaction: the frame is "playing" — a running timecode ticks
-// from a fixed start (never wall-clock time, so a slow connection or a
-// paused tab never shows a wildly large number).
-function useTimecode() {
-  const [seconds, setSeconds] = useState(3);
-  useEffect(() => {
-    const id = setInterval(() => setSeconds((s) => s + 1), 1000);
-    return () => clearInterval(id);
-  }, []);
-  const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-  const s = String(seconds % 60).padStart(2, "0");
-  return `00:${m}:${s}`;
-}
-
 export default function LandingHero() {
-  const timecode = useTimecode();
-
   return (
     <section className="relative overflow-hidden bg-[#0b0c0f]">
       {/* Letterbox bars — the "paused film frame" the whole world reads
@@ -45,18 +28,6 @@ export default function LandingHero() {
         />
 
         <div className="relative max-w-5xl mx-auto">
-          {/* Corner timecode — the running proof this is "live", not a
-              static screenshot of a video. Spans the full frame width,
-              above both columns. */}
-          <div className="flex items-center justify-between mb-10 text-[#f3efe4]/50">
-            <EnglishText as="span" className="timecode text-xs">
-              {timecode}
-            </EnglishText>
-            <EnglishText as="span" className="timecode text-xs">
-              REC ●
-            </EnglishText>
-          </div>
-
           <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-center">
           <div>
 
@@ -157,8 +128,8 @@ export default function LandingHero() {
                 <span className="w-1.5 h-1.5 rounded-full bg-[#4d9eff] animate-pulse" />
                 מורה AI מתקן עכשיו
               </span>
-              <EnglishText as="span" className="timecode text-xs text-[#f3efe4]/40">
-                B1 · 00:24
+              <EnglishText as="span" className="text-xs font-semibold tracking-wide text-[#f3efe4]/40">
+                B1
               </EnglishText>
             </div>
             <div className="caption-stack">

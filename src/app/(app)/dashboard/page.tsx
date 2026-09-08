@@ -151,10 +151,7 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      {/* Status strip: greeting beside today's numbers, read as measured
-          numerals (see StatField) — the same tabular-timecode grammar as
-          the rest of the world, tuned down for an Operate surface: no
-          cinema framing here, just scanability. */}
+      {/* Status strip: greeting beside today's numbers. */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -242,7 +239,7 @@ export default function DashboardPage() {
           <div className="relative flex items-center gap-5 mt-4">
             <RadialProgress percent={goalPct} />
             <div>
-              <p className="timecode text-3xl font-extrabold">
+              <p className="text-3xl font-extrabold">
                 {todayXp}
                 <span className="text-base font-medium text-muted"> / {DAILY_XP_GOAL} XP</span>
               </p>
@@ -365,7 +362,7 @@ function StatField({
 
   return (
     <div className="px-5 py-4 sm:py-6 flex flex-col items-center justify-center text-center min-w-[92px]">
-      <span className={`timecode flex items-center gap-1 font-extrabold text-lg ${toneClass}`}>
+      <span className={`flex items-center gap-1 font-extrabold text-lg ${toneClass}`}>
         <Icon size={15} className="fill-current" />
         {value}
       </span>

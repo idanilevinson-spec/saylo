@@ -19,9 +19,9 @@ export default function LandingPricingTeaser() {
           transition={{ duration: 0.5 }}
           className="caption-bar rounded-2xl px-7 py-8 sm:px-10 sm:py-10 text-center"
         >
-          <EnglishText as="span" className="timecode text-xs text-muted">
+          <span className="text-xs font-bold tracking-[0.08em] text-accent">
             {bestValue.badge}
-          </EnglishText>
+          </span>
           <h2 className="mt-2 text-2xl sm:text-3xl font-bold">3 ימים חינם, בלי התחייבות</h2>
 
           <div className="caption-stack mt-5 items-center">

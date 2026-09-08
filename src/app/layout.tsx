@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Rubik, Plus_Jakarta_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Rubik, Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
 import { MotionConfig } from "framer-motion";
 import "./globals.css";
@@ -16,15 +16,6 @@ const rubik = Rubik({
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin"],
-});
-
-// The one earned use of monospace: caption timecodes and other measured
-// numerals (see .timecode in globals.css) — never body copy or a
-// "technical" costume.
-const timecode = IBM_Plex_Mono({
-  variable: "--font-timecode",
-  subsets: ["latin"],
-  weight: ["500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -56,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="he"
       dir="rtl"
-      className={`${rubik.variable} ${jakarta.variable} ${timecode.variable} h-full antialiased`}
+      className={`${rubik.variable} ${jakarta.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
