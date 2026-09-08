@@ -235,7 +235,7 @@ export default function ProfilePage() {
                     <button
                       onClick={() => submitCancelToggle(true)}
                       disabled={cancelLoading}
-                      className="px-3 py-1.5 rounded-lg bg-danger text-white text-sm font-medium disabled:opacity-60"
+                      className="px-3 py-1.5 rounded-lg bg-danger text-[#04122b] text-sm font-medium disabled:opacity-60"
                     >
                       {cancelLoading ? "מבטל..." : "כן, בטלו את המנוי"}
                     </button>
