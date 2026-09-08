@@ -1,23 +1,31 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Design world: "Subtitle Culture" — understanding arrives as text locked to
+   the moment of speech, the way a lifetime of subtitled film and TV is how
+   this audience actually learned English. Amber is the "English track" (the
+   active, spoken-right-now word — the way a subtitle highlights a
+   translated idiom); teal is the "Hebrew track" (the correction/translation
+   running beneath it). The two never merge into one line, only stack — see
+   .caption-stack below. Light mode is the same grammar read on a bright
+   screen in daylight, not a different identity. See DESIGN.md. */
 :root {
-  --background: #f6f9fd;
-  --background-2: #ecf3fb;
-  --foreground: #081025;
+  --background: #faf7f0;
+  --background-2: #f1ebdf;
+  --foreground: #211c14;
   --card: #ffffff;
-  --card-border: #e1eaf6;
-  --primary: #0066d6;
-  --primary-hover: #0052ad;
+  --card-border: #e4dbc8;
+  --primary: #c2790f;
+  --primary-hover: #a86209;
   --primary-ink: #ffffff;
-  --accent: #00a19d;
-  --accent-hover: #008783;
-  --accent-ink: #04211f;
+  --accent: #0d7d78;
+  --accent-hover: #0a615d;
+  --accent-ink: #ffffff;
   --success: #16a34a;
   --success-ink: #f0fdf4;
   --danger: #ef4444;
   --danger-ink: #fef2f2;
-  --muted: #667085;
+  --muted: #6e6656;
 }
 
 /* Three theme states: an explicit choice (data-theme) always wins; with no
@@ -26,14 +34,14 @@
    mix of light and dark tokens. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --background: #0a0f1a;
-    --background-2: #121826;
-    --foreground: #e8f0fb;
-    --card: #151c2c;
-    --card-border: #26314a;
-    --primary: #4d9eff;
-    --primary-hover: #7ab8ff;
-    --primary-ink: #04122b;
+    --background: #0b0c0f;
+    --background-2: #17181c;
+    --foreground: #f3efe4;
+    --card: #1c1d22;
+    --card-border: #2e2f36;
+    --primary: #f2a53c;
+    --primary-hover: #f7bf6e;
+    --primary-ink: #241503;
     --accent: #2dd4cf;
     --accent-hover: #5ee6e1;
     --accent-ink: #042e2c;
@@ -41,19 +49,19 @@
     --success-ink: #052e13;
     --danger: #f87171;
     --danger-ink: #450a0a;
-    --muted: #94a3c2;
+    --muted: #a39c8c;
   }
 }
 
 :root[data-theme="dark"] {
-  --background: #0a0f1a;
-  --background-2: #121826;
-  --foreground: #e8f0fb;
-  --card: #151c2c;
-  --card-border: #26314a;
-  --primary: #4d9eff;
-  --primary-hover: #7ab8ff;
-  --primary-ink: #04122b;
+  --background: #0b0c0f;
+  --background-2: #17181c;
+  --foreground: #f3efe4;
+  --card: #1c1d22;
+  --card-border: #2e2f36;
+  --primary: #f2a53c;
+  --primary-hover: #f7bf6e;
+  --primary-ink: #241503;
   --accent: #2dd4cf;
   --accent-hover: #5ee6e1;
   --accent-ink: #042e2c;
@@ -61,7 +69,7 @@
   --success-ink: #052e13;
   --danger: #f87171;
   --danger-ink: #450a0a;
-  --muted: #94a3c2;
+  --muted: #a39c8c;
 }
 
 @theme inline {
@@ -83,21 +91,52 @@
   --color-muted: var(--muted);
   --font-sans: var(--font-rubik);
   --font-content: var(--font-jakarta);
-  --font-pen: var(--font-caveat);
+  --font-mono: var(--font-timecode);
 }
 
 body {
-  background:
-    radial-gradient(ellipse 55% 40% at 82% -8%, color-mix(in srgb, var(--primary) 14%, transparent) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 35% at 0% 10%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 55%),
-    var(--background);
-  background-attachment: fixed;
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-rubik), Arial, Helvetica, sans-serif;
   min-height: 100vh;
   padding-bottom: env(safe-area-inset-bottom);
   transition: background-color 0.2s ease, color 0.2s ease;
   position: relative;
+}
+
+/* Two caption tracks stacked, never merged — English (primary/amber) above,
+   Hebrew (accent/teal) beneath, each keeping its own script's natural
+   direction. The one recurring structural device of the whole identity. */
+.caption-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+}
+.caption-track-en {
+  direction: ltr;
+  text-align: start;
+}
+.caption-track-he {
+  direction: rtl;
+  text-align: start;
+}
+
+/* A caption bar: the bottom-anchored, high-contrast text plate every hero
+   and feature "scene" reads through. Letterboxed by its own top/bottom
+   rules rather than a drawn border. */
+.caption-bar {
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--card-border);
+}
+
+/* Timecode numerals — the one place monospace is earned (it is measurement,
+   not a technical costume). */
+.timecode {
+  font-family: var(--font-timecode), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
 /* A whisper-thin film-grain layer over the whole site — the kind of detail
@@ -153,29 +192,6 @@ h2 {
 }
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up {
-    animation: none;
-  }
-}
-
-/* A slow light-sweep across the hero's gradient headline — the kind of
-   quiet, premium detail that reads as polish rather than decoration. */
-@keyframes gradient-shimmer {
-  0%, 15% {
-    background-position: 0% 50%;
-  }
-  50%, 65% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-.animate-gradient-shimmer {
-  background-size: 220% 100%;
-  animation: gradient-shimmer 6s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .animate-gradient-shimmer {
     animation: none;
   }
 }

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Rubik, Plus_Jakarta_Sans, Caveat } from "next/font/google";
+import { Rubik, Plus_Jakarta_Sans, IBM_Plex_Mono } from "next/font/google";
 import Script from "next/script";
 import { MotionConfig } from "framer-motion";
 import "./globals.css";
@@ -18,12 +18,13 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
-// Used sparingly on the landing page for the AI tutor's handwritten-style
-// correction marks (the "teacher's pen" motif) — never for body copy.
-const caveat = Caveat({
-  variable: "--font-caveat",
+// The one earned use of monospace: caption timecodes and other measured
+// numerals (see .timecode in globals.css) — never body copy or a
+// "technical" costume.
+const timecode = IBM_Plex_Mono({
+  variable: "--font-timecode",
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0066d6",
+  themeColor: "#c2790f",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -55,7 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="he"
       dir="rtl"
-      className={`${rubik.variable} ${jakarta.variable} ${caveat.variable} h-full antialiased`}
+      className={`${rubik.variable} ${jakarta.variable} ${timecode.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

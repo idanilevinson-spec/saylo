@@ -1,230 +1,178 @@
 "use client";
 
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
-import { useRef } from "react";
-import type { MouseEvent } from "react";
-import Image from "next/image";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Bot, Plane } from "lucide-react";
+import { Play } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MagneticButton from "@/components/MagneticButton";
 
+// Signature interaction: the frame is "playing" — a running timecode ticks
+// from a fixed start (never wall-clock time, so a slow connection or a
+// paused tab never shows a wildly large number).
+function useTimecode() {
+  const [seconds, setSeconds] = useState(3);
+  useEffect(() => {
+    const id = setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+  const s = String(seconds % 60).padStart(2, "0");
+  return `00:${m}:${s}`;
+}
+
 export default function LandingHero() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 300, damping: 40, restDelta: 0.001 });
-  const opacity = useTransform(smoothProgress, [0, 1], [1, 0]);
-  const y = useTransform(smoothProgress, [0, 1], [0, 40]);
-  const blobPrimaryY = useTransform(smoothProgress, [0, 1], [0, 60]);
-  const blobAccentY = useTransform(smoothProgress, [0, 1], [0, -50]);
-  const cardRotate = useTransform(smoothProgress, [0, 1], [-2.2, 0.8]);
-  const cardY = useTransform(smoothProgress, [0, 1], [0, -14]);
-  const stampRotate = useTransform(smoothProgress, [0, 1], [-11, -5]);
-
-  // A gentle cursor-parallax on the two ambient glows — the blobs drift
-  // toward the pointer at different rates, giving the hero a subtle sense
-  // of depth that only shows up once you actually move the mouse.
-  const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-  const pointerXSpring = useSpring(pointerX, { stiffness: 60, damping: 20, mass: 0.6 });
-  const pointerYSpring = useSpring(pointerY, { stiffness: 60, damping: 20, mass: 0.6 });
-  const blobPrimaryX = useTransform(pointerXSpring, [-1, 1], [-18, 18]);
-  const blobPrimaryYPointer = useTransform(pointerYSpring, [-1, 1], [-18, 18]);
-  const blobAccentX = useTransform(pointerXSpring, [-1, 1], [14, -14]);
-  const blobAccentYPointer = useTransform(pointerYSpring, [-1, 1], [14, -14]);
-  const blobPrimaryYCombined = useTransform([blobPrimaryY, blobPrimaryYPointer], ([a, b]: number[]) => a + b);
-  const blobAccentYCombined = useTransform([blobAccentY, blobAccentYPointer], ([a, b]: number[]) => a + b);
-
-  function onPointerMove(e: MouseEvent<HTMLElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    pointerX.set(((e.clientX - rect.left) / rect.width) * 2 - 1);
-    pointerY.set(((e.clientY - rect.top) / rect.height) * 2 - 1);
-  }
-
-  function onPointerLeave() {
-    pointerX.set(0);
-    pointerY.set(0);
-  }
+  const timecode = useTimecode();
 
   return (
-    <section
-      ref={ref}
-      onMouseMove={onPointerMove}
-      onMouseLeave={onPointerLeave}
-      className="relative overflow-hidden px-4 pt-16 pb-20 sm:pt-24 sm:pb-28"
-    >
-      <motion.div
-        aria-hidden="true"
-        className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-primary/20 blur-3xl pointer-events-none"
-        style={{ y: blobPrimaryYCombined, x: blobPrimaryX }}
-      />
-      <motion.div
-        aria-hidden="true"
-        className="absolute bottom-0 left-[8%] w-64 h-64 rounded-full bg-accent/20 blur-3xl pointer-events-none"
-        style={{ y: blobAccentYCombined, x: blobAccentX }}
-      />
+    <section className="relative overflow-hidden bg-[#0b0c0f]">
+      {/* Letterbox bars — the "paused film frame" the whole world reads
+          through. Independent of theme: this frame is always the cinema,
+          light or dark theme is what plays inside the caption bar below. */}
+      <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[6%] bg-black z-20" />
+      <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[6%] bg-black z-20" />
 
-      {/* The dashed flight path draws itself in once on load — the same
-          "your journey" metaphor as the passport stamp and the boarding-pass
-          steps section further down, made literal right in the hero. */}
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.35]"
-      >
-        <motion.path
-          d="M 4 92 C 30 78, 34 46, 58 34 S 88 14, 94 8"
-          fill="none"
-          stroke="var(--accent)"
-          strokeWidth="0.35"
-          strokeDasharray="1.6 2.2"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ duration: 1.8, delay: 0.4, ease: "easeInOut" }}
+      <div className="relative px-4 py-24 sm:py-32">
+        {/* Film grain + a faint scanline give the frame texture without
+            relying on a photograph — see body::after for the site-wide
+            grain layer this intensifies locally. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 opacity-[0.06] pointer-events-none"
+          style={{
+            backgroundImage: "repeating-linear-gradient(0deg, #fff 0px, transparent 1px, transparent 2px)",
+          }}
         />
-      </svg>
-      <motion.span
-        aria-hidden="true"
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 0.45, scale: 1 }}
-        transition={{ duration: 0.4, delay: 2.1 }}
-        className="absolute rotate-[-38deg] text-accent-hover"
-        style={{ top: "5%", left: "91%" }}
-      >
-        <Plane size={18} strokeWidth={2} />
-      </motion.span>
-      <Image
-        src="/logo-watermark.png"
-        alt=""
-        aria-hidden="true"
-        width={480}
-        height={415}
-        className="absolute top-1/2 -translate-y-1/2 -left-24 rotate-[6deg] opacity-[0.08] pointer-events-none select-none"
-      />
 
-      <div className="relative max-w-5xl mx-auto grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-14 items-center">
-        <motion.div style={{ opacity, y }}>
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6"
-          >
-            3 ימים ראשונים חינם — בלי כרטיס אשראי
-          </motion.span>
+        <div className="relative max-w-5xl mx-auto">
+          {/* Corner timecode — the running proof this is "live", not a
+              static screenshot of a video. Spans the full frame width,
+              above both columns. */}
+          <div className="flex items-center justify-between mb-10 text-[#f3efe4]/50">
+            <EnglishText as="span" className="timecode text-xs">
+              {timecode}
+            </EnglishText>
+            <EnglishText as="span" className="timecode text-xs">
+              REC ●
+            </EnglishText>
+          </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-6xl font-bold tracking-tight leading-tight"
-          >
-            האנגלית שתמיד רצית,
-            <br />
-            <span className="animate-gradient-shimmer bg-gradient-to-l from-primary to-accent bg-clip-text text-transparent">
-              סוף סוף מובנת
-            </span>
-          </motion.h1>
+          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-center">
+          <div>
+
+          {/* The caption bar itself is the hero's whole thesis: no gradient
+              headline, no hero-metric template — just two stacked tracks,
+              English above Hebrew, the way real bilingual subtitles run. */}
+          <div className="caption-stack">
+            <motion.div
+              initial={{ clipPath: "inset(0 100% 0 0)" }}
+              animate={{ clipPath: "inset(0 0% 0 0)" }}
+              transition={{ duration: 1.1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              className="caption-track-en"
+            >
+              <EnglishText
+                as="h1"
+                className="text-4xl sm:text-6xl font-bold leading-[1.05] text-[#f3efe4]"
+              >
+                The English you always wanted<span className="text-[#f2a53c]">.</span>
+              </EnglishText>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.1 }}
+              className="caption-track-he"
+            >
+              <h2 className="text-2xl sm:text-4xl font-bold leading-tight text-[#5ee6e1]">
+                סוף סוף, ברור.
+              </h2>
+            </motion.div>
+          </div>
 
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 text-lg text-muted max-w-xl"
+            transition={{ duration: 0.6, delay: 1.4 }}
+            className="mt-6 max-w-xl text-lg text-[#f3efe4]/70 leading-relaxed"
           >
-            מבחן רמה אישי, מסלול לימוד שמתאים בדיוק לחוזקות ולחולשות שלכם, ומורה AI
-            שזוכר כל מילה שקשה לכם.
+            מבחן רמה אישי, מסלול לימוד שמתאים בדיוק לחוזקות ולחולשות שלכם, ומורה AI שזוכר כל מילה שקשה לכם.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-3"
+            transition={{ duration: 0.6, delay: 1.55 }}
+            className="mt-6 inline-block rounded-full bg-[#f2a53c]/10 border border-[#f2a53c]/30 px-4 py-1.5 text-sm font-medium text-[#f2a53c]"
+          >
+            3 ימים ראשונים חינם — בלי כרטיס אשראי
+          </motion.div>
+
+          {/* CTAs styled as a video player's own controls, sitting where a
+              scrubber's play/next buttons would sit — not a generic button
+              pair. */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.7 }}
+            className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
           >
             <MagneticButton>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   href="/signup"
-                  className="block px-8 py-3.5 rounded-xl bg-primary text-primary-ink font-medium text-lg hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+                  className="flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#f2a53c] text-[#241503] font-bold text-lg hover:bg-[#f7bf6e] transition-colors"
                 >
+                  <Play size={18} fill="currentColor" strokeWidth={0} />
                   התחילו ללמוד בחינם
                 </Link>
               </motion.div>
             </MagneticButton>
             <MagneticButton>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   href="/pricing"
-                  className="block px-8 py-3.5 rounded-xl bg-card border border-card-border font-medium text-lg hover:bg-background-2 transition-colors"
+                  className="block px-7 py-3.5 rounded-full border border-[#f3efe4]/25 text-[#f3efe4] font-medium text-lg hover:bg-[#f3efe4]/5 transition-colors"
                 >
                   לצפייה במסלולים
                 </Link>
               </motion.div>
             </MagneticButton>
           </motion.div>
-        </motion.div>
+          </div>
 
-        {/* A live "lesson in progress" mockup — the AI tutor catching and
-            correcting a real mistake — doubles as a product demo instead of
-            decoration. The passport-stamp badge ties into the CEFR levels
-            further down the page. */}
-        <motion.div
-          initial={{ opacity: 0, y: 24, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          className="relative mx-auto w-full max-w-sm"
-        >
+          {/* The live correction — the mechanism, dramatized. A real caption
+              card, not a chat bubble: the mistake captions in, strikes
+              through, and the fix captions in beneath it in the same
+              grammar the whole hero already taught you to read. Sits
+              beside the copy on desktop so it's inside the first
+              viewport, not scrolled past. */}
           <motion.div
-            style={{ rotate: stampRotate }}
-            className="absolute -top-6 -left-7 w-[92px] h-[92px] rounded-full border-[2.5px] border-dashed border-accent bg-accent/[0.07] text-accent-hover flex flex-col items-center justify-center z-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.9 }}
+            className="caption-bar mt-14 lg:mt-0 rounded-2xl px-5 py-5 sm:px-7 sm:py-6"
           >
-            <EnglishText as="span" className="font-extrabold text-xl leading-none">
-              B1
-            </EnglishText>
-            <span className="font-pen font-bold text-sm mt-0.5">עברתם!</span>
-          </motion.div>
-
-          <motion.div
-            style={{ rotate: cardRotate, y: cardY }}
-            className="bg-card border border-card-border rounded-[20px] p-6 shadow-xl shadow-primary/10"
-          >
-            <div className="flex items-center gap-2.5 pb-3.5 mb-4 border-b border-dashed border-card-border">
-              <span className="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-ink">
-                <Bot size={17} strokeWidth={2.25} />
+            <div className="flex items-center justify-between mb-3">
+              <span className="flex items-center gap-2 text-xs font-semibold text-[#f2a53c]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#f2a53c] animate-pulse" />
+                מורה AI מתקן עכשיו
               </span>
-              <div>
-                <div className="text-[13.5px] font-semibold">מורה AI</div>
-                <div className="text-[11.5px] text-accent-hover flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  מתקן עכשיו
-                </div>
-              </div>
-            </div>
-
-            <div className="-mb-1 flex items-baseline gap-1.5 pe-1.5">
-              <span aria-hidden="true" className="text-accent-hover text-xl leading-none">
-                ↳
-              </span>
-              <EnglishText as="span" className="font-pen font-bold text-accent-hover text-xl">
-                have gone
+              <EnglishText as="span" className="timecode text-xs text-[#f3efe4]/40">
+                B1 · 00:24
               </EnglishText>
             </div>
-
-            <div className="mt-3.5 bg-background-2 rounded-2xl p-4">
-              <EnglishText as="span" className="block text-[15px] leading-relaxed">
-                I <span className="text-danger line-through decoration-[1.5px] opacity-75">have went</span> to the
-                store yesterday.
+            <div className="caption-stack">
+              <EnglishText as="p" className="caption-track-en text-lg leading-relaxed text-[#f3efe4]">
+                I <span className="line-through decoration-2 decoration-[#f87171]/70 text-[#f3efe4]/50">have went</span>{" "}
+                have gone to the store yesterday.
               </EnglishText>
-              <span className="block mt-2 text-xs text-muted leading-relaxed">
-                הלכתי לחנות אתמול — אבל &quot;went&quot; לא מתחבר ל-have. הצורה הנכונה:{" "}
-                <EnglishText as="span">gone</EnglishText>.
-              </span>
+              <p className="caption-track-he text-sm leading-relaxed text-[#5ee6e1]">
+                &quot;went&quot; לא מתחבר ל-have — הצורה הנכונה: <EnglishText as="span">gone</EnglishText>.
+              </p>
             </div>
           </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );

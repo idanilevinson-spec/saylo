@@ -11,44 +11,35 @@ const bestValue = PRICING_PLANS[PRICING_PLANS.length - 1];
 export default function LandingPricingTeaser() {
   return (
     <section className="px-4 py-24 bg-background-2">
-      <div className="max-w-xl mx-auto text-center">
+      <div className="max-w-lg mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 24, scale: 0.96 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
-          className="relative bg-card border border-card-border rounded-3xl p-8 sm:p-10 shadow-xl shadow-primary/5"
+          className="caption-bar rounded-2xl px-7 py-8 sm:px-10 sm:py-10 text-center"
         >
-          {/* Boarding-pass notches: two half-circles punched into the card's
-              own edges, cut from the section's background color. */}
-          <span
-            aria-hidden="true"
-            className="hidden sm:block absolute top-1/2 -right-3.5 -translate-y-1/2 w-7 h-7 rounded-full bg-background-2"
-          />
-          <span
-            aria-hidden="true"
-            className="hidden sm:block absolute top-1/2 -left-3.5 -translate-y-1/2 w-7 h-7 rounded-full bg-background-2"
-          />
-
-          <span className="inline-block px-3 py-1 rounded-full bg-accent/15 text-accent-hover text-xs font-bold mb-4">
+          <EnglishText as="span" className="timecode text-xs text-muted">
             {bestValue.badge}
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-bold">3 ימים חינם, בלי התחייבות</h2>
+          </EnglishText>
+          <h2 className="mt-2 text-2xl sm:text-3xl font-bold">3 ימים חינם, בלי התחייבות</h2>
 
-          <div className="border-t-2 border-dashed border-card-border my-6 -mx-8 sm:-mx-10" aria-hidden="true" />
+          <div className="caption-stack mt-5 items-center">
+            <p className="caption-track-en text-muted">
+              then{" "}
+              <EnglishText as="span" className="font-bold text-primary">
+                ₪{monthlyEquivalent(bestValue)}
+              </EnglishText>
+              /mo
+            </p>
+            <p className="caption-track-he text-sm text-accent">במסלול השנתי</p>
+          </div>
 
-          <p className="text-muted">
-            ואז החל מ־
-            <EnglishText as="span" className="font-bold text-foreground mx-1">
-              ₪{monthlyEquivalent(bestValue)}
-            </EnglishText>
-            לחודש במסלול השנתי
-          </p>
           <MagneticButton className="mt-8 inline-block">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
                 href="/pricing"
-                className="block px-8 py-3.5 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+                className="block px-8 py-3.5 rounded-full bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors"
               >
                 לכל המסלולים
               </Link>

@@ -55,22 +55,19 @@ export default function Navbar() {
     >
       <ScrollProgress />
       <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 leading-tight" onClick={() => setMenuOpen(false)}>
+        <Link href="/" className="flex items-center gap-2 leading-tight shrink-0" onClick={() => setMenuOpen(false)}>
           <Image src="/logo-mark.png" alt="" width={32} height={32} className="rounded-lg" />
           <span>
-            <EnglishText
-              as="span"
-              className="block text-xl font-bold tracking-tight bg-gradient-to-l from-primary to-accent bg-clip-text text-transparent"
-            >
+            <EnglishText as="span" className="block text-xl font-extrabold tracking-tight text-primary">
               saylo
             </EnglishText>
-            <EnglishText as="span" className="block text-[10px] text-muted font-medium -mt-0.5">
+            <EnglishText as="span" className="hidden sm:block text-[10px] text-muted font-medium -mt-0.5">
               Speak. Learn. Grow.
             </EnglishText>
           </span>
         </Link>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           {session && (
             <nav className="hidden md:flex items-center gap-1 bg-card/60 border border-card-border rounded-xl p-1">
               {links.map((link) => (
@@ -91,13 +88,13 @@ export default function Navbar() {
           )}
 
           {!session && pathname !== "/login" && (
-            <div className="flex items-center gap-2">
-              <Link href="/login" className={linkClass("/login")}>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Link href="/login" className={`${linkClass("/login")} whitespace-nowrap px-2 sm:px-3`}>
                 התחברות
               </Link>
               <Link
                 href="/signup"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-ink hover:bg-primary-hover transition-colors"
+                className="whitespace-nowrap px-3 py-2 sm:px-4 rounded-lg text-sm font-medium bg-primary text-primary-ink hover:bg-primary-hover transition-colors"
               >
                 התחילו חינם
               </Link>
