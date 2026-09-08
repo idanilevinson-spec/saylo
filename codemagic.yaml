@@ -6,8 +6,6 @@ workflows:
     integrations:
       app_store_connect: saylo_asc_key
     environment:
-      groups:
-        - ios_signing
       vars:
         BUNDLE_ID: com.saylolearn.app
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
@@ -37,7 +35,7 @@ workflows:
       - name: Increment build number
         script: |
           cd $CM_BUILD_DIR
-          agvtool new-version -all $(($(app-store-connect get-latest-app-store-build-number "$BUNDLE_ID") + 1))
+          agvtool new-version -all $BUILD_NUMBER
       - name: Build ipa for distribution
         script: |
           xcode-project build-ipa \
