@@ -343,7 +343,7 @@ export default function MatchGamePage() {
           </div>
           <div className="relative w-12 h-12 shrink-0 flex items-center justify-center rounded-full border-2 border-dashed border-card-border">
             <Timer size={14} className="absolute -top-1.5 -right-1.5 bg-background rounded-full text-muted" />
-            <EnglishText as="span" className="text-sm font-bold tabular-nums">
+            <EnglishText as="span" className="timecode text-sm font-bold">
               {timeLeft}
             </EnglishText>
           </div>

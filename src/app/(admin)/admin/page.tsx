@@ -18,7 +18,7 @@ function MetricCard({ label, value, href }: { label: string; value: string; href
   const content = (
     <div className="bg-card border border-card-border rounded-2xl p-5 hover:border-primary/40 hover:shadow-md transition-all h-full">
       <p className="text-sm text-muted">{label}</p>
-      <p className="mt-2 text-3xl font-bold">{value}</p>
+      <p className="timecode mt-2 text-3xl font-bold">{value}</p>
     </div>
   );
   return href ? <Link href={href}>{content}</Link> : content;

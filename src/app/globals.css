@@ -106,7 +106,7 @@ body {
   position: relative;
 }
 
-/* Two caption tracks stacked, never merged — English (primary/amber) above,
+/* Two caption tracks stacked, never merged — English (primary/blue) above,
    Hebrew (accent/teal) beneath, each keeping its own script's natural
    direction. The one recurring structural device of the whole identity. */
 .caption-stack {

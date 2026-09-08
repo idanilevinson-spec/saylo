@@ -145,7 +145,7 @@ export default function ProfilePage() {
           className="mt-6 flex items-center justify-around bg-card border border-card-border rounded-2xl p-5"
         >
           <div className="flex flex-col items-center gap-1">
-            <span className="flex items-center gap-1 text-primary">
+            <span className="timecode flex items-center gap-1 text-primary">
               <Star size={16} className="fill-current" />
               <EnglishText as="span" className="font-bold">
                 {stats.totalXp}
@@ -153,9 +153,9 @@ export default function ProfilePage() {
             </span>
             <p className="text-xs text-muted">XP</p>
           </div>
-          <div className="h-8 border-e border-dashed border-card-border" />
+          <div className="h-8 border-e border-card-border" />
           <div className="flex flex-col items-center gap-1">
-            <span className="flex items-center gap-1 text-accent-hover">
+            <span className="timecode flex items-center gap-1 text-accent-hover">
               <Trophy size={16} />
               <EnglishText as="span" className="font-bold">
                 {stats.level}
@@ -163,9 +163,9 @@ export default function ProfilePage() {
             </span>
             <p className="text-xs text-muted">רמה</p>
           </div>
-          <div className="h-8 border-e border-dashed border-card-border" />
+          <div className="h-8 border-e border-card-border" />
           <div className="flex flex-col items-center gap-1">
-            <span className="flex items-center gap-1 text-accent-hover">
+            <span className="timecode flex items-center gap-1 text-accent-hover">
               <Flame size={16} />
               <EnglishText as="span" className="font-bold">
                 {stats.currentStreak}

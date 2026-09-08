@@ -130,16 +130,17 @@ export default function PlacementPage() {
           transition={{ duration: 0.4, delay: 0.1, type: "spring", bounce: 0.4 }}
           className="mt-8 flex flex-col items-center"
         >
-          {/* The big payoff moment — your CEFR level, stamped like the
-              landing page's passport badges, just larger for once. */}
+          {/* The big payoff moment: your CEFR level filled in solid, not
+              stamped — the moment the scrubber's dashed marker resolves
+              into a completed chapter. */}
           <motion.div
             initial={{ rotate: 0 }}
             animate={{ rotate: -6 }}
             transition={{ delay: 0.35, duration: 0.4, ease: "easeOut" }}
-            className="w-36 h-36 sm:w-40 sm:h-40 rounded-full border-[3px] border-dashed border-accent bg-accent/[0.07] flex flex-col items-center justify-center"
+            className="w-36 h-36 sm:w-40 sm:h-40 rounded-full bg-accent flex flex-col items-center justify-center shadow-lg shadow-accent/20"
           >
-            <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-accent-hover">רמתכם</span>
-            <EnglishText as="span" className="text-4xl sm:text-5xl font-extrabold text-accent-hover leading-none mt-1">
+            <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-accent-ink/80">רמתכם</span>
+            <EnglishText as="span" className="timecode text-4xl sm:text-5xl font-extrabold text-accent-ink leading-none mt-1">
               {result.overallCefr}
             </EnglishText>
           </motion.div>

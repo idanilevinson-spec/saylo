@@ -151,10 +151,10 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      {/* Boarding-pass header: greeting on one side, today's "flight
-          details" (streak/XP/hearts) on the other, split by a dashed
-          perforation — the same ticket motif as the landing page's
-          pricing card, carried into daily use without its decoration. */}
+      {/* Status strip: greeting beside today's numbers, read as measured
+          numerals (see StatField) — the same tabular-timecode grammar as
+          the rest of the world, tuned down for an Operate surface: no
+          cinema framing here, just scanability. */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -171,7 +171,7 @@ export default function DashboardPage() {
         </div>
 
         {stats && (
-          <div className="border-t sm:border-t-0 sm:border-e border-dashed border-card-border sm:w-px" aria-hidden="true" />
+          <div className="border-t sm:border-t-0 sm:border-e border-card-border sm:w-px" aria-hidden="true" />
         )}
 
         {stats && (
@@ -194,7 +194,7 @@ export default function DashboardPage() {
         >
           <Link
             href="/placement"
-            className="group relative flex items-center gap-5 overflow-hidden rounded-2xl border-2 border-dashed border-accent bg-accent/[0.07] p-6 transition-colors hover:bg-accent/[0.11]"
+            className="group relative flex items-center gap-5 overflow-hidden rounded-2xl border border-accent/40 bg-accent/[0.07] p-6 transition-colors hover:bg-accent/[0.11]"
           >
             <span className="inline-flex w-14 h-14 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent-hover">
               <Target size={26} strokeWidth={2} />
@@ -242,7 +242,7 @@ export default function DashboardPage() {
           <div className="relative flex items-center gap-5 mt-4">
             <RadialProgress percent={goalPct} />
             <div>
-              <p className="text-3xl font-extrabold">
+              <p className="timecode text-3xl font-extrabold">
                 {todayXp}
                 <span className="text-base font-medium text-muted"> / {DAILY_XP_GOAL} XP</span>
               </p>
@@ -331,9 +331,6 @@ function RadialProgress({ percent }: { percent: number }) {
 
   return (
     <svg viewBox="0 0 72 72" className="w-[72px] h-[72px] shrink-0 -rotate-90">
-      {/* Dashed outer ring echoes the CEFR "passport stamps" from the
-          landing page — today's goal as a stamp waiting to be completed. */}
-      <circle cx="36" cy="36" r={radius + 6} fill="none" stroke="var(--card-border)" strokeWidth="1.5" strokeDasharray="3 4" />
       <circle cx="36" cy="36" r={radius} fill="none" stroke="var(--background-2)" strokeWidth="7" />
       <motion.circle
         cx="36"
@@ -368,7 +365,7 @@ function StatField({
 
   return (
     <div className="px-5 py-4 sm:py-6 flex flex-col items-center justify-center text-center min-w-[92px]">
-      <span className={`flex items-center gap-1 font-extrabold text-lg ${toneClass}`}>
+      <span className={`timecode flex items-center gap-1 font-extrabold text-lg ${toneClass}`}>
         <Icon size={15} className="fill-current" />
         {value}
       </span>

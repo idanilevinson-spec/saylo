@@ -269,11 +269,11 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       </div>
 
       <div className="relative flex items-center justify-center w-64 h-64 sm:w-72 sm:h-72">
-        {/* passport-stamp echo: a quiet dashed ring framing the orb, the
-            same motif as the CEFR stamps and the placement-test result */}
+        {/* A live-state ring, not a stamp — the same "recording" register
+            as the hero's REC/timecode readout, tinted by call state. */}
         <div
           aria-hidden="true"
-          className={`absolute inset-[8%] rounded-full border-2 border-dashed transition-colors duration-500 ${
+          className={`absolute inset-[8%] rounded-full border-2 transition-colors duration-500 ${
             state === "listening"
               ? "border-primary/50"
               : state === "speaking"
