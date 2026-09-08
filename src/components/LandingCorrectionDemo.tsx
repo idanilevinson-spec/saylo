@@ -104,12 +104,16 @@ export default function LandingCorrectionDemo() {
 
   return (
     <div
-      className="mt-14 lg:mt-0 rounded-2xl px-5 py-5 sm:px-7 sm:py-6 bg-black/40 backdrop-blur-md border-y border-white/10"
+      className="relative mt-6 lg:mt-0 bg-background rounded-lg shadow-2xl px-5 py-5 sm:px-7 sm:py-6"
       aria-live="off"
     >
+      {/* Color-coded edge matching the accent/Hebrew "channel," pairing
+          with the headline plate's primary edge. */}
+      <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-accent" />
+
       <div className="flex items-center justify-between mb-3">
-        <span className="flex items-center gap-2 text-xs font-semibold text-[#4d9eff]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#4d9eff] animate-pulse" />
+        <span className="flex items-center gap-2 text-xs font-bold text-accent-hover">
+          <span className="live-dot w-1.5 h-1.5 rounded-full bg-accent" />
           מורה AI מתקן עכשיו
         </span>
         <motion.span
@@ -117,7 +121,7 @@ export default function LandingCorrectionDemo() {
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="text-xs font-semibold tracking-wide text-[#f3efe4]/40"
+          className="text-xs font-bold tracking-wide text-muted"
         >
           {example.level}
         </motion.span>
@@ -131,16 +135,16 @@ export default function LandingCorrectionDemo() {
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="caption-track-en"
         >
-          <EnglishText as="p" className="text-lg leading-relaxed text-[#f3efe4]">
+          <EnglishText as="p" className="text-lg leading-relaxed text-foreground">
             {example.prefix}
             <span className="relative inline-block">
-              <span className={showStrike ? "text-[#f3efe4]/50" : undefined}>{example.wrong}</span>
+              <span className={showStrike ? "text-muted" : undefined}>{example.wrong}</span>
               <motion.span
                 aria-hidden="true"
                 initial={false}
                 animate={{ scaleX: showStrike ? 1 : 0 }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
-                className="absolute inset-x-0 top-1/2 h-[2px] bg-[#f87171]/70 origin-left"
+                className="absolute inset-x-0 top-1/2 h-[2px] bg-danger origin-left"
               />
             </span>
             {showCorrection && (
@@ -149,6 +153,7 @@ export default function LandingCorrectionDemo() {
                 initial={reduceMotion ? false : { opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
+                className="text-primary font-semibold"
               >
                 {" "}
                 {example.correct}
@@ -163,7 +168,7 @@ export default function LandingCorrectionDemo() {
             initial={reduceMotion ? false : { opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35 }}
-            className="caption-track-he text-sm leading-relaxed text-[#5ee6e1]"
+            className="caption-track-he text-sm leading-relaxed text-accent-hover"
           >
             {example.he}
           </motion.p>

@@ -17,12 +17,13 @@ export default function LandingPricingTeaser() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
-          className="caption-bar rounded-2xl px-7 py-8 sm:px-10 sm:py-10 text-center"
+          className="relative bg-card border border-card-border shadow-sm rounded-lg px-7 py-8 sm:px-10 sm:py-10 text-center"
         >
-          <span className="text-xs font-bold tracking-[0.08em] text-accent">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-accent" />
+          <span className="inline-block px-2.5 py-1 rounded-md bg-accent text-accent-ink text-xs font-bold tracking-[0.04em]">
             {bestValue.badge}
           </span>
-          <h2 className="mt-2 text-2xl sm:text-3xl font-bold">3 ימים חינם, בלי התחייבות</h2>
+          <h2 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight">3 ימים חינם, בלי התחייבות</h2>
 
           <div className="caption-stack mt-5 items-center">
             <p className="caption-track-en text-muted">
@@ -39,7 +40,7 @@ export default function LandingPricingTeaser() {
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
                 href="/pricing"
-                className="block px-8 py-3.5 rounded-full bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors"
+                className="block px-8 py-3.5 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors"
               >
                 לכל המסלולים
               </Link>

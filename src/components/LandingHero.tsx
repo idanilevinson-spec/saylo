@@ -9,111 +9,99 @@ import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
 
 export default function LandingHero() {
   return (
-    <section className="relative overflow-hidden bg-[#0b0c0f]">
-      {/* Letterbox bars — the "paused film frame" the whole world reads
-          through. Independent of theme: this frame is always the cinema,
-          light or dark theme is what plays inside the caption bar below. */}
-      <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[6%] bg-black z-20" />
-      <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[6%] bg-black z-20" />
+    <section className="relative overflow-hidden bg-primary">
+      {/* The two-tone studio frame: a teal field behind the live segment,
+          a blue field behind the headline plate. Desktop only — on mobile
+          the columns stack and a hard diagonal split reads as noise. */}
+      <div aria-hidden="true" className="hidden lg:block absolute inset-y-0 end-0 w-[38%] bg-accent" />
 
-      <div className="relative px-4 py-24 sm:py-32">
-        {/* Film grain + a faint scanline give the frame texture without
-            relying on a photograph — see body::after for the site-wide
-            grain layer this intensifies locally. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 opacity-[0.06] pointer-events-none"
-          style={{
-            backgroundImage: "repeating-linear-gradient(0deg, #fff 0px, transparent 1px, transparent 2px)",
-          }}
-        />
+      {/* The studio ground breathes — a slow, quiet ambient wash rather
+          than a flat digital field. Raised from the shader-portal
+          challenger's full-bleed commitment, translated to something this
+          budget can actually build: no WebGL, one soft animated glow. */}
+      <motion.div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        initial={{ opacity: 0.5 }}
+        animate={{ opacity: [0.5, 0.8, 0.5] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 15% 15%, color-mix(in srgb, var(--primary-ink) 16%, transparent) 0%, transparent 60%)",
+        }}
+      />
 
-        <div className="relative max-w-5xl mx-auto">
-          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-center">
-          <div>
+      <div className="relative px-4 py-16 sm:py-20">
+        <div className="relative max-w-6xl mx-auto">
+          {/* The one LIVE flag on the page — never repeated as a HUD
+              element threaded through every section (that was the retired
+              timecode mistake). */}
+          <div className="flex items-center gap-2 mb-8">
+            <span aria-hidden="true" className="live-dot w-2 h-2 rounded-full bg-primary-ink" />
+            <EnglishText as="span" className="chyron text-xs text-primary-ink tracking-[0.15em]">
+              Live
+            </EnglishText>
+          </div>
 
-          {/* The caption bar itself is the hero's whole thesis: no gradient
-              headline, no hero-metric template — just two stacked tracks,
-              English above Hebrew, the way real bilingual subtitles run. */}
-          <div className="caption-stack">
+          <div className="grid lg:grid-cols-[1.3fr_1fr] gap-8 lg:gap-10 items-start">
             <motion.div
-              initial={{ clipPath: "inset(0 100% 0 0)" }}
-              animate={{ clipPath: "inset(0 0% 0 0)" }}
-              transition={{ duration: 1.1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="caption-track-en"
-            >
-              <EnglishText
-                as="h1"
-                className="text-4xl sm:text-6xl font-bold leading-[1.05] text-[#f3efe4]"
-              >
-                The English you always wanted<span className="text-[#4d9eff]">.</span>
-              </EnglishText>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.1 }}
-              className="caption-track-he"
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="relative bg-background rounded-lg shadow-2xl p-6 sm:p-9"
             >
-              <h2 className="text-2xl sm:text-4xl font-bold leading-tight text-[#5ee6e1]">
+              {/* The card's color-coded edge, a broadcast-graphic detail:
+                  which "channel" (English) this plate belongs to. */}
+              <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-primary" />
+
+              <EnglishText as="h1" className="chyron text-4xl sm:text-6xl text-foreground">
+                The English you
+                <br />
+                always wanted<span className="text-primary">.</span>
+              </EnglishText>
+              <h2 className="mt-3 text-xl sm:text-2xl font-extrabold leading-snug text-accent-hover">
                 סוף סוף, ברור.
               </h2>
+              <p className="mt-5 max-w-xl text-muted leading-relaxed">
+                מבחן רמה אישי, מסלול לימוד שמתאים בדיוק לחוזקות ולחולשות שלכם, ומורה AI שזוכר כל מילה שקשה לכם.
+              </p>
+
+              <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <MagneticButton>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Link
+                      href="/signup"
+                      className="flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-lg bg-primary text-primary-ink font-bold text-lg hover:bg-primary-hover transition-colors"
+                    >
+                      <Play size={18} fill="currentColor" strokeWidth={0} />
+                      התחילו ללמוד בחינם
+                    </Link>
+                  </motion.div>
+                </MagneticButton>
+                <MagneticButton>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Link
+                      href="/pricing"
+                      className="block text-center px-7 py-3.5 rounded-lg border border-card-border text-foreground font-medium text-lg hover:bg-background-2 transition-colors"
+                    >
+                      לכל המסלולים
+                    </Link>
+                  </motion.div>
+                </MagneticButton>
+              </div>
             </motion.div>
-          </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.4 }}
-            className="mt-6 max-w-xl text-lg text-[#f3efe4]/70 leading-relaxed"
-          >
-            מבחן רמה אישי, מסלול לימוד שמתאים בדיוק לחוזקות ולחולשות שלכם, ומורה AI שזוכר כל מילה שקשה לכם.
-          </motion.p>
-
-          {/* CTAs styled as a video player's own controls, sitting where a
-              scrubber's play/next buttons would sit — not a generic button
-              pair. */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.55 }}
-            className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
-          >
-            <MagneticButton>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Link
-                  href="/signup"
-                  className="flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#4d9eff] text-[#04122b] font-bold text-lg hover:bg-[#7ab8ff] transition-colors"
-                >
-                  <Play size={18} fill="currentColor" strokeWidth={0} />
-                  התחילו ללמוד בחינם
-                </Link>
-              </motion.div>
-            </MagneticButton>
-            <MagneticButton>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Link
-                  href="/pricing"
-                  className="block px-7 py-3.5 rounded-full border border-[#f3efe4]/25 text-[#f3efe4] font-medium text-lg hover:bg-[#f3efe4]/5 transition-colors"
-                >
-                  לכל המסלולים
-                </Link>
-              </motion.div>
-            </MagneticButton>
-          </motion.div>
-          </div>
-
-          {/* The signature moment: not a screenshot of the product but the
-              product's real mechanism, playing live and looping through a
-              handful of real mistakes. Sits beside the copy on desktop so
-              it's inside the first viewport, not scrolled past. */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.9 }}
-          >
-            <LandingCorrectionDemo />
-          </motion.div>
+            {/* The signature moment: not a screenshot of the product but
+                the product's real mechanism, playing live and looping
+                through a handful of real mistakes. Sits in the teal zone
+                on desktop, inside the first viewport, not scrolled past. */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <LandingCorrectionDemo />
+            </motion.div>
           </div>
         </div>
       </div>

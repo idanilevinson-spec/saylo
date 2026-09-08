@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Rubik, Plus_Jakarta_Sans } from "next/font/google";
+import { Rubik, Plus_Jakarta_Sans, Anton } from "next/font/google";
 import Script from "next/script";
 import { MotionConfig } from "framer-motion";
 import "./globals.css";
@@ -16,6 +16,15 @@ const rubik = Rubik({
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin"],
+});
+
+// The chyron voice: one earned, oversized-impact display face for the
+// marketing page's broadcast headlines only. Never used for body copy,
+// exercise content, or dense Operate surfaces.
+const chyron = Anton({
+  variable: "--font-chyron",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -47,7 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="he"
       dir="rtl"
-      className={`${rubik.variable} ${jakarta.variable} h-full antialiased`}
+      className={`${rubik.variable} ${jakarta.variable} ${chyron.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

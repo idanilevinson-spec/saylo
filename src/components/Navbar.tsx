@@ -50,7 +50,7 @@ export default function Navbar() {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b border-card-border bg-background/90 backdrop-blur relative"
+      className="sticky top-0 z-40 border-b-2 border-accent bg-background/90 backdrop-blur relative"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <ScrollProgress />
@@ -58,7 +58,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-2 leading-tight shrink-0" onClick={() => setMenuOpen(false)}>
           <Image src="/logo-mark.png" alt="" width={32} height={32} className="rounded-lg" />
           <span>
-            <EnglishText as="span" className="block text-xl font-extrabold tracking-tight text-primary">
+            <EnglishText as="span" className="block text-xl font-black tracking-tight text-primary">
               saylo
             </EnglishText>
             <EnglishText as="span" className="hidden sm:block text-[10px] text-muted font-medium -mt-0.5">

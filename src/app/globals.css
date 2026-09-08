@@ -1,16 +1,13 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* Design world: "Subtitle Culture" — understanding arrives as text locked to
-   the moment of speech, the way a lifetime of subtitled film and TV is how
-   this audience actually learned English. Blue is the "English track" (the
-   active, spoken-right-now word — the way a subtitle highlights a
-   translated idiom); teal is the "Hebrew track" (the correction/translation
-   running beneath it) — both sampled from the real Saylo logo gradient
-   (public/logo-mark.png), not chosen freely. The two never merge into one
-   line, only stack — see .caption-stack below. Light mode is the same
-   grammar read on a bright screen in daylight, not a different identity.
-   See DESIGN.md. */
+/* Design world: "On Air" — your English gets corrected the moment it
+   happens, cut into like a live broadcast, not filed away in a quiz
+   result. Bold color-block "on-air" fields (Saylo's own blue/teal, never
+   literal news-red) stand in for the old quiet, letterboxed cinema-caption
+   look. Blue is the "English track," teal is the "Hebrew track" — both
+   sampled from the real Saylo logo gradient (public/logo-mark.png), not
+   chosen freely. See DESIGN.md. */
 :root {
   --background: #faf7f0;
   --background-2: #f1ebdf;
@@ -93,6 +90,7 @@
   --color-muted: var(--muted);
   --font-sans: var(--font-rubik);
   --font-content: var(--font-jakarta);
+  --font-display: var(--font-chyron);
 }
 
 body {
@@ -105,9 +103,11 @@ body {
   position: relative;
 }
 
-/* Two caption tracks stacked, never merged — English (primary/blue) above,
+/* Two language tracks stacked, never merged — English (primary/blue) above,
    Hebrew (accent/teal) beneath, each keeping its own script's natural
-   direction. The one recurring structural device of the whole identity. */
+   direction. Pure layout/direction plumbing, no look of its own: the RTL
+   and LTR halves of a correction always pair correctly wherever this is
+   used, whatever the surrounding visual world is doing. */
 .caption-stack {
   display: flex;
   flex-direction: column;
@@ -122,19 +122,63 @@ body {
   text-align: start;
 }
 
-/* A caption bar: the bottom-anchored, high-contrast text plate every hero
-   and feature "scene" reads through. Letterboxed by its own top/bottom
-   rules rather than a drawn border. */
-.caption-bar {
-  background: color-mix(in srgb, var(--background) 88%, transparent);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid var(--card-border);
-  border-bottom: 1px solid var(--card-border);
+/* A solid on-air color plate — the lower-third graphic every correction
+   and callout cuts in on. Deliberately flat and opaque, not glass: a
+   broadcast graphic is a filled plate, never a frosted pane. */
+.on-air-plate {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+/* The single LIVE flag's pulse — used once per view, never threaded
+   through every element (that was the retired timecode mistake). */
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.live-dot {
+  animation: live-pulse 1.3s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+  }
+}
+
+/* The one marquee this site allows itself (design-taste-frontend's
+   max-one-per-page rule) — a real news ticker is the single most honest
+   expression of this world's own thesis, not decoration reached for out
+   of habit. Track content is duplicated by the component; this animates
+   exactly one copy-width so the loop is seamless. Moves right-to-left,
+   which reads correctly for RTL content: new text enters from the right,
+   the same order a Hebrew reader already expects. */
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.ticker-track {
+  animation: ticker-scroll 26s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    transform: translateX(0%);
+  }
 }
 
 /* A whisper-thin film-grain layer over the whole site — the kind of detail
-   that doesn't register consciously but keeps large flat gradient areas
-   (the hero glow, card backgrounds) from looking like flat digital color. */
+   that doesn't register consciously but keeps large flat color fields
+   (the hero's blocks, card backgrounds) from looking like flat digital
+   color. */
 body::after {
   content: "";
   position: fixed;
@@ -194,6 +238,18 @@ h2 {
    so learners never confuse "what the app says" with "what they're learning". */
 .font-content {
   font-family: var(--font-jakarta), Arial, Helvetica, sans-serif;
+}
+
+/* The chyron voice: an oversized, condensed, all-caps impact face for
+   broadcast-headline moments only (hero, section leads). Never body copy,
+   never Operate surfaces — see DESIGN.md Type. Declared after
+   .font-content so it wins the cascade tie when EnglishText applies both
+   classes to the same element (equal specificity, source order decides). */
+.chyron {
+  font-family: var(--font-chyron), Impact, "Arial Narrow", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
 }
 
 /* Tailwind Typography's color palettes (prose-neutral etc.) are fixed

@@ -24,9 +24,9 @@ export default function LandingLevels() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
-          className="text-3xl sm:text-4xl font-bold text-center mb-4"
+          className="text-3xl sm:text-4xl font-black tracking-tight text-center mb-4"
         >
-          מרמת התחלה ועד שליטה מלאה
+          מדריך התוכניות: מהתחלה ועד שליטה מלאה
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -79,7 +79,7 @@ export default function LandingLevels() {
                   </EnglishText>
                   <span className="hidden sm:block mt-1 text-[11px] text-muted">{level.he}</span>
                   {isCurrent && (
-                    <span className="mt-1.5 hidden sm:inline-block px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
+                    <span className="mt-1.5 hidden sm:inline-block px-2 py-0.5 rounded-md bg-primary text-primary-ink text-[10px] font-bold">
                       אתם כאן
                     </span>
                   )}

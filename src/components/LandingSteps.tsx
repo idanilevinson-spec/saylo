@@ -3,8 +3,9 @@
 import { motion } from "framer-motion";
 import EnglishText from "@/components/EnglishText";
 
-// A continuous rail replaces the banned 01/02/03 card grid — order reads
-// from position on the line, not from a printed number.
+// A rundown, not a card grid — segment numbers are earned here (a real
+// broadcast rundown IS numbered order), unlike the banned decorative
+// 01/02/03 the old direction refused.
 const STEPS = [
   {
     en: "Take the level test.",
@@ -30,49 +31,40 @@ const STEPS = [
 
 export default function LandingSteps() {
   return (
-    <section className="px-4 py-24">
+    <section className="px-4 py-20 sm:py-24">
       <div className="max-w-3xl mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
-          className="text-3xl sm:text-4xl font-bold text-center mb-16"
+          className="text-3xl sm:text-4xl font-black tracking-tight text-center mb-14"
         >
-          איך זה עובד
+          סדר היום
         </motion.h2>
 
-        {/* One continuous rail — a single vertical line the steps sit on,
-            not four identical boxes. Order reads from position alone. */}
-        <div className="relative">
-          <div
-            aria-hidden="true"
-            className="absolute top-1 bottom-1 start-1 w-px bg-card-border"
-          />
-          <div className="space-y-10">
-            {STEPS.map((step, i) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.45, delay: i * 0.08 }}
-                className="relative flex gap-6 sm:gap-8 ps-9"
-              >
-                <span
-                  aria-hidden="true"
-                  className="absolute start-0 top-1.5 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-background"
-                />
-                <div className="flex-1 min-w-0 pb-1">
-                  <EnglishText as="p" className="caption-track-en text-lg font-bold text-foreground">
-                    {step.en}
-                  </EnglishText>
-                  <p className="mt-1 text-sm text-accent font-medium">{step.title}</p>
-                  <p className="mt-2 text-muted leading-relaxed max-w-md">{step.he}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        <div className="divide-y divide-card-border border-y border-card-border">
+          {STEPS.map((step, i) => (
+            <motion.div
+              key={step.title}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.45, delay: i * 0.08 }}
+              className="flex items-center gap-5 sm:gap-8 py-6"
+            >
+              <span className="chyron shrink-0 w-14 sm:w-16 text-4xl sm:text-5xl text-card-border text-center" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="flex-1 min-w-0">
+                <EnglishText as="p" className="caption-track-en text-lg font-bold text-foreground">
+                  {step.en}
+                </EnglishText>
+                <p className="mt-1 text-sm text-accent-hover font-bold">{step.title}</p>
+                <p className="mt-2 text-muted leading-relaxed max-w-md">{step.he}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
