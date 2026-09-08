@@ -9,11 +9,11 @@ import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
 
 export default function LandingHero() {
   return (
-    <section className="relative overflow-hidden bg-primary-soft">
+    <section className="relative overflow-hidden bg-primary">
       {/* One uniform blue field, the exact hue sampled from the real
-          Saylo logo — no second "channel" color. A softened tint, not
-          flat full-saturation: a small button earns full intensity, a
-          whole section reads as glaring at the same strength. */}
+          Saylo logo — the same intensity as the button sitting on it,
+          not a softened variant. A field and its button in two different
+          blues read as mismatched, not restrained. */}
 
       {/* The studio ground breathes — a slow, quiet ambient wash rather
           than a flat digital field. Raised from the shader-portal
@@ -37,8 +37,8 @@ export default function LandingHero() {
               element threaded through every section (that was the retired
               timecode mistake). */}
           <div className="flex items-center gap-2 mb-8">
-            <span aria-hidden="true" className="live-dot w-2 h-2 rounded-full bg-primary" />
-            <EnglishText as="span" className="chyron text-xs text-foreground tracking-[0.15em]">
+            <span aria-hidden="true" className="live-dot w-2 h-2 rounded-full bg-primary-ink" />
+            <EnglishText as="span" className="chyron text-xs text-primary-ink tracking-[0.15em]">
               Live
             </EnglishText>
           </div>

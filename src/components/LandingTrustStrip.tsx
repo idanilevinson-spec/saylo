@@ -22,7 +22,7 @@ const GROUP = Array.from({ length: 4 }, () => ITEMS).flat();
 
 export default function LandingTrustStrip() {
   return (
-    <div className="bg-primary-soft overflow-hidden">
+    <div className="bg-primary overflow-hidden">
       <div className="flex items-stretch">
         <EnglishText
           as="span"
@@ -33,7 +33,7 @@ export default function LandingTrustStrip() {
         <div className="flex-1 overflow-hidden py-2.5">
           <div className="ticker-track flex w-max gap-12 whitespace-nowrap">
             {[...GROUP, ...GROUP].map((item, i) => (
-              <span key={i} className="text-sm font-bold text-foreground">
+              <span key={i} className="text-sm font-bold text-primary-ink">
                 {item}
               </span>
             ))}

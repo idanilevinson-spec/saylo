@@ -40,75 +40,80 @@ export default function LoginForm() {
   return (
     <div className="max-w-md mx-auto px-4 py-16">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <h1 className="text-3xl font-bold text-center">ברוכים השבים</h1>
+        <h1 className="text-3xl font-black tracking-tight text-center">ברוכים השבים</h1>
         <p className="mt-2 text-center text-muted">התחברו כדי להמשיך ללמוד</p>
       </motion.div>
 
-      <motion.form
+      {/* The same plate language as the rest of the site: a card with a
+          primary-colored edge, not bare inputs floating on the page. */}
+      <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        onSubmit={handleSubmit}
-        className="mt-8 space-y-4"
+        className="relative mt-8 bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7"
       >
-        <div>
-          <label htmlFor="login-email" className="block text-sm font-medium mb-1.5">אימייל</label>
-          <input
-            id="login-email"
-            type="email"
-            dir="ltr"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 rounded-xl border border-card-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-        </div>
-        <div>
-          <label htmlFor="login-password" className="block text-sm font-medium mb-1.5">סיסמה</label>
-          <input
-            id="login-password"
-            type="password"
-            dir="ltr"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 rounded-xl border border-card-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-        </div>
+        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
 
-        {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="login-email" className="block text-sm font-medium mb-1.5">אימייל</label>
+            <input
+              id="login-email"
+              type="email"
+              dir="ltr"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+          </div>
+          <div>
+            <label htmlFor="login-password" className="block text-sm font-medium mb-1.5">סיסמה</label>
+            <input
+              id="login-password"
+              type="password"
+              dir="ltr"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+          </div>
 
-        <div className="text-left">
-          <Link href="/reset-password" className="text-sm text-primary">
-            שכחתם סיסמה?
-          </Link>
+          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+
+          <div className="text-left">
+            <Link href="/reset-password" className="text-sm text-primary">
+              שכחתם סיסמה?
+            </Link>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            type="submit"
+            disabled={loading}
+            className="w-full px-4 py-3 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors disabled:opacity-60"
+          >
+            {loading ? "מתחבר..." : "התחברות"}
+          </motion.button>
+        </form>
+
+        <div className="mt-4 flex items-center gap-3">
+          <div className="flex-1 h-px bg-card-border" />
+          <span className="text-xs text-muted">או</span>
+          <div className="flex-1 h-px bg-card-border" />
         </div>
 
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
-          type="submit"
-          disabled={loading}
-          className="w-full px-4 py-3 rounded-xl bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-60"
+          onClick={handleGoogleLogin}
+          className="mt-4 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
         >
-          {loading ? "מתחבר..." : "התחברות"}
+          המשך עם Google
         </motion.button>
-      </motion.form>
-
-      <div className="mt-4 flex items-center gap-3">
-        <div className="flex-1 h-px bg-card-border" />
-        <span className="text-xs text-muted">או</span>
-        <div className="flex-1 h-px bg-card-border" />
-      </div>
-
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-        onClick={handleGoogleLogin}
-        className="mt-4 w-full px-4 py-3 rounded-xl border border-card-border bg-card font-medium hover:bg-background-2 transition-colors"
-      >
-        המשך עם Google
-      </motion.button>
+      </motion.div>
 
       <p className="mt-6 text-center text-sm text-muted">
         עדיין אין לכם חשבון?{" "}
