@@ -167,48 +167,79 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       // so listenOnce() below can skip straight to opening the mic.
       const nextListenPreload = loadCredentials().catch(() => null);
 
+      const fallbackToBrowser = async () => {
+        browserSpeak(replyText, 1, async () => {
+          if (cancelled) return;
+          const preloaded = await nextListenPreload;
+          listenOnce(preloaded ?? undefined);
+        });
+      };
+
       loadCredentials()
         .then(({ token, region, sdk }) => {
           if (cancelled) return;
           const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(token, region);
           speechConfig.speechSynthesisVoiceName = NEURAL_VOICE[voicePrefRef.current];
-          const audioConfig = sdk.AudioConfig.fromDefaultSpeakerOutput();
-          const synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
+          speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
+          // No AudioConfig (null) — deliberately NOT AudioConfig.fromDefaultSpeakerOutput().
+          // That API drives Azure's own internal Web Audio playback, created fresh on
+          // every turn from inside an async callback (after the network round-trip to
+          // Claude) rather than synchronously inside a user tap — which WKWebView's
+          // autoplay policy silently swallows: speakTextAsync's success callback still
+          // fires normally, so nothing looks wrong, no sound ever plays. Passing null
+          // instead makes the SDK return the raw audio bytes in result.audioData without
+          // attempting to play them itself; playing that through a real <audio> element
+          // below is the same mechanism ReadingTextViewer/useNeuralSpeech already use
+          // reliably in this app's WebView shell.
+          const synthesizer = new sdk.SpeechSynthesizer(speechConfig, null);
           // Real lip-sync: Azure fires one of these per syllable, timed to
           // the actual audio — visemeId 0 means silence/mouth-closed,
           // anything else means the mouth is shaping a sound right now.
+          // Timing comes from the synthesis engine itself, not from local
+          // playback, so this still fires correctly with no AudioConfig.
           synthesizer.visemeReceived = (_sender, e) => {
             if (!cancelled) setViseme(e.visemeId);
           };
 
           synthesizer.speakTextAsync(
             replyText,
-            async () => {
+            async (result) => {
               synthesizer.close();
               if (cancelled) return;
-              const preloaded = await nextListenPreload;
-              listenOnce(preloaded ?? undefined);
-            },
-            async () => {
-              synthesizer.close();
-              // Azure TTS failed mid-flight — fall back to the free browser
-              // voice rather than breaking the call.
-              browserSpeak(replyText, 1, async () => {
+              if (result.reason !== sdk.ResultReason.SynthesizingAudioCompleted || !result.audioData?.byteLength) {
+                fallbackToBrowser();
+                return;
+              }
+              const blob = new Blob([result.audioData], { type: "audio/mpeg" });
+              const objectUrl = URL.createObjectURL(blob);
+              const audio = new Audio(objectUrl);
+              const advance = async () => {
+                URL.revokeObjectURL(objectUrl);
                 if (cancelled) return;
                 const preloaded = await nextListenPreload;
                 listenOnce(preloaded ?? undefined);
+              };
+              audio.onended = advance;
+              audio.onerror = () => {
+                URL.revokeObjectURL(objectUrl);
+                if (!cancelled) fallbackToBrowser();
+              };
+              audio.play().catch(() => {
+                URL.revokeObjectURL(objectUrl);
+                if (!cancelled) fallbackToBrowser();
               });
+            },
+            () => {
+              synthesizer.close();
+              // Azure TTS failed mid-flight — fall back to the free browser
+              // voice rather than breaking the call.
+              if (!cancelled) fallbackToBrowser();
             }
           );
         })
-        .catch(async () => {
-          if (cancelled) return;
+        .catch(() => {
           // Couldn't even get a token for TTS — same fallback.
-          browserSpeak(replyText, 1, async () => {
-            if (cancelled) return;
-            const preloaded = await nextListenPreload;
-            listenOnce(preloaded ?? undefined);
-          });
+          if (!cancelled) fallbackToBrowser();
         });
     }
 
