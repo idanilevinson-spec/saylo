@@ -6,6 +6,17 @@ workflows:
     integrations:
       app_store_connect: saylo_asc_key
     environment:
+      # CERTIFICATE_PRIVATE_KEY lives in the "appstore_credentials" group,
+      # set up in Codemagic's UI (Team settings -> Environment variables) —
+      # not in this file, since it's a secret. Required for the "Set up
+      # code signing" step below: fetch-signing-files --create needs an RSA
+      # private key to build the certificate's CSR from, and reads it from
+      # this exact env var name automatically if it isn't passed as a flag.
+      # Without it, fetch-signing-files fails with "Cannot save Signing
+      # Certificates without certificate private key" and every downstream
+      # signing option comes back empty.
+      groups:
+        - appstore_credentials
       vars:
         BUNDLE_ID: com.saylolearn.app
         XCODE_PROJECT: "ios/App/App.xcodeproj"
