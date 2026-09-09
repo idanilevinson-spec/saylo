@@ -46,7 +46,7 @@ export default function PricingCards() {
             whileHover={{ y: -3 }}
             className={`relative overflow-hidden rounded-lg p-6 border flex flex-col transition-shadow hover:shadow-lg hover:shadow-primary/5 ${
               plan.badge
-                ? "border-primary bg-card shadow-xl shadow-primary/10 lg:-translate-y-2"
+                ? "pt-14 border-primary bg-card shadow-xl shadow-primary/10 lg:-translate-y-2"
                 : "border-card-border bg-card"
             }`}
           >
