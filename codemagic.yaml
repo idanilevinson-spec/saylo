@@ -57,4 +57,12 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        submit_to_testflight: true
+        # Internal-only distribution: goes straight to the "Internal"
+        # TestFlight group with no Apple review step at all. Apple's beta
+        # review (submit_to_testflight: true) is only required to reach
+        # EXTERNAL testers — for an internal group it adds nothing but
+        # failure modes: missing-metadata rejections, and only one build
+        # account-wide allowed "in review" at a time, which blocked every
+        # later build behind whichever one submitted first.
+        beta_groups:
+          - Internal
