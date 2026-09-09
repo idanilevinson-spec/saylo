@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Hand, Trophy, Zap } from "lucide-react";
+import { Hand, Trophy, Zap, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
@@ -294,8 +294,15 @@ export default function WordCatchPage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">תפוס את המילה הושלם!</h1>
-        <p className="mt-2 text-3xl font-bold text-accent-hover">{score} נקודות</p>
-        <p className="mt-2 text-muted">
+        <motion.p
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
+          className="mt-4 text-5xl font-black text-accent-hover"
+        >
+          {score}
+        </motion.p>
+        <p className="mt-1 text-muted">
           {caughtRef.current} מתוך {TOTAL_ROUNDS} תפוסות ({accuracy}%)
           {streakBonus > 0 && <> · +{streakBonus} XP בונוס רצף</>}
         </p>
@@ -350,7 +357,15 @@ export default function WordCatchPage() {
           <p className="text-sm text-muted">
             גל {waveIndex + 1} מתוך {WAVE_COUNT} · מילה {roundInWave + 1} מתוך {WAVE_SIZE}
           </p>
-          <p className="text-sm font-bold text-accent-hover">{score} נק&apos;</p>
+          <motion.span
+            key={score}
+            initial={{ scale: 1.3 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", bounce: 0.6, duration: 0.4 }}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent-hover font-bold text-base"
+          >
+            <Zap size={16} className="fill-current" /> {score}
+          </motion.span>
         </div>
 
         <div className="relative h-96 rounded-lg border border-card-border bg-background-2 overflow-hidden">
@@ -402,7 +417,14 @@ export default function WordCatchPage() {
         </p>
 
         {result && (
-          <p role="status" className={`mt-4 text-center text-sm ${result === "caught" ? "text-success" : "text-danger"}`}>
+          <motion.p
+            role="status"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
+            className={`mt-4 flex items-center justify-center gap-1.5 text-lg font-bold ${result === "caught" ? "text-success" : "text-danger"}`}
+          >
+            {result === "caught" ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
             {result === "caught" ? (
               "תפסתם נכון!"
             ) : (
@@ -410,7 +432,7 @@ export default function WordCatchPage() {
                 <EnglishText>{item.headword}</EnglishText> = {item.translationHe}
               </>
             )}
-          </p>
+          </motion.p>
         )}
       </div>
     </HeartsGate>

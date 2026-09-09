@@ -302,8 +302,16 @@ export default function MatchGamePage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">משחק ההתאמה הושלם!</h1>
-        <p className="mt-2 text-muted">
-          {correctCountRef.current} התאמות נכונות מתוך {totalAttemptsRef.current} ({accuracy}%)
+        <motion.p
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
+          className="mt-4 text-5xl font-black text-accent-hover"
+        >
+          {accuracy}%
+        </motion.p>
+        <p className="mt-1 text-muted">
+          {correctCountRef.current} התאמות נכונות מתוך {totalAttemptsRef.current}
         </p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
           <MotionLink

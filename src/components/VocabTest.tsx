@@ -212,11 +212,19 @@ export default function VocabTest({ steps }: VocabTestProps) {
       <div className="max-w-xl mx-auto px-4 py-12 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">המבחן הושלם!</h1>
-        <p className="mt-2 text-muted">
+        <motion.p
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
+          className="mt-4 text-5xl font-black text-accent-hover"
+        >
+          {accuracy}%
+        </motion.p>
+        <p className="mt-1 text-muted">
           <EnglishText as="span" className="font-bold">
             {correctCount}/{outcomes.length}
           </EnglishText>{" "}
-          נכונות ({accuracy}%)
+          נכונות
         </p>
 
         <div className="mt-6 space-y-3 text-right">
@@ -410,15 +418,18 @@ export default function VocabTest({ steps }: VocabTestProps) {
 
             {answeredThisStep && lastCorrect !== null && (
               <>
-                <div
+                <motion.div
                   role="status"
-                  className={`mt-4 flex items-center justify-center gap-1.5 text-sm font-medium ${
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
+                  className={`mt-4 flex items-center justify-center gap-1.5 text-lg font-bold ${
                     lastCorrect ? "text-success" : "text-danger"
                   }`}
                 >
-                  {lastCorrect ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                  {lastCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
                   {lastCorrect ? "תשובה נכונה!" : "לא בדיוק"}
-                </div>
+                </motion.div>
                 {!lastCorrect && outcomes.length > 0 && (
                   <p className="mt-1 text-center text-sm text-danger">
                     התשובה הנכונה:{" "}

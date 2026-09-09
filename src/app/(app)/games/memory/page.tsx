@@ -142,9 +142,15 @@ export default function MemoryGamePage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">משחק הזיכרון הושלם!</h1>
-        <p className="mt-2 text-muted">
-          מצאתם את כל {pairTotal} הזוגות ב-<EnglishText as="span">{comparisons}</EnglishText> ניסיונות
-        </p>
+        <motion.p
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
+          className="mt-4 text-5xl font-black text-accent-hover"
+        >
+          <EnglishText as="span">{comparisons}</EnglishText>
+        </motion.p>
+        <p className="mt-1 text-muted">ניסיונות למצוא את כל {pairTotal} הזוגות</p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
           <MotionLink
             whileHover={{ scale: 1.02 }}
