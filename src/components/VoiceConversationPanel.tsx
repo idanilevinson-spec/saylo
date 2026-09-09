@@ -38,6 +38,13 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   const [restartTick, setRestartTick] = useState(0);
   const [voicePref, setVoicePref] = useState<VoicePref>(() => loadVoicePref());
   const [viseme, setViseme] = useState<number | undefined>(undefined);
+  // TEMPORARY: on-screen trace for diagnosing silent playback on-device,
+  // where there's no way to see the console. Remove once the voice call's
+  // audio is confirmed working. Capped so a long call doesn't grow forever.
+  const [debugLog, setDebugLog] = useState<string[]>([]);
+  function logDebug(line: string) {
+    setDebugLog((prev) => [...prev.slice(-11), `${new Date().toISOString().slice(11, 19)} ${line}`]);
+  }
   const silentTurnsRef = useRef(0);
   const voicePrefRef = useRef<VoicePref>(voicePref);
   // Tracks whichever recognizer is currently listening, so the effect's
@@ -157,6 +164,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     }
 
     function speakReply(replyText: string) {
+      logDebug(`speakReply start, len=${replyText.length}`);
       setState("speaking");
       // No live viseme data yet for this turn — the avatar falls back to
       // its decorative loop until the first visemeReceived event (Azure
@@ -168,6 +176,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       const nextListenPreload = loadCredentials().catch(() => null);
 
       const fallbackToBrowser = async () => {
+        logDebug("fallbackToBrowser: using window.speechSynthesis");
         browserSpeak(replyText, 1, async () => {
           if (cancelled) return;
           const preloaded = await nextListenPreload;
@@ -178,6 +187,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       loadCredentials()
         .then(({ token, region, sdk }) => {
           if (cancelled) return;
+          logDebug("credentials OK, building SpeechSynthesizer");
           const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(token, region);
           speechConfig.speechSynthesisVoiceName = NEURAL_VOICE[voicePrefRef.current];
           speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
@@ -205,6 +215,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
             replyText,
             async (result) => {
               synthesizer.close();
+              logDebug(`speakTextAsync done, reason=${result.reason}, bytes=${result.audioData?.byteLength ?? 0}`);
               if (cancelled) return;
               if (result.reason !== sdk.ResultReason.SynthesizingAudioCompleted || !result.audioData?.byteLength) {
                 fallbackToBrowser();
@@ -214,30 +225,38 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
               const objectUrl = URL.createObjectURL(blob);
               const audio = new Audio(objectUrl);
               const advance = async () => {
+                logDebug("audio.onended fired");
                 URL.revokeObjectURL(objectUrl);
                 if (cancelled) return;
                 const preloaded = await nextListenPreload;
                 listenOnce(preloaded ?? undefined);
               };
               audio.onended = advance;
-              audio.onerror = () => {
+              audio.onerror = (e) => {
+                logDebug(`audio.onerror: ${JSON.stringify(e)}`);
                 URL.revokeObjectURL(objectUrl);
                 if (!cancelled) fallbackToBrowser();
               };
-              audio.play().catch(() => {
-                URL.revokeObjectURL(objectUrl);
-                if (!cancelled) fallbackToBrowser();
-              });
+              audio
+                .play()
+                .then(() => logDebug("audio.play() resolved"))
+                .catch((err) => {
+                  logDebug(`audio.play() rejected: ${err?.name ?? err}`);
+                  URL.revokeObjectURL(objectUrl);
+                  if (!cancelled) fallbackToBrowser();
+                });
             },
-            () => {
+            (err) => {
               synthesizer.close();
+              logDebug(`speakTextAsync error callback: ${err}`);
               // Azure TTS failed mid-flight — fall back to the free browser
               // voice rather than breaking the call.
               if (!cancelled) fallbackToBrowser();
             }
           );
         })
-        .catch(() => {
+        .catch((err) => {
+          logDebug(`loadCredentials failed: ${err}`);
           // Couldn't even get a token for TTS — same fallback.
           if (!cancelled) fallbackToBrowser();
         });
@@ -366,6 +385,18 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       >
         <Keyboard size={13} /> להמשיך בהקלדה בלי לסיים
       </button>
+
+      {/* TEMPORARY debug trace — remove once silent playback is fixed. */}
+      {debugLog.length > 0 && (
+        <div
+          dir="ltr"
+          className="mt-4 w-full max-w-sm rounded-lg bg-background-2 border border-card-border p-3 text-[10px] font-mono text-muted text-left overflow-x-auto"
+        >
+          {debugLog.map((line, i) => (
+            <div key={i}>{line}</div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
