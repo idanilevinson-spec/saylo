@@ -115,8 +115,18 @@ body {
   font-family: var(--font-rubik), Arial, Helvetica, sans-serif;
   min-height: 100vh;
   padding-bottom: env(safe-area-inset-bottom);
+  /* Info.plist explicitly allows landscape rotation, where the safe area
+     that matters shifts to the left/right edge (notch/Dynamic Island)
+     instead of top/bottom — covered here too, not just portrait's top/bottom. */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   transition: background-color 0.2s ease, color 0.2s ease;
   position: relative;
+  /* Every interactive element already gets its own deliberate hover/press
+     feedback (color change, whileTap scale, etc.) — iOS Safari/WKWebView's
+     default gray tap-flash on links and buttons fights with that, showing
+     briefly as a second, uncoordinated flash. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Two language tracks stacked, never merged — English (primary/blue) above,

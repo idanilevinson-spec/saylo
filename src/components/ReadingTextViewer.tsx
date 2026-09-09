@@ -138,7 +138,11 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord }: ReadingTextVi
             </div>
             <p className="mt-1">{popover.entry.translation_he}</p>
           </div>
-          <button onClick={() => setPopover(null)} aria-label="סגירה" className="text-muted hover:text-foreground">
+          <button
+            onClick={() => setPopover(null)}
+            aria-label="סגירה"
+            className="p-1.5 -m-1.5 rounded-lg shrink-0 text-muted hover:text-foreground hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          >
             <X size={16} />
           </button>
         </div>
