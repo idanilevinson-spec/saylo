@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -8,6 +9,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+
+        // Without this, WKWebView audio uses iOS's default "ambient" audio
+        // session category, which is silenced by the hardware mute switch
+        // and can't play back at all while something (Azure Speech
+        // recognizeOnceAsync) has the mic open for input — exactly the
+        // combination the AI Teacher voice call needs simultaneously.
+        // playAndRecord lets record + playback coexist and ignores the
+        // mute switch; defaultToSpeaker keeps replies audible on the
+        // speaker instead of the quiet earpiece.
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP])
+            try session.setActive(true)
+        } catch {
+            print("Failed to configure AVAudioSession: \(error)")
+        }
+
         return true
     }
 
