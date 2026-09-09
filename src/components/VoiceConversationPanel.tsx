@@ -33,6 +33,38 @@ const MAX_SILENT_RETRIES = 3;
 // import gap after "מקשיבים לכם..." appears is enough to clip the very
 // start of what the user says.
 export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, canEnd }: VoiceConversationPanelProps) {
+  // The call doesn't auto-start: iOS Safari/WKWebView only allows
+  // audio.play() when it's traceable to a real, synchronous tap. Every
+  // reply plays several async hops after the user's last tap (recognized
+  // speech -> network round-trip to Claude -> synthesis), which is exactly
+  // what gets silently rejected with NotAllowedError — confirmed via the
+  // on-screen debug trace below on a real device. The fix is the standard
+  // one for this restriction: require one explicit tap to begin, use that
+  // tap to "bless" a single reusable <audio> element by playing a silent
+  // clip on it, then reuse that same already-blessed element for every
+  // reply for the rest of the call — WebKit permits repeat programmatic
+  // playback on an element once it's been unlocked by a real gesture, with
+  // no fresh gesture needed per turn.
+  const [started, setStarted] = useState(false);
+  const audioElRef = useRef<HTMLAudioElement | null>(null);
+  const SILENT_CLIP =
+    "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAAABkYXRhAAAAAA==";
+
+  function startCall() {
+    const audio = new Audio(SILENT_CLIP);
+    audio
+      .play()
+      .then(() => audio.pause())
+      .catch(() => {
+        // Even if this particular play() is rejected, the element itself is
+        // still the one that received a play() call inside a real tap —
+        // reusing it later is what matters, not whether this exact call
+        // resolved.
+      });
+    audioElRef.current = audio;
+    setStarted(true);
+  }
+
   const [state, setState] = useState<CallState>("connecting");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [restartTick, setRestartTick] = useState(0);
@@ -72,6 +104,8 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
   useEffect(() => {
     let cancelled = false;
+
+    if (!started) return;
 
     if (ending) {
       // The parent is scoring/closing the conversation — stop the loop
@@ -223,7 +257,11 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
               }
               const blob = new Blob([result.audioData], { type: "audio/mpeg" });
               const objectUrl = URL.createObjectURL(blob);
-              const audio = new Audio(objectUrl);
+              // Reuse the single <audio> element blessed by the user's tap
+              // in startCall() — a fresh `new Audio()` here would be exactly
+              // the un-blessed, gesture-less element WebKit rejects.
+              const audio = audioElRef.current ?? new Audio();
+              audioElRef.current = audio;
               const advance = async () => {
                 logDebug("audio.onended fired");
                 URL.revokeObjectURL(objectUrl);
@@ -237,6 +275,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
                 URL.revokeObjectURL(objectUrl);
                 if (!cancelled) fallbackToBrowser();
               };
+              audio.src = objectUrl;
               audio
                 .play()
                 .then(() => logDebug("audio.play() resolved"))
@@ -270,7 +309,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       if (activeRecognizerRef.current) safeClose(activeRecognizerRef.current);
       activeRecognizerRef.current = null;
     };
-  }, [onSend, restartTick, ending]);
+  }, [onSend, restartTick, ending, started]);
 
   function resume() {
     silentTurnsRef.current = 0;
@@ -287,6 +326,54 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     : state === "listening" || state === "thinking" || state === "speaking" || state === "error"
       ? state
       : "idle";
+
+  if (!started) {
+    return (
+      <div className="relative flex flex-col items-center justify-center gap-7 py-12 px-4 overflow-hidden">
+        <div className="flex items-center gap-1.5 p-1 rounded-full bg-background-2 border border-card-border">
+          <button
+            onClick={() => selectVoice("female")}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              voicePref === "female" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
+            }`}
+          >
+            קול נשי
+          </button>
+          <button
+            onClick={() => selectVoice("male")}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              voicePref === "male" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
+            }`}
+          >
+            קול גברי
+          </button>
+        </div>
+
+        <SayloAvatar expression="idle" gender={voicePref} size={224} />
+
+        <p className="text-xl sm:text-2xl font-semibold text-center px-4">מוכנים לשיחה?</p>
+        <p className="text-sm text-muted text-center px-4 max-w-xs">
+          לחצו כדי להתחיל — יש לאשר גישה למיקרופון כשיתבקש.
+        </p>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={startCall}
+          className="px-8 py-4 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+        >
+          התחילו שיחה
+        </motion.button>
+
+        <button
+          onClick={onExit}
+          className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors"
+        >
+          <Keyboard size={13} /> להמשיך בהקלדה בלי לסיים
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex flex-col items-center justify-center gap-7 py-12 px-4 overflow-hidden">
