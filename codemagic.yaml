@@ -55,14 +55,13 @@ workflows:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
     publishing:
+      # Just the upload, nothing else. An Internal Testing group (unlike a
+      # Beta Group) isn't something a build can be explicitly assigned to
+      # via this API at all — "Enable automatic distribution", checked when
+      # the "Internal" group was created in App Store Connect, is what
+      # actually gets every processed build to internal testers automatically.
+      # submit_to_testflight/beta_groups both belong to Apple's EXTERNAL
+      # review flow, which is not in use here and was the cause of every
+      # prior failure (missing metadata, one-build-in-review-at-a-time).
       app_store_connect:
         auth: integration
-        # Internal-only distribution: goes straight to the "Internal"
-        # TestFlight group with no Apple review step at all. Apple's beta
-        # review (submit_to_testflight: true) is only required to reach
-        # EXTERNAL testers — for an internal group it adds nothing but
-        # failure modes: missing-metadata rejections, and only one build
-        # account-wide allowed "in review" at a time, which blocked every
-        # later build behind whichever one submitted first.
-        beta_groups:
-          - Internal
