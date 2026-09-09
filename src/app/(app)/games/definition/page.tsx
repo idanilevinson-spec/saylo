@@ -89,9 +89,15 @@ export default function DefinitionGamePage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">זיהוי לפי הגדרה הושלם!</h1>
-        <p className="mt-2 text-muted">
-          {correctCount} מתוך {items.length} נכונות ({accuracy}%)
-        </p>
+        <motion.p
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
+          className="mt-4 text-5xl font-black text-accent-hover"
+        >
+          {accuracy}%
+        </motion.p>
+        <p className="mt-2 text-muted">{correctCount} מתוך {items.length} נכונות</p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
           <MotionLink
             whileHover={{ scale: 1.02 }}
@@ -163,9 +169,16 @@ export default function DefinitionGamePage() {
           </div>
 
           {wasCorrect !== null && (
-            <p role="status" className={`mt-4 font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
+            <motion.p
+              role="status"
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
+              className={`mt-4 flex items-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
+            >
+              {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
               {wasCorrect ? "כל הכבוד!" : `לא בדיוק — המילה היא "${item.headword}" (${item.translationHe})`}
-            </p>
+            </motion.p>
           )}
         </motion.div>
       </div>

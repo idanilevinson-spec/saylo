@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { PenTool, Trophy } from "lucide-react";
+import { PenTool, Trophy, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
@@ -95,9 +95,15 @@ export default function SpellingChallengePage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">אתגר האיות הושלם!</h1>
-        <p className="mt-2 text-muted">
-          {correctCount} מתוך {items.length} נכונות ({accuracy}%)
-        </p>
+        <motion.p
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
+          className="mt-4 text-5xl font-black text-accent-hover"
+        >
+          {accuracy}%
+        </motion.p>
+        <p className="mt-2 text-muted">{correctCount} מתוך {items.length} נכונות</p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
           <MotionLink
             whileHover={{ scale: 1.02 }}
@@ -165,9 +171,16 @@ export default function SpellingChallengePage() {
           />
 
           {wasCorrect !== null && (
-            <p role="status" className={`mt-4 font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
+            <motion.p
+              role="status"
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
+              className={`mt-4 flex items-center justify-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
+            >
+              {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
               {wasCorrect ? "כל הכבוד!" : `לא בדיוק — המילה היא "${item.headword}"`}
-            </p>
+            </motion.p>
           )}
 
           {!locked && (

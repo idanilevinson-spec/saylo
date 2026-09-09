@@ -145,8 +145,16 @@ export default function SpeedRoundPage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">סיבוב מהירות הושלם!</h1>
+        <motion.p
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
+          className="mt-4 text-5xl font-black text-accent-hover"
+        >
+          {accuracy}%
+        </motion.p>
         <p className="mt-2 text-muted">
-          {correctCount} מתוך {items.length} נכונות ({accuracy}%)
+          {correctCount} מתוך {items.length} נכונות
           {bonusXp > 0 && <> · +{bonusXp} XP בונוס מהירות</>}
         </p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
@@ -178,13 +186,19 @@ export default function SpeedRoundPage() {
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-12">
         <h1 className="sr-only">סיבוב מהירות</h1>
-        <div className="flex items-center justify-between text-sm text-muted mb-2">
-          <span>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm text-muted">
             שאלה {index + 1} מתוך {items.length}
           </span>
-          <span className="flex items-center gap-1 font-bold text-accent-hover">
-            <Zap size={14} /> {correctCount}
-          </span>
+          <motion.span
+            key={correctCount}
+            initial={{ scale: 1.3 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", bounce: 0.6, duration: 0.4 }}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent-hover font-bold text-base"
+          >
+            <Zap size={16} className="fill-current" /> {correctCount}
+          </motion.span>
         </div>
         <QuestionTimer key={`timer-${index}`} locked={locked} onTimeout={() => submitAnswer(-1)} />
 
@@ -223,9 +237,16 @@ export default function SpeedRoundPage() {
           </div>
 
           {wasCorrect !== null && (
-            <p role="status" className={`mt-4 font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
+            <motion.p
+              role="status"
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
+              className={`mt-4 flex items-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
+            >
+              {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
               {wasCorrect ? "כל הכבוד!" : timedOut ? "נגמר הזמן!" : "לא בדיוק"}
-            </p>
+            </motion.p>
           )}
         </motion.div>
       </div>

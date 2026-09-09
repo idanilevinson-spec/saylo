@@ -203,9 +203,15 @@ function LearnModePageInner() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">סבב הלמידה הושלם!</h1>
-        <p className="mt-2 text-muted">
-          {masteredWords.length} מתוך {total} מילים הגיעו לשליטה מלאה
-        </p>
+        <motion.p
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
+          className="mt-4 text-5xl font-black text-accent-hover"
+        >
+          {masteredWords.length}/{total}
+        </motion.p>
+        <p className="mt-2 text-muted">מילים הגיעו לשליטה מלאה</p>
         {masteredWords.length > 0 && (
           <div className="mt-6 flex flex-wrap justify-center gap-2">
             {masteredWords.map((w) => (
@@ -248,13 +254,19 @@ function LearnModePageInner() {
     <HeartsGate>
       <div className="max-w-3xl mx-auto px-4 py-10">
         <h1 className="sr-only">סבב הלמידה</h1>
-        <div className="flex items-center justify-between text-sm text-muted mb-6">
-          <span>
+        <div className="flex items-center justify-between mb-6">
+          <span className="text-sm text-muted">
             {masteredWords.length} מתוך {total} מילים בשליטה
           </span>
-          <span className="flex items-center gap-1 font-bold text-accent-hover">
-            <Sparkles size={14} /> {correctCount}
-          </span>
+          <motion.span
+            key={correctCount}
+            initial={{ scale: 1.3 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", bounce: 0.6, duration: 0.4 }}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent-hover font-bold text-base"
+          >
+            <Sparkles size={16} className="fill-current" /> {correctCount}
+          </motion.span>
         </div>
 
         <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
@@ -353,13 +365,20 @@ function LearnModePageInner() {
               )}
 
               {wasCorrect !== null && (
-                <p role="status" className={`mt-4 text-center font-medium ${wasCorrect ? "text-success" : "text-danger"}`}>
+                <motion.p
+                  role="status"
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
+                  className={`mt-4 flex items-center justify-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
+                >
+                  {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
                   {wasCorrect
                     ? "כל הכבוד!"
                     : question.type === "recall"
                       ? `לא בדיוק — המילה היא "${question.item.headword}"`
                       : "לא בדיוק"}
-                </p>
+                </motion.p>
               )}
             </motion.div>
           )}
