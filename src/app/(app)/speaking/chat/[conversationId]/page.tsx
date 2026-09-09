@@ -63,7 +63,7 @@ function SpeakingChatInner() {
         const res = await fetch("/api/ai/conversation", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ conversationId, message: text }),
+          body: JSON.stringify({ conversationId, message: text, voiceMode }),
         });
         if (!res.ok) throw new Error("failed");
         const { reply } = await res.json();
@@ -78,7 +78,7 @@ function SpeakingChatInner() {
         return null;
       }
     },
-    [conversationId, profile]
+    [conversationId, profile, voiceMode]
   );
 
   async function handleSend() {

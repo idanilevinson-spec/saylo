@@ -15,9 +15,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
   }
 
-  const { conversationId, message } = (await request.json()) as {
+  const { conversationId, message, voiceMode } = (await request.json()) as {
     conversationId?: string;
     message?: string;
+    voiceMode?: boolean;
   };
   if (!conversationId || !message?.trim()) {
     return NextResponse.json({ error: "missing conversationId or message" }, { status: 400 });
@@ -56,11 +57,15 @@ export async function POST(request: Request) {
     .limit(1)
     .maybeSingle();
 
+  // Voice calls are read aloud turn-by-turn, so a web search's round-trip
+  // (up to two, per the tool's max_uses) is what turns a snappy back-and-forth
+  // into a laggy one — text chat keeps the tool since a few extra seconds is
+  // invisible there.
   const claudeMessage = await anthropic.messages.create({
     model: CLAUDE_MODEL,
     max_tokens: 550,
-    system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null),
-    tools: [{ type: "web_search_20260318", name: "web_search", max_uses: 2 }],
+    system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode),
+    ...(voiceMode ? {} : { tools: [{ type: "web_search_20260318" as const, name: "web_search", max_uses: 2 }] }),
     messages: (history ?? []).map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("assistant" as const),
       content: m.content,

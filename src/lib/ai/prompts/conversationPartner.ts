@@ -25,11 +25,19 @@ const TEACHING_DEPTH_NOTE =
 
 export function buildConversationSystemPrompt(
   scenarioSystemPrompt: string | null,
-  startingLevel: string | null = null
+  startingLevel: string | null = null,
+  // Live voice calls are read out loud turn-by-turn, so pacing itself is
+  // part of the experience — a web search adds a real round-trip (and up
+  // to two of them) before any reply, which barely registers in a typed
+  // chat but breaks the "phone call" feel completely. Text chat keeps the
+  // tool; voice mode drops both the instruction and (in the route) the
+  // tool definition itself.
+  allowWebSearch = true
 ): string {
   const adaptiveLevelNote = buildAdaptiveLevelNote(startingLevel);
+  const webSearchNote = allowWebSearch ? ` ${WEB_SEARCH_NOTE}` : "";
   if (!scenarioSystemPrompt) {
-    return `You are a friendly, encouraging English conversation partner and tutor, chatting with a Hebrew-speaking learner who wants to practice English. Speak only in English. Keep replies short (1-5 sentences) and conversational, like a real chat — ask follow-up questions to keep the conversation going. ${TEACHING_DEPTH_NOTE} ${adaptiveLevelNote} ${WEB_SEARCH_NOTE} ${SAFETY_NOTE}`;
+    return `You are a friendly, encouraging English conversation partner and tutor, chatting with a Hebrew-speaking learner who wants to practice English. Speak only in English. Keep replies short (1-5 sentences) and conversational, like a real chat — ask follow-up questions to keep the conversation going. ${TEACHING_DEPTH_NOTE} ${adaptiveLevelNote}${webSearchNote} ${SAFETY_NOTE}`;
   }
-  return `${scenarioSystemPrompt}\n\nStay in character for this role-play. Speak only in English. Keep replies short (1-5 sentences) and natural. ${TEACHING_DEPTH_NOTE} ${adaptiveLevelNote} ${WEB_SEARCH_NOTE} ${SAFETY_NOTE}`;
+  return `${scenarioSystemPrompt}\n\nStay in character for this role-play. Speak only in English. Keep replies short (1-5 sentences) and natural. ${TEACHING_DEPTH_NOTE} ${adaptiveLevelNote}${webSearchNote} ${SAFETY_NOTE}`;
 }
