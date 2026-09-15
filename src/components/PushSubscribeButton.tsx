@@ -77,10 +77,13 @@ export default function PushSubscribeButton() {
     // happen from inside that callback, not right after calling register().
     const registered = await new Promise<boolean>((resolve) => {
       PushNotifications.addListener("registration", async (token) => {
-        await supabase
+        const { error } = await supabase
           .from("device_push_tokens")
           .upsert({ profile_id: profile.id, token: token.value, platform: "ios" }, { onConflict: "token" });
-        resolve(true);
+        // A save failure here (e.g. the table not existing yet) must not
+        // report success — this exact silent-failure shape is what made a
+        // real missing-migration bug look like a working subscription.
+        resolve(!error);
       });
       PushNotifications.addListener("registrationError", () => resolve(false));
       PushNotifications.register();
