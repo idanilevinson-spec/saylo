@@ -3,10 +3,21 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Bell, BellOff } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
+import { PushNotifications } from "@capacitor/push-notifications";
 import { supabase } from "@/lib/supabase/browserClient";
 import { useAuth } from "@/context/AuthProvider";
 
 type Status = "unsupported" | "loading" | "off" | "on" | "denied";
+
+// The native iOS app can't use Web Push at all (iOS's WKWebView doesn't
+// implement the Push API there), so this button does something entirely
+// different when running inside Capacitor: talk to Apple Push Notification
+// service via @capacitor/push-notifications and store the device token in
+// device_push_tokens, instead of subscribing through the browser's
+// PushManager into push_subscriptions. Same button, same on/off language —
+// the split only matters inside enable()/disable()/checkStatus().
+const isNative = Capacitor.isNativePlatform();
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -21,6 +32,22 @@ export default function PushSubscribeButton() {
 
   useEffect(() => {
     async function checkStatus() {
+      if (isNative) {
+        const { receive } = await PushNotifications.checkPermissions();
+        if (receive === "denied") {
+          setStatus("denied");
+          return;
+        }
+        // No per-token "is this device currently subscribed" check exists
+        // on the native side the way pushManager.getSubscription() gives
+        // one for web — granted-but-not-yet-registered and granted-and-
+        // registered look the same to checkPermissions(), so "granted"
+        // reads as already on. A stale row (app deleted and reinstalled)
+        // self-corrects: sendApnsPush() clears it on the first 410.
+        setStatus(receive === "granted" ? "on" : "off");
+        return;
+      }
+
       if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
         setStatus("unsupported");
         return;
@@ -36,7 +63,34 @@ export default function PushSubscribeButton() {
     checkStatus();
   }, []);
 
+  async function enableNative() {
+    if (!profile) return;
+
+    const permission = await PushNotifications.requestPermissions();
+    if (permission.receive !== "granted") {
+      setStatus("denied");
+      return;
+    }
+
+    // register() only asks APNs for a token — the actual token arrives
+    // asynchronously via the "registration" listener, so the insert has to
+    // happen from inside that callback, not right after calling register().
+    const registered = await new Promise<boolean>((resolve) => {
+      PushNotifications.addListener("registration", async (token) => {
+        await supabase
+          .from("device_push_tokens")
+          .upsert({ profile_id: profile.id, token: token.value, platform: "ios" }, { onConflict: "token" });
+        resolve(true);
+      });
+      PushNotifications.addListener("registrationError", () => resolve(false));
+      PushNotifications.register();
+    });
+
+    setStatus(registered ? "on" : "denied");
+  }
+
   async function enable() {
+    if (isNative) return enableNative();
     if (!profile) return;
     const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
     if (!publicKey) {
@@ -68,6 +122,16 @@ export default function PushSubscribeButton() {
   }
 
   async function disable() {
+    if (isNative) {
+      // Apple has no client-side "unsubscribe" the way Web Push does —
+      // system-level notification permission can only be revoked from iOS
+      // Settings. Deleting our own stored token is what actually stops
+      // this device from receiving reminders, which is the part in this
+      // app's control.
+      if (profile) await supabase.from("device_push_tokens").delete().eq("profile_id", profile.id);
+      setStatus("off");
+      return;
+    }
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.getSubscription();
     if (subscription) {
@@ -80,7 +144,13 @@ export default function PushSubscribeButton() {
   if (status === "unsupported" || status === "loading") return null;
 
   if (status === "denied") {
-    return <p className="text-sm text-muted">התראות חסומות בדפדפן — ניתן לאפשר בהגדרות האתר.</p>;
+    return (
+      <p className="text-sm text-muted">
+        {isNative
+          ? "התראות חסומות — ניתן לאפשר בהגדרות המכשיר עבור Saylo."
+          : "התראות חסומות בדפדפן — ניתן לאפשר בהגדרות האתר."}
+      </p>
+    );
   }
 
   return (

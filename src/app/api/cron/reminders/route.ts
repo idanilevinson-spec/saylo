@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { sendStreakReminderEmail } from "@/lib/notifications/resend";
 import { sendPushNotification } from "@/lib/notifications/webpush";
+import { sendApnsPush } from "@/lib/notifications/apns";
 
 // Daily job (see vercel.json) — reminds anyone with an active streak who
 // hasn't practiced yet today, at most once per day. Runs with the
@@ -45,20 +46,37 @@ export async function GET(request: Request) {
     }
 
     if (profile.push_reminders_enabled) {
+      const pushPayload = {
+        title: "אל תשברו את הרצף! 🔥",
+        body: `${streak.current_streak} ימים ברצף — 5 דקות מספיקות כדי לשמור עליו`,
+        url: "/dashboard",
+      };
+
       const { data: subs } = await supabaseAdmin
         .from("push_subscriptions")
         .select("*")
         .eq("profile_id", streak.profile_id);
 
       for (const sub of subs ?? []) {
-        const result = await sendPushNotification(sub, {
-          title: "אל תשברו את הרצף! 🔥",
-          body: `${streak.current_streak} ימים ברצף — 5 דקות מספיקות כדי לשמור עליו`,
-          url: "/dashboard",
-        });
+        const result = await sendPushNotification(sub, pushPayload);
         if (result.ok) remindedPush++;
         if (result.expired) {
           await supabaseAdmin.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+        }
+      }
+
+      // Web Push doesn't work inside the iOS app's WKWebView — this is the
+      // separate APNs path for device tokens registered from there.
+      const { data: deviceTokens } = await supabaseAdmin
+        .from("device_push_tokens")
+        .select("*")
+        .eq("profile_id", streak.profile_id);
+
+      for (const device of deviceTokens ?? []) {
+        const result = await sendApnsPush(device.token, pushPayload);
+        if (result.ok) remindedPush++;
+        if (result.expired) {
+          await supabaseAdmin.from("device_push_tokens").delete().eq("token", device.token);
         }
       }
     }

@@ -432,6 +432,14 @@ export interface PushSubscriptionRow {
   created_at: string;
 }
 
+export interface DevicePushTokenRow {
+  id: string;
+  profile_id: string;
+  platform: string;
+  token: string;
+  created_at: string;
+}
+
 export interface Hearts {
   profile_id: string;
   current_hearts: number;
@@ -662,6 +670,11 @@ export interface Database {
         Row: PushSubscriptionRow;
         Insert: Partial<PushSubscriptionRow> & Pick<PushSubscriptionRow, "profile_id" | "endpoint" | "p256dh" | "auth">;
         Update: Partial<PushSubscriptionRow>;
+      };
+      device_push_tokens: {
+        Row: DevicePushTokenRow;
+        Insert: Partial<DevicePushTokenRow> & Pick<DevicePushTokenRow, "profile_id" | "token">;
+        Update: Partial<DevicePushTokenRow>;
       };
     };
   };
