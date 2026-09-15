@@ -5,6 +5,7 @@ import { buildConversationScoringPrompt, type TranscriptTurn } from "@/lib/ai/pr
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { setSkillLevelFromScore } from "@/lib/assessment/skillLevel";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
+import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import type { ConversationFeedback } from "@/types/database";
 
 interface ScoringResult extends ConversationFeedback {
@@ -81,9 +82,11 @@ export async function POST(request: Request) {
       thinking: { type: "disabled" },
       messages: [{ role: "user", content: scoringPrompt }],
     });
-    parsed = parseJsonResponse<ScoringResult>(extractText(retryMessage));
+    const retryRaw = extractText(retryMessage);
+    parsed = parseJsonResponse<ScoringResult>(retryRaw);
     inputTokens += retryMessage.usage.input_tokens;
     outputTokens += retryMessage.usage.output_tokens;
+    if (!parsed) await reportAiParseFailure("conversation-score (after retry)", retryRaw);
   }
 
   parsed = parsed ?? {

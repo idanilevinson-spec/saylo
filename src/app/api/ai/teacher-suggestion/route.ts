@@ -60,9 +60,11 @@ export async function GET() {
 
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    // thinking disabled: on by default, and would silently eat into this
-    // already-tight 150-token budget before any output text is written.
-    max_tokens: 150,
+    // thinking disabled: on by default, and would silently eat into the
+    // token budget before any output text is written. 220 leaves headroom
+    // above the ~110 tokens a real reply typically used at 150 — a Hebrew
+    // sentence or two runs longer in tokens than in visible characters.
+    max_tokens: 220,
     thinking: { type: "disabled" },
     messages: [
       {

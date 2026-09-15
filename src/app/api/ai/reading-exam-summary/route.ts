@@ -8,6 +8,7 @@ import {
 } from "@/lib/ai/prompts/readingExamSummary";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
+import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import type { CefrLevel } from "@/types/database";
 
 interface ExamSummaryResult {
@@ -63,7 +64,9 @@ export async function POST(request: Request) {
   });
   const raw = extractText(message);
 
-  const parsed = parseJsonResponse<ExamSummaryResult>(raw) ?? {
+  const parsedResult = parseJsonResponse<ExamSummaryResult>(raw);
+  if (!parsedResult) await reportAiParseFailure("reading-exam-summary", raw);
+  const parsed = parsedResult ?? {
     summaryHe: "כל הכבוד על סיום המבחן! המשיכו לתרגל קריאה בקצב קבוע.",
   };
 

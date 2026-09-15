@@ -4,6 +4,7 @@ import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/a
 import { buildSpeakingTestResponsePrompt } from "@/lib/ai/prompts/speakingTestResponse";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
+import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import type { CefrLevel } from "@/types/database";
 
 interface SpeakingTestGradeResult {
@@ -57,7 +58,9 @@ export async function POST(request: Request) {
   });
   const raw = extractText(message);
 
-  const parsed = parseJsonResponse<SpeakingTestGradeResult>(raw) ?? {
+  const parsedResult = parseJsonResponse<SpeakingTestGradeResult>(raw);
+  if (!parsedResult) await reportAiParseFailure("speaking-test-response", raw);
+  const parsed = parsedResult ?? {
     score: 0,
     feedbackHe: "אירעה שגיאה בניתוח התשובה של ה-AI. נסו שוב.",
   };

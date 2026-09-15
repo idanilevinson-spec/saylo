@@ -5,6 +5,7 @@ import { buildWritingCoachPrompt } from "@/lib/ai/prompts/writingCoach";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
 import { setSkillLevelFromScore } from "@/lib/assessment/skillLevel";
+import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 
 interface WritingCoachResult {
   overallScore: number;
@@ -61,7 +62,9 @@ export async function POST(request: Request) {
   });
   const raw = extractText(message);
 
-  const parsed = parseJsonResponse<WritingCoachResult>(raw) ?? {
+  const parsedResult = parseJsonResponse<WritingCoachResult>(raw);
+  if (!parsedResult) await reportAiParseFailure("writing-coach", raw);
+  const parsed = parsedResult ?? {
     overallScore: 0,
     feedbackHe: "אירעה שגיאה בניתוח התשובה של ה-AI. נסו לשלוח שוב.",
     improvedVersion: submittedText,

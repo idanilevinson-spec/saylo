@@ -4,6 +4,7 @@ import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/a
 import { buildPlacementSummaryPrompt, type SkillScore } from "@/lib/ai/prompts/placementSummary";
 import { buildWritingCoachPrompt } from "@/lib/ai/prompts/writingCoach";
 import { logAiUsage } from "@/lib/ai/usageLog";
+import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import { cefrLevelFromPercent } from "@/lib/assessment/cefrScoring";
 import type { SkillArea } from "@/types/database";
 
@@ -71,13 +72,18 @@ export async function POST(request: Request) {
       messages: [{ role: "user", content: buildWritingCoachPrompt(PLACEMENT_WRITING_PROMPT, writingSample) }],
     });
     writingUsage = writingMessage.usage;
-    const parsed = parseJsonResponse<{ overallScore?: number }>(extractText(writingMessage));
+    const writingRaw = extractText(writingMessage);
+    const parsed = parseJsonResponse<{ overallScore?: number }>(writingRaw);
     if (parsed) {
       const percentCorrect = Math.max(0, Math.min(100, parsed.overallScore ?? 0));
       scores.push({ skill: "writing", percentCorrect, cefrLevel: cefrLevelFromPercent(percentCorrect) });
+    } else {
+      // The AI didn't return parseable JSON — skip scoring writing rather
+      // than block the rest of the (already-graded) placement result, but
+      // still record it: silently dropping the writing skill from a
+      // placement result is a real degradation worth knowing about.
+      await reportAiParseFailure("placement-summary (writing)", writingRaw);
     }
-    // If the AI didn't return parseable JSON, skip scoring writing rather
-    // than block the rest of the (already-graded) placement result.
   }
 
   const message = await anthropic.messages.create({

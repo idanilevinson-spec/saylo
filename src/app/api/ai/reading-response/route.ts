@@ -5,6 +5,7 @@ import { buildReadingResponsePrompt } from "@/lib/ai/prompts/readingResponse";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
 import { setSkillLevelFromScore } from "@/lib/assessment/skillLevel";
+import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import type { CefrLevel } from "@/types/database";
 
 interface ReadingResponseResult {
@@ -84,7 +85,9 @@ export async function POST(request: Request) {
   });
   const raw = extractText(message);
 
-  const parsed = parseJsonResponse<ReadingResponseResult>(raw) ?? {
+  const parsedResult = parseJsonResponse<ReadingResponseResult>(raw);
+  if (!parsedResult) await reportAiParseFailure("reading-response", raw);
+  const parsed = parsedResult ?? {
     score: 0,
     feedbackHe: "אירעה שגיאה בניתוח התשובה של ה-AI. נסו לשלוח שוב.",
     modelAnswerEn: "",

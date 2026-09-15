@@ -4,6 +4,7 @@ import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/a
 import { buildSpeakingTestQuestionsPrompt } from "@/lib/ai/prompts/speakingTestQuestions";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
+import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import type { CefrLevel } from "@/types/database";
 
 const QUESTION_COUNT = 3;
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
   await logAiUsage(supabase, user.id, "speaking_test_questions", message.usage.input_tokens, message.usage.output_tokens);
 
   if (!parsed?.questions?.length) {
+    await reportAiParseFailure("speaking-test-questions", raw);
     return NextResponse.json({ error: "failed to generate questions" }, { status: 502 });
   }
 
