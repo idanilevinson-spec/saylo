@@ -13,6 +13,7 @@ import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
+import { GameScorePill, GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
 import type { McqContent } from "@/types/exercises";
 
 const QUESTION_SECONDS = 8;
@@ -145,14 +146,7 @@ export default function SpeedRoundPage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">סיבוב מהירות הושלם!</h1>
-        <motion.p
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
-          className="mt-4 text-5xl font-black text-accent-hover"
-        >
-          {accuracy}%
-        </motion.p>
+        <GameCompletionScore>{accuracy}%</GameCompletionScore>
         <p className="mt-2 text-muted">
           {correctCount} מתוך {items.length} נכונות
           {bonusXp > 0 && <> · +{bonusXp} XP בונוס מהירות</>}
@@ -190,15 +184,7 @@ export default function SpeedRoundPage() {
           <span className="text-sm text-muted">
             שאלה {index + 1} מתוך {items.length}
           </span>
-          <motion.span
-            key={correctCount}
-            initial={{ scale: 1.3 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", bounce: 0.6, duration: 0.4 }}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent-hover font-bold text-base"
-          >
-            <Zap size={16} className="fill-current" /> {correctCount}
-          </motion.span>
+          <GameScorePill value={correctCount} icon={Zap} />
         </div>
         <QuestionTimer key={`timer-${index}`} locked={locked} onTimeout={() => submitAnswer(-1)} />
 
@@ -237,16 +223,9 @@ export default function SpeedRoundPage() {
           </div>
 
           {wasCorrect !== null && (
-            <motion.p
-              role="status"
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
-              className={`mt-4 flex items-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
-            >
-              {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
+            <GameFeedback correct={wasCorrect}>
               {wasCorrect ? "כל הכבוד!" : timedOut ? "נגמר הזמן!" : "לא בדיוק"}
-            </motion.p>
+            </GameFeedback>
           )}
         </motion.div>
       </div>

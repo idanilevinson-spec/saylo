@@ -21,6 +21,7 @@ import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
+import { GameScorePill, GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
 
 const POOL_SIZE = 12;
 // Mastering a word needs repetitions to reach 4 (new -> learning -> familiar
@@ -203,14 +204,9 @@ function LearnModePageInner() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">סבב הלמידה הושלם!</h1>
-        <motion.p
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
-          className="mt-4 text-5xl font-black text-accent-hover"
-        >
+        <GameCompletionScore>
           {masteredWords.length}/{total}
-        </motion.p>
+        </GameCompletionScore>
         <p className="mt-2 text-muted">מילים הגיעו לשליטה מלאה</p>
         {masteredWords.length > 0 && (
           <div className="mt-6 flex flex-wrap justify-center gap-2">
@@ -258,15 +254,7 @@ function LearnModePageInner() {
           <span className="text-sm text-muted">
             {masteredWords.length} מתוך {total} מילים בשליטה
           </span>
-          <motion.span
-            key={correctCount}
-            initial={{ scale: 1.3 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", bounce: 0.6, duration: 0.4 }}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent-hover font-bold text-base"
-          >
-            <Sparkles size={16} className="fill-current" /> {correctCount}
-          </motion.span>
+          <GameScorePill value={correctCount} icon={Sparkles} />
         </div>
 
         <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
@@ -365,20 +353,13 @@ function LearnModePageInner() {
               )}
 
               {wasCorrect !== null && (
-                <motion.p
-                  role="status"
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
-                  className={`mt-4 flex items-center justify-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
-                >
-                  {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
+                <GameFeedback correct={wasCorrect} centered>
                   {wasCorrect
                     ? "כל הכבוד!"
                     : question.type === "recall"
                       ? `לא בדיוק — המילה היא "${question.item.headword}"`
                       : "לא בדיוק"}
-                </motion.p>
+                </GameFeedback>
               )}
             </motion.div>
           )}

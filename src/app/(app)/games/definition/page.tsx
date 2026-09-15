@@ -12,6 +12,7 @@ import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
+import { GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
 
 const ROUND_SIZE = 10;
 
@@ -89,14 +90,7 @@ export default function DefinitionGamePage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">זיהוי לפי הגדרה הושלם!</h1>
-        <motion.p
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
-          className="mt-4 text-5xl font-black text-accent-hover"
-        >
-          {accuracy}%
-        </motion.p>
+        <GameCompletionScore>{accuracy}%</GameCompletionScore>
         <p className="mt-2 text-muted">{correctCount} מתוך {items.length} נכונות</p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
           <MotionLink
@@ -169,16 +163,9 @@ export default function DefinitionGamePage() {
           </div>
 
           {wasCorrect !== null && (
-            <motion.p
-              role="status"
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
-              className={`mt-4 flex items-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
-            >
-              {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
+            <GameFeedback correct={wasCorrect}>
               {wasCorrect ? "כל הכבוד!" : `לא בדיוק — המילה היא "${item.headword}" (${item.translationHe})`}
-            </motion.p>
+            </GameFeedback>
           )}
         </motion.div>
       </div>

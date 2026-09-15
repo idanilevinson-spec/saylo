@@ -12,6 +12,7 @@ import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
+import { GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
 
 interface VocabTestProps {
   steps: TestStep[];
@@ -212,14 +213,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
       <div className="max-w-xl mx-auto px-4 py-12 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">המבחן הושלם!</h1>
-        <motion.p
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
-          className="mt-4 text-5xl font-black text-accent-hover"
-        >
-          {accuracy}%
-        </motion.p>
+        <GameCompletionScore>{accuracy}%</GameCompletionScore>
         <p className="mt-1 text-muted">
           <EnglishText as="span" className="font-bold">
             {correctCount}/{outcomes.length}
@@ -418,18 +412,9 @@ export default function VocabTest({ steps }: VocabTestProps) {
 
             {answeredThisStep && lastCorrect !== null && (
               <>
-                <motion.div
-                  role="status"
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
-                  className={`mt-4 flex items-center justify-center gap-1.5 text-lg font-bold ${
-                    lastCorrect ? "text-success" : "text-danger"
-                  }`}
-                >
-                  {lastCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
+                <GameFeedback correct={lastCorrect} centered>
                   {lastCorrect ? "תשובה נכונה!" : "לא בדיוק"}
-                </motion.div>
+                </GameFeedback>
                 {!lastCorrect && outcomes.length > 0 && (
                   <p className="mt-1 text-center text-sm text-danger">
                     התשובה הנכונה:{" "}

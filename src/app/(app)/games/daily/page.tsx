@@ -15,6 +15,7 @@ import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
+import { GameScorePill, GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
 import type { McqContent } from "@/types/exercises";
 
 const ROUND_SIZE = 10;
@@ -149,14 +150,7 @@ export default function DailyChallengePage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">האתגר היומי הושלם!</h1>
-        <motion.p
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
-          className="mt-4 text-5xl font-black text-accent-hover"
-        >
-          {accuracy}%
-        </motion.p>
+        <GameCompletionScore>{accuracy}%</GameCompletionScore>
         <p className="mt-2 text-muted">
           {correctCount} מתוך {items.length} נכונות
           {!alreadyDoneToday && <> · +{COMPLETION_BONUS_XP} XP בונוס על השלמת האתגר היומי</>}
@@ -185,15 +179,7 @@ export default function DailyChallengePage() {
           <span className="text-sm text-muted">
             שאלה {index + 1} מתוך {items.length}
           </span>
-          <motion.span
-            key={correctCount}
-            initial={{ scale: 1.3 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", bounce: 0.6, duration: 0.4 }}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent-hover font-bold text-base"
-          >
-            <Sparkles size={16} className="fill-current" /> {correctCount}
-          </motion.span>
+          <GameScorePill value={correctCount} icon={Sparkles} />
         </div>
         <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-6">
           <div className="h-full bg-accent transition-all" style={{ width: `${((index + 1) / items.length) * 100}%` }} />
@@ -266,20 +252,13 @@ export default function DailyChallengePage() {
           )}
 
           {wasCorrect !== null && (
-            <motion.p
-              role="status"
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
-              className={`mt-4 flex items-center justify-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
-            >
-              {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
+            <GameFeedback correct={wasCorrect} centered>
               {wasCorrect
                 ? "כל הכבוד!"
                 : mode === "spelling"
                   ? `לא בדיוק — המילה היא "${item.headword}"`
                   : `לא בדיוק — התשובה הנכונה: "${mcqContent?.options[mcqContent.correctIndex]}"`}
-            </motion.p>
+            </GameFeedback>
           )}
         </motion.div>
       </div>
