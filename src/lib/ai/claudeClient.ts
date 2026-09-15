@@ -38,6 +38,17 @@ export function parseJsonResponse<T>(raw: string): T | null {
   try {
     return JSON.parse(cleaned) as T;
   } catch {
-    return null;
+    // The model occasionally prefaces the JSON with a stray sentence
+    // despite the instruction not to — the fence-strip above only handles
+    // wrapping, not a preamble. Recover by parsing just the outermost
+    // {...} span instead of giving up on the whole response.
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start === -1 || end <= start) return null;
+    try {
+      return JSON.parse(cleaned.slice(start, end + 1)) as T;
+    } catch {
+      return null;
+    }
   }
 }

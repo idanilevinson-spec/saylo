@@ -51,16 +51,33 @@ export async function POST(request: Request) {
     content: m.content,
   }));
 
+  const scoringPrompt = buildConversationScoringPrompt(transcript);
   const claudeMessage = await anthropic.messages.create({
     model: CLAUDE_MODEL,
     // See reading-response route: 700 could truncate the JSON mid-string
     // on longer feedback, making it unparseable.
     max_tokens: 1024,
-    messages: [{ role: "user", content: buildConversationScoringPrompt(transcript) }],
+    messages: [{ role: "user", content: scoringPrompt }],
   });
-  const raw = extractText(claudeMessage);
+  let parsed = parseJsonResponse<ScoringResult>(extractText(claudeMessage));
+  let inputTokens = claudeMessage.usage.input_tokens;
+  let outputTokens = claudeMessage.usage.output_tokens;
 
-  const parsed = parseJsonResponse<ScoringResult>(raw) ?? {
+  // A single bad generation (the model straying from the JSON-only
+  // instruction) shouldn't hand the student an all-zero score screen —
+  // one retry recovers the overwhelming majority of those transient misses.
+  if (!parsed) {
+    const retryMessage = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
+      max_tokens: 1024,
+      messages: [{ role: "user", content: scoringPrompt }],
+    });
+    parsed = parseJsonResponse<ScoringResult>(extractText(retryMessage));
+    inputTokens += retryMessage.usage.input_tokens;
+    outputTokens += retryMessage.usage.output_tokens;
+  }
+
+  parsed = parsed ?? {
     fluencyScore: 0,
     grammarScore: 0,
     vocabularyScore: 0,
@@ -99,13 +116,7 @@ export async function POST(request: Request) {
     .update({ status: "completed", completed_at: new Date().toISOString() })
     .eq("id", conversationId);
 
-  await logAiUsage(
-    supabase,
-    user.id,
-    "conversation_scoring",
-    claudeMessage.usage.input_tokens,
-    claudeMessage.usage.output_tokens
-  );
+  await logAiUsage(supabase, user.id, "conversation_scoring", inputTokens, outputTokens);
   await setSkillLevelFromScore(supabase, user.id, "speaking", parsed.overallScore ?? 0);
 
   return NextResponse.json({ score });
