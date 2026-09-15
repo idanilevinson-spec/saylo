@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Play } from "lucide-react";
+import { Play, Apple } from "lucide-react";
 import { supabase } from "@/lib/supabase/browserClient";
 import { deriveAgeBand } from "@/lib/auth/ageBand";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
@@ -73,6 +73,15 @@ export default function SignupForm() {
   async function handleGoogleSignup() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+  }
+
+  // See LoginForm.tsx — same App Store Review Guideline 4.8 requirement
+  // applies here too.
+  async function handleAppleSignup() {
+    await supabase.auth.signInWithOAuth({
+      provider: "apple",
       options: { redirectTo: `${window.location.origin}/dashboard` },
     });
   }
@@ -186,6 +195,15 @@ export default function SignupForm() {
           className="mt-4 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
         >
           המשך עם Google
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={handleAppleSignup}
+          className="mt-2.5 flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
+        >
+          <Apple size={18} fill="currentColor" /> המשך עם Apple
         </motion.button>
       </motion.div>
 

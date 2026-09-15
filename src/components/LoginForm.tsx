@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Apple } from "lucide-react";
 import { supabase } from "@/lib/supabase/browserClient";
 
 export default function LoginForm() {
@@ -33,6 +34,19 @@ export default function LoginForm() {
   async function handleGoogleLogin() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+  }
+
+  // Required alongside Google sign-in, not optional: App Store Review
+  // Guideline 4.8 requires an app offering a third-party login to also
+  // offer Sign in with Apple as an equivalent option. Same Supabase OAuth
+  // mechanism as Google — the actual "Apple" provider has to be configured
+  // in the Supabase dashboard (Services ID, Team ID, Key ID, private key
+  // from Apple Developer) before this button does anything.
+  async function handleAppleLogin() {
+    await supabase.auth.signInWithOAuth({
+      provider: "apple",
       options: { redirectTo: `${window.location.origin}/dashboard` },
     });
   }
@@ -112,6 +126,15 @@ export default function LoginForm() {
           className="mt-4 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
         >
           המשך עם Google
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={handleAppleLogin}
+          className="mt-2.5 flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
+        >
+          <Apple size={18} fill="currentColor" /> המשך עם Apple
         </motion.button>
       </motion.div>
 
