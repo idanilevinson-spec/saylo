@@ -73,7 +73,7 @@ export default function SignupForm() {
   async function handleGoogleSignup() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
     });
   }
 
@@ -82,7 +82,7 @@ export default function SignupForm() {
   async function handleAppleSignup() {
     await supabase.auth.signInWithOAuth({
       provider: "apple",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
     });
   }
 
