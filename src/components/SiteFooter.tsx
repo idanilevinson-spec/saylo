@@ -12,7 +12,7 @@ export default function SiteFooter() {
             saylo
           </EnglishText>
         </div>
-        <nav className="flex items-center gap-5">
+        <nav aria-label="ניווט תחתון" className="flex items-center gap-5">
           <Link href="/pricing" className="hover:text-foreground transition-colors">
             מסלולים
           </Link>
@@ -21,6 +21,9 @@ export default function SiteFooter() {
           </Link>
           <Link href="/terms" className="hover:text-foreground transition-colors">
             תנאי שימוש
+          </Link>
+          <Link href="/accessibility" className="hover:text-foreground transition-colors">
+            הצהרת נגישות
           </Link>
           <Link href="/login" className="hover:text-foreground transition-colors">
             התחברות
