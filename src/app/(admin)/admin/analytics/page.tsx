@@ -14,6 +14,13 @@ interface FunnelStep {
   count: number;
 }
 
+interface AiUsageRow {
+  feature: string;
+  calls: number;
+  inputTokens: number;
+  outputTokens: number;
+}
+
 interface AnalyticsState {
   totalMrr: number;
   planBreakdown: PlanBreakdown[];
@@ -22,7 +29,25 @@ interface AnalyticsState {
   exerciseAttemptsLast7Days: number;
   retainedPct: number;
   funnel: FunnelStep[];
+  aiUsage: AiUsageRow[];
+  aiUsageCallsLast7Days: number;
 }
+
+// Feature strings as written by logAiUsage() calls across src/app/api/ai/*
+// and src/lib/ai/topicIntro.ts — kept here rather than imported so this
+// page doesn't need a shared constants module for a one-place display label.
+const AI_FEATURE_LABELS: Record<string, string> = {
+  conversation_turn: "שיחת AI (הודעה)",
+  conversation_scoring: "ניתוח שיחה",
+  writing_coach: "מאמן כתיבה",
+  reading_response: "משוב תרגיל קריאה",
+  speaking_test_response: "משוב מבחן דיבור",
+  speaking_test_questions: "יצירת שאלות מבחן דיבור",
+  placement_scoring: "סיכום מבחן רמה",
+  reading_exam_summary: "סיכום מבחן קריאה",
+  teacher_suggestion: "הצעת המורה AI",
+  vocabulary_topic_intro: "הקדמה לנושא אוצר מילים",
+};
 
 function Bar({ label, count, max }: { label: string; count: number; max: number }) {
   const pct = max > 0 ? Math.round((count / max) * 100) : 0;
@@ -59,6 +84,8 @@ export default function AdminAnalyticsPage() {
         { count: completedPlacements },
         { data: usersWithAttempts },
         { data: usersWithConversations },
+        { data: aiUsageLast30Days },
+        { count: aiUsageCallsLast7Days },
       ] = await Promise.all([
         supabase.from("subscriptions").select("status, subscription_plans(code, price_ils, months)").eq("status", "active"),
         supabase.from("profiles").select("id, created_at"),
@@ -68,6 +95,8 @@ export default function AdminAnalyticsPage() {
         supabase.from("placement_tests").select("*", { count: "exact", head: true }).eq("status", "completed"),
         supabase.from("exercise_attempts").select("profile_id").limit(5000),
         supabase.from("conversations").select("profile_id").limit(5000),
+        supabase.from("ai_usage_log").select("feature, input_tokens, output_tokens").gte("created_at", thirtyDaysAgo).limit(20000),
+        supabase.from("ai_usage_log").select("*", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
       ]);
 
       const planMap = new Map<string, PlanBreakdown>();
@@ -95,6 +124,23 @@ export default function AdminAnalyticsPage() {
       const distinctAttemptUsers = new Set((usersWithAttempts ?? []).map((r) => r.profile_id)).size;
       const distinctConversationUsers = new Set((usersWithConversations ?? []).map((r) => r.profile_id)).size;
 
+      const aiUsageByFeature = new Map<string, AiUsageRow>();
+      (aiUsageLast30Days ?? []).forEach((row) => {
+        const existing = aiUsageByFeature.get(row.feature) ?? {
+          feature: row.feature,
+          calls: 0,
+          inputTokens: 0,
+          outputTokens: 0,
+        };
+        existing.calls += 1;
+        existing.inputTokens += row.input_tokens;
+        existing.outputTokens += row.output_tokens;
+        aiUsageByFeature.set(row.feature, existing);
+      });
+      const aiUsage = [...aiUsageByFeature.values()].sort(
+        (a, b) => b.inputTokens + b.outputTokens - (a.inputTokens + a.outputTokens)
+      );
+
       setState({
         totalMrr: Math.round(totalMrr),
         planBreakdown: [...planMap.values()].sort((a, b) => b.mrr - a.mrr),
@@ -108,6 +154,8 @@ export default function AdminAnalyticsPage() {
           { label: "ביצעו תרגיל אחד לפחות", count: distinctAttemptUsers },
           { label: "ניסו שיחת AI", count: distinctConversationUsers },
         ],
+        aiUsage,
+        aiUsageCallsLast7Days: aiUsageCallsLast7Days ?? 0,
       });
     }
     load();
@@ -169,6 +217,39 @@ export default function AdminAnalyticsPage() {
           {state.funnel.map((step) => (
             <Bar key={step.label} label={step.label} count={step.count} max={funnelMax} />
           ))}
+        </div>
+      </div>
+
+      <div>
+        <h2 className="font-bold text-lg">שימוש ב-AI</h2>
+        <p className="mt-1 text-sm text-muted">
+          {state.aiUsageCallsLast7Days} קריאות ל-AI ב-7 הימים האחרונים · פירוט לפי פיצ׳ר, 30 הימים האחרונים
+        </p>
+        <div className="mt-3 bg-card border border-card-border rounded-lg overflow-x-auto">
+          {state.aiUsage.length === 0 ? (
+            <p className="p-5 text-muted text-sm">אין עדיין נתוני שימוש ב-30 הימים האחרונים.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-card-border text-muted text-right">
+                  <th className="p-3 font-medium">פיצ׳ר</th>
+                  <th className="p-3 font-medium">קריאות</th>
+                  <th className="p-3 font-medium">טוקני קלט</th>
+                  <th className="p-3 font-medium">טוקני פלט</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.aiUsage.map((row) => (
+                  <tr key={row.feature} className="border-b border-card-border last:border-0">
+                    <td className="p-3">{AI_FEATURE_LABELS[row.feature] ?? row.feature}</td>
+                    <td className="p-3 tabular-nums">{row.calls.toLocaleString("he-IL")}</td>
+                    <td className="p-3 tabular-nums">{row.inputTokens.toLocaleString("he-IL")}</td>
+                    <td className="p-3 tabular-nums">{row.outputTokens.toLocaleString("he-IL")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
