@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      # Placeholder values, not real secrets — this only checks that the
+      # app still compiles and every route/page is well-formed. Next.js
+      # imports each API route during "collecting page data" to read its
+      # exports, and several of those modules throw at import time if
+      # their env var is empty (a deliberate fail-fast check for local
+      # dev), so the build needs *something* present in every required
+      # var — the actual value is never read for anything at build time.
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
+          SUPABASE_SERVICE_ROLE_KEY: ci-placeholder
+          ANTHROPIC_API_KEY: ci-placeholder
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
+          STRIPE_SECRET_KEY: sk_test_ci_placeholder
+          STRIPE_WEBHOOK_SECRET: ci-placeholder
+          AZURE_SPEECH_KEY: ci-placeholder
+          AZURE_SPEECH_REGION: ci-placeholder
+          RESEND_API_KEY: ci-placeholder
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ci-placeholder
+          VAPID_PRIVATE_KEY: ci-placeholder
+          CRON_SECRET: ci-placeholder
