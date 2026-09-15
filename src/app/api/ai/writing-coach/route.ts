@@ -51,9 +51,12 @@ export async function POST(request: Request) {
 
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    // See reading-response route: 700 could truncate the JSON mid-string
-    // on longer feedback, making it unparseable.
+    // thinking disabled: extended thinking is on by default and silently
+    // eats into max_tokens before any output text is written, which is
+    // what was actually truncating longer feedback — not the JSON size
+    // itself. See conversation-score route for how this was diagnosed.
     max_tokens: 1024,
+    thinking: { type: "disabled" },
     messages: [{ role: "user", content: buildWritingCoachPrompt(prompt.prompt_en, submittedText) }],
   });
   const raw = extractText(message);

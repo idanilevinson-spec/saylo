@@ -33,7 +33,11 @@ export async function POST(request: Request) {
 
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
+    // thinking disabled: on by default, and silently eats into max_tokens
+    // before any output text is written. See conversation-score route for
+    // how this was diagnosed as a real truncation cause elsewhere.
     max_tokens: 700,
+    thinking: { type: "disabled" },
     messages: [
       { role: "user", content: buildSpeakingTestQuestionsPrompt(level, QUESTION_COUNT, topicNameEn) },
     ],

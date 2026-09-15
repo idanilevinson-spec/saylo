@@ -60,7 +60,10 @@ export async function GET() {
 
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
+    // thinking disabled: on by default, and would silently eat into this
+    // already-tight 150-token budget before any output text is written.
     max_tokens: 150,
+    thinking: { type: "disabled" },
     messages: [
       {
         role: "user",

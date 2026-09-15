@@ -64,8 +64,12 @@ export async function POST(request: Request) {
     // Detailed Hebrew feedback plus a model answer can run past 700 tokens
     // for longer C1/C2 passages, which truncates the JSON mid-string and
     // makes it unparseable — 1024 leaves real headroom, confirmed against
-    // repeated live failures at 700.
+    // repeated live failures at 700. thinking disabled: extended thinking
+    // is on by default and silently eats into that same budget before any
+    // output text is written — see conversation-score route for how this
+    // was diagnosed as the real cause of this class of truncation.
     max_tokens: 1024,
+    thinking: { type: "disabled" },
     messages: [
       {
         role: "user",

@@ -54,9 +54,17 @@ export async function POST(request: Request) {
   const scoringPrompt = buildConversationScoringPrompt(transcript);
   const claudeMessage = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    // See reading-response route: 700 could truncate the JSON mid-string
-    // on longer feedback, making it unparseable.
-    max_tokens: 1024,
+    // Root cause of the real truncated-JSON failures this was hitting:
+    // extended thinking is on by default for this model and eats into
+    // max_tokens before any output text is written, so a long transcript
+    // (many grammar mistakes to describe) could exhaust the whole budget
+    // on thinking alone, or leave too little for the JSON to finish —
+    // confirmed live against an 18-turn transcript. Disabling thinking for
+    // this bounded scoring task (its reasoning isn't shown to the student
+    // anyway) makes the token budget predictable, and 2048 leaves real
+    // headroom on top of that for a long conversation's worth of feedback.
+    max_tokens: 2048,
+    thinking: { type: "disabled" },
     messages: [{ role: "user", content: scoringPrompt }],
   });
   let parsed = parseJsonResponse<ScoringResult>(extractText(claudeMessage));
@@ -69,7 +77,8 @@ export async function POST(request: Request) {
   if (!parsed) {
     const retryMessage = await anthropic.messages.create({
       model: CLAUDE_MODEL,
-      max_tokens: 1024,
+      max_tokens: 2048,
+      thinking: { type: "disabled" },
       messages: [{ role: "user", content: scoringPrompt }],
     });
     parsed = parseJsonResponse<ScoringResult>(extractText(retryMessage));

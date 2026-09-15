@@ -35,7 +35,10 @@ export async function getVocabularyTopicIntro(
   try {
     const message = await anthropic.messages.create({
       model: CLAUDE_MODEL,
+      // thinking disabled: on by default, and would silently eat into this
+      // already-tight 300-token budget before any output text is written.
       max_tokens: 300,
+      thinking: { type: "disabled" },
       messages: [
         {
           role: "user",

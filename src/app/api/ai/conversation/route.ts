@@ -64,6 +64,13 @@ export async function POST(request: Request) {
   const claudeMessage = await anthropic.messages.create({
     model: CLAUDE_MODEL,
     max_tokens: 550,
+    // thinking disabled: on by default, and eats into both the token
+    // budget (risking a truncated reply at only 550 tokens) and latency —
+    // the latter matters most for voice turns, which are read aloud
+    // turn-by-turn and already had a separate latency fix (skipping web
+    // search). See conversation-score route for how the truncation risk
+    // was diagnosed.
+    thinking: { type: "disabled" },
     system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode),
     ...(voiceMode ? {} : { tools: [{ type: "web_search_20260318" as const, name: "web_search", max_uses: 2 }] }),
     messages: (history ?? []).map((m) => ({

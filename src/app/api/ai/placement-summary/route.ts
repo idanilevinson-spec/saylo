@@ -63,9 +63,11 @@ export async function POST(request: Request) {
   if (writingSample?.trim()) {
     const writingMessage = await anthropic.messages.create({
       model: CLAUDE_MODEL,
-      // See reading-response route: 700 could truncate the JSON mid-string
-      // on longer feedback, making it unparseable.
+      // thinking disabled: on by default, and silently eats into max_tokens
+      // before any output text is written — see conversation-score route
+      // for how this was diagnosed as the real truncation cause.
       max_tokens: 1024,
+      thinking: { type: "disabled" },
       messages: [{ role: "user", content: buildWritingCoachPrompt(PLACEMENT_WRITING_PROMPT, writingSample) }],
     });
     writingUsage = writingMessage.usage;
@@ -80,7 +82,10 @@ export async function POST(request: Request) {
 
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
+    // thinking disabled: on by default, and would silently eat into this
+    // already-tight 300-token budget before any output text is written.
     max_tokens: 300,
+    thinking: { type: "disabled" },
     messages: [{ role: "user", content: buildPlacementSummaryPrompt(scores, overallCefr) }],
   });
   const summary = extractText(message);
