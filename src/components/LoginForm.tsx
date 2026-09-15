@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Apple } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/lib/supabase/browserClient";
+import { signInWithOAuthNative } from "@/lib/auth/nativeOAuth";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -31,7 +33,17 @@ export default function LoginForm() {
     router.push(searchParams.get("next") ?? "/dashboard");
   }
 
+  // Native runs the whole round trip through a dismissible modal browser and
+  // a deep-link return (see nativeOAuth.ts) instead of the full-page redirect
+  // chain the web flow below uses — that chain is several real cross-origin
+  // navigations inside the app's own WebView, which is what produced a
+  // visible white flash between pages even after tinting the WebView's
+  // background.
   async function handleGoogleLogin() {
+    if (Capacitor.isNativePlatform()) {
+      if (await signInWithOAuthNative("google")) router.push("/dashboard");
+      return;
+    }
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
@@ -45,6 +57,10 @@ export default function LoginForm() {
   // in the Supabase dashboard (Services ID, Team ID, Key ID, private key
   // from Apple Developer) before this button does anything.
   async function handleAppleLogin() {
+    if (Capacitor.isNativePlatform()) {
+      if (await signInWithOAuthNative("apple")) router.push("/dashboard");
+      return;
+    }
     await supabase.auth.signInWithOAuth({
       provider: "apple",
       options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },

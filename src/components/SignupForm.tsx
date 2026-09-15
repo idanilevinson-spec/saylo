@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Play, Apple } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/lib/supabase/browserClient";
 import { deriveAgeBand } from "@/lib/auth/ageBand";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
+import { signInWithOAuthNative } from "@/lib/auth/nativeOAuth";
 
 export default function SignupForm() {
   const router = useRouter();
@@ -70,7 +72,13 @@ export default function SignupForm() {
     setLoading(false);
   }
 
+  // See LoginForm.tsx — native avoids the multi-hop redirect chain (and the
+  // white flash it produced) via a modal browser + deep-link return instead.
   async function handleGoogleSignup() {
+    if (Capacitor.isNativePlatform()) {
+      if (await signInWithOAuthNative("google")) router.push("/dashboard");
+      return;
+    }
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
@@ -80,6 +88,10 @@ export default function SignupForm() {
   // See LoginForm.tsx — same App Store Review Guideline 4.8 requirement
   // applies here too.
   async function handleAppleSignup() {
+    if (Capacitor.isNativePlatform()) {
+      if (await signInWithOAuthNative("apple")) router.push("/dashboard");
+      return;
+    }
     await supabase.auth.signInWithOAuth({
       provider: "apple",
       options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
