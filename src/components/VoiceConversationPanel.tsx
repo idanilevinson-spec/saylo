@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PhoneOff, Keyboard } from "lucide-react";
+import { PhoneOff, Keyboard, RotateCcw } from "lucide-react";
 import { speak as browserSpeak } from "@/lib/speech/browserTts";
 import SayloAvatar, { type AvatarExpression } from "@/components/SayloAvatar";
 import { loadVoicePref, saveVoicePref, NEURAL_VOICE, type VoicePref } from "@/lib/speech/voicePref";
+import { NEURAL_SPEECH_RATES } from "@/lib/speech/useNeuralSpeech";
 import type { SpeechRecognizer } from "microsoft-cognitiveservices-speech-sdk";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
@@ -37,9 +38,9 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   // audio.play() when it's traceable to a real, synchronous tap. Every
   // reply plays several async hops after the user's last tap (recognized
   // speech -> network round-trip to Claude -> synthesis), which is exactly
-  // what gets silently rejected with NotAllowedError — confirmed via the
-  // on-screen debug trace below on a real device. The fix is the standard
-  // one for this restriction: require one explicit tap to begin, use that
+  // what gets silently rejected with NotAllowedError — confirmed via an
+  // on-device debug trace (since removed) during development. The fix is
+  // the standard one for this restriction: require one explicit tap to begin, use that
   // tap to "bless" a single reusable <audio> element by playing a silent
   // clip on it, then reuse that same already-blessed element for every
   // reply for the rest of the call — WebKit permits repeat programmatic
@@ -70,13 +71,24 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   const [restartTick, setRestartTick] = useState(0);
   const [voicePref, setVoicePref] = useState<VoicePref>(() => loadVoicePref());
   const [viseme, setViseme] = useState<number | undefined>(undefined);
-  // TEMPORARY: on-screen trace for diagnosing silent playback on-device,
-  // where there's no way to see the console. Remove once the voice call's
-  // audio is confirmed working. Capped so a long call doesn't grow forever.
-  const [debugLog, setDebugLog] = useState<string[]>([]);
-  function logDebug(line: string) {
-    setDebugLog((prev) => [...prev.slice(-11), `${new Date().toISOString().slice(11, 19)} ${line}`]);
-  }
+  const [rate, setRate] = useState(1);
+  const rateRef = useRef(rate);
+  useEffect(() => {
+    rateRef.current = rate;
+  }, [rate]);
+
+  // Caches the most recent reply so "listen again" can replay it instantly —
+  // `url` for the Azure path (kept alive across turns instead of revoked on
+  // end, only released when superseded or on unmount) and `text` as the
+  // browser-TTS-fallback path's replay source, which never has a blob url.
+  const [hasLastReply, setHasLastReply] = useState(false);
+  const lastReplyRef = useRef<{ url: string | null; text: string }>({ url: null, text: "" });
+  useEffect(() => {
+    return () => {
+      if (lastReplyRef.current.url) URL.revokeObjectURL(lastReplyRef.current.url);
+    };
+  }, []);
+
   const silentTurnsRef = useRef(0);
   const voicePrefRef = useRef<VoicePref>(voicePref);
   // Tracks whichever recognizer is currently listening, so the effect's
@@ -198,7 +210,6 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     }
 
     function speakReply(replyText: string) {
-      logDebug(`speakReply start, len=${replyText.length}`);
       setState("speaking");
       // No live viseme data yet for this turn — the avatar falls back to
       // its decorative loop until the first visemeReceived event (Azure
@@ -210,8 +221,9 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       const nextListenPreload = loadCredentials().catch(() => null);
 
       const fallbackToBrowser = async () => {
-        logDebug("fallbackToBrowser: using window.speechSynthesis");
-        browserSpeak(replyText, 1, async () => {
+        lastReplyRef.current = { url: null, text: replyText };
+        setHasLastReply(true);
+        browserSpeak(replyText, rateRef.current, async () => {
           if (cancelled) return;
           const preloaded = await nextListenPreload;
           listenOnce(preloaded ?? undefined);
@@ -221,7 +233,6 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       loadCredentials()
         .then(({ token, region, sdk }) => {
           if (cancelled) return;
-          logDebug("credentials OK, building SpeechSynthesizer");
           const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(token, region);
           speechConfig.speechSynthesisVoiceName = NEURAL_VOICE[voicePrefRef.current];
           speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
@@ -249,7 +260,6 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
             replyText,
             async (result) => {
               synthesizer.close();
-              logDebug(`speakTextAsync done, reason=${result.reason}, bytes=${result.audioData?.byteLength ?? 0}`);
               if (cancelled) return;
               if (result.reason !== sdk.ResultReason.SynthesizingAudioCompleted || !result.audioData?.byteLength) {
                 fallbackToBrowser();
@@ -263,31 +273,39 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
               const audio = audioElRef.current ?? new Audio();
               audioElRef.current = audio;
               const advance = async () => {
-                logDebug("audio.onended fired");
-                URL.revokeObjectURL(objectUrl);
                 if (cancelled) return;
                 const preloaded = await nextListenPreload;
                 listenOnce(preloaded ?? undefined);
               };
               audio.onended = advance;
-              audio.onerror = (e) => {
-                logDebug(`audio.onerror: ${JSON.stringify(e)}`);
+              audio.onerror = () => {
+                // This specific clip is broken — drop it as the cached
+                // "replay" candidate too, not just this playback attempt.
+                if (lastReplyRef.current.url === objectUrl) lastReplyRef.current = { url: null, text: "" };
                 URL.revokeObjectURL(objectUrl);
                 if (!cancelled) fallbackToBrowser();
               };
               audio.src = objectUrl;
+              audio.playbackRate = rateRef.current;
               audio
                 .play()
-                .then(() => logDebug("audio.play() resolved"))
-                .catch((err) => {
-                  logDebug(`audio.play() rejected: ${err?.name ?? err}`);
+                .then(() => {
+                  // Only cache once playback actually starts — an object URL
+                  // that never played is nothing worth replaying. The old
+                  // cached clip (if any) is superseded, so it's safe to
+                  // release now instead of waiting for unmount.
+                  if (lastReplyRef.current.url) URL.revokeObjectURL(lastReplyRef.current.url);
+                  lastReplyRef.current = { url: objectUrl, text: replyText };
+                  setHasLastReply(true);
+                })
+                .catch(() => {
                   URL.revokeObjectURL(objectUrl);
                   if (!cancelled) fallbackToBrowser();
                 });
             },
             (err) => {
               synthesizer.close();
-              logDebug(`speakTextAsync error callback: ${err}`);
+              console.error("speakTextAsync error", err);
               // Azure TTS failed mid-flight — fall back to the free browser
               // voice rather than breaking the call.
               if (!cancelled) fallbackToBrowser();
@@ -295,7 +313,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
           );
         })
         .catch((err) => {
-          logDebug(`loadCredentials failed: ${err}`);
+          console.error("loadCredentials for TTS failed", err);
           // Couldn't even get a token for TTS — same fallback.
           if (!cancelled) fallbackToBrowser();
         });
@@ -315,6 +333,36 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     silentTurnsRef.current = 0;
     setErrorMessage(null);
     setRestartTick((t) => t + 1);
+  }
+
+  // Replays the cached last reply on demand, without a fresh synthesis call.
+  // Interrupts an in-progress listen (closing the mic like the effect's own
+  // cleanup does) so the replay isn't picked up as the user's next turn, then
+  // bumps restartTick — the same mechanism resume() uses — to hand control
+  // back to a fresh listen cycle once playback ends.
+  function replayLastReply() {
+    const last = lastReplyRef.current;
+    if (!last.text || ending || state === "speaking" || state === "thinking" || state === "connecting") return;
+
+    if (activeRecognizerRef.current) safeClose(activeRecognizerRef.current);
+    activeRecognizerRef.current = null;
+    window.speechSynthesis?.cancel();
+    silentTurnsRef.current = 0;
+    setState("speaking");
+
+    const relisten = () => setRestartTick((t) => t + 1);
+
+    if (last.url && audioElRef.current) {
+      const audio = audioElRef.current;
+      audio.onended = relisten;
+      audio.onerror = relisten;
+      audio.src = last.url;
+      audio.playbackRate = rate;
+      audio.currentTime = 0;
+      audio.play().catch(relisten);
+    } else {
+      browserSpeak(last.text, rate, relisten);
+    }
   }
 
   // "ending" (scoring the call) reuses the "thinking" expression — it's the
@@ -405,6 +453,29 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         </button>
       </div>
 
+      <div className="flex items-center gap-2 flex-wrap justify-center">
+        <button
+          onClick={replayLastReply}
+          disabled={!hasLastReply || ending || state === "speaking" || state === "thinking" || state === "connecting"}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-background-2 border border-card-border text-foreground hover:bg-card transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <RotateCcw size={13} /> השמיעו שוב
+        </button>
+        <div className="flex items-center gap-1 p-1 rounded-full bg-background-2 border border-card-border text-xs">
+          {NEURAL_SPEECH_RATES.map((r) => (
+            <button
+              key={r}
+              onClick={() => setRate(r)}
+              className={`px-2.5 py-1 rounded-full font-medium transition-colors ${
+                rate === r ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
+              }`}
+            >
+              {r}x
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="relative flex items-center justify-center w-64 h-64 sm:w-72 sm:h-72">
         {/* A live-state ring, not a stamp — tinted by call state instead
             of a fixed outline. */}
@@ -472,18 +543,6 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       >
         <Keyboard size={13} /> להמשיך בהקלדה בלי לסיים
       </button>
-
-      {/* TEMPORARY debug trace — remove once silent playback is fixed. */}
-      {debugLog.length > 0 && (
-        <div
-          dir="ltr"
-          className="mt-4 w-full max-w-sm rounded-lg bg-background-2 border border-card-border p-3 text-[10px] font-mono text-muted text-left overflow-x-auto"
-        >
-          {debugLog.map((line, i) => (
-            <div key={i}>{line}</div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
