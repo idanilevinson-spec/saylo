@@ -20,6 +20,18 @@ const config: CapacitorConfig = {
   server: {
     url: "https://www.saylolearn.com",
     cleartext: false,
+    // Without this, any navigation to a host other than www.saylolearn.com
+    // gets treated as an external link and handed off to the system
+    // browser — same mechanism as the "always opens Safari" bug above, but
+    // this time hit deliberately: signInWithOAuth({ provider: "apple" |
+    // "google" }) genuinely has to navigate to the provider's own domain
+    // and then to Supabase's callback domain before landing back on
+    // saylolearn.com. Without these allowlisted, that hand-off to Safari
+    // has no way back into the app (no Universal Links configured), so the
+    // user completes sign-in in Safari and the native app never sees the
+    // session. Allowlisting keeps the whole round trip inside the app's
+    // own WebView instead.
+    allowNavigation: ["appleid.apple.com", "accounts.google.com", "*.supabase.co"],
   },
   ios: {
     contentInset: "automatic",
