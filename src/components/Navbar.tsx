@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -26,6 +26,24 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Exposes the navbar's real rendered height (safe-area padding, mobile
+  // menu open/closed, font metrics and all) as a CSS var, so any page that
+  // needs "exactly the viewport below the navbar, no scroll" can size
+  // itself with calc(100dvh - var(--navbar-h)) instead of guessing a fixed
+  // rem value — a guess that's wrong on notch/Dynamic Island devices, where
+  // this header's own safe-area-inset-top padding makes it taller than a
+  // no-notch estimate accounts for.
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const setVar = () => document.documentElement.style.setProperty("--navbar-h", `${el.offsetHeight}px`);
+    setVar();
+    const observer = new ResizeObserver(setVar);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [menuOpen]);
 
   const links = profile?.is_admin ? [...AUTHED_LINKS, { href: "/admin", label: "ניהול" }] : AUTHED_LINKS;
 
@@ -51,6 +69,7 @@ export default function Navbar() {
 
   return (
     <header
+      ref={headerRef}
       className="sticky top-0 z-40 border-b-2 border-accent bg-background/90 backdrop-blur relative"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >

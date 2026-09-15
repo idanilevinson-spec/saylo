@@ -210,7 +210,10 @@ function SpeakingChatInner() {
   const hasUserMessage = !!messages?.some((m) => m.role === "user");
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-8 flex flex-col h-[calc(100vh-6rem)]">
+    <div
+      className="max-w-xl mx-auto px-4 py-6 flex flex-col"
+      style={{ height: "calc(100dvh - var(--navbar-h, 6rem) - env(safe-area-inset-bottom))" }}
+    >
       <div className="flex items-center justify-between mb-4">
         <MotionLink
           whileTap={{ scale: 0.97 }}
