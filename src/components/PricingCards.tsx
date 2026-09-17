@@ -1,21 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
+import { configureNativeIap, getNativePlanPackages, purchaseNativePlan, type NativePlanPackage } from "@/lib/subscriptions/nativeIap";
+
+// App Store Review Guideline 3.1.1: a subscription that unlocks in-app
+// content has to be purchased through Apple's own StoreKit when running as
+// the native app — Israel isn't covered by any of the external-purchase-
+// link exceptions Apple has granted elsewhere. So the native build never
+// uses the Stripe/PayPlus checkout below at all, only RevenueCat — see
+// nativeIap.ts for why, and the webhook that actually owns the write.
+const isNative = Capacitor.isNativePlatform();
 
 export default function PricingCards() {
-  const { session } = useAuth();
+  const router = useRouter();
+  const { session, profile } = useAuth();
   const [loadingCode, setLoadingCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [nativePackages, setNativePackages] = useState<NativePlanPackage[]>([]);
+
+  useEffect(() => {
+    if (!isNative || !profile) return;
+    (async () => {
+      await configureNativeIap(profile.id);
+      setNativePackages(await getNativePlanPackages());
+    })();
+  }, [profile]);
 
   async function handleCheckout(planCode: string) {
     setLoadingCode(planCode);
     setError(null);
+
+    if (isNative) {
+      const match = nativePackages.find((p) => p.planCode === planCode);
+      if (!match) {
+        setError("המסלול הזה עדיין לא זמין דרך האפליקציה. נסו שוב בעוד רגע.");
+        setLoadingCode(null);
+        return;
+      }
+      const ok = await purchaseNativePlan(match.pkg);
+      if (ok) router.push("/dashboard?upgraded=1");
+      else setLoadingCode(null);
+      return;
+    }
+
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
