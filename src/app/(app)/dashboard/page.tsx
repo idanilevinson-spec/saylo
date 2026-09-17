@@ -186,7 +186,7 @@ export default function DashboardPage() {
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="p-6 sm:p-7 sm:flex-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            {greeting()}, {profile.display_name} 👋
+            {greeting()}, {profile.display_name}
           </h1>
           <Link href="/progress" className="mt-2 inline-block text-sm text-primary hover:underline">
             כל ההתקדמות שלי ←

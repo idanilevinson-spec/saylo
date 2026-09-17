@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, Trophy, Sparkles, CheckCircle2, XCircle } from "lucide-react";
+import { GraduationCap, Trophy, Sparkles, CheckCircle2, XCircle, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import {
   getLearnPool,
@@ -274,7 +274,10 @@ function LearnModePageInner() {
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-background/90 rounded-lg"
               >
-                <p className="text-xl font-bold text-success">מילה בשליטה מלאה! 🎉</p>
+                <p className="flex items-center gap-2 text-xl font-bold text-success">
+                  <PartyPopper size={20} className="shrink-0" aria-hidden="true" />
+                  מילה בשליטה מלאה!
+                </p>
                 {question && <EnglishText className="text-lg text-muted">{question.item.headword}</EnglishText>}
               </motion.div>
             )}

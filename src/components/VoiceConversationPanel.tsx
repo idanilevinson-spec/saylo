@@ -378,10 +378,10 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   if (!started) {
     return (
       <div className="relative flex flex-col items-center justify-center gap-7 py-12 px-4 overflow-hidden">
-        <div className="flex items-center gap-1.5 p-1 rounded-full bg-background-2 border border-card-border">
+        <div className="flex items-center gap-1.5 p-1 rounded-lg bg-background-2 border border-card-border">
           <button
             onClick={() => selectVoice("female")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               voicePref === "female" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
             }`}
           >
@@ -389,7 +389,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
           </button>
           <button
             onClick={() => selectVoice("male")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               voicePref === "male" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
             }`}
           >
@@ -434,10 +434,10 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         }}
       />
 
-      <div className="flex items-center gap-1.5 p-1 rounded-full bg-background-2 border border-card-border">
+      <div className="flex items-center gap-1.5 p-1 rounded-lg bg-background-2 border border-card-border">
         <button
           onClick={() => selectVoice("female")}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             voicePref === "female" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
           }`}
         >
@@ -445,7 +445,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         </button>
         <button
           onClick={() => selectVoice("male")}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             voicePref === "male" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
           }`}
         >
@@ -457,16 +457,16 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         <button
           onClick={replayLastReply}
           disabled={!hasLastReply || ending || state === "speaking" || state === "thinking" || state === "connecting"}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-background-2 border border-card-border text-foreground hover:bg-card transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-background-2 border border-card-border text-foreground hover:bg-card transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <RotateCcw size={13} /> השמיעו שוב
         </button>
-        <div className="flex items-center gap-1 p-1 rounded-full bg-background-2 border border-card-border text-xs">
+        <div className="flex items-center gap-1 p-1 rounded-lg bg-background-2 border border-card-border text-xs">
           {NEURAL_SPEECH_RATES.map((r) => (
             <button
               key={r}
               onClick={() => setRate(r)}
-              className={`px-2.5 py-1 rounded-full font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
                 rate === r ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
               }`}
             >

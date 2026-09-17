@@ -109,7 +109,7 @@ function VocabTestPageInner() {
 
       <button
         onClick={() => generate()}
-        className="mt-6 w-full flex items-center gap-4 bg-gradient-to-l from-primary/10 to-accent/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-all text-right"
+        className="mt-6 w-full flex items-center gap-4 bg-primary/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-all text-right"
       >
         <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
           <Layers size={22} />

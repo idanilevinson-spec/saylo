@@ -19,12 +19,12 @@ export async function sendStreakReminderEmail(to: string, displayName: string): 
   const { error } = await resend.emails.send({
     from: "Saylo <reminders@saylolearn.com>",
     to,
-    subject: "🔥 אל תשברו את הרצף שלכם היום",
+    subject: "אל תשברו את הרצף שלכם היום",
     html: `
       <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-        <h1 style="color: #4f46e5;">היי ${displayName},</h1>
+        <h1 style="color: #0066d6;">היי ${displayName},</h1>
         <p>עוד לא תרגלתם אנגלית היום — 5 דקות מספיקות כדי לשמור על הרצף שלכם ב-Saylo.</p>
-        <a href="https://saylolearn.com/dashboard" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
+        <a href="https://saylolearn.com/dashboard" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: #0066d6; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
           לתרגול עכשיו
         </a>
       </div>
@@ -54,7 +54,7 @@ function reportEmailHtml(displayName: string, summary: ScoreSummary, periodLabel
 
   return `
     <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-      <h1 style="color: #4f46e5;">היי ${displayName},</h1>
+      <h1 style="color: #0066d6;">היי ${displayName},</h1>
       <p>הנה הדוח ${periodLabel} שלכם ב-Saylo:</p>
 
       <div style="display: flex; gap: 12px; margin: 20px 0;">
@@ -74,7 +74,7 @@ function reportEmailHtml(displayName: string, summary: ScoreSummary, periodLabel
 
       ${summary.items.length === 0 ? emptyState : `<table style="width: 100%; border-collapse: collapse;">${rows}</table>`}
 
-      <a href="https://saylolearn.com/progress" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
+      <a href="https://saylolearn.com/progress" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #0066d6; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
         לכל ההתקדמות שלי
       </a>
       <p style="margin-top: 24px; font-size: 12px; color: #9ca3af;">אפשר לכבות דוח זה בכל עת בהגדרות הפרופיל.</p>
@@ -89,7 +89,7 @@ export async function sendWeeklyReportEmail(to: string, displayName: string, sum
   const { error } = await resend.emails.send({
     from: "Saylo <reports@saylolearn.com>",
     to,
-    subject: "📊 הדוח השבועי שלכם ב-Saylo",
+    subject: "הדוח השבועי שלכם ב-Saylo",
     html: reportEmailHtml(displayName, summary, "השבוע"),
   });
 
@@ -103,7 +103,7 @@ export async function sendMonthlyReportEmail(to: string, displayName: string, su
   const { error } = await resend.emails.send({
     from: "Saylo <reports@saylolearn.com>",
     to,
-    subject: "📊 הדוח החודשי שלכם ב-Saylo",
+    subject: "הדוח החודשי שלכם ב-Saylo",
     html: reportEmailHtml(displayName, summary, "החודש"),
   });
 

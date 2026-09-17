@@ -202,7 +202,7 @@ export default function MemoryGamePage() {
                 className="relative w-full h-full [transform-style:preserve-3d]"
               >
                 <div
-                  className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center [backface-visibility:hidden]"
+                  className="absolute inset-0 rounded-lg bg-primary flex items-center justify-center [backface-visibility:hidden]"
                   aria-hidden="true"
                 >
                   <span className="w-2.5 h-2.5 rounded-full bg-white/70" />

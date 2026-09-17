@@ -8,6 +8,8 @@ import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
 
+const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
+
 export default function PricingCards() {
   const { session } = useAuth();
   const [loadingCode, setLoadingCode] = useState<string | null>(null);
@@ -42,7 +44,7 @@ export default function PricingCards() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.4, delay: i * 0.08 }}
+            transition={{ duration: 0.4, delay: i * 0.06, ease: EASE_OUT }}
             whileHover={{ y: -3 }}
             className={`relative overflow-hidden rounded-lg p-6 border flex flex-col transition-shadow hover:shadow-lg hover:shadow-primary/5 ${
               plan.badge

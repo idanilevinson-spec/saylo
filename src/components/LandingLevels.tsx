@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import EnglishText from "@/components/EnglishText";
 
+const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
+
 // The CEFR ladder as a scrubber, not passport stamps — six chapter markers
 // on one continuous rail. Order and position carry the progression; the
 // level code itself is the only label this needs.
@@ -18,34 +20,29 @@ const LEVELS = [
 export default function LandingLevels() {
   return (
     <section className="px-4 py-24">
-      <div className="max-w-3xl mx-auto">
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5 }}
-          className="text-3xl sm:text-4xl font-black tracking-tight text-center mb-4"
-        >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.5, ease: EASE_OUT }}
+        className="max-w-3xl mx-auto"
+      >
+        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center mb-4">
           מדריך התוכניות: מהתחלה ועד שליטה מלאה
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-center text-muted mb-16"
-        >
+        </h2>
+        <p className="text-center text-muted mb-16">
           מבחן הרמה שלנו ממקם אתכם בדיוק, לפי הסטנדרט הבינלאומי CEFR.
-        </motion.p>
+        </p>
 
-        {/* The scrubber rail. */}
+        {/* The scrubber rail — the fill-width reveal is a real progress
+            indicator, not decoration, so it keeps its own scroll trigger. */}
         <div className="relative pt-2">
           <div className="relative h-1.5 rounded-full bg-card-border overflow-hidden">
             <motion.div
               initial={{ width: "0%" }}
               whileInView={{ width: "18%" }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1, delay: 0.2, ease: EASE_OUT }}
               className="absolute inset-y-0 start-0 rounded-full bg-primary"
             />
           </div>
@@ -54,14 +51,7 @@ export default function LandingLevels() {
             {LEVELS.map((level, i) => {
               const isCurrent = i === 1;
               return (
-                <motion.div
-                  key={level.code}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.4, delay: 0.5 + i * 0.06 }}
-                  className="flex flex-col items-center text-center"
-                >
+                <div key={level.code} className="flex flex-col items-center text-center">
                   <span
                     aria-hidden="true"
                     className={
@@ -83,12 +73,12 @@ export default function LandingLevels() {
                       אתם כאן
                     </span>
                   )}
-                </motion.div>
+                </div>
               );
             })}
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

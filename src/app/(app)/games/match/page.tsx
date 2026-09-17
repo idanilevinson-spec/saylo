@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link2, Trophy, Timer } from "lucide-react";
+import { Link2, Trophy, Timer, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { getMatchPairs, type MatchPair, type MatchRoundType } from "@/lib/games/matchContent";
@@ -368,7 +368,10 @@ export default function MatchGamePage() {
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 z-10 flex items-center justify-center bg-background/90 rounded-lg"
               >
-                <p className="text-xl font-bold text-accent-hover">שלב הושלם! 🎉</p>
+                <p className="flex items-center gap-2 text-xl font-bold text-accent-hover">
+                  <PartyPopper size={20} className="shrink-0" aria-hidden="true" />
+                  שלב הושלם!
+                </p>
               </motion.div>
             )}
           </AnimatePresence>

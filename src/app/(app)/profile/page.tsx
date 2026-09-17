@@ -130,7 +130,7 @@ export default function ProfilePage() {
         transition={{ duration: 0.4 }}
         className="flex flex-col items-center text-center"
       >
-        <div className="w-20 h-20 rounded-full bg-gradient-to-l from-primary to-accent flex items-center justify-center text-2xl font-bold text-primary-ink shadow-lg shadow-primary/20">
+        <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-2xl font-bold text-primary-ink shadow-lg shadow-primary/20">
           {initial}
         </div>
         <h1 className="mt-4 text-2xl font-bold">{profile.display_name}</h1>

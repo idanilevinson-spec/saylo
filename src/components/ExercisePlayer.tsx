@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, Heart } from "lucide-react";
+import { CheckCircle2, XCircle, Heart, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
 import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
@@ -120,9 +120,10 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.15, type: "spring", bounce: 0.5 }}
-                  className="mt-2 text-sm font-medium text-accent-hover"
+                  className="mt-2 flex items-center justify-center gap-1.5 text-sm font-medium text-accent-hover"
                 >
-                  🎉 קיבלתם תג חדש: {result.newBadges.map((b) => b.name_he).join(", ")}
+                  <PartyPopper size={16} className="shrink-0" aria-hidden="true" />
+                  קיבלתם תג חדש: {result.newBadges.map((b) => b.name_he).join(", ")}
                 </motion.p>
               )}
             </motion.div>

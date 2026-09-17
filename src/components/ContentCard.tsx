@@ -35,7 +35,7 @@ export default function ContentCard({ href, index = 0, className = "", children 
       {href && (
         <span
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-[3px] origin-right scale-x-0 bg-gradient-to-l from-primary to-accent transition-transform duration-300 group-hover:scale-x-100"
+          className="absolute inset-x-0 top-0 h-[3px] origin-right scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100"
         />
       )}
       {children}

@@ -28,6 +28,7 @@ const chyron = Anton({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.saylolearn.com"),
   title: "Saylo",
   description: "לומדים אנגלית בקצב שלכם — מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם",
   formatDetection: {
@@ -37,6 +38,14 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "default",
     title: "Saylo",
+  },
+  openGraph: {
+    title: "Saylo",
+    description: "לומדים אנגלית בקצב שלכם — מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם",
+    url: "https://www.saylolearn.com",
+    siteName: "Saylo",
+    locale: "he_IL",
+    type: "website",
   },
 };
 
