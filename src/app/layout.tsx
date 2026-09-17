@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Rubik, Plus_Jakarta_Sans, Anton } from "next/font/google";
 import Script from "next/script";
-import { MotionConfig } from "framer-motion";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
 import Navbar from "@/components/Navbar";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PageTransition from "@/components/PageTransition";
+import AccessibilityProvider from "@/components/AccessibilityProvider";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -63,6 +63,12 @@ export const viewport: Viewport = {
 // explicit choice (from the toggle) always wins over it.
 const noFlashThemeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t="dark"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`;
 
+// Same no-flash principle as the theme script above: apply any saved
+// accessibility preferences straight to <html> before first paint, so a
+// returning visitor who turned on high contrast or a larger text size
+// never sees a flash of the unadjusted page.
+const noFlashA11yScript = `(function(){try{var raw=localStorage.getItem("saylo-a11y-prefs");if(!raw)return;var p=JSON.parse(raw);var html=document.documentElement;if(p.fontScale&&p.fontScale!==100)html.setAttribute("data-a11y-font-scale",String(p.fontScale));if(p.highContrast)html.setAttribute("data-a11y-contrast","high");if(p.grayscale)html.setAttribute("data-a11y-grayscale","true");if(p.underlineLinks)html.setAttribute("data-a11y-underline-links","true");if(p.readingSpacing)html.setAttribute("data-a11y-reading-spacing","true");if(p.stopAnimations)html.setAttribute("data-a11y-motion","reduced")}catch(e){}})();`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -75,6 +81,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script id="no-flash-theme" strategy="beforeInteractive">
           {noFlashThemeScript}
         </Script>
+        <Script id="no-flash-a11y" strategy="beforeInteractive">
+          {noFlashA11yScript}
+        </Script>
       </head>
       <body className="min-h-full flex flex-col">
         <a
@@ -84,14 +93,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           דלגו לתוכן הראשי
         </a>
         <ServiceWorkerRegister />
-        <MotionConfig reducedMotion="user">
+        <AccessibilityProvider>
           <AuthProvider>
             <Navbar />
             <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
               <PageTransition>{children}</PageTransition>
             </main>
           </AuthProvider>
-        </MotionConfig>
+        </AccessibilityProvider>
       </body>
     </html>
   );

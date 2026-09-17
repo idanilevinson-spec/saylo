@@ -293,6 +293,8 @@ function SpeakingChatInner() {
           <input
             type="text"
             dir="ltr"
+            lang="en"
+            aria-label="הקלידו הודעה באנגלית"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}

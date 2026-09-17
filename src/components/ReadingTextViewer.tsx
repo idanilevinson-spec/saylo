@@ -93,7 +93,7 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord }: ReadingTextVi
         </div>
       </div>
 
-      <div dir="ltr" className="font-content text-lg leading-loose text-left space-y-4">
+      <div dir="ltr" lang="en" className="font-content text-lg leading-loose text-left space-y-4">
         {paragraphs.map((paragraph, pIdx) => (
           <p
             key={pIdx}

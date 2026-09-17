@@ -128,6 +128,7 @@ export default function AdminGrammarPage() {
         {topicEditingId && (
           <div className="mt-3 p-3 rounded-lg bg-background-2 space-y-2">
             <input
+              aria-label="slug"
               value={topicForm.slug}
               onChange={(e) => setTopicForm({ ...topicForm, slug: e.target.value })}
               placeholder="slug (למשל: present-simple)"
@@ -135,16 +136,19 @@ export default function AdminGrammarPage() {
               className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             />
             <input
+              aria-label="שם בעברית"
               value={topicForm.name_he}
               onChange={(e) => setTopicForm({ ...topicForm, name_he: e.target.value })}
               placeholder="שם בעברית"
               className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             />
             <input
+              aria-label="Name in English"
               value={topicForm.name_en}
               onChange={(e) => setTopicForm({ ...topicForm, name_en: e.target.value })}
               placeholder="Name in English"
               dir="ltr"
+              lang="en"
               className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
             />
             <div className="flex gap-2">
@@ -226,12 +230,14 @@ export default function AdminGrammarPage() {
             {lessonEditingId && (
               <div className="mt-3 p-3 rounded-lg bg-background-2 space-y-2">
                 <input
+                  aria-label="כותרת השיעור"
                   value={lessonForm.title_he}
                   onChange={(e) => setLessonForm({ ...lessonForm, title_he: e.target.value })}
                   placeholder="כותרת השיעור"
                   className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
                 />
                 <textarea
+                  aria-label="תוכן השיעור (Markdown)"
                   value={lessonForm.body_md}
                   onChange={(e) => setLessonForm({ ...lessonForm, body_md: e.target.value })}
                   placeholder="תוכן השיעור (Markdown)"

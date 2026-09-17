@@ -188,7 +188,10 @@ export default function DashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             {greeting()}, {profile.display_name}
           </h1>
-          <Link href="/progress" className="mt-2 inline-block text-sm text-primary hover:underline">
+          <Link
+            href="/progress"
+            className="mt-2 inline-block text-sm text-primary hover:underline rounded focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          >
             כל ההתקדמות שלי ←
           </Link>
         </div>
@@ -217,7 +220,7 @@ export default function DashboardPage() {
         >
           <Link
             href="/placement"
-            className="group relative flex items-center gap-5 overflow-hidden rounded-lg border border-accent/40 bg-accent/[0.07] p-6 transition-colors hover:bg-accent/[0.11]"
+            className="group relative flex items-center gap-5 overflow-hidden rounded-lg border border-accent/40 bg-accent/[0.07] p-6 transition-colors hover:bg-accent/[0.11] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             <span className="inline-flex w-14 h-14 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent-hover">
               <Target size={26} strokeWidth={2} />
@@ -298,7 +301,7 @@ export default function DashboardPage() {
             >
               <Link
                 href={m.href}
-                className={`h-full flex items-center gap-4 rounded-lg border p-5 transition-all hover:shadow-md ${
+                className={`h-full flex items-center gap-4 rounded-lg border p-5 transition-all hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                   m.tone === "accent"
                     ? "bg-accent/10 border-accent/30 hover:border-accent/50"
                     : "bg-primary/10 border-primary/30 hover:border-primary/50"
@@ -335,7 +338,7 @@ export default function DashboardPage() {
                 <Link
                   key={m.title}
                   href={m.href}
-                  className="group flex items-center gap-3 px-4 py-3.5 hover:bg-background-2 transition-colors"
+                  className="group flex items-center gap-3 px-4 py-3.5 hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
                 >
                   <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <m.icon size={18} strokeWidth={2} />

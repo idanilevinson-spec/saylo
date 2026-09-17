@@ -17,12 +17,23 @@
   --primary: #0066d6;
   --primary-hover: #0052ad;
   --primary-ink: #ffffff;
-  --accent: #00a19d;
-  --accent-hover: #008783;
-  --accent-ink: #04211f;
-  --success: #16a34a;
+  /* accent/success/danger darkened from the original light-mode values —
+     a real WCAG AA gap: #00a19d/#16a34a/#ef4444 measured 2.98-3.76:1 as
+     text against --background/--card (need 4.5:1), because they were
+     tuned as *fill* colors with their own -ink text, not as direct text
+     colors — but text-accent/text-success/text-danger are exactly how
+     status/error text is written across the app (see e.g. LoginForm's
+     role="alert" text-danger). Dark mode already passes (7-11:1) and is
+     untouched. accent-ink flips dark->light to match: the same badge
+     (bg-accent text-accent-ink, e.g. the CEFR result badge on
+     /placement) needs a light ink once the fill itself gets darker,
+     the same way success-ink/danger-ink already are. */
+  --accent: #00726f;
+  --accent-hover: #006663;
+  --accent-ink: #f0fdfa;
+  --success: #0f7a37;
   --success-ink: #f0fdf4;
-  --danger: #ef4444;
+  --danger: #c81e1e;
   --danger-ink: #fef2f2;
   --muted: #6e6656;
 }
@@ -304,4 +315,113 @@ h2 {
   --tw-prose-pre-bg: var(--background-2);
   --tw-prose-th-borders: var(--card-border);
   --tw-prose-td-borders: var(--card-border);
+}
+
+/* Accessibility toolbar (AccessibilityWidget) — a manual, in-page override
+   layer on top of the OS-level prefers-color-scheme/prefers-reduced-motion
+   support the rest of the app already has. Required for real people whose
+   assistive setup can't (or hasn't) changed an OS-wide setting, and — in
+   Israel — a de-facto expectation under תקנות שוויון זכויות/ת"י 5568
+   alongside AA contrast and full keyboard support. Every rule here is
+   opt-in via a data-a11y-* attribute the widget sets on <html>; nothing
+   here changes the default experience for someone who never opens it. */
+
+:root[data-a11y-font-scale="110"] {
+  font-size: 110%;
+}
+:root[data-a11y-font-scale="125"] {
+  font-size: 125%;
+}
+:root[data-a11y-font-scale="140"] {
+  font-size: 140%;
+}
+
+/* A dedicated high-contrast palette, not a tweak of whichever theme is
+   active — low-vision users asking for "high contrast" want the extremes,
+   not a slightly-stronger version of the current look. */
+:root[data-a11y-contrast="high"] {
+  /* !important here is deliberate, not a shortcut: this is a manual,
+     user-invoked override that must reliably beat the theme system's own
+     :root[data-theme] / @media(prefers-color-scheme) rules regardless of
+     which one last touched a given token, not just tie on specificity. */
+  --background: #ffffff !important;
+  --background-2: #ffffff !important;
+  --foreground: #000000 !important;
+  --card: #ffffff !important;
+  --card-border: #000000 !important;
+  --muted: #000000 !important;
+  --primary: #0000cc !important;
+  --primary-hover: #000099 !important;
+  --primary-ink: #ffffff !important;
+  --accent: #006666 !important;
+  --accent-hover: #004d4d !important;
+  --accent-ink: #ffffff !important;
+  --success: #006600 !important;
+  --success-ink: #ffffff !important;
+  --danger: #cc0000 !important;
+  --danger-ink: #ffffff !important;
+}
+:root[data-a11y-contrast="high"] * {
+  border-color: currentColor;
+}
+/* Belt-and-suspenders: body's own background/color are set once via
+   var(--background)/var(--foreground) and, in testing, didn't reliably
+   re-resolve purely from the custom-property change above in every
+   engine — setting them directly here removes that indirection. */
+:root[data-a11y-contrast="high"] body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  transition: none !important;
+}
+
+:root[data-a11y-grayscale="true"] {
+  filter: grayscale(1);
+}
+
+:root[data-a11y-underline-links="true"] a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* More breathing room for readers with dyslexia or low vision — spacing,
+   not a typeface swap, so it stays honest to the brand's own type system
+   (DESIGN.md) instead of replacing it outright. */
+:root[data-a11y-reading-spacing="true"] {
+  letter-spacing: 0.02em;
+}
+:root[data-a11y-reading-spacing="true"] p,
+:root[data-a11y-reading-spacing="true"] li {
+  line-height: 1.85;
+  word-spacing: 0.04em;
+}
+
+/* The manual "stop animations" toggle. framer-motion's own JS-driven
+   animations are handled separately (AccessibilityProvider passes
+   reducedMotion="always" to MotionConfig when this is on) — this covers
+   the plain-CSS animations (ticker, LIVE pulse, film grain, fade-up) the
+   same way the prefers-reduced-motion media query already does, plus a
+   blanket safety net for anything not individually listed. */
+:root[data-a11y-motion="reduced"] .live-dot {
+  animation: none;
+}
+:root[data-a11y-motion="reduced"] .ticker-track {
+  animation: none;
+  transform: translateX(0%);
+}
+:root[data-a11y-motion="reduced"] body::after {
+  display: none;
+}
+:root[data-a11y-motion="reduced"] body {
+  transition: none;
+}
+:root[data-a11y-motion="reduced"] .animate-fade-up {
+  animation: none;
+}
+:root[data-a11y-motion="reduced"] *,
+:root[data-a11y-motion="reduced"] *::before,
+:root[data-a11y-motion="reduced"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
 }

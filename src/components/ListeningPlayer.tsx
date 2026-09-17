@@ -19,7 +19,7 @@ export default function ListeningPlayer({ transcriptEn }: ListeningPlayerProps) 
         <button
           onClick={togglePlayPause}
           disabled={playback === "loading"}
-          className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-70"
+          className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           {playback === "loading" && <Loader2 size={16} className="animate-spin" />}
           {playback === "playing" && <Pause size={16} />}
@@ -39,7 +39,7 @@ export default function ListeningPlayer({ transcriptEn }: ListeningPlayerProps) 
             <button
               key={r}
               onClick={() => setRate(r)}
-              className={`px-2.5 py-1.5 rounded-md font-medium transition-colors ${
+              className={`px-2.5 py-1.5 rounded-md font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                 rate === r ? "bg-primary/15 text-primary" : "text-muted hover:bg-background-2"
               }`}
             >
@@ -50,7 +50,8 @@ export default function ListeningPlayer({ transcriptEn }: ListeningPlayerProps) 
 
         <button
           onClick={() => setShowTranscript((s) => !s)}
-          className="px-5 py-2.5 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors"
+          aria-expanded={showTranscript}
+          className="px-5 py-2.5 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           {showTranscript ? "הסתירו תמלול" : "הציגו תמלול"}
         </button>

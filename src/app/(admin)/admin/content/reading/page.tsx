@@ -70,23 +70,28 @@ export default function AdminReadingPage() {
       {editingId && (
         <div className="mt-3 p-3 rounded-lg bg-background-2 space-y-2">
           <input
+            aria-label="כותרת בעברית"
             value={form.title_he}
             onChange={(e) => setForm({ ...form, title_he: e.target.value })}
             placeholder="כותרת בעברית"
             className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           />
           <input
+            aria-label="Title in English"
             value={form.title_en}
             onChange={(e) => setForm({ ...form, title_en: e.target.value })}
             placeholder="Title in English"
             dir="ltr"
+            lang="en"
             className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           />
           <textarea
+            aria-label="Text body (English)"
             value={form.body_en}
             onChange={(e) => setForm({ ...form, body_en: e.target.value })}
             placeholder="Text body (English)"
             dir="ltr"
+            lang="en"
             rows={8}
             className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           />

@@ -195,6 +195,7 @@ export default function AdminModerationPage() {
                       {flaggingId === c.id ? (
                         <div className="flex items-center gap-2">
                           <input
+                            aria-label="סיבת הסימון"
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
                             placeholder="סיבת הסימון"

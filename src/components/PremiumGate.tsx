@@ -49,7 +49,7 @@ export default function PremiumGate({ children, featureName, requirePaid = false
         </p>
         <Link
           href="/pricing"
-          className="mt-6 inline-block px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-6 inline-block px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           לצפייה במסלולים
         </Link>

@@ -56,6 +56,11 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
   return (
     <HeartsGate>
       <div className="max-w-xl mx-auto px-4 py-12">
+        {/* No visible page heading here by design (the question prompt
+            itself is the focal content), but a screen-reader user
+            navigating by heading needs a real landmark to jump to — this
+            is the single template every exercise type renders through. */}
+        <h1 className="sr-only">{progress ? `תרגול — שאלה ${progress.current} מתוך ${progress.total}` : "תרגול"}</h1>
         <div className="flex items-center justify-between gap-3">
           <Link href={backHref} className="text-sm text-primary">
             ← {backLabel}
@@ -154,7 +159,7 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                     dir="ltr"
                     className="mx-auto mb-4 w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/25 text-sm font-medium"
                   >
-                    <span className="text-accent-hover">Well done</span>
+                    <span lang="en" className="text-accent-hover">Well done</span>
                     <span aria-hidden="true" className="text-accent text-xs">
                       ⇄
                     </span>

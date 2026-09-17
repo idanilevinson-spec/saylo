@@ -250,6 +250,7 @@ function TopicFormFields({
   return (
     <div className="mt-3 p-3 rounded-lg bg-background-2 space-y-2">
       <input
+        aria-label="slug"
         value={form.slug}
         onChange={(e) => setForm({ ...form, slug: e.target.value })}
         placeholder="slug (למשל: animals)"
@@ -257,16 +258,19 @@ function TopicFormFields({
         className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <input
+        aria-label="שם בעברית"
         value={form.name_he}
         onChange={(e) => setForm({ ...form, name_he: e.target.value })}
         placeholder="שם בעברית"
         className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <input
+        aria-label="Name in English"
         value={form.name_en}
         onChange={(e) => setForm({ ...form, name_en: e.target.value })}
         placeholder="Name in English"
         dir="ltr"
+        lang="en"
         className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <div className="flex gap-2">
@@ -322,13 +326,16 @@ function ItemFormFields({
     <div className="mt-3 p-3 rounded-lg bg-background-2 space-y-2">
       <div className="grid sm:grid-cols-2 gap-2">
         <input
+          aria-label="Word"
           value={form.headword}
           onChange={(e) => setForm({ ...form, headword: e.target.value })}
           placeholder="Word"
           dir="ltr"
+          lang="en"
           className="px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
         />
         <input
+          aria-label="IPA (אופציונלי)"
           value={form.ipa ?? ""}
           onChange={(e) => setForm({ ...form, ipa: e.target.value })}
           placeholder="IPA (אופציונלי)"
@@ -337,19 +344,23 @@ function ItemFormFields({
         />
       </div>
       <input
+        aria-label="תרגום לעברית"
         value={form.translation_he}
         onChange={(e) => setForm({ ...form, translation_he: e.target.value })}
         placeholder="תרגום לעברית"
         className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <input
+        aria-label="Example sentence"
         value={form.example_en}
         onChange={(e) => setForm({ ...form, example_en: e.target.value })}
         placeholder="Example sentence"
         dir="ltr"
+        lang="en"
         className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
       />
       <input
+        aria-label="חלק דיבר (אופציונלי, למשל noun)"
         value={form.part_of_speech ?? ""}
         onChange={(e) => setForm({ ...form, part_of_speech: e.target.value })}
         placeholder="חלק דיבר (אופציונלי, למשל noun)"
