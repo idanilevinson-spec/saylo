@@ -55,7 +55,7 @@ export default function MatchQuestion({ content, disabled, onSubmit }: MatchQues
               disabled={disabled || matchedLeftSet.has(p.left)}
               onClick={() => setSelectedLeft(p.left)}
               aria-pressed={selectedLeft === p.left}
-              className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+              className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border text-sm transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98] ${
                 matchedLeftSet.has(p.left)
                   ? "border-card-border bg-background-2 opacity-60"
                   : selectedLeft === p.left
@@ -74,7 +74,7 @@ export default function MatchQuestion({ content, disabled, onSubmit }: MatchQues
               key={right}
               disabled={disabled || matchedRightSet.has(right) || !selectedLeft}
               onClick={() => pickRight(right)}
-              className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+              className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border text-sm transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98] ${
                 matchedRightSet.has(right)
                   ? "border-card-border bg-background-2 opacity-60"
                   : "border-card-border hover:border-primary/40 disabled:opacity-40"
@@ -90,7 +90,7 @@ export default function MatchQuestion({ content, disabled, onSubmit }: MatchQues
         <button
           onClick={() => allMatched && onSubmit({ pairs: matched })}
           disabled={!allMatched}
-          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
         >
           בדיקה
         </button>
