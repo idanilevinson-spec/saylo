@@ -41,10 +41,10 @@ export async function POST(request: Request) {
   const event = body.event;
   if (!event?.app_user_id) return NextResponse.json({ error: "missing event" }, { status: 400 });
 
-  // Sandbox events happen constantly during App Review and while testing —
-  // never let one touch a real user's production subscription row.
-  if (event.environment !== "PRODUCTION") return NextResponse.json({ received: true, skipped: "sandbox" });
-
+  // Sandbox events are deliberately processed: TestFlight and App Review
+  // purchases are always sandbox, and skipping them would leave the buyer
+  // without access. app_user_id is the buyer's own profile id, so a sandbox
+  // purchase can only ever touch that same person's row.
   const profileId = event.app_user_id;
 
   if (ACTIVE_EVENT_TYPES.has(event.type)) {
