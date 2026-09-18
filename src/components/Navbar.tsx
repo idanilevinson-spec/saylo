@@ -37,13 +37,16 @@ export default function Navbar() {
   // no-notch estimate accounts for.
   useEffect(() => {
     const el = headerRef.current;
-    if (!el) return;
+    if (!el) {
+      document.documentElement.style.setProperty("--navbar-h", "0px");
+      return;
+    }
     const setVar = () => document.documentElement.style.setProperty("--navbar-h", `${el.offsetHeight}px`);
     setVar();
     const observer = new ResizeObserver(setVar);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [menuOpen]);
+  }, [menuOpen, pathname]);
 
   const links = profile?.is_admin ? [...AUTHED_LINKS, { href: "/admin", label: "ניהול" }] : AUTHED_LINKS;
 
@@ -66,6 +69,9 @@ export default function Navbar() {
     await signOut();
     router.push("/");
   }
+
+  // The cinematic home page carries its own navigation inside the hero.
+  if (pathname === "/") return null;
 
   return (
     <header

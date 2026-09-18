@@ -1,28 +1,23 @@
 import type { Metadata } from "next";
-import LandingHero from "@/components/LandingHero";
-import LandingTrustStrip from "@/components/LandingTrustStrip";
-import LandingSteps from "@/components/LandingSteps";
-import LandingFeatures from "@/components/LandingFeatures";
-import LandingLevels from "@/components/LandingLevels";
-import LandingPricingTeaser from "@/components/LandingPricingTeaser";
-import LandingFinalCta from "@/components/LandingFinalCta";
+import CinemaHero from "@/components/cinema/CinemaHero";
+import CinemaAbout from "@/components/cinema/CinemaAbout";
+import CinemaFeatures from "@/components/cinema/CinemaFeatures";
 import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Saylo — לומדים אנגלית בקצב שלכם",
 };
 
+// Experiment: the whole page lives inside .theme-cinema, which re-points the
+// design tokens (background, card, foreground, primary…) to the dark cream
+// palette — so the shared footer follows along without being touched.
 export default function HomePage() {
   return (
-    <>
-      <LandingHero />
-      <LandingTrustStrip />
-      <LandingSteps />
-      <LandingFeatures />
-      <LandingLevels />
-      <LandingPricingTeaser />
-      <LandingFinalCta />
+    <div className="theme-cinema">
+      <CinemaHero />
+      <CinemaAbout />
+      <CinemaFeatures />
       <SiteFooter />
-    </>
+    </div>
   );
 }

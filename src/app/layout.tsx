@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Rubik, Plus_Jakarta_Sans, Anton } from "next/font/google";
+import { Rubik, Plus_Jakarta_Sans, Anton, Almarai, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
@@ -25,6 +25,23 @@ const chyron = Anton({
   variable: "--font-chyron",
   subsets: ["latin"],
   weight: "400",
+});
+
+// The cinematic landing page's two faces. Almarai ships Arabic + Latin but
+// no Hebrew, so Hebrew glyphs fall through to Rubik (see .theme-cinema in
+// globals.css); Instrument Serif italic is Latin-only, which is why the
+// italic accent line on that page is the English tagline, not Hebrew.
+const almarai = Almarai({
+  variable: "--font-almarai",
+  subsets: ["arabic", "latin"],
+  weight: ["300", "400", "700", "800"],
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument",
+  subsets: ["latin"],
+  weight: "400",
+  style: "italic",
 });
 
 export const metadata: Metadata = {
@@ -74,7 +91,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="he"
       dir="rtl"
-      className={`${rubik.variable} ${jakarta.variable} ${chyron.variable} h-full antialiased`}
+      className={`${rubik.variable} ${jakarta.variable} ${chyron.variable} ${almarai.variable} ${instrumentSerif.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

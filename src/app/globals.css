@@ -116,6 +116,7 @@
   --color-danger-ink: var(--danger-ink);
   --color-muted: var(--muted);
   --font-sans: var(--font-rubik);
+  --font-serif: var(--font-instrument), serif;
   --font-content: var(--font-jakarta);
   --font-display: var(--font-chyron);
 }
@@ -424,4 +425,34 @@ h2 {
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
+}
+
+/* "Cinematic" landing page (CinemaHero/About/Features): a self-contained
+   dark, warm-cream world scoped to one wrapper. It redefines the same
+   tokens the rest of the site reads, so the shared footer and any
+   utility like text-primary or bg-primary resolve to cream inside it —
+   and nothing outside the wrapper changes. Font stack: Almarai for Latin,
+   Rubik as the Hebrew fallback (Almarai has no Hebrew glyphs). */
+.theme-cinema {
+  --background: #000000;
+  --background-2: #101010;
+  --card: #212121;
+  --card-border: #2c2c2a;
+  --foreground: #e1e0cc;
+  --muted: #a3a397;
+  --primary: #dedbc8;
+  --primary-hover: #ffffff;
+  --primary-ink: #000000;
+  background: #000000;
+  color: #e1e0cc;
+  font-family: var(--font-almarai), var(--font-rubik), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Fractal-noise textures as inline SVG data URIs — the overlay sits on the
+   hero video, the softer one behind the features grid. */
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
