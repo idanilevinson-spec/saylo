@@ -100,20 +100,28 @@ export default function PricingCards() {
             <h2 className="font-bold text-lg">{plan.label}</h2>
             <div className="mt-4">
               <EnglishText as="span" className="text-3xl font-bold">
-                {native
-                  ? new Intl.NumberFormat("en", {
-                      style: "currency",
-                      currency: native.currencyCode,
-                      maximumFractionDigits: 0,
-                    }).format(native.price / plan.months)
-                  : `₪${monthlyEquivalent(plan)}`}
+                {native ? native.priceString : `₪${plan.totalPrice}`}
               </EnglishText>
-              <span className="text-muted text-sm"> / חודש</span>
+              <span className="text-muted text-sm">
+                {" "}
+                / {plan.months === 1 ? "חודש" : plan.months === 12 ? "שנה" : `${plan.months} חודשים`}
+              </span>
             </div>
-            <p className="mt-1 text-xs text-muted">
-              <EnglishText as="span">{native ? native.priceString : `₪${plan.totalPrice}`}</EnglishText> בתשלום אחד ל־{plan.months}{" "}
-              {plan.months === 1 ? "חודש" : "חודשים"}
-            </p>
+            {plan.months > 1 && (
+              <p className="mt-1 text-xs text-muted">
+                שווה ערך ל־
+                <EnglishText as="span">
+                  {native
+                    ? new Intl.NumberFormat("en", {
+                        style: "currency",
+                        currency: native.currencyCode,
+                        maximumFractionDigits: 0,
+                      }).format(native.price / plan.months)
+                    : `₪${monthlyEquivalent(plan)}`}
+                </EnglishText>{" "}
+                לחודש
+              </p>
+            )}
 
             {session ? (
               <motion.button
