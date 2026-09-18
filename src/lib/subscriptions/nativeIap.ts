@@ -32,6 +32,7 @@ export async function configureNativeIap(profileId: string): Promise<void> {
 export interface NativePlanPackage {
   planCode: string;
   priceString: string;
+  price: number;
   pkg: PurchasesPackage;
 }
 
@@ -48,6 +49,7 @@ export async function getNativePlanPackages(): Promise<NativePlanPackage[]> {
   return current.availablePackages.map((pkg) => ({
     planCode: pkg.product.identifier.split(".").pop() ?? "",
     priceString: pkg.product.priceString,
+    price: pkg.product.price,
     pkg,
   }));
 }

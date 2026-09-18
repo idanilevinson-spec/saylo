@@ -71,7 +71,11 @@ export default function PricingCards() {
       {error && <p role="alert" className="max-w-md mx-auto mb-6 text-center text-sm text-danger">{error}</p>}
 
       <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
-        {PRICING_PLANS.map((plan, i) => (
+        {PRICING_PLANS.map((plan, i) => {
+          // On the native app the price shown must be exactly what Apple
+          // charges, so it comes from StoreKit rather than plans.ts.
+          const native = isNative ? nativePackages.find((p) => p.planCode === plan.code) : undefined;
+          return (
           <motion.div
             key={plan.code}
             initial={{ opacity: 0, y: 24 }}
@@ -96,12 +100,12 @@ export default function PricingCards() {
             <h2 className="font-bold text-lg">{plan.label}</h2>
             <div className="mt-4">
               <EnglishText as="span" className="text-3xl font-bold">
-                ₪{monthlyEquivalent(plan)}
+                ₪{native ? Math.round(native.price / plan.months) : monthlyEquivalent(plan)}
               </EnglishText>
               <span className="text-muted text-sm"> / חודש</span>
             </div>
             <p className="mt-1 text-xs text-muted">
-              <EnglishText as="span">₪{plan.totalPrice}</EnglishText> בתשלום אחד ל־{plan.months}{" "}
+              <EnglishText as="span">{native ? native.priceString : `₪${plan.totalPrice}`}</EnglishText> בתשלום אחד ל־{plan.months}{" "}
               {plan.months === 1 ? "חודש" : "חודשים"}
             </p>
 
@@ -126,7 +130,8 @@ export default function PricingCards() {
               </MotionLink>
             )}
           </motion.div>
-        ))}
+          );
+        })}
       </div>
 
       <motion.div
