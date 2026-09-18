@@ -212,7 +212,26 @@ export default function ProfilePage() {
             </>
           )}
 
-          {subscription.status === "active" && !subscription.cancel_at_period_end && (
+          {subscription.status === "active" && subscription.billing_provider === "apple" && (
+            <>
+              <p className="text-sm">
+                {planLabel ?? "מנוי פעיל"} ·{" "}
+                {subscription.cancel_at_period_end ? "יבוטל ב-" : "מתחדש ב-"}
+                <strong>{formatDate(subscription.current_period_end)}</strong>
+              </p>
+              <p className="text-xs text-muted">המנוי נרכש דרך App Store, וניהול או ביטול שלו נעשים בהגדרות ה-Apple ID שלכם.</p>
+              <a
+                href="https://apps.apple.com/account/subscriptions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-sm text-primary font-medium hover:underline"
+              >
+                ניהול המנוי ב-App Store ←
+              </a>
+            </>
+          )}
+
+          {subscription.status === "active" && subscription.billing_provider !== "apple" && !subscription.cancel_at_period_end && (
             <>
               <p className="text-sm">
                 {planLabel ?? "מנוי פעיל"} · מתחדש ב-<strong>{formatDate(subscription.current_period_end)}</strong>
@@ -252,7 +271,7 @@ export default function ProfilePage() {
             </>
           )}
 
-          {subscription.status === "active" && subscription.cancel_at_period_end && (
+          {subscription.status === "active" && subscription.billing_provider !== "apple" && subscription.cancel_at_period_end && (
             <>
               <p className="text-sm">
                 המנוי שלכם יבוטל ב-<strong>{formatDate(subscription.current_period_end)}</strong> — עד אז יש לכם

@@ -20,7 +20,6 @@ const ACTIVE_EVENT_TYPES = new Set([
   "SUBSCRIPTION_EXTENDED",
   "REFUND_REVERSED",
 ]);
-const CANCELED_EVENT_TYPES = new Set(["CANCELLATION", "EXPIRATION"]);
 
 interface RevenueCatEvent {
   type: string;
@@ -28,6 +27,13 @@ interface RevenueCatEvent {
   product_id: string;
   expiration_at_ms: number | null;
   environment: "SANDBOX" | "PRODUCTION";
+}
+
+// A database failure must not look like success: returning 500 makes
+// RevenueCat show the failed delivery and retry it.
+function failed(message: string) {
+  console.error("revenuecat webhook write failed:", message);
+  return NextResponse.json({ error: "write failed" }, { status: 500 });
 }
 
 export async function POST(request: Request) {
@@ -54,7 +60,7 @@ export async function POST(request: Request) {
       .eq("apple_product_id", event.product_id)
       .maybeSingle();
 
-    await supabaseAdmin.from("subscriptions").upsert({
+    const { error } = await supabaseAdmin.from("subscriptions").upsert({
       profile_id: profileId,
       plan_id: plan?.id ?? null,
       status: "active",
@@ -63,25 +69,37 @@ export async function POST(request: Request) {
       cancel_at_period_end: false,
       updated_at: new Date().toISOString(),
     });
-  } else if (CANCELED_EVENT_TYPES.has(event.type)) {
+    if (error) return failed(error.message);
+  } else if (event.type === "CANCELLATION" || event.type === "EXPIRATION") {
+    // CANCELLATION means auto-renew was switched off (or a refund) — the
+    // user has paid through expiration_at_ms, so access must continue until
+    // then and only EXPIRATION ends it. A refund arrives with an expiration
+    // already in the past, which is treated as ended.
+    const expiresAt = event.expiration_at_ms;
+    const ended = event.type === "EXPIRATION" || (expiresAt !== null && expiresAt <= Date.now());
+    const update = ended
+      ? { status: "expired", cancel_at_period_end: false }
+      : {
+          cancel_at_period_end: true,
+          ...(expiresAt ? { current_period_end: new Date(expiresAt).toISOString() } : {}),
+        };
+
     // billing_provider guard: only ever touch a row this event's own
     // provider actually owns — a stray Apple event must not overwrite a
     // subscription this profile is really paying for via PayPlus/Stripe.
-    await supabaseAdmin
+    const { error } = await supabaseAdmin
       .from("subscriptions")
-      .update({
-        status: event.type === "EXPIRATION" ? "expired" : "canceled",
-        cancel_at_period_end: false,
-        updated_at: new Date().toISOString(),
-      })
+      .update({ ...update, updated_at: new Date().toISOString() })
       .eq("profile_id", profileId)
       .eq("billing_provider", "apple");
+    if (error) return failed(error.message);
   } else if (event.type === "BILLING_ISSUE") {
-    await supabaseAdmin
+    const { error } = await supabaseAdmin
       .from("subscriptions")
       .update({ status: "past_due", updated_at: new Date().toISOString() })
       .eq("profile_id", profileId)
       .eq("billing_provider", "apple");
+    if (error) return failed(error.message);
   }
 
   return NextResponse.json({ received: true });

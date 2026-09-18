@@ -72,3 +72,14 @@ export async function purchaseNativePlan(pkg: PurchasesPackage): Promise<boolean
     return false;
   }
 }
+
+// Apple requires a way to re-sync purchases made on another device or after
+// a reinstall. Resolves to whether an active entitlement exists afterwards.
+export async function restoreNativePurchases(): Promise<boolean> {
+  try {
+    const { customerInfo } = await Purchases.restorePurchases();
+    return Object.keys(customerInfo.entitlements.active).length > 0;
+  } catch {
+    return false;
+  }
+}

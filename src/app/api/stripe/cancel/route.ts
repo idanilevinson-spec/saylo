@@ -23,11 +23,13 @@ export async function POST(request: Request) {
 
   const { data: sub } = await supabase
     .from("subscriptions")
-    .select("stripe_subscription_id, status")
+    .select("stripe_subscription_id, status, billing_provider")
     .eq("profile_id", user.id)
     .maybeSingle();
 
-  if (!sub?.stripe_subscription_id || sub.status !== "active") {
+  // Apple subscriptions can only be canceled by the user inside their Apple
+  // account settings, never from here.
+  if (!sub?.stripe_subscription_id || sub.status !== "active" || sub.billing_provider !== "stripe") {
     return NextResponse.json({ error: "no active paid subscription to update" }, { status: 400 });
   }
 

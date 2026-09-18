@@ -9,7 +9,13 @@ import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
-import { configureNativeIap, getNativePlanPackages, purchaseNativePlan, type NativePlanPackage } from "@/lib/subscriptions/nativeIap";
+import {
+  configureNativeIap,
+  getNativePlanPackages,
+  purchaseNativePlan,
+  restoreNativePurchases,
+  type NativePlanPackage,
+} from "@/lib/subscriptions/nativeIap";
 
 // App Store Review Guideline 3.1.1: a subscription that unlocks in-app
 // content has to be purchased through Apple's own StoreKit when running as
@@ -25,6 +31,17 @@ export default function PricingCards() {
   const [loadingCode, setLoadingCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [nativePackages, setNativePackages] = useState<NativePlanPackage[]>([]);
+  const [restoring, setRestoring] = useState(false);
+  const [restoreMessage, setRestoreMessage] = useState<string | null>(null);
+
+  async function handleRestore() {
+    setRestoring(true);
+    setRestoreMessage(null);
+    const found = await restoreNativePurchases();
+    setRestoreMessage(found ? "המנוי שוחזר בהצלחה." : "לא נמצא מנוי פעיל לשחזור בחשבון ה-Apple הזה.");
+    setRestoring(false);
+    if (found) router.push("/dashboard");
+  }
 
   useEffect(() => {
     if (!isNative || !profile) return;
@@ -147,6 +164,38 @@ export default function PricingCards() {
           );
         })}
       </div>
+
+      {isNative && (
+        <div className="max-w-3xl mx-auto mt-8 text-center space-y-3">
+          {session && (
+            <button
+              onClick={handleRestore}
+              disabled={restoring}
+              className="text-sm text-primary font-medium hover:underline disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            >
+              {restoring ? "משחזר..." : "שחזור רכישות"}
+            </button>
+          )}
+          {restoreMessage && (
+            <p role="status" className="text-sm text-muted">
+              {restoreMessage}
+            </p>
+          )}
+          <p className="text-xs text-muted leading-relaxed">
+            המנוי מתחדש אוטומטית בתום כל תקופה, באותו מחיר ובאותו משך, אלא אם בוטל לפחות 24 שעות לפני סיומה. החיוב
+            נעשה דרך חשבון ה-Apple שלכם, ואפשר לנהל או לבטל את המנוי בכל עת בהגדרות ה-Apple ID.
+          </p>
+          <p className="text-xs">
+            <a href="/terms" className="text-primary hover:underline">
+              תנאי שימוש
+            </a>
+            {" · "}
+            <a href="/privacy" className="text-primary hover:underline">
+              מדיניות פרטיות
+            </a>
+          </p>
+        </div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}
