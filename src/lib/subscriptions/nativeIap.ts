@@ -33,6 +33,7 @@ export interface NativePlanPackage {
   planCode: string;
   priceString: string;
   price: number;
+  currencyCode: string;
   pkg: PurchasesPackage;
 }
 
@@ -50,6 +51,7 @@ export async function getNativePlanPackages(): Promise<NativePlanPackage[]> {
     planCode: pkg.product.identifier.split(".").pop() ?? "",
     priceString: pkg.product.priceString,
     price: pkg.product.price,
+    currencyCode: pkg.product.currencyCode,
     pkg,
   }));
 }

@@ -100,7 +100,13 @@ export default function PricingCards() {
             <h2 className="font-bold text-lg">{plan.label}</h2>
             <div className="mt-4">
               <EnglishText as="span" className="text-3xl font-bold">
-                ₪{native ? Math.round(native.price / plan.months) : monthlyEquivalent(plan)}
+                {native
+                  ? new Intl.NumberFormat("en", {
+                      style: "currency",
+                      currency: native.currencyCode,
+                      maximumFractionDigits: 0,
+                    }).format(native.price / plan.months)
+                  : `₪${monthlyEquivalent(plan)}`}
               </EnglishText>
               <span className="text-muted text-sm"> / חודש</span>
             </div>
