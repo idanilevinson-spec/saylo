@@ -34,6 +34,27 @@ export default function ProfilePage() {
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function deleteAccount() {
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch("/api/account/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: true }),
+      });
+      if (!res.ok) throw new Error("delete failed");
+      await signOut();
+      router.push("/");
+    } catch {
+      setDeleteError("לא הצלחנו למחוק את החשבון. נסו שוב, או פנו אלינו ב-support@saylolearn.com.");
+      setDeleteLoading(false);
+    }
+  }
 
   async function toggleEmailReminders() {
     if (!profile || savingEmailPref) return;
@@ -369,6 +390,59 @@ export default function ProfilePage() {
       >
         התנתקות
       </motion.button>
+
+      <div className="mt-8 border-t border-card-border pt-6">
+        {!confirmingDelete ? (
+          <button
+            onClick={() => setConfirmingDelete(true)}
+            className="text-sm text-muted hover:text-danger hover:underline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          >
+            מחיקת החשבון
+          </button>
+        ) : (
+          <div className="bg-danger-ink border border-danger/30 rounded-lg p-4 space-y-3">
+            <h2 className="font-bold text-sm">למחוק את החשבון לצמיתות?</h2>
+            <p className="text-sm">
+              כל הנתונים שלכם יימחקו לצמיתות: ההתקדמות, ה־XP, ההיסטוריה והמנוי. אי אפשר לשחזר את זה.
+            </p>
+            {subscription?.status === "active" && subscription.billing_provider === "apple" && (
+              <p className="text-sm">
+                מחיקת החשבון <strong>לא מבטלת</strong> את המנוי ב־App Store, וההחיוב ימשיך. בטלו אותו קודם{" "}
+                <a
+                  href="https://apps.apple.com/account/subscriptions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary font-medium hover:underline"
+                >
+                  בהגדרות ה־Apple ID
+                </a>
+                .
+              </p>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={deleteAccount}
+                disabled={deleteLoading}
+                className="px-3 py-1.5 rounded-lg bg-danger text-[#04122b] text-sm font-medium disabled:opacity-60"
+              >
+                {deleteLoading ? "מוחק..." : "כן, מחקו את החשבון שלי"}
+              </button>
+              <button
+                onClick={() => setConfirmingDelete(false)}
+                disabled={deleteLoading}
+                className="px-3 py-1.5 rounded-lg border border-card-border text-sm"
+              >
+                ביטול
+              </button>
+            </div>
+            {deleteError && (
+              <p role="alert" className="text-sm text-danger">
+                {deleteError}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
