@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
+import { DAILY_CONVERSATION_LIMIT, DAILY_WRITING_LIMIT } from "@/lib/legal/siteInfo";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -68,8 +70,8 @@ export default function PricingCards() {
               <span className="text-muted text-sm"> / חודש</span>
             </div>
             <p className="mt-1 text-xs text-muted">
-              <EnglishText as="span">₪{plan.totalPrice}</EnglishText> בתשלום אחד ל־{plan.months}{" "}
-              {plan.months === 1 ? "חודש" : "חודשים"}
+              <EnglishText as="span">₪{plan.totalPrice}</EnglishText>{" "}
+              {plan.months === 1 ? "בתשלום אחד לחודש" : `בתשלום אחד ל־${plan.months} חודשים`}
             </p>
 
             {session ? (
@@ -96,29 +98,47 @@ export default function PricingCards() {
         ))}
       </div>
 
+      <p className="max-w-3xl mx-auto mt-8 text-center text-sm text-muted leading-relaxed">
+        המחירים בשקלים והם סופיים: העסק רשום כעוסק פטור ואינו גובה מע״מ. כל מסלול משולם מראש, בתשלום אחד, ומתחדש
+        אוטומטית לאותה תקופה עד שתבטלו. אפשר לבטל את החידוש בכל עת בעמוד הפרופיל. פרטים ב
+        <Link href="/terms" className="text-primary hover:underline">
+          תנאי השימוש
+        </Link>{" "}
+        וב
+        <Link href="/refunds" className="text-primary hover:underline">
+          מדיניות הביטולים וההחזרים
+        </Link>
+        .
+      </p>
+
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.4 }}
-        className="max-w-3xl mx-auto mt-14 bg-background-2 border border-card-border rounded-lg p-6"
+        className="max-w-3xl mx-auto mt-8 bg-background-2 border border-card-border rounded-lg p-6"
       >
         <h2 className="font-bold mb-3">מה כלול בכל המסלולים בתשלום?</h2>
         <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted">
           {[
             "מבחן רמה ומסלול לימוד אישי",
-            "מורה AI אישי ללא הגבלה",
+            "שיחות עם מורה AI, בטקסט ובקול",
             "תרגול דיבור עם AI",
-            "תרגילים ללא הגבלה",
+            "משוב AI על כתיבה",
+            "תרגול בלי מגבלת לבבות",
             "חזרה חכמה יומית",
             "כל 6 רמות ה־CEFR",
           ].map((item) => (
             <li key={item} className="flex items-center gap-2">
-              <Check size={16} className="shrink-0 text-success" />
+              <Check size={16} className="shrink-0 text-success" aria-hidden="true" />
               {item}
             </li>
           ))}
         </ul>
+        <p className="mt-4 text-xs text-muted leading-relaxed">
+          שימוש הוגן: עד {DAILY_CONVERSATION_LIMIT} שיחות חדשות עם המורה ועד {DAILY_WRITING_LIMIT} הגשות כתיבה בכל 24
+          שעות. שיחה עם המורה זמינה במנוי בתשלום בלבד, ולא בניסיון החינם.
+        </p>
       </motion.div>
     </section>
   );

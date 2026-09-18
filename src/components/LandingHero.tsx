@@ -66,7 +66,8 @@ export default function LandingHero() {
                 סוף סוף, ברור.
               </h2>
               <p className="mt-5 max-w-xl text-muted leading-relaxed">
-                מבחן רמה אישי, מסלול לימוד שמתאים בדיוק לחוזקות ולחולשות שלכם, ומורה AI שזוכר כל מילה שקשה לכם.
+                מבחן רמה אישי, מסלול לימוד שמתאים לחוזקות ולחולשות שלכם, ומורה AI שמציע מה לתרגל לפי הטעויות
+                האחרונות שלכם.
               </p>
 
               <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">

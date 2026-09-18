@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import SiteFooter from "@/components/SiteFooter";
+import LegalPage, { EmailLink, LegalSection, LegalList, PhoneLink } from "@/components/LegalPage";
+import { ACCESSIBILITY_COORDINATOR_NAME, ACCESSIBILITY_COORDINATOR_PHONE } from "@/lib/legal/siteInfo";
 
 export const metadata: Metadata = {
   title: "הצהרת נגישות — Saylo",
@@ -7,61 +8,61 @@ export const metadata: Metadata = {
 
 export default function AccessibilityPage() {
   return (
-    <>
-      <section className="px-4 pt-16 pb-8 max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold tracking-tight">הצהרת נגישות</h1>
-        <p className="mt-2 text-sm text-muted">עודכן לאחרונה: {new Date().toLocaleDateString("he-IL")}</p>
+    <LegalPage title="הצהרת נגישות">
+      <LegalSection title="המחויבות שלנו לנגישות">
+        <p>
+          אנחנו ב-Saylo רוצים שכל אחד יוכל ללמוד באתר ובאפליקציה, כולל אנשים עם מוגבלות. אנחנו פועלים להנגשת השירות
+          לפי תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע״ג-2013, ולפי התקן הישראלי ת״י 5568
+          המבוסס על הנחיות WCAG ברמה AA.
+        </p>
+      </LegalSection>
 
-        <div className="mt-8 space-y-8 text-foreground leading-relaxed">
-          <section>
-            <h2 className="text-xl font-bold">המחויבות שלנו לנגישות</h2>
-            <p className="mt-2 text-muted">
-              אנחנו ב-Saylo רואים חשיבות רבה במתן שירות שוויוני, מכבד ונגיש לכלל המשתמשים, כולל אנשים עם
-              מוגבלויות. אנו פועלים להנגשת האתר והאפליקציה בהתאם לתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות
-              נגישות לשירות), התשע״ג-2013, ובהתאם לתקן הישראלי ת״י 5568 המבוסס על הנחיות WCAG 2.0 ברמה AA.
-            </p>
-          </section>
+      <LegalSection title="התאמות הנגישות שבוצעו">
+        <LegalList>
+          <li>
+            תפריט נגישות צף שמאפשר להגדיל טקסט, להפעיל ניגודיות גבוהה או גווני אפור, להדגיש קישורים, להגדיל ריווח
+            קריאה ולעצור אנימציות. הוא זמין בכל עמוד באתר ובאפליקציה.
+          </li>
+          <li>
+            ניגודיות צבעים לפי דרישות רמה AA, במצב בהיר ובמצב כהה: יחס של 4.5:1 לפחות לטקסט, ו-3:1 לפחות לגבולות של
+            שדות טופס.
+          </li>
+          <li>ניווט במקלדת בפעולות המרכזיות בשירות, עם מסגרת פוקוס גלויה.</li>
+          <li>
+            תמיכה בקוראי מסך: תוויות לכפתורים ולשדות, והכרזה על תוצאות תרגילים והודעות שגיאה בזמן אמת.
+          </li>
+          <li>קישור &quot;דלגו לתוכן הראשי&quot; בתחילת כל עמוד.</li>
+          <li>
+            כיבוד הגדרת &quot;הפחתת תנועה&quot; של מערכת ההפעלה: אנימציות מושבתות אוטומטית למי שבחר בכך.
+          </li>
+          <li>אפשרות להגדיל טקסט ולהתקרב במסך, בלי שהתצוגה תיחסם.</li>
+        </LegalList>
+      </LegalSection>
 
-          <section>
-            <h2 className="text-xl font-bold">אמצעי הנגישות שיושמו</h2>
-            <ul className="mt-2 space-y-1.5 text-muted list-disc list-inside">
-              <li>
-                תפריט נגישות צף בפינת המסך המאפשר הגדלת טקסט, מצב ניגודיות גבוהה, גווני אפור, הדגשת קישורים, ריווח
-                קריאה מוגדל ועצירת אנימציות — זמין בכל עמוד באתר ובאפליקציה.
-              </li>
-              <li>ניגודיות צבעים העומדת בתקן WCAG AA בין טקסט לרקע, במצב בהיר ובמצב כהה כאחד.</li>
-              <li>ניווט מלא באמצעות מקלדת לכל הפעולות באתר ובאפליקציה, כולל מצבי פוקוס (focus) גלויים לעין.</li>
-              <li>תמיכה בטכנולוגיות מסייעות (כגון קוראי מסך) — תיוג ARIA, תוויות נגישות לכפתורי אייקון, והכרזות סטטוס לתוצאות תרגילים ומשוב בזמן אמת.</li>
-              <li>קישור &quot;דלגו לתוכן הראשי&quot; המאפשר לדלג על תפריט הניווט החוזר בכל עמוד.</li>
-              <li>כיבוד הגדרת &quot;הפחתת תנועה&quot; (Reduce Motion) של מערכת ההפעלה — אנימציות מושבתות אוטומטית למשתמשים שבחרו בכך.</li>
-              <li>אזורי נגיעה (touch targets) בגודל מספק, ותצוגה שאינה חוסמת הגדלת טקסט או תנועות זום.</li>
-              <li>מבנה סמנטי של כותרות, טפסים והודעות שגיאה, המאפשר ניווט מובנה עם טכנולוגיות מסייעות.</li>
-            </ul>
-          </section>
+      <LegalSection title="מגבלות נגישות ידועות">
+        <p>
+          חלק מהתרגילים מבוססים על שמע: הקראה וזיהוי דיבור הם חלק מהותי מלימוד שפה מדוברת. במרבית התרגילים
+          האלה יש חלופה בטקסט. אנחנו ממשיכים לשפר את הנגישות של הרכיבים הקוליים. ייתכן שחלקים נוספים בשירות עדיין
+          אינם נגישים במלואם.
+        </p>
+      </LegalSection>
 
-          <section>
-            <h2 className="text-xl font-bold">מגבלות נגישות ידועות</h2>
-            <p className="mt-2 text-muted">
-              חלק מהתרגילים באתר מבוססים על תוכן שמע (זיהוי דיבור, הקראה) המהווים חלק מהותי מתהליך לימוד השפה
-              המדוברת. עבור משתמשים המתקשים בשימוש בתכנים אלו, קיימות חלופות מבוססות טקסט ברוב התרגילים. אנו
-              ממשיכים לעבוד על שיפור הנגישות של הרכיבים הקוליים באתר ובאפליקציה.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold">פנייה בנושאי נגישות</h2>
-            <p className="mt-2 text-muted">
-              נתקלתם בבעיית נגישות באתר או באפליקציה, או שיש לכם הצעה לשיפור? נשמח שתפנו אלינו לרכז הנגישות מטעם
-              Saylo בכתובת{" "}
-              <a href="mailto:support@saylolearn.com" className="text-primary hover:underline">
-                support@saylolearn.com
-              </a>
-              . נשתדל להשיב ולטפל בפנייה בהקדם האפשרי.
-            </p>
-          </section>
-        </div>
-      </section>
-      <SiteFooter />
-    </>
+      <LegalSection title="נתקלתם בבעיה? פנו אלינו">
+        <p>
+          מצאתם בעיית נגישות או שיש לכם הצעה לשיפור? פנו אל רכז הנגישות של Saylo. נטפל בפנייה בהקדם האפשרי.
+        </p>
+        <LegalList>
+          {ACCESSIBILITY_COORDINATOR_NAME && <li>שם: {ACCESSIBILITY_COORDINATOR_NAME}</li>}
+          {ACCESSIBILITY_COORDINATOR_PHONE && (
+            <li>
+              טלפון: <PhoneLink />
+            </li>
+          )}
+          <li>
+            אימייל: <EmailLink />
+          </li>
+        </LegalList>
+      </LegalSection>
+    </LegalPage>
   );
 }

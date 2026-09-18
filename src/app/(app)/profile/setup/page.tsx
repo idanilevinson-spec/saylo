@@ -7,12 +7,15 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { deriveAgeBand } from "@/lib/auth/ageBand";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
+import TermsConsent from "@/components/TermsConsent";
+import { TERMS_REQUIRED_MESSAGE, termsConsentMetadata } from "@/lib/legal/consent";
 
 export default function ProfileSetupPage() {
   const router = useRouter();
   const { session, profile, loading: authLoading, refreshProfile } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [age, setAge] = useState("");
+  const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -24,6 +27,8 @@ export default function ProfileSetupPage() {
 
   const fallbackName = (session?.user.user_metadata?.display_name as string | undefined) ?? "";
   const nameValue = displayName || fallbackName;
+  // Email sign-ups already accepted the terms on the sign-up form.
+  const alreadyAccepted = Boolean(session?.user.user_metadata?.terms_accepted_at);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -32,7 +37,11 @@ export default function ProfileSetupPage() {
     const finalName = nameValue.trim();
     const ageNum = Number(age);
     if (!session || !finalName || !ageNum || ageNum < 4 || ageNum > 119) {
-      setError("בדקו שהשם והגיל תקינים");
+      setError("בדקו שהכינוי והגיל תקינים");
+      return;
+    }
+    if (!alreadyAccepted && !accepted) {
+      setError(TERMS_REQUIRED_MESSAGE);
       return;
     }
 
@@ -43,6 +52,7 @@ export default function ProfileSetupPage() {
       age: ageNum,
       age_band: deriveAgeBand(ageNum),
       native_language: "he",
+      email_reminders_enabled: false,
     });
 
     if (insertError) {
@@ -55,6 +65,10 @@ export default function ProfileSetupPage() {
     await supabase
       .from("subscriptions")
       .insert({ profile_id: session.user.id, status: "trialing", trial_ends_at: trialEndsAt });
+
+    if (!alreadyAccepted) {
+      await supabase.auth.updateUser({ data: termsConsentMetadata() });
+    }
 
     await refreshProfile();
     router.push("/dashboard");
@@ -79,21 +93,28 @@ export default function ProfileSetupPage() {
         className="mt-8 space-y-4"
       >
         <div>
-          <label htmlFor="setup-name" className="block text-sm font-medium mb-1.5">שם מלא</label>
+          <label htmlFor="setup-name" className="block text-sm font-medium mb-1.5">כינוי</label>
           <input
             id="setup-name"
             type="text"
+            autoComplete="given-name"
+            aria-describedby="setup-name-hint"
             value={nameValue}
             onChange={(e) => setDisplayName(e.target.value)}
             required
             className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
+          <p id="setup-name-hint" className="mt-1.5 text-xs text-muted">
+            כינוי מספיק, אין צורך בשם מלא. הוא מוצג בלוח התוצאות למשתמשים בוגרים.
+          </p>
         </div>
         <div>
           <label htmlFor="setup-age" className="block text-sm font-medium mb-1.5">גיל</label>
           <input
             id="setup-age"
             type="number"
+            inputMode="numeric"
+            autoComplete="off"
             min={4}
             max={119}
             value={age}
@@ -102,6 +123,8 @@ export default function ProfileSetupPage() {
             className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
+
+        {!alreadyAccepted && <TermsConsent checked={accepted} onChange={setAccepted} />}
 
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
 

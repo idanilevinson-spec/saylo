@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase/browserClient";
+import { EMAIL_INPUT } from "@/lib/utils/inputProps";
 
 export default function ResetPasswordForm() {
   const [email, setEmail] = useState("");
@@ -64,8 +65,7 @@ export default function ResetPasswordForm() {
             <label htmlFor="reset-email" className="block text-sm font-medium mb-1.5">אימייל</label>
             <input
               id="reset-email"
-              type="email"
-              dir="ltr"
+              {...EMAIL_INPUT}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -292,8 +293,8 @@ function SpeakingChatInner() {
         <div className="flex gap-2 pt-2 border-t border-card-border">
           <input
             type="text"
-            dir="ltr"
-            lang="en"
+            {...ENGLISH_TEXT_INPUT}
+            enterKeyHint="send"
             aria-label="הקלידו הודעה באנגלית"
             value={input}
             onChange={(e) => setInput(e.target.value)}

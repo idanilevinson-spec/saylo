@@ -8,6 +8,8 @@ import { Apple } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/lib/supabase/browserClient";
 import { signInWithOAuthNative } from "@/lib/auth/nativeOAuth";
+import PasswordField from "@/components/PasswordField";
+import { EMAIL_INPUT } from "@/lib/utils/inputProps";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -89,8 +91,7 @@ export default function LoginForm() {
             <label htmlFor="login-email" className="block text-sm font-medium mb-1.5">אימייל</label>
             <input
               id="login-email"
-              type="email"
-              dir="ltr"
+              {...EMAIL_INPUT}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -99,14 +100,12 @@ export default function LoginForm() {
           </div>
           <div>
             <label htmlFor="login-password" className="block text-sm font-medium mb-1.5">סיסמה</label>
-            <input
+            <PasswordField
               id="login-password"
-              type="password"
-              dir="ltr"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
           </div>
 
@@ -152,6 +151,18 @@ export default function LoginForm() {
         >
           <Apple size={18} fill="currentColor" /> המשך עם Apple
         </motion.button>
+
+        <p className="mt-4 text-xs text-muted leading-relaxed">
+          התחברות עם Google או Apple בפעם הראשונה פותחת חשבון חדש. בהמשך תתבקשו לאשר את{" "}
+          <Link href="/terms" className="text-primary hover:underline">
+            תנאי השימוש
+          </Link>{" "}
+          ואת{" "}
+          <Link href="/privacy" className="text-primary hover:underline">
+            מדיניות הפרטיות
+          </Link>
+          .
+        </p>
       </motion.div>
 
       <p className="mt-6 text-center text-sm text-muted">

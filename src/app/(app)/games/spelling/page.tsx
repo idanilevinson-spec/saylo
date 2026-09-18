@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { PenTool, Trophy } from "lucide-react";
@@ -154,7 +155,7 @@ export default function SpellingChallengePage() {
           <input
             ref={inputRef}
             type="text"
-            dir="ltr"
+            {...ENGLISH_WORD_INPUT}
             aria-label={`השלימו את המילה עבור ${item.translationHe}`}
             value={input}
             onChange={(e) => setInput(e.target.value)}

@@ -1,6 +1,7 @@
 import "server-only";
 import webpush from "web-push";
 import type { PushSubscriptionRow } from "@/types/database";
+import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 let configured = false;
 
@@ -9,7 +10,7 @@ function ensureConfigured(): boolean {
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const privateKey = process.env.VAPID_PRIVATE_KEY;
   if (!publicKey || !privateKey) return false;
-  webpush.setVapidDetails("mailto:support@saylolearn.com", publicKey, privateKey);
+  webpush.setVapidDetails(`mailto:${CONTACT_EMAIL}`, publicKey, privateKey);
   configured = true;
   return true;
 }

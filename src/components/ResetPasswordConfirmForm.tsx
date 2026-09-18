@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import IconBadge from "@/components/IconBadge";
 import { supabase } from "@/lib/supabase/browserClient";
+import PasswordField from "@/components/PasswordField";
 
 // Reached only via the link in the password-reset email. Supabase's client
 // auto-detects the recovery token in the URL on load and fires a
@@ -89,15 +90,13 @@ export default function ResetPasswordConfirmForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="new-password" className="block text-sm font-medium mb-1.5">סיסמה חדשה</label>
-            <input
+            <PasswordField
               id="new-password"
-              type="password"
-              dir="ltr"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
           </div>
 

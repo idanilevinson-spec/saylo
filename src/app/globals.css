@@ -36,6 +36,9 @@
   --danger: #c81e1e;
   --danger-ink: #fef2f2;
   --muted: #6e6656;
+  /* Form-field outlines: --card-border is a decorative hairline (~1.3:1),
+     but WCAG 1.4.11 needs 3:1 for the boundary of an input. */
+  --field-border: #8a806c;
 }
 
 /* Three theme states: an explicit choice (data-theme) always wins; with no
@@ -60,6 +63,7 @@
     --danger: #f87171;
     --danger-ink: #450a0a;
     --muted: #a39c8c;
+    --field-border: #6f7280;
   }
 }
 
@@ -80,6 +84,7 @@
   --danger: #f87171;
   --danger-ink: #450a0a;
   --muted: #a39c8c;
+  --field-border: #6f7280;
 }
 
 /* Softened field tints for large full-bleed areas (the hero, its studio
@@ -241,6 +246,27 @@ h2 {
   text-wrap: balance;
 }
 
+/* Every text field's outline meets 3:1 (see --field-border), and the border
+   turns primary on focus so the active field is unmistakable. Unlayered on
+   purpose: it wins over each input's own Tailwind border-color utility, so
+   the fix lives in one place. The underline-style blank in FillBlankQuestion
+   opts out via its border-primary class. */
+input:not([type="checkbox"]):not([type="radio"]):not([class*="border-primary"]),
+textarea,
+select {
+  border-color: var(--field-border);
+}
+input:not([type="checkbox"]):not([type="radio"]):not([class*="border-primary"]):focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   body {
     transition: none;
@@ -360,6 +386,7 @@ h2 {
   --success-ink: #ffffff !important;
   --danger: #cc0000 !important;
   --danger-ink: #ffffff !important;
+  --field-border: #000000 !important;
 }
 :root[data-a11y-contrast="high"] * {
   border-color: currentColor;

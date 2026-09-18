@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Timer, Trophy, CheckCircle2, XCircle, Check, X } from "lucide-react";
@@ -364,7 +365,7 @@ export default function VocabTest({ steps }: VocabTestProps) {
                 <p className="mt-1 text-2xl font-bold">{step.translationHe}</p>
                 <input
                   type="text"
-                  dir="ltr"
+                  {...ENGLISH_WORD_INPUT}
                   aria-label={`השלימו את המילה עבור ${step.translationHe}`}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}

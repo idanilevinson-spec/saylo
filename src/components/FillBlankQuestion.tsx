@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useState } from "react";
 import { Lightbulb, Keyboard, RotateCcw } from "lucide-react";
 import type { FillBlankContent, FillBlankResponse } from "@/types/exercises";
@@ -51,7 +52,7 @@ export default function FillBlankQuestion({ content, disabled, onSubmit }: FillB
         {typedMode ? (
           <input
             type="text"
-            dir="ltr"
+            {...ENGLISH_WORD_INPUT}
             aria-label={`השלימו את החלק החסר במשפט: ${c.sentence}`}
             value={text}
             onChange={(e) => setText(e.target.value)}

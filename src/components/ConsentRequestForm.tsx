@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import type { ParentalConsentStatus } from "@/types/database";
+import { EMAIL_INPUT } from "@/lib/utils/inputProps";
 
 interface ConsentRequestFormProps {
   status: ParentalConsentStatus;
@@ -75,8 +76,8 @@ export default function ConsentRequestForm({ status }: ConsentRequestFormProps) 
           : "כדי לתרגל שיחה עם ה-AI, אנחנו צריכים אישור מהורה או אפוטרופוס. הזינו את האימייל שלהם ונכין עבורכם קישור לשליחה."}
       </p>
       <input
-        type="email"
-        dir="ltr"
+        {...EMAIL_INPUT}
+        autoComplete="off"
         aria-label="אימייל ההורה או האפוטרופוס"
         value={email}
         onChange={(e) => setEmail(e.target.value)}

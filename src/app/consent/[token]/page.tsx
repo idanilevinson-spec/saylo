@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
+import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 import ConsentDecision from "@/components/ConsentDecision";
 import { createClient } from "@/lib/supabase/serverClient";
 
@@ -35,8 +37,17 @@ export default async function ConsentPage({ params }: PageProps) {
           השיחה עם AI באתר <strong>Saylo</strong>.
         </p>
         <p className="mt-3 text-sm text-muted leading-relaxed">
-          התכונה כרגע מבוססת טקסט בלבד (כתיבה וקריאה, בלי הקלטת קול). אם בעתיד תתווסף אפשרות דיבור עם מיקרופון,
-          יידרש אישור נפרד לכך.
+          השיחה יכולה להתנהל בכתב וגם בקול. בשיחה קולית הקול נשלח ל-Microsoft Azure לצורך תמלול, וההקלטה עצמה אינה
+          נשמרת אצלנו; נשמר תמלול השיחה. הודעות השיחה נשלחות לספק ה-AI (Anthropic) כדי לייצר תשובות, בלי הכינוי
+          והאימייל של {info.minor_display_name}. אפשר לפנות אלינו בכל עת בבקשה לעיין במידע, לתקן אותו או למחוק אותו:{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary hover:underline">
+            {CONTACT_EMAIL}
+          </a>
+          . פרטים מלאים ב
+          <Link href="/privacy" className="text-primary hover:underline">
+            מדיניות הפרטיות
+          </Link>
+          .
         </p>
       </div>
 

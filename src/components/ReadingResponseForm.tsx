@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -142,7 +143,7 @@ export default function ReadingResponseForm({
         {questionEn}
       </EnglishText>
       <textarea
-        dir="ltr"
+        {...ENGLISH_TEXT_INPUT}
         aria-label="התשובה שלכם באנגלית לשאלה הפתוחה"
         value={text}
         onChange={(e) => setText(e.target.value)}

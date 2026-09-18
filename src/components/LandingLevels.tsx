@@ -31,7 +31,7 @@ export default function LandingLevels() {
           מדריך התוכניות: מהתחלה ועד שליטה מלאה
         </h2>
         <p className="text-center text-muted mb-16">
-          מבחן הרמה שלנו ממקם אתכם בדיוק, לפי הסטנדרט הבינלאומי CEFR.
+          מבחן הרמה שלנו מעריך את הרמה שלכם לפי סולם CEFR הבינלאומי. זו הערכה פנימית של Saylo, לא מבחן רשמי.
         </p>
 
         {/* The scrubber rail — the fill-width reveal is a real progress
@@ -40,7 +40,7 @@ export default function LandingLevels() {
           <div className="relative h-1.5 rounded-full bg-card-border overflow-hidden">
             <motion.div
               initial={{ width: "0%" }}
-              whileInView={{ width: "18%" }}
+              whileInView={{ width: "100%" }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 1, delay: 0.2, ease: EASE_OUT }}
               className="absolute inset-y-0 start-0 rounded-full bg-primary"
@@ -48,34 +48,15 @@ export default function LandingLevels() {
           </div>
 
           <div className="mt-3 grid grid-cols-6 gap-1 sm:gap-3">
-            {LEVELS.map((level, i) => {
-              const isCurrent = i === 1;
-              return (
-                <div key={level.code} className="flex flex-col items-center text-center">
-                  <span
-                    aria-hidden="true"
-                    className={
-                      "w-3 h-3 rounded-full mb-2.5 " + (i <= 1 ? "bg-primary" : "bg-card-border")
-                    }
-                  />
-                  <EnglishText
-                    as="span"
-                    className={
-                      "mt-1 font-extrabold text-sm sm:text-lg leading-none " +
-                      (isCurrent ? "text-primary" : "text-foreground")
-                    }
-                  >
-                    {level.code}
-                  </EnglishText>
-                  <span className="hidden sm:block mt-1 text-[11px] text-muted">{level.he}</span>
-                  {isCurrent && (
-                    <span className="mt-1.5 hidden sm:inline-block px-2 py-0.5 rounded-md bg-primary text-primary-ink text-[10px] font-bold">
-                      אתם כאן
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+            {LEVELS.map((level) => (
+              <div key={level.code} className="flex flex-col items-center text-center">
+                <span aria-hidden="true" className="w-3 h-3 rounded-full mb-2.5 bg-primary" />
+                <EnglishText as="span" className="mt-1 font-extrabold text-sm sm:text-lg leading-none text-foreground">
+                  {level.code}
+                </EnglishText>
+                <span className="hidden sm:block mt-1 text-[11px] text-muted">{level.he}</span>
+              </div>
+            ))}
           </div>
         </div>
       </motion.div>

@@ -39,9 +39,9 @@ const NOW_PLAYING = [
 const SCENES = [
   { icon: BookOpen, title: "אוצר מילים לפי נושא", body: "ממספרים ובגדים ועד Business ו-Technology.", href: "/vocabulary" },
   { icon: PenLine, title: "דקדוק מלא", body: "מסלול שלם מ-A1 ועד C2, בלי לדלג.", href: "/grammar" },
-  { icon: Headphones, title: "האזנה", body: "שיחות, חדשות ופודקאסטים לפי רמה.", href: "/listening" },
+  { icon: Headphones, title: "האזנה", body: "שיחות וקטעי האזנה לפי רמה.", href: "/listening" },
   { icon: BookOpenText, title: "קריאה חכמה", body: "סיפורים לפי רמה, מבחן הבנה ושאלה פתוחה עם משוב AI.", href: "/reading" },
-  { icon: Brain, title: "חזרה חכמה", body: "המערכת זוכרת מה שכחתם, ומחזירה לכם בדיוק את זה ברגע הנכון: לא לפני, לא אחרי.", href: "/review" },
+  { icon: Brain, title: "חזרה חכמה", body: "המערכת מחזירה לכם מילים במרווחי זמן מתוכננים, כדי שיישארו בזיכרון.", href: "/review" },
   { icon: Gamepad2, title: "לומדים דרך משחק", body: "XP, רצף ימים ותגי הישג.", href: "/games" },
   { icon: Target, title: "מסלולים לפי מטרה", body: "עבודה, טיולים, ראיונות או לימודים.", href: "/learn" },
 ];

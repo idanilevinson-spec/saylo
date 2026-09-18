@@ -10,6 +10,10 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { deriveAgeBand } from "@/lib/auth/ageBand";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 import { signInWithOAuthNative } from "@/lib/auth/nativeOAuth";
+import PasswordField from "@/components/PasswordField";
+import TermsConsent from "@/components/TermsConsent";
+import { TERMS_REQUIRED_MESSAGE, termsConsentMetadata } from "@/lib/legal/consent";
+import { EMAIL_INPUT } from "@/lib/utils/inputProps";
 
 export default function SignupForm() {
   const router = useRouter();
@@ -17,9 +21,16 @@ export default function SignupForm() {
   const [age, setAge] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
+
+  function requireAccepted() {
+    if (accepted) return true;
+    setError(TERMS_REQUIRED_MESSAGE);
+    return false;
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -27,15 +38,16 @@ export default function SignupForm() {
 
     const ageNum = Number(age);
     if (!displayName.trim() || !ageNum || ageNum < 4 || ageNum > 119) {
-      setError("בדקו שהשם והגיל תקינים");
+      setError("בדקו שהכינוי והגיל תקינים");
       return;
     }
+    if (!requireAccepted()) return;
 
     setLoading(true);
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName } },
+      options: { data: { display_name: displayName, ...termsConsentMetadata() } },
     });
 
     if (signUpError) {
@@ -51,6 +63,7 @@ export default function SignupForm() {
         age: ageNum,
         age_band: deriveAgeBand(ageNum),
         native_language: "he",
+        email_reminders_enabled: false,
       });
 
       if (profileError) {
@@ -75,6 +88,8 @@ export default function SignupForm() {
   // See LoginForm.tsx — native avoids the multi-hop redirect chain (and the
   // white flash it produced) via a modal browser + deep-link return instead.
   async function handleGoogleSignup() {
+    setError(null);
+    if (!requireAccepted()) return;
     if (Capacitor.isNativePlatform()) {
       if (await signInWithOAuthNative("google")) router.push("/dashboard");
       return;
@@ -88,6 +103,8 @@ export default function SignupForm() {
   // See LoginForm.tsx — same App Store Review Guideline 4.8 requirement
   // applies here too.
   async function handleAppleSignup() {
+    setError(null);
+    if (!requireAccepted()) return;
     if (Capacitor.isNativePlatform()) {
       if (await signInWithOAuthNative("apple")) router.push("/dashboard");
       return;
@@ -129,21 +146,28 @@ export default function SignupForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="signup-name" className="block text-sm font-medium mb-1.5">שם מלא</label>
+            <label htmlFor="signup-name" className="block text-sm font-medium mb-1.5">כינוי</label>
             <input
               id="signup-name"
               type="text"
+              autoComplete="given-name"
+              aria-describedby="signup-name-hint"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               required
               className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
+            <p id="signup-name-hint" className="mt-1.5 text-xs text-muted">
+              כינוי מספיק, אין צורך בשם מלא. הוא מוצג בלוח התוצאות למשתמשים בוגרים.
+            </p>
           </div>
           <div>
             <label htmlFor="signup-age" className="block text-sm font-medium mb-1.5">גיל</label>
             <input
               id="signup-age"
               type="number"
+              inputMode="numeric"
+              autoComplete="off"
               min={4}
               max={119}
               value={age}
@@ -156,8 +180,7 @@ export default function SignupForm() {
             <label htmlFor="signup-email" className="block text-sm font-medium mb-1.5">אימייל</label>
             <input
               id="signup-email"
-              type="email"
-              dir="ltr"
+              {...EMAIL_INPUT}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -166,17 +189,21 @@ export default function SignupForm() {
           </div>
           <div>
             <label htmlFor="signup-password" className="block text-sm font-medium mb-1.5">סיסמה</label>
-            <input
+            <PasswordField
               id="signup-password"
-              type="password"
-              dir="ltr"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
+              aria-describedby="signup-password-hint"
             />
+            <p id="signup-password-hint" className="mt-1.5 text-xs text-muted">
+              לפחות 6 תווים
+            </p>
           </div>
+
+          <TermsConsent checked={accepted} onChange={setAccepted} />
 
           {error && <p role="alert" className="text-sm text-danger">{error}</p>}
 

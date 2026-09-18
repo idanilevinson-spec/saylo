@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Trophy, CheckCircle2, XCircle } from "lucide-react";
@@ -230,7 +231,7 @@ export default function DailyChallengePage() {
               <input
                 ref={inputRef}
                 type="text"
-                dir="ltr"
+                {...ENGLISH_WORD_INPUT}
                 aria-label={`השלימו את המילה עבור ${item.translationHe}`}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}

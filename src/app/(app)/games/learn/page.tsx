@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -334,7 +335,7 @@ function LearnModePageInner() {
                   <input
                     ref={inputRef}
                     type="text"
-                    dir="ltr"
+                    {...ENGLISH_WORD_INPUT}
                     aria-label={`השלימו את המילה עבור ${question.item.translationHe}`}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}

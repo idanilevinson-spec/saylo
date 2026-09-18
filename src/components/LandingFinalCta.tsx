@@ -18,7 +18,7 @@ export default function LandingFinalCta() {
       >
         <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-primary-ink">מוכנים להתחיל?</h2>
         <p className="mt-4 text-primary-ink text-lg leading-relaxed">
-          מבחן הרמה לוקח פחות מ־10 דקות. תדעו בדיוק איפה אתם עומדים, ולאן ללכת מכאן.
+          מבחן הרמה בודק אוצר מילים, דקדוק, קריאה והאזנה. בסופו תקבלו הערכת רמה ומסלול לימוד.
         </p>
         {/* Unlike the hero's CTA (which sits on its own white/dark card,
             not the field), this button sits directly on the field with

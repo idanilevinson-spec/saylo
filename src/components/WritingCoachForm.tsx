@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useState } from "react";
 import Link from "next/link";
 import { Crown } from "lucide-react";
@@ -122,7 +123,7 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
   return (
     <div>
       <textarea
-        dir="ltr"
+        {...ENGLISH_TEXT_INPUT}
         aria-label="התשובה שלכם באנגלית"
         value={text}
         onChange={(e) => setText(e.target.value)}

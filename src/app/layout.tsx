@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PageTransition from "@/components/PageTransition";
 import AccessibilityProvider from "@/components/AccessibilityProvider";
+import CookieNotice from "@/components/CookieNotice";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -100,6 +101,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <PageTransition>{children}</PageTransition>
             </main>
           </AuthProvider>
+          <CookieNotice />
         </AccessibilityProvider>
       </body>
     </html>

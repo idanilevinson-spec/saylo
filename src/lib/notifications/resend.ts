@@ -12,6 +12,18 @@ function getClient(): Resend | null {
   return client;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// Every optional email says why it was sent and how to stop it.
+const OPT_OUT_FOOTER = `<p style="margin-top: 24px; font-size: 12px; color: #6b7280;">קיבלתם מייל זה כי הפעלתם אותו בהגדרות הפרופיל. כדי להפסיק לקבל אותו, כבו אותו ב<a href="https://saylolearn.com/profile" style="color: #0066d6;">הגדרות הפרופיל</a>.</p>`;
+
 export async function sendStreakReminderEmail(to: string, displayName: string): Promise<boolean> {
   const resend = getClient();
   if (!resend) return false;
@@ -22,11 +34,12 @@ export async function sendStreakReminderEmail(to: string, displayName: string): 
     subject: "אל תשברו את הרצף שלכם היום",
     html: `
       <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-        <h1 style="color: #0066d6;">היי ${displayName},</h1>
+        <h1 style="color: #0066d6;">היי ${escapeHtml(displayName)},</h1>
         <p>עוד לא תרגלתם אנגלית היום — 5 דקות מספיקות כדי לשמור על הרצף שלכם ב-Saylo.</p>
         <a href="https://saylolearn.com/dashboard" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: #0066d6; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
           לתרגול עכשיו
         </a>
+        ${OPT_OUT_FOOTER}
       </div>
     `,
   });
@@ -54,7 +67,7 @@ function reportEmailHtml(displayName: string, summary: ScoreSummary, periodLabel
 
   return `
     <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-      <h1 style="color: #0066d6;">היי ${displayName},</h1>
+      <h1 style="color: #0066d6;">היי ${escapeHtml(displayName)},</h1>
       <p>הנה הדוח ${periodLabel} שלכם ב-Saylo:</p>
 
       <div style="display: flex; gap: 12px; margin: 20px 0;">
@@ -77,7 +90,7 @@ function reportEmailHtml(displayName: string, summary: ScoreSummary, periodLabel
       <a href="https://saylolearn.com/progress" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #0066d6; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
         לכל ההתקדמות שלי
       </a>
-      <p style="margin-top: 24px; font-size: 12px; color: #9ca3af;">אפשר לכבות דוח זה בכל עת בהגדרות הפרופיל.</p>
+      ${OPT_OUT_FOOTER}
     </div>
   `;
 }

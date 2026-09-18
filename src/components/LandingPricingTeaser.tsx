@@ -33,7 +33,9 @@ export default function LandingPricingTeaser() {
               </EnglishText>
               /mo
             </p>
-            <p className="caption-track-he text-sm text-primary">במסלול השנתי</p>
+            <p className="caption-track-he text-sm text-primary">
+              במסלול השנתי, <EnglishText as="span">₪{bestValue.totalPrice}</EnglishText> בתשלום אחד
+            </p>
           </div>
 
           <motion.div
