@@ -6,6 +6,8 @@ import { Mic, X } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import { supabase } from "@/lib/supabase/browserClient";
 import { useAuth } from "@/context/AuthProvider";
+import { ParentalConsentNotice } from "@/components/ParentalConsentGuard";
+import { requiresParentalConsent } from "@/lib/auth/consentGate";
 import type {
   SpeechRecognizer,
   SpeechConfig as AzureSpeechConfig,
@@ -202,7 +204,13 @@ export default function PronunciationRecorder({ targetPhrase }: { targetPhrase: 
       const tokenRes = await fetch("/api/speech/token");
       if (!tokenRes.ok) {
         const body = await tokenRes.json().catch(() => ({}));
-        throw new Error(body.error === "premium required" ? "תרגול הגייה זמין למנויי פרימיום" : "שירות ההגייה לא זמין כרגע");
+        throw new Error(
+          body.error === "premium required"
+            ? "תרגול הגייה זמין למנויי פרימיום"
+            : body.error === "parental consent required"
+              ? "כדי להקליט קול נדרש אישור של הורה או אפוטרופוס"
+              : "שירות ההגייה לא זמין כרגע"
+        );
       }
       const { token, region } = await tokenRes.json();
       if (dismissedRef.current) return;
@@ -278,6 +286,8 @@ export default function PronunciationRecorder({ targetPhrase }: { targetPhrase: 
       setErrorMessage(err instanceof Error ? err.message : "אירעה שגיאה");
     }
   }
+
+  if (profile && requiresParentalConsent(profile)) return <ParentalConsentNotice />;
 
   const showTargetPhrase = status === "idle" || status === "connecting" || status === "listening";
 

@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { buildSpeakingTest, type SpeakingTestStep } from "@/lib/games/speakingTestContent";
 import type { VocabularyItemLite } from "@/lib/games/testContent";
 import SpeakingTest from "@/components/SpeakingTest";
+import ParentalConsentGuard from "@/components/ParentalConsentGuard";
 import IconBadge from "@/components/IconBadge";
 import type { Topic } from "@/types/database";
 
@@ -21,9 +22,11 @@ type Phase = "picker" | "generating" | "ready" | "empty";
 // games/test/page.tsx wraps itself the same way.
 export default function SpeakingTestPage() {
   return (
-    <Suspense fallback={<div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>}>
-      <SpeakingTestPageInner />
-    </Suspense>
+    <ParentalConsentGuard title="מבחן דיבור">
+      <Suspense fallback={<div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>}>
+        <SpeakingTestPageInner />
+      </Suspense>
+    </ParentalConsentGuard>
   );
 }
 

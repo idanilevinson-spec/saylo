@@ -12,8 +12,8 @@ export default function TermsConsent({ checked, onChange }: TermsConsentProps) {
     <div className="space-y-3">
       <p className="text-xs text-muted leading-relaxed">
         אנחנו אוספים רק את הפרטים הדרושים לפתיחת החשבון: כינוי, גיל, אימייל וסיסמה (או התחברות דרך Google או Apple).
-        מסירת הפרטים אינה חובה על פי דין, אבל בלעדיהם אי אפשר לפתוח חשבון. מתחת לגיל 18 נדרש אישור הורה לשיחה עם
-        מורה ה-AI.
+        מסירת הפרטים אינה חובה על פי דין, אבל בלעדיהם אי אפשר לפתוח חשבון. מתחת לגיל 18 נדרש אישור הורה להקלטת
+        קול ולשיחה עם מורה ה-AI.
       </p>
       <label className="flex items-start gap-3 text-sm cursor-pointer">
         <input

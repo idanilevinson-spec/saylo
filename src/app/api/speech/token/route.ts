@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
+import { hasParentalClearance } from "@/lib/auth/consentServer";
 
 // Issues a short-lived Azure Speech auth token so the browser can run
 // live pronunciation assessment via the mic without ever seeing
 // AZURE_SPEECH_KEY. Tokens expire after ~10 minutes (Azure's own limit).
-export async function GET() {
+//
+// Only text-to-speech (?purpose=tts) is open to a minor without a guardian's
+// consent, since it plays audio and records nothing. Every other request is
+// treated as speech recognition, i.e. capturing the user's voice, so a minor
+// needs granted consent — including a bare call with no purpose. (An Azure
+// token can't be scoped, so this can't stop a client that lies about its
+// purpose; it does stop every honest client and any direct call.)
+export async function GET(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -13,6 +21,11 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   if (!(await isPremiumServer(supabase, user.id))) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
+  }
+
+  const purpose = new URL(request.url).searchParams.get("purpose");
+  if (purpose !== "tts" && !(await hasParentalClearance(supabase, user.id))) {
+    return NextResponse.json({ error: "parental consent required" }, { status: 403 });
   }
 
   const key = process.env.AZURE_SPEECH_KEY;

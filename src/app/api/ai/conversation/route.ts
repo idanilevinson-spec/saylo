@@ -4,6 +4,7 @@ import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
 import { buildConversationSystemPrompt } from "@/lib/ai/prompts/conversationPartner";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
+import { hasParentalClearance } from "@/lib/auth/consentServer";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   if (!(await isPaidServer(supabase, user.id))) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
+  }
+  if (!(await hasParentalClearance(supabase, user.id))) {
+    return NextResponse.json({ error: "parental consent required" }, { status: 403 });
   }
 
   const { conversationId, message, voiceMode } = (await request.json()) as {

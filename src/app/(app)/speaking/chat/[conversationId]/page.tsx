@@ -8,6 +8,7 @@ import { ChevronDown, ChevronUp, Phone } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import PremiumGate from "@/components/PremiumGate";
+import ParentalConsentGuard from "@/components/ParentalConsentGuard";
 import VoiceConversationPanel from "@/components/VoiceConversationPanel";
 import SayloAvatar from "@/components/SayloAvatar";
 import { useAuth } from "@/context/AuthProvider";
@@ -18,7 +19,9 @@ import type { ConversationMessage, ConversationScore } from "@/types/database";
 export default function SpeakingChatPage() {
   return (
     <PremiumGate featureName="שיחה עם מורה AI" requirePaid>
-      <SpeakingChatInner />
+      <ParentalConsentGuard title="שיחה עם מורה AI">
+        <SpeakingChatInner />
+      </ParentalConsentGuard>
     </PremiumGate>
   );
 }

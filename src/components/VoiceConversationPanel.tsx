@@ -136,7 +136,11 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       if (!tokenRes.ok) {
         const body = await tokenRes.json().catch(() => ({}));
         throw new Error(
-          body.error === "premium required" ? "שיחה קולית זמינה למנויי פרימיום" : "שירות הקול לא זמין כרגע"
+          body.error === "premium required"
+            ? "שיחה קולית זמינה למנויי פרימיום"
+            : body.error === "parental consent required"
+              ? "כדי להקליט קול נדרש אישור של הורה או אפוטרופוס"
+              : "שירות הקול לא זמין כרגע"
         );
       }
       const { token, region } = await tokenRes.json();
