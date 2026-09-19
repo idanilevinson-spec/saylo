@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Trophy, CheckCircle2, XCircle } from "lucide-react";
@@ -210,7 +211,7 @@ export default function DailyChallengePage() {
                       key={i}
                       disabled={locked}
                       onClick={() => submitMcq(i)}
-                      className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
+                      className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default active:scale-[0.98] ${stateClass}`}
                     >
                       <EnglishText>{option}</EnglishText>
                       {locked && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
@@ -230,7 +231,7 @@ export default function DailyChallengePage() {
               <input
                 ref={inputRef}
                 type="text"
-                dir="ltr"
+                {...ENGLISH_WORD_INPUT}
                 aria-label={`השלימו את המילה עבור ${item.translationHe}`}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -243,7 +244,7 @@ export default function DailyChallengePage() {
                 <button
                   onClick={submitSpelling}
                   disabled={!input.trim()}
-                  className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
                 >
                   בדיקה
                 </button>

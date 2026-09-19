@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
@@ -9,6 +10,7 @@ import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
+import { DAILY_CONVERSATION_LIMIT, DAILY_WRITING_LIMIT } from "@/lib/legal/siteInfo";
 import {
   configureNativeIap,
   getNativePlanPackages,
@@ -24,6 +26,8 @@ import {
 // uses the Stripe/PayPlus checkout below at all, only RevenueCat — see
 // nativeIap.ts for why, and the webhook that actually owns the write.
 const isNative = Capacitor.isNativePlatform();
+
+const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function PricingCards() {
   const router = useRouter();
@@ -98,7 +102,7 @@ export default function PricingCards() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.4, delay: i * 0.08 }}
+            transition={{ duration: 0.4, delay: i * 0.06, ease: EASE_OUT }}
             whileHover={{ y: -3 }}
             className={`relative overflow-hidden rounded-lg p-6 border flex flex-col transition-shadow hover:shadow-lg hover:shadow-primary/5 ${
               plan.badge
@@ -165,6 +169,21 @@ export default function PricingCards() {
         })}
       </div>
 
+      {!isNative && (
+        <p className="max-w-3xl mx-auto mt-8 text-center text-sm text-muted leading-relaxed">
+          המחירים בשקלים והם סופיים: העסק רשום כעוסק פטור ואינו גובה מע״מ. כל מסלול משולם מראש, בתשלום אחד, ומתחדש
+          אוטומטית לאותה תקופה עד שתבטלו. אפשר לבטל את החידוש בכל עת בעמוד הפרופיל. פרטים ב
+          <Link href="/terms" className="text-primary hover:underline">
+            תנאי השימוש
+          </Link>{" "}
+          וב
+          <Link href="/refunds" className="text-primary hover:underline">
+            מדיניות הביטולים וההחזרים
+          </Link>
+          .
+        </p>
+      )}
+
       {isNative && (
         <div className="max-w-3xl mx-auto mt-8 text-center space-y-3">
           {session && (
@@ -193,6 +212,10 @@ export default function PricingCards() {
             <a href="/privacy" className="text-primary hover:underline">
               מדיניות פרטיות
             </a>
+            {" · "}
+            <a href="/refunds" className="text-primary hover:underline">
+              ביטולים והחזרים
+            </a>
           </p>
         </div>
       )}
@@ -202,24 +225,29 @@ export default function PricingCards() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.4 }}
-        className="max-w-3xl mx-auto mt-14 bg-background-2 border border-card-border rounded-lg p-6"
+        className="max-w-3xl mx-auto mt-8 bg-background-2 border border-card-border rounded-lg p-6"
       >
         <h2 className="font-bold mb-3">מה כלול בכל המסלולים בתשלום?</h2>
         <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted">
           {[
             "מבחן רמה ומסלול לימוד אישי",
-            "מורה AI אישי ללא הגבלה",
+            "שיחות עם מורה AI, בטקסט ובקול",
             "תרגול דיבור עם AI",
-            "תרגילים ללא הגבלה",
+            "משוב AI על כתיבה",
+            "תרגול בלי מגבלת לבבות",
             "חזרה חכמה יומית",
             "כל 6 רמות ה־CEFR",
           ].map((item) => (
             <li key={item} className="flex items-center gap-2">
-              <Check size={16} className="shrink-0 text-success" />
+              <Check size={16} className="shrink-0 text-success" aria-hidden="true" />
               {item}
             </li>
           ))}
         </ul>
+        <p className="mt-4 text-xs text-muted leading-relaxed">
+          שימוש הוגן: עד {DAILY_CONVERSATION_LIMIT} שיחות חדשות עם המורה ועד {DAILY_WRITING_LIMIT} הגשות כתיבה בכל 24
+          שעות. שיחה עם המורה זמינה במנוי בתשלום בלבד, ולא בניסיון החינם.
+        </p>
       </motion.div>
     </section>
   );

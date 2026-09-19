@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Volume2, Turtle, Target } from "lucide-react";
@@ -97,7 +98,7 @@ export default function PlacementPage() {
           <h1 className="mt-5 text-2xl sm:text-3xl font-bold">מבחן רמה</h1>
           <p className="mt-3 text-muted leading-relaxed">
             {questions.length} שאלות קצרות שבודקות אוצר מילים, דקדוק, קריאה והאזנה — ובסוף אפשרות לדגימת כתיבה
-            קצרה. לוקח פחות מ־10 דקות, ובסיום תקבלו את רמת ה-CEFR שלכם, לפי תחום.
+            קצרה. בסיום תקבלו הערכת רמה לפי סולם CEFR, לפי תחום. זו הערכה פנימית של Saylo ולא מבחן רשמי.
           </p>
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -263,7 +264,7 @@ export default function PlacementPage() {
             זה עוזר לנו להעריך גם את רמת הכתיבה שלכם. אפשר לדלג אם אתם מעדיפים.
           </p>
           <textarea
-            dir="ltr"
+            {...ENGLISH_TEXT_INPUT}
             aria-label="דגימת כתיבה למבחן ההתחלה"
             value={writingSample}
             onChange={(e) => setWritingSample(e.target.value)}

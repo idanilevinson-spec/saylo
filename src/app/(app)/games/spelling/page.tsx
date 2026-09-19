@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { PenTool, Trophy } from "lucide-react";
@@ -154,7 +155,7 @@ export default function SpellingChallengePage() {
           <input
             ref={inputRef}
             type="text"
-            dir="ltr"
+            {...ENGLISH_WORD_INPUT}
             aria-label={`השלימו את המילה עבור ${item.translationHe}`}
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -174,7 +175,7 @@ export default function SpellingChallengePage() {
             <button
               onClick={handleSubmit}
               disabled={!input.trim()}
-              className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
             >
               בדיקה
             </button>

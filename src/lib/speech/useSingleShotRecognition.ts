@@ -125,7 +125,13 @@ export function useSingleShotRecognition() {
       const tokenRes = await fetch("/api/speech/token");
       if (!tokenRes.ok) {
         const body = await tokenRes.json().catch(() => ({}));
-        throw new Error(body.error === "premium required" ? "מבחן הדיבור זמין למנויי פרימיום" : "שירות ההקלטה לא זמין כרגע");
+        throw new Error(
+          body.error === "premium required"
+            ? "מבחן הדיבור זמין למנויי פרימיום"
+            : body.error === "parental consent required"
+              ? "כדי להקליט קול נדרש אישור של הורה או אפוטרופוס"
+              : "שירות ההקלטה לא זמין כרגע"
+        );
       }
       const { token, region } = await tokenRes.json();
       if (dismissedRef.current) return;

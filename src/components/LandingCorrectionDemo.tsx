@@ -114,7 +114,7 @@ export default function LandingCorrectionDemo() {
       <div className="flex items-center justify-between mb-3">
         <span className="flex items-center gap-2 text-xs font-bold text-primary-hover">
           <span className="live-dot w-1.5 h-1.5 rounded-full bg-primary" />
-          מורה AI מתקן עכשיו
+          הדגמה: כך המורה מתקן
         </span>
         <motion.span
           key={`level-${index}`}

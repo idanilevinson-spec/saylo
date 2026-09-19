@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useState } from "react";
 import { Lightbulb, Keyboard, RotateCcw } from "lucide-react";
 import type { FillBlankContent, FillBlankResponse } from "@/types/exercises";
@@ -51,7 +52,7 @@ export default function FillBlankQuestion({ content, disabled, onSubmit }: FillB
         {typedMode ? (
           <input
             type="text"
-            dir="ltr"
+            {...ENGLISH_WORD_INPUT}
             aria-label={`השלימו את החלק החסר במשפט: ${c.sentence}`}
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -85,7 +86,7 @@ export default function FillBlankQuestion({ content, disabled, onSubmit }: FillB
                 onClick={() => toggleWord(i)}
                 disabled={disabled}
                 aria-pressed={picked.includes(i)}
-                className={`px-3.5 py-2 rounded-lg border font-content text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${
+                className={`px-3.5 py-2 rounded-lg border font-content text-sm transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default active:scale-[0.98] ${
                   picked.includes(i)
                     ? "border-card-border bg-background-2 text-muted opacity-50"
                     : "border-primary/40 bg-primary/5 hover:bg-primary/10"
@@ -131,7 +132,7 @@ export default function FillBlankQuestion({ content, disabled, onSubmit }: FillB
             }
           }}
           disabled={typedMode ? !text.trim() : !canSubmitBank}
-          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
         >
           בדיקה
         </button>

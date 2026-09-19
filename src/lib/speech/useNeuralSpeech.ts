@@ -130,7 +130,7 @@ export function useNeuralSpeech(segments: string[]) {
 
       (async () => {
         try {
-          const tokenRes = await fetch("/api/speech/token");
+          const tokenRes = await fetch("/api/speech/token?purpose=tts");
           if (!tokenRes.ok) {
             if (myToken === requestTokenRef.current) playViaBrowser();
             return;

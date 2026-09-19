@@ -39,7 +39,7 @@ export default function McqQuestion({ content, disabled, onSubmit }: McqQuestion
               disabled={disabled}
               onClick={() => setSelectedDisplayIndex(displayIndex)}
               aria-pressed={isSelected}
-              className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
+              className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default active:scale-[0.98] ${stateClass}`}
             >
               <EnglishText>{option}</EnglishText>
               {disabled && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
@@ -55,13 +55,13 @@ export default function McqQuestion({ content, disabled, onSubmit }: McqQuestion
               selectedDisplayIndex !== null && onSubmit({ selectedIndex: displayOrder[selectedDisplayIndex] })
             }
             disabled={selectedDisplayIndex === null}
-            className="flex-1 px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="flex-1 px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
           >
             בדיקה
           </button>
           <button
             onClick={() => onSubmit({ selectedIndex: -1 })}
-            className="px-4 py-2.5 rounded-lg border border-card-border text-muted font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="px-4 py-2.5 rounded-lg border border-card-border text-muted font-medium hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
           >
             לא יודע/ת · דלגו
           </button>

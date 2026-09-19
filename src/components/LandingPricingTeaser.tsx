@@ -3,10 +3,10 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import EnglishText from "@/components/EnglishText";
-import MagneticButton from "@/components/MagneticButton";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
 
 const bestValue = PRICING_PLANS[PRICING_PLANS.length - 1];
+const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function LandingPricingTeaser() {
   return (
@@ -16,7 +16,7 @@ export default function LandingPricingTeaser() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, ease: EASE_OUT }}
           className="relative bg-card border border-card-border shadow-sm rounded-lg px-7 py-8 sm:px-10 sm:py-10 text-center"
         >
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
@@ -33,19 +33,24 @@ export default function LandingPricingTeaser() {
               </EnglishText>
               /mo
             </p>
-            <p className="caption-track-he text-sm text-primary">במסלול השנתי</p>
+            <p className="caption-track-he text-sm text-primary">
+              במסלול השנתי, <EnglishText as="span">₪{bestValue.totalPrice}</EnglishText> בתשלום אחד
+            </p>
           </div>
 
-          <MagneticButton className="mt-8 inline-block">
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                href="/pricing"
-                className="block px-8 py-3.5 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors"
-              >
-                לכל המסלולים
-              </Link>
-            </motion.div>
-          </MagneticButton>
+          <motion.div
+            className="mt-8 inline-block"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.16, ease: EASE_OUT }}
+          >
+            <Link
+              href="/pricing"
+              className="block px-8 py-3.5 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors"
+            >
+              לכל המסלולים
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </section>

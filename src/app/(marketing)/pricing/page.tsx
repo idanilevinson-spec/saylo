@@ -12,7 +12,7 @@ export default function PricingPage() {
       <section className="px-4 pt-16 pb-8 text-center">
         <h1 className="text-4xl sm:text-5xl font-black tracking-tight">מסלולים ומחירים</h1>
         <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
-          3 ימים ראשונים על הבית, בלי כרטיס אשראי.
+          3 ימים ראשונים על הבית, בלי כרטיס אשראי. שיחה עם מורה ה-AI זמינה במנוי בתשלום.
         </p>
       </section>
       <PricingCards />

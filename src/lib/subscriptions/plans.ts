@@ -17,7 +17,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   { code: "monthly", months: 1, totalPrice: 59, label: "חודשי" },
   { code: "bimonthly", months: 2, totalPrice: 109, label: "חודשיים" },
   { code: "quarterly", months: 3, totalPrice: 149, label: "3 חודשים" },
-  { code: "biannual", months: 6, totalPrice: 269, label: "חצי שנה", badge: "פופולרי" },
+  { code: "biannual", months: 6, totalPrice: 269, label: "חצי שנה" },
   { code: "annual", months: 12, totalPrice: 449, label: "שנתי", badge: "הכי משתלם" },
 ];
 

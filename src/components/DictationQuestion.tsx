@@ -1,5 +1,6 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useState } from "react";
 import { Volume2, Turtle } from "lucide-react";
 import { speak } from "@/lib/speech/browserTts";
@@ -21,20 +22,20 @@ export default function DictationQuestion({ content, disabled, onSubmit }: Dicta
       <div className="flex gap-2">
         <button
           onClick={() => speak(c.audioText, 1)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-[border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
         >
           <Volume2 size={16} /> השמעה
         </button>
         <button
           onClick={() => speak(c.audioText, 0.6)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-[border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
         >
           <Turtle size={16} /> לאט
         </button>
       </div>
       <input
         type="text"
-        dir="ltr"
+        {...ENGLISH_WORD_INPUT}
         aria-label="מה ששמעתם"
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -46,7 +47,7 @@ export default function DictationQuestion({ content, disabled, onSubmit }: Dicta
         <button
           onClick={() => text.trim() && onSubmit({ text })}
           disabled={!text.trim()}
-          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
         >
           בדיקה
         </button>

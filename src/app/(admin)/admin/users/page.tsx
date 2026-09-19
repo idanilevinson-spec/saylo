@@ -62,6 +62,7 @@ export default function AdminUsersPage() {
         <h2 className="text-lg font-bold">משתמשים {users ? `(${users.length})` : ""}</h2>
         <input
           type="text"
+          aria-label="חיפוש לפי שם"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="חיפוש לפי שם..."

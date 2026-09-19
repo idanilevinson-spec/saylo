@@ -50,9 +50,15 @@ export async function GET() {
 
   const { data: profiles } =
     idsToName.size > 0
-      ? await supabaseAdmin.from("profiles").select("id, display_name").in("id", [...idsToName])
+      ? await supabaseAdmin.from("profiles").select("id, display_name, age_band").in("id", [...idsToName])
       : { data: [] };
-  const nameById = new Map((profiles ?? []).map((p) => [p.id, p.display_name]));
+  // A minor's name is never shown to other users; they still see their own.
+  const nameById = new Map(
+    (profiles ?? []).map((p) => [
+      p.id,
+      p.age_band === "adult" || p.id === user.id ? p.display_name : "לומד/ת אנונימי/ת",
+    ])
+  );
 
   const entries: LeaderboardEntry[] = top.map((r, i) => ({
     rank: i + 1,

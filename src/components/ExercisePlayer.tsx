@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, Heart } from "lucide-react";
+import { CheckCircle2, XCircle, Heart, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
 import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
@@ -56,6 +56,11 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
   return (
     <HeartsGate>
       <div className="max-w-xl mx-auto px-4 py-12">
+        {/* No visible page heading here by design (the question prompt
+            itself is the focal content), but a screen-reader user
+            navigating by heading needs a real landmark to jump to — this
+            is the single template every exercise type renders through. */}
+        <h1 className="sr-only">{progress ? `תרגול — שאלה ${progress.current} מתוך ${progress.total}` : "תרגול"}</h1>
         <div className="flex items-center justify-between gap-3">
           <Link href={backHref} className="text-sm text-primary">
             ← {backLabel}
@@ -120,9 +125,10 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.15, type: "spring", bounce: 0.5 }}
-                  className="mt-2 text-sm font-medium text-accent-hover"
+                  className="mt-2 flex items-center justify-center gap-1.5 text-sm font-medium text-accent-hover"
                 >
-                  🎉 קיבלתם תג חדש: {result.newBadges.map((b) => b.name_he).join(", ")}
+                  <PartyPopper size={16} className="shrink-0" aria-hidden="true" />
+                  קיבלתם תג חדש: {result.newBadges.map((b) => b.name_he).join(", ")}
                 </motion.p>
               )}
             </motion.div>
@@ -153,7 +159,7 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                     dir="ltr"
                     className="mx-auto mb-4 w-fit flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/25 text-sm font-medium"
                   >
-                    <span className="text-accent-hover">Well done</span>
+                    <span lang="en" className="text-accent-hover">Well done</span>
                     <span aria-hidden="true" className="text-accent text-xs">
                       ⇄
                     </span>

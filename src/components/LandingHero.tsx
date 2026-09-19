@@ -4,8 +4,12 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
-import MagneticButton from "@/components/MagneticButton";
 import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
+
+// Strong custom ease-out — the built-in framer-motion/CSS easings read as
+// weak/default; this is the curve emil-design-eng recommends for anything
+// entering the screen.
+const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function LandingHero() {
   return (
@@ -62,31 +66,36 @@ export default function LandingHero() {
                 סוף סוף, ברור.
               </h2>
               <p className="mt-5 max-w-xl text-muted leading-relaxed">
-                מבחן רמה אישי, מסלול לימוד שמתאים בדיוק לחוזקות ולחולשות שלכם, ומורה AI שזוכר כל מילה שקשה לכם.
+                מבחן רמה אישי, מסלול לימוד שמתאים לחוזקות ולחולשות שלכם, ומורה AI שמציע מה לתרגל לפי הטעויות
+                האחרונות שלכם.
               </p>
 
               <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <MagneticButton>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Link
-                      href="/signup"
-                      className="flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-lg bg-primary text-primary-ink font-bold text-lg hover:bg-primary-hover transition-colors"
-                    >
-                      <Play size={18} fill="currentColor" strokeWidth={0} />
-                      התחילו ללמוד בחינם
-                    </Link>
-                  </motion.div>
-                </MagneticButton>
-                <MagneticButton>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Link
-                      href="/pricing"
-                      className="block text-center px-7 py-3.5 rounded-lg border border-card-border text-foreground font-medium text-lg hover:bg-background-2 transition-colors"
-                    >
-                      לכל המסלולים
-                    </Link>
-                  </motion.div>
-                </MagneticButton>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.16, ease: EASE_OUT }}
+                >
+                  <Link
+                    href="/signup"
+                    className="flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-lg bg-primary text-primary-ink font-bold text-lg hover:bg-primary-hover transition-colors"
+                  >
+                    <Play size={18} fill="currentColor" strokeWidth={0} />
+                    התחילו ללמוד בחינם
+                  </Link>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.16, ease: EASE_OUT }}
+                >
+                  <Link
+                    href="/pricing"
+                    className="block text-center px-7 py-3.5 rounded-lg border border-card-border text-foreground font-medium text-lg hover:bg-background-2 transition-colors"
+                  >
+                    לכל המסלולים
+                  </Link>
+                </motion.div>
               </div>
             </motion.div>
 

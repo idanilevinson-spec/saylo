@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { buildSpeakingTest, type SpeakingTestStep } from "@/lib/games/speakingTestContent";
 import type { VocabularyItemLite } from "@/lib/games/testContent";
 import SpeakingTest from "@/components/SpeakingTest";
+import ParentalConsentGuard from "@/components/ParentalConsentGuard";
 import IconBadge from "@/components/IconBadge";
 import type { Topic } from "@/types/database";
 
@@ -21,9 +22,11 @@ type Phase = "picker" | "generating" | "ready" | "empty";
 // games/test/page.tsx wraps itself the same way.
 export default function SpeakingTestPage() {
   return (
-    <Suspense fallback={<div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>}>
-      <SpeakingTestPageInner />
-    </Suspense>
+    <ParentalConsentGuard title="מבחן דיבור">
+      <Suspense fallback={<div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>}>
+        <SpeakingTestPageInner />
+      </Suspense>
+    </ParentalConsentGuard>
   );
 }
 
@@ -122,7 +125,7 @@ function SpeakingTestPageInner() {
 
       <button
         onClick={() => generate()}
-        className="mt-6 w-full flex items-center gap-4 bg-gradient-to-l from-primary/10 to-accent/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-all text-right"
+        className="mt-6 w-full flex items-center gap-4 bg-primary/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-all text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
       >
         <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
           <Layers size={22} />
@@ -140,8 +143,9 @@ function SpeakingTestPageInner() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: i * 0.03 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => generate(topic.id, topic.name_en)}
-            className="w-full flex items-center justify-between gap-3 bg-card border border-card-border rounded-lg p-4 hover:border-primary/40 transition-colors text-right"
+            className="w-full flex items-center justify-between gap-3 bg-card border border-card-border rounded-lg p-4 hover:border-primary/40 transition-colors text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             <div>
               <p className="font-bold">{topic.name_he}</p>

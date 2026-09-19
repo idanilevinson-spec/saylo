@@ -1,9 +1,10 @@
 "use client";
 
+import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, Trophy, Sparkles, CheckCircle2, XCircle } from "lucide-react";
+import { GraduationCap, Trophy, Sparkles, CheckCircle2, XCircle, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import {
   getLearnPool,
@@ -274,7 +275,10 @@ function LearnModePageInner() {
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-background/90 rounded-lg"
               >
-                <p className="text-xl font-bold text-success">מילה בשליטה מלאה! 🎉</p>
+                <p className="flex items-center gap-2 text-xl font-bold text-success">
+                  <PartyPopper size={20} className="shrink-0" aria-hidden="true" />
+                  מילה בשליטה מלאה!
+                </p>
                 {question && <EnglishText className="text-lg text-muted">{question.item.headword}</EnglishText>}
               </motion.div>
             )}
@@ -314,7 +318,7 @@ function LearnModePageInner() {
                           key={i}
                           disabled={locked}
                           onClick={() => submitMcq(i)}
-                          className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
+                          className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default active:scale-[0.98] ${stateClass}`}
                         >
                           <EnglishText>{option}</EnglishText>
                           {locked && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
@@ -331,7 +335,7 @@ function LearnModePageInner() {
                   <input
                     ref={inputRef}
                     type="text"
-                    dir="ltr"
+                    {...ENGLISH_WORD_INPUT}
                     aria-label={`השלימו את המילה עבור ${question.item.translationHe}`}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -344,7 +348,7 @@ function LearnModePageInner() {
                     <button
                       onClick={submitRecall}
                       disabled={!input.trim()}
-                      className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                      className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
                     >
                       בדיקה
                     </button>

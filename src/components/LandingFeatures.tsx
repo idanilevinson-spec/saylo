@@ -39,9 +39,9 @@ const NOW_PLAYING = [
 const SCENES = [
   { icon: BookOpen, title: "אוצר מילים לפי נושא", body: "ממספרים ובגדים ועד Business ו-Technology.", href: "/vocabulary" },
   { icon: PenLine, title: "דקדוק מלא", body: "מסלול שלם מ-A1 ועד C2, בלי לדלג.", href: "/grammar" },
-  { icon: Headphones, title: "האזנה", body: "שיחות, חדשות ופודקאסטים לפי רמה.", href: "/listening" },
+  { icon: Headphones, title: "האזנה", body: "שיחות וקטעי האזנה לפי רמה.", href: "/listening" },
   { icon: BookOpenText, title: "קריאה חכמה", body: "סיפורים לפי רמה, מבחן הבנה ושאלה פתוחה עם משוב AI.", href: "/reading" },
-  { icon: Brain, title: "חזרה חכמה", body: "המערכת זוכרת מה שכחתם, ומחזירה לכם בדיוק את זה ברגע הנכון: לא לפני, לא אחרי.", href: "/review" },
+  { icon: Brain, title: "חזרה חכמה", body: "המערכת מחזירה לכם מילים במרווחי זמן מתוכננים, כדי שיישארו בזיכרון.", href: "/review" },
   { icon: Gamepad2, title: "לומדים דרך משחק", body: "XP, רצף ימים ותגי הישג.", href: "/games" },
   { icon: Target, title: "מסלולים לפי מטרה", body: "עבודה, טיולים, ראיונות או לימודים.", href: "/learn" },
 ];
@@ -67,6 +67,11 @@ function SignalMeter() {
   );
 }
 
+// Strong custom ease-out — the built-in framer-motion/CSS easings read as
+// weak/default; this is the curve emil-design-eng recommends for anything
+// entering the screen.
+const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
+
 export default function LandingFeatures() {
   // Logged-in visitors go straight to the feature; anyone else goes to
   // signup first — every card here otherwise lands on a page that just
@@ -76,35 +81,27 @@ export default function LandingFeatures() {
 
   return (
     <section className="px-4 py-24 bg-background-2">
-      <div className="max-w-3xl mx-auto">
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5 }}
-          className="text-3xl sm:text-4xl font-black tracking-tight text-center mb-4"
-        >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.5, ease: EASE_OUT }}
+        className="max-w-3xl mx-auto"
+      >
+        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center mb-4">
           הכל בערוץ אחד
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-center text-muted mb-14 max-w-lg mx-auto"
-        >
+        </h2>
+        <p className="text-center text-muted mb-14 max-w-lg mx-auto">
           לא עוד אתר לימוד רגיל. מערכת שלמה שמכירה אתכם ומתאימה את עצמה אליכם.
-        </motion.p>
+        </p>
 
         <div className="space-y-3 mb-3">
-          {NOW_PLAYING.map((f, i) => (
+          {NOW_PLAYING.map((f) => (
             <Link key={f.title} href={dest(f.href)} className="block rounded-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.45, delay: i * 0.08 }}
                 whileHover={{ x: -3 }}
+                whileTap={{ scale: 0.985 }}
+                transition={{ duration: 0.16, ease: EASE_OUT }}
                 className="relative bg-card border border-card-border shadow-sm rounded-lg px-5 py-5 sm:px-6 sm:py-6 flex items-start gap-4"
               >
                 <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-primary" />
@@ -130,17 +127,15 @@ export default function LandingFeatures() {
         </div>
 
         <div className="rounded-lg border border-card-border overflow-hidden divide-y divide-card-border">
-          {SCENES.map((f, i) => (
+          {SCENES.map((f) => (
             <Link
               key={f.title}
               href={dest(f.href)}
               className="block focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
             >
               <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.35, delay: i * 0.04 }}
+                whileTap={{ scale: 0.985 }}
+                transition={{ duration: 0.16, ease: EASE_OUT }}
                 className="group flex items-center gap-4 px-5 py-4 bg-card hover:bg-background-2 transition-colors"
               >
                 <span className="inline-flex w-8 h-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -154,7 +149,7 @@ export default function LandingFeatures() {
             </Link>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

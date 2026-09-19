@@ -371,12 +371,15 @@ export default function WordCatchPage() {
             return (
               <motion.button
                 key={`${opt}-${i}`}
-                // Not part of the keyboard focus chain at all — this game
-                // is steered entirely by arrow keys moving the falling
-                // word, and a button that picks up focus from a mouse
-                // click would otherwise let the browser's own arrow-key
-                // focus movement hop between these options instead.
-                tabIndex={-1}
+                // Keyboard-focusable: the falling-word steering listens on
+                // `window` with preventDefault (see the ArrowLeft/ArrowRight
+                // effect above), so it fires regardless of which element
+                // has focus — these are plain buttons with no native
+                // arrow-key focus-cycling (that only exists for roles like
+                // radiogroup/listbox, which this isn't), so there's no
+                // actual conflict to avoid by pulling them out of the tab
+                // order. A Tab+Enter user needs a real way to pick an
+                // answer without racing the fall timer.
                 onClick={(e) => {
                   e.currentTarget.blur();
                   handlePick(opt, i);

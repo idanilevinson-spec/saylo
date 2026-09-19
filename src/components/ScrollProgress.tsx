@@ -24,7 +24,7 @@ export default function ScrollProgress() {
 
   return (
     <motion.div
-      className="absolute inset-x-0 bottom-0 h-[3px] origin-right bg-gradient-to-l from-primary via-accent to-primary"
+      className="absolute inset-x-0 bottom-0 h-[3px] origin-right bg-primary"
       style={{ scaleX }}
       aria-hidden="true"
     />

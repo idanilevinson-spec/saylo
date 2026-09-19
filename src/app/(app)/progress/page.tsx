@@ -315,7 +315,7 @@ export default function ProgressPage() {
                       initial={{ width: 0 }}
                       animate={{ width: `${pct ?? 0}%` }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
-                      className="h-full rounded-full bg-gradient-to-l from-primary to-accent"
+                      className="h-full rounded-full bg-primary"
                     />
                   </div>
                 </div>

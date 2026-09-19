@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
+import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 import ConsentDecision from "@/components/ConsentDecision";
 import { createClient } from "@/lib/supabase/serverClient";
 
@@ -31,12 +33,22 @@ export default async function ConsentPage({ params }: PageProps) {
 
       <div className="mt-6 bg-card border border-card-border rounded-lg p-6">
         <p className="leading-relaxed">
-          <strong>{info.minor_display_name}</strong> (גיל {info.minor_age}) מבקש/ת את אישורכם להשתמש בתכונת תרגול
-          השיחה עם AI באתר <strong>Saylo</strong>.
+          <strong>{info.minor_display_name}</strong> (גיל {info.minor_age}) מבקש/ת את אישורכם להשתמש באתר{" "}
+          <strong>Saylo</strong> בתכונות שמקליטות קול או משוחחות עם ה-AI: תרגול הגייה, מבחן דיבור ושיחה עם המורה,
+          בכתב ובקול.
         </p>
         <p className="mt-3 text-sm text-muted leading-relaxed">
-          התכונה כרגע מבוססת טקסט בלבד (כתיבה וקריאה, בלי הקלטת קול). אם בעתיד תתווסף אפשרות דיבור עם מיקרופון,
-          יידרש אישור נפרד לכך.
+          בכל התכונות האלה הקול נשלח מהמכשיר ל-Microsoft Azure לצורך תמלול והערכת הגייה, וההקלטה עצמה אינה נשמרת
+          אצלנו; נשמרים רק התוצאות, כמו הציון ותמלול השיחה. הודעות השיחה נשלחות לספק ה-AI (Anthropic) כדי לייצר תשובות, בלי הכינוי
+          והאימייל של {info.minor_display_name}. אפשר לפנות אלינו בכל עת בבקשה לעיין במידע, לתקן אותו או למחוק אותו:{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary hover:underline">
+            {CONTACT_EMAIL}
+          </a>
+          . פרטים מלאים ב
+          <Link href="/privacy" className="text-primary hover:underline">
+            מדיניות הפרטיות
+          </Link>
+          .
         </p>
       </div>
 
