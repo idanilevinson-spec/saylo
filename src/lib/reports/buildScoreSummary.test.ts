@@ -4,7 +4,8 @@ import { israelWeekStart, israelMonthStart, isLastDayOfIsraelMonth } from "./bui
 function israelParts(d: Date) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Jerusalem",
-    hour12: false,
+    // hour12:false renders midnight as "24" on Node 20's ICU (CI), "00" on newer Node.
+    hourCycle: "h23",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
