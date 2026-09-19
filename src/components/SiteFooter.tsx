@@ -16,6 +16,7 @@ const LINKS = [
   { href: "/privacy#cookies", label: "עוגיות" },
   { href: "/terms", label: "תנאי שימוש" },
   { href: "/refunds", label: "ביטולים והחזרים" },
+  { href: "/support", label: "תמיכה" },
   { href: "/accessibility", label: "הצהרת נגישות" },
   { href: "/login", label: "התחברות" },
 ];
