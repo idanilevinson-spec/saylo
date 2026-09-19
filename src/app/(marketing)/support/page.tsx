@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import LegalPage, { BusinessDetails, LegalSection } from "@/components/LegalPage";
+import LegalPage, { EmailLink, LegalSection } from "@/components/LegalPage";
 
 export const metadata: Metadata = {
   title: "תמיכה — Saylo",
@@ -13,8 +13,9 @@ export default function SupportPage() {
   return (
     <LegalPage title="תמיכה">
       <LegalSection title="יצירת קשר">
-        <p>נתקלתם בבעיה או שיש לכם שאלה? כתבו לנו או התקשרו, ונחזור אליכם בהקדם האפשרי.</p>
-        <BusinessDetails />
+        <p>
+          נתקלתם בבעיה או שיש לכם שאלה? כתבו לנו ל-<EmailLink />, ונחזור אליכם בהקדם האפשרי.
+        </p>
       </LegalSection>
 
       <LegalSection title="איך מבטלים מנוי">

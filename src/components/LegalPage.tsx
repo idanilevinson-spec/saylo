@@ -3,8 +3,6 @@ import SiteFooter from "@/components/SiteFooter";
 import {
   BUSINESS_ADDRESS,
   BUSINESS_NAME,
-  BUSINESS_PHONE,
-  BUSINESS_PHONE_TEL,
   BUSINESS_REGISTRATION,
   CONTACT_EMAIL,
   LEGAL_UPDATED,
@@ -47,15 +45,6 @@ export function LegalList({ children }: { children: ReactNode }) {
   return <ul className="list-disc list-inside space-y-1.5">{children}</ul>;
 }
 
-export function PhoneLink() {
-  if (!BUSINESS_PHONE) return null;
-  return (
-    <a href={`tel:${BUSINESS_PHONE_TEL}`} dir="ltr" className="inline-block text-primary hover:underline">
-      {BUSINESS_PHONE}
-    </a>
-  );
-}
-
 export function EmailLink() {
   return (
     <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary hover:underline">
@@ -64,18 +53,28 @@ export function EmailLink() {
   );
 }
 
-// The seller details a consumer is entitled to see before buying online.
+// What a distance seller must disclose before the sale (Consumer Protection
+// Law s.14C): name, ID/business number and address. The email is the channel
+// for cancellations. The phone number is deliberately left out — it is only
+// required in the accessibility statement.
 export function BusinessDetails() {
   return (
     <LegalList>
       <li>שם העסק: {BUSINESS_NAME}</li>
       {BUSINESS_REGISTRATION && <li>{BUSINESS_REGISTRATION}</li>}
       {BUSINESS_ADDRESS && <li>כתובת: {BUSINESS_ADDRESS}</li>}
-      {BUSINESS_PHONE && (
-        <li>
-          טלפון: <PhoneLink />
-        </li>
-      )}
+      <li>
+        אימייל: <EmailLink />
+      </li>
+    </LegalList>
+  );
+}
+
+// Who to contact, with nothing beyond a name and an email.
+export function ContactDetails() {
+  return (
+    <LegalList>
+      <li>שם: {BUSINESS_NAME}</li>
       <li>
         אימייל: <EmailLink />
       </li>
