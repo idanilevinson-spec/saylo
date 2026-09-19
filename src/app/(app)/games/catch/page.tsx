@@ -294,7 +294,7 @@ export default function WordCatchPage() {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">תפוס את המילה הושלם!</h1>
+        <h1 className="text-2xl font-bold">תפסו את המילה הושלם!</h1>
         <GameCompletionScore>{score}</GameCompletionScore>
         <p className="mt-1 text-muted">
           {caughtRef.current} מתוך {TOTAL_ROUNDS} תפוסות ({accuracy}%)
@@ -346,7 +346,7 @@ export default function WordCatchPage() {
   return (
     <HeartsGate>
       <div className="max-w-4xl mx-auto px-4 py-10">
-        <h1 className="sr-only">תפוס את המילה</h1>
+        <h1 className="sr-only">תפסו את המילה</h1>
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted">
             גל {waveIndex + 1} מתוך {WAVE_COUNT} · מילה {roundInWave + 1} מתוך {WAVE_SIZE}

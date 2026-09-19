@@ -1,4 +1,5 @@
 import type { CefrLevel } from "@/types/database";
+import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
 
 // Grading bar is calibrated to the reader's own tested level rather than
 // a fixed rubric — the same 3-sentence answer that's a strong response
@@ -29,5 +30,7 @@ ${submittedText}
 """
 
 Evaluate BOTH whether the answer shows real understanding of the passage AND the quality of the English used to express it. Respond with ONLY valid JSON, no markdown code fences, in exactly this shape:
-{"score": <integer 0-100>, "feedbackHe": "<2-4 sentences in Hebrew: what the answer got right about the passage, what it missed or misunderstood if anything, and one concrete note on the English itself>", "modelAnswerEn": "<a strong example answer at the reader's own level, not an advanced rewrite>"}`;
+{"score": <integer 0-100>, "feedbackHe": "<2-4 sentences in Hebrew: what the answer got right about the passage, what it missed or misunderstood if anything, and one concrete note on the English itself>", "modelAnswerEn": "<a strong example answer at the reader's own level, not an advanced rewrite>"}
+
+${HEBREW_GENDER_NEUTRAL_NOTE}`;
 }

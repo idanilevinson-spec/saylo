@@ -53,11 +53,18 @@ export async function proxy(request: NextRequest) {
   const isAdminRoute = ADMIN_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
   if (isProtected || isAdminRoute) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // getClaims() verifies the session token's signature locally (against the
+    // project's cached public keys) instead of asking the Auth server on
+    // every navigation the way getUser() does — that round trip was added to
+    // every tap on a protected page. This gate only decides who gets
+    // redirected to /login; every API route still calls getUser(), and the
+    // data itself is protected by row-level security, so nothing here is the
+    // security boundary. On a project still signing with a shared secret,
+    // getClaims() falls back to asking the Auth server, i.e. today's behaviour.
+    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = claimsData?.claims?.sub;
 
-    if (!user) {
+    if (!userId) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
@@ -67,7 +74,7 @@ export async function proxy(request: NextRequest) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("is_admin")
-        .eq("id", user.id)
+        .eq("id", userId)
         .maybeSingle();
 
       if (!profile?.is_admin) {

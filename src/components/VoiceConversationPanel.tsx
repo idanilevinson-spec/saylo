@@ -20,6 +20,9 @@ interface VoiceConversationPanelProps {
 }
 
 const MAX_SILENT_RETRIES = 3;
+// Azure speech tokens last 10 minutes; the token route may already have kept
+// one for up to 4, so the client keeps it for at most 4 more.
+const TOKEN_REUSE_MS = 4 * 60 * 1000;
 
 // Hands-free "phone call" mode for AI conversation practice: loops
 // Azure recognizeOnceAsync (listen) -> onSend (Claude turn) -> Azure
@@ -96,6 +99,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   // effect re-runs) mid-listen, instead of leaving it capturing in the
   // background until Azure's own callback eventually fires.
   const activeRecognizerRef = useRef<SpeechRecognizer | null>(null);
+  const tokenCacheRef = useRef<{ token: string; region: string; at: number } | null>(null);
 
   // Azure throws if close() runs twice on the same recognizer (e.g. the
   // effect's cleanup and recognizeOnceAsync's own callback both racing to
@@ -132,6 +136,14 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     type Credentials = { token: string; region: string; sdk: Sdk };
 
     async function loadCredentials(): Promise<Credentials> {
+      // The token is valid for ~10 minutes, but every turn used to fetch a new
+      // one (twice) — and the one for the reply sat on the critical path
+      // between Claude answering and the voice starting. Reuse it, and only
+      // ask again once it is old enough to be near expiry.
+      const cached = tokenCacheRef.current;
+      if (cached && Date.now() - cached.at < TOKEN_REUSE_MS) {
+        return { token: cached.token, region: cached.region, sdk: await import("microsoft-cognitiveservices-speech-sdk") };
+      }
       const tokenRes = await fetch("/api/speech/token");
       if (!tokenRes.ok) {
         const body = await tokenRes.json().catch(() => ({}));
@@ -144,6 +156,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         );
       }
       const { token, region } = await tokenRes.json();
+      tokenCacheRef.current = { token, region, at: Date.now() };
       const sdk = await import("microsoft-cognitiveservices-speech-sdk");
       return { token, region, sdk };
     }

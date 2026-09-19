@@ -1,4 +1,5 @@
 import type { CefrLevel } from "@/types/database";
+import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
 
 // Grades a *speech transcript*, not written text — same calibrated-to-level
 // approach as buildReadingResponsePrompt, but explicitly told to expect
@@ -24,5 +25,7 @@ ${transcript}
 """
 
 Evaluate whether the answer actually addresses the question and how clearly the idea comes across in spoken English. Respond with ONLY valid JSON, no markdown code fences, in exactly this shape:
-{"score": <integer 0-100>, "feedbackHe": "<2-3 sentences in Hebrew: whether the answer addressed the question, and one concrete note on the spoken English itself>"}`;
+{"score": <integer 0-100>, "feedbackHe": "<2-3 sentences in Hebrew: whether the answer addressed the question, and one concrete note on the spoken English itself>"}
+
+${HEBREW_GENDER_NEUTRAL_NOTE}`;
 }

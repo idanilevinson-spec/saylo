@@ -6,7 +6,8 @@ import { Zap, Trophy, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
-import { recordAttempt } from "@/lib/exercises/recordAttempt";
+import { startAttempt } from "@/lib/exercises/recordAttempt";
+import { runSerially } from "@/lib/gamification/answerTail";
 import { awardXp } from "@/lib/gamification/xp";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import HeartsGate from "@/components/HeartsGate";
@@ -76,7 +77,7 @@ export default function SpeedRoundPage() {
     });
   }, [profile]);
 
-  async function submitAnswer(selectedIndex: number) {
+  function submitAnswer(selectedIndex: number) {
     if (!profile || !items || locked) return;
     setLocked(true);
     setSelected(selectedIndex);
@@ -84,15 +85,19 @@ export default function SpeedRoundPage() {
 
     const elapsed = Date.now() - questionStartRef.current;
     const item = items[index];
-    const res = await recordAttempt(profile.id, item.exercise, { selectedIndex });
-    setWasCorrect(res.isCorrect);
+    // Graded locally: in a game built around pace, the verdict and the next
+    // question can't wait on the network. Saving runs in the background, in
+    // order (the bonus goes through the same queue so XP updates never overlap).
+    const attempt = startAttempt(profile.id, item.exercise, { selectedIndex });
+    attempt.done.catch(() => undefined);
+    setWasCorrect(attempt.isCorrect);
 
-    if (res.isCorrect) {
+    if (attempt.isCorrect) {
       playCorrectSound();
       correctCountRef.current += 1;
       setCorrectCount(correctCountRef.current);
       if (elapsed < FAST_ANSWER_THRESHOLD_MS) {
-        await awardXp(profile.id, "vocab_game_speed_bonus", SPEED_BONUS_XP);
+        runSerially(() => awardXp(profile.id, "vocab_game_speed_bonus", SPEED_BONUS_XP)).catch(() => undefined);
         bonusXpRef.current += SPEED_BONUS_XP;
         setBonusXp(bonusXpRef.current);
       }
@@ -123,7 +128,7 @@ export default function SpeedRoundPage() {
         setWasCorrect(null);
         setTimedOut(false);
       }
-    }, res.isCorrect ? 350 : 700);
+    }, attempt.isCorrect ? 350 : 700);
   }
 
   if (loading || items === null) {

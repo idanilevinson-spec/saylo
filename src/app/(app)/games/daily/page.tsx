@@ -7,7 +7,8 @@ import { Sparkles, Trophy, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
-import { recordAttempt } from "@/lib/exercises/recordAttempt";
+import { startAttempt } from "@/lib/exercises/recordAttempt";
+import { runSerially } from "@/lib/gamification/answerTail";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { maskWord, checkSpelling } from "@/lib/games/spelling";
 import { awardXp } from "@/lib/gamification/xp";
@@ -84,7 +85,7 @@ export default function DailyChallengePage() {
       xp_awarded: alreadyDoneToday ? 0 : COMPLETION_BONUS_XP,
     });
     if (!alreadyDoneToday) {
-      await awardXp(profile.id, "vocab_game_daily_bonus", COMPLETION_BONUS_XP);
+      await runSerially(() => awardXp(profile.id, "vocab_game_daily_bonus", COMPLETION_BONUS_XP));
     }
     playCompleteSound();
     setFinished(true);
@@ -107,19 +108,21 @@ export default function DailyChallengePage() {
     }, 1100);
   }
 
-  async function submitMcq(selectedIndex: number) {
+  function submitMcq(selectedIndex: number) {
     if (!profile || !items || locked) return;
     setLocked(true);
     setSelected(selectedIndex);
     const item = items[index];
-    const res = await recordAttempt(profile.id, item.exercise, { selectedIndex });
-    setWasCorrect(res.isCorrect);
-    if (res.isCorrect) playCorrectSound();
+    // Verdict is instant (graded locally); the attempt saves in the background.
+    const attempt = startAttempt(profile.id, item.exercise, { selectedIndex });
+    attempt.done.catch(() => undefined);
+    setWasCorrect(attempt.isCorrect);
+    if (attempt.isCorrect) playCorrectSound();
     else playIncorrectSound();
-    void advance(res.isCorrect);
+    void advance(attempt.isCorrect);
   }
 
-  async function submitSpelling() {
+  function submitSpelling() {
     if (!profile || !items || locked || !input.trim()) return;
     setLocked(true);
     const item = items[index];
@@ -127,7 +130,7 @@ export default function DailyChallengePage() {
     setWasCorrect(isCorrect);
     if (isCorrect) playCorrectSound();
     else playIncorrectSound();
-    await recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_daily");
+    recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_daily").catch(() => undefined);
     void advance(isCorrect);
   }
 

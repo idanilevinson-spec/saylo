@@ -1,25 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { Fragment } from "react";
 import { usePathname } from "next/navigation";
 
-// Deliberately animates only the entering page (no exit crossfade) - an
-// AnimatePresence exit animation on every App Router navigation means
-// holding the outgoing route in the tree with position:absolute, which
-// fights this app's page-level layout assumptions for no real payoff.
-// A key on pathname is enough to make navigation itself feel like a
-// transition instead of a hard cut.
+// Deliberately does NOT animate. This wraps every in-app navigation, and an
+// entrance fade (opacity 0 → 1, 300ms) means each tap on a link or "next
+// exercise" shows a blank screen for a third of a second before the page
+// appears — on top of the network wait that was already there. Frequent
+// actions should feel instant; the keyed Fragment stays because a new
+// pathname must still remount the page, so per-page state (an answered
+// question, a typed input) never leaks into the next route.
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  return (
-    <motion.div
-      key={pathname}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <Fragment key={pathname}>{children}</Fragment>;
 }

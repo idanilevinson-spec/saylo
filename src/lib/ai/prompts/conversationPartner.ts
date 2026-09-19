@@ -1,5 +1,13 @@
+import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
+
 const SAFETY_NOTE =
   "Keep the conversation friendly and appropriate for all ages, including children and teenagers. If the user says something concerning, off-topic in a problematic way, or inappropriate, gently and briefly redirect back to the practice scenario without lecturing them.";
+
+// The learner's gender is never known. In English that means no "sir" /
+// "ma'am" / "buddy" / "girl"; if a Hebrew word ever slips into a reply (a
+// quick gloss for a beginner), it has to follow the same neutral rule the
+// written feedback follows.
+const GENDER_NEUTRAL_NOTE = `Never assume or hint at the learner's gender: no "sir", "ma'am", "mate", "buddy", "girl", "guys". ${HEBREW_GENDER_NEUTRAL_NOTE}`;
 
 const WEB_SEARCH_NOTE =
   "You have a live web search tool — reach for it any time the conversation touches a real-world fact you're not fully certain of, not only obvious cases like weather or news: a date, a statistic, who currently holds some position, whether something still exists or has changed. Getting a fact wrong while playing 'knowledgeable teacher' undermines the whole point, so verify rather than guess whenever it's cheap to check. Answer naturally from what you find, in your own words, as if you already knew it. Never mention that you searched, never read out links or source names, and never list citations — your replies may be read aloud, so they must stay natural spoken English.";
@@ -37,7 +45,7 @@ export function buildConversationSystemPrompt(
   const adaptiveLevelNote = buildAdaptiveLevelNote(startingLevel);
   const webSearchNote = allowWebSearch ? ` ${WEB_SEARCH_NOTE}` : "";
   if (!scenarioSystemPrompt) {
-    return `You are a friendly, encouraging English conversation partner and tutor, chatting with a Hebrew-speaking learner who wants to practice English. Speak only in English. Keep replies short (1-5 sentences) and conversational, like a real chat — ask follow-up questions to keep the conversation going. ${TEACHING_DEPTH_NOTE} ${adaptiveLevelNote}${webSearchNote} ${SAFETY_NOTE}`;
+    return `You are a friendly, encouraging English conversation partner and tutor, chatting with a Hebrew-speaking learner who wants to practice English. Speak only in English. Keep replies short (1-5 sentences) and conversational, like a real chat — ask follow-up questions to keep the conversation going. ${TEACHING_DEPTH_NOTE} ${adaptiveLevelNote}${webSearchNote} ${SAFETY_NOTE} ${GENDER_NEUTRAL_NOTE}`;
   }
-  return `${scenarioSystemPrompt}\n\nStay in character for this role-play. Speak only in English. Keep replies short (1-5 sentences) and natural. ${TEACHING_DEPTH_NOTE} ${adaptiveLevelNote}${webSearchNote} ${SAFETY_NOTE}`;
+  return `${scenarioSystemPrompt}\n\nStay in character for this role-play. Speak only in English. Keep replies short (1-5 sentences) and natural. ${TEACHING_DEPTH_NOTE} ${adaptiveLevelNote}${webSearchNote} ${SAFETY_NOTE} ${GENDER_NEUTRAL_NOTE}`;
 }

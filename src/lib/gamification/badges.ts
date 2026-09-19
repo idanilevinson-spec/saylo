@@ -20,15 +20,13 @@ export async function checkAndAwardBadges(profileId: string, ctx: BadgeContext):
   if (!badges) return [];
 
   const earnedIds = new Set((earned ?? []).map((e) => e.badge_id));
-  const newlyEarned: Badge[] = [];
+  const newlyEarned = badges.filter(
+    (badge) => !earnedIds.has(badge.id) && meetsCriteria(badge.criteria as unknown as BadgeCriteria, ctx)
+  );
 
-  for (const badge of badges) {
-    if (earnedIds.has(badge.id)) continue;
-    if (meetsCriteria(badge.criteria as unknown as BadgeCriteria, ctx)) {
-      await supabase.from("user_badges").insert({ profile_id: profileId, badge_id: badge.id });
-      newlyEarned.push(badge);
-    }
-  }
+  await Promise.all(
+    newlyEarned.map((badge) => supabase.from("user_badges").insert({ profile_id: profileId, badge_id: badge.id }))
+  );
 
   return newlyEarned;
 }

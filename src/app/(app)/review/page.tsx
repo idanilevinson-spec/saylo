@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { PartyPopper, CheckCircle2, XCircle, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
-import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
+import { startAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
 import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import McqQuestion from "@/components/McqQuestion";
@@ -18,7 +18,11 @@ export default function ReviewPage() {
   const { profile, loading: authLoading } = useAuth();
   const [items, setItems] = useState<DueReviewItem[] | null>(null);
   const [index, setIndex] = useState(0);
-  const [result, setResult] = useState<AttemptResult | null>(null);
+  // Verdict is graded locally and shown at once; streak/hearts come from the
+  // server a moment later. Details are tagged with their exercise so a slow
+  // save for one word can never show up under the next word.
+  const [result, setResult] = useState<{ isCorrect: boolean; xpAwarded: number } | null>(null);
+  const [details, setDetails] = useState<{ exerciseId: string; data: AttemptResult } | null>(null);
 
   useEffect(() => {
     if (profile) {
@@ -88,13 +92,17 @@ export default function ReviewPage() {
 
   const current = items[index];
 
-  async function handleSubmit(response: McqResponse) {
-    if (!profile) return;
-    const res = await recordAttempt(profile.id, current.exercise, response);
-    setResult(res);
-    if (res.isCorrect) playCorrectSound();
+  function handleSubmit(response: McqResponse) {
+    if (!profile || result) return;
+    const exerciseId = current.exercise.id;
+    const attempt = startAttempt(profile.id, current.exercise, response);
+    setResult({ isCorrect: attempt.isCorrect, xpAwarded: attempt.xpAwarded });
+    if (attempt.isCorrect) playCorrectSound();
     else playIncorrectSound();
+    attempt.done.then((data) => setDetails({ exerciseId, data })).catch(() => undefined);
   }
+
+  const heartsRemaining = details?.exerciseId === current.exercise.id ? details.data.heartsRemaining : null;
 
   return (
     <HeartsGate>
@@ -105,9 +113,6 @@ export default function ReviewPage() {
         </p>
         <motion.div
           key={index}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
           className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           <McqQuestion content={current.exercise.content} disabled={!!result} onSubmit={handleSubmit} />
@@ -132,9 +137,9 @@ export default function ReviewPage() {
                   </p>
                 )}
                 <p className="mt-1 text-sm text-muted">+{result.xpAwarded} XP</p>
-                {result.heartsRemaining !== null && (
+                {heartsRemaining !== null && (
                   <p className="mt-1 flex items-center gap-1.5 text-sm text-danger">
-                    <Heart size={14} className="fill-current" /> נשארו לכם {result.heartsRemaining} לבבות
+                    <Heart size={14} className="fill-current" /> נשארו לכם {heartsRemaining} לבבות
                   </p>
                 )}
               </motion.div>

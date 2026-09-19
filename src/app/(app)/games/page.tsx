@@ -59,7 +59,7 @@ const GAME_MODES = [
   },
   {
     icon: Hand,
-    title: "תפוס את המילה",
+    title: "תפסו את המילה",
     body: "מילה נופלת מלמעלה — תפסו את התרגום הנכון לפני שהיא נוחתת",
     href: "/games/catch",
     tone: "primary" as const,

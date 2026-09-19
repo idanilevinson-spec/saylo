@@ -1,3 +1,5 @@
+import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
+
 export interface TranscriptTurn {
   role: "user" | "assistant";
   content: string;
@@ -27,5 +29,7 @@ Respond with ONLY valid JSON, no markdown code fences, in exactly this shape:
   "generalSuggestionsHe": "<2-3 sentences in Hebrew with encouraging, specific advice for next time>"
 }
 
-If there isn't enough student text to judge something, use an empty array or a reasonable middle score rather than inventing detail. Base every item strictly on what the student actually wrote.`;
+If there isn't enough student text to judge something, use an empty array or a reasonable middle score rather than inventing detail. Base every item strictly on what the student actually wrote.
+
+${HEBREW_GENDER_NEUTRAL_NOTE}`;
 }

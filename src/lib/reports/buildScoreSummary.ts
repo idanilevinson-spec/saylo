@@ -25,7 +25,7 @@ const GAME_TYPE_LABELS: Record<string, string> = {
   daily_challenge: "אתגר יומי",
   definition: "זיהוי לפי הגדרה",
   match: "משחק התאמה",
-  word_catch: "תפוס את המילה",
+  word_catch: "תפסו את המילה",
   memory: "זיכרון",
   learn: "למידה",
   test: "מבחן תרגול",
