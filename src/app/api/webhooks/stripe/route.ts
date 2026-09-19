@@ -42,6 +42,7 @@ export async function POST(request: Request) {
           profile_id: profileId,
           plan_id: planId,
           status: "active",
+          billing_provider: "stripe",
           stripe_customer_id: (session.customer as string) ?? null,
           stripe_subscription_id: subscription.id,
           current_period_end: periodEndIso(subscription),
@@ -58,6 +59,9 @@ export async function POST(request: Request) {
       const profileId = subscription.metadata?.profile_id;
       if (profileId) {
         const status = subscription.status === "past_due" ? "past_due" : "active";
+        // billing_provider guard: if this profile switched to buying through
+        // Apple IAP since this Stripe subscription was created, a late/retried
+        // Stripe webhook must not clobber the row Apple/RevenueCat now owns.
         await supabaseAdmin
           .from("subscriptions")
           .update({
@@ -66,7 +70,8 @@ export async function POST(request: Request) {
             cancel_at_period_end: subscription.cancel_at_period_end,
             updated_at: new Date().toISOString(),
           })
-          .eq("profile_id", profileId);
+          .eq("profile_id", profileId)
+          .eq("billing_provider", "stripe");
       }
       break;
     }
@@ -77,7 +82,8 @@ export async function POST(request: Request) {
         await supabaseAdmin
           .from("subscriptions")
           .update({ status: "canceled", cancel_at_period_end: false, updated_at: new Date().toISOString() })
-          .eq("profile_id", profileId);
+          .eq("profile_id", profileId)
+          .eq("billing_provider", "stripe");
       }
       break;
     }

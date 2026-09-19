@@ -414,6 +414,7 @@ export interface Subscription {
   profile_id: string;
   plan_id: string | null;
   status: SubscriptionStatus;
+  billing_provider: "stripe" | "payplus" | "apple";
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   trial_ends_at: string | null;

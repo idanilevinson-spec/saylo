@@ -1,25 +1,77 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
 import { DAILY_CONVERSATION_LIMIT, DAILY_WRITING_LIMIT } from "@/lib/legal/siteInfo";
+import {
+  configureNativeIap,
+  getNativePlanPackages,
+  purchaseNativePlan,
+  restoreNativePurchases,
+  type NativePlanPackage,
+} from "@/lib/subscriptions/nativeIap";
+
+// App Store Review Guideline 3.1.1: a subscription that unlocks in-app
+// content has to be purchased through Apple's own StoreKit when running as
+// the native app — Israel isn't covered by any of the external-purchase-
+// link exceptions Apple has granted elsewhere. So the native build never
+// uses the Stripe/PayPlus checkout below at all, only RevenueCat — see
+// nativeIap.ts for why, and the webhook that actually owns the write.
+const isNative = Capacitor.isNativePlatform();
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function PricingCards() {
-  const { session } = useAuth();
+  const router = useRouter();
+  const { session, profile } = useAuth();
   const [loadingCode, setLoadingCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [nativePackages, setNativePackages] = useState<NativePlanPackage[]>([]);
+  const [restoring, setRestoring] = useState(false);
+  const [restoreMessage, setRestoreMessage] = useState<string | null>(null);
+
+  async function handleRestore() {
+    setRestoring(true);
+    setRestoreMessage(null);
+    const found = await restoreNativePurchases();
+    setRestoreMessage(found ? "המנוי שוחזר בהצלחה." : "לא נמצא מנוי פעיל לשחזור בחשבון ה-Apple הזה.");
+    setRestoring(false);
+    if (found) router.push("/dashboard");
+  }
+
+  useEffect(() => {
+    if (!isNative || !profile) return;
+    (async () => {
+      await configureNativeIap(profile.id);
+      setNativePackages(await getNativePlanPackages());
+    })();
+  }, [profile]);
 
   async function handleCheckout(planCode: string) {
     setLoadingCode(planCode);
     setError(null);
+
+    if (isNative) {
+      const match = nativePackages.find((p) => p.planCode === planCode);
+      if (!match) {
+        setError("המסלול הזה עדיין לא זמין דרך האפליקציה. נסו שוב בעוד רגע.");
+        setLoadingCode(null);
+        return;
+      }
+      const ok = await purchaseNativePlan(match.pkg);
+      if (ok) router.push("/dashboard?upgraded=1");
+      else setLoadingCode(null);
+      return;
+    }
+
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -40,7 +92,11 @@ export default function PricingCards() {
       {error && <p role="alert" className="max-w-md mx-auto mb-6 text-center text-sm text-danger">{error}</p>}
 
       <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
-        {PRICING_PLANS.map((plan, i) => (
+        {PRICING_PLANS.map((plan, i) => {
+          // On the native app the price shown must be exactly what Apple
+          // charges, so it comes from StoreKit rather than plans.ts.
+          const native = isNative ? nativePackages.find((p) => p.planCode === plan.code) : undefined;
+          return (
           <motion.div
             key={plan.code}
             initial={{ opacity: 0, y: 24 }}
@@ -65,14 +121,28 @@ export default function PricingCards() {
             <h2 className="font-bold text-lg">{plan.label}</h2>
             <div className="mt-4">
               <EnglishText as="span" className="text-3xl font-bold">
-                ₪{monthlyEquivalent(plan)}
+                {native ? native.priceString : `₪${plan.totalPrice}`}
               </EnglishText>
-              <span className="text-muted text-sm"> / חודש</span>
+              <span className="text-muted text-sm">
+                {" "}
+                / {plan.months === 1 ? "חודש" : plan.months === 12 ? "שנה" : `${plan.months} חודשים`}
+              </span>
             </div>
-            <p className="mt-1 text-xs text-muted">
-              <EnglishText as="span">₪{plan.totalPrice}</EnglishText>{" "}
-              {plan.months === 1 ? "בתשלום אחד לחודש" : `בתשלום אחד ל־${plan.months} חודשים`}
-            </p>
+            {plan.months > 1 && (
+              <p className="mt-1 text-xs text-muted">
+                שווה ערך ל־
+                <EnglishText as="span">
+                  {native
+                    ? new Intl.NumberFormat("en", {
+                        style: "currency",
+                        currency: native.currencyCode,
+                        maximumFractionDigits: 0,
+                      }).format(native.price / plan.months)
+                    : `₪${monthlyEquivalent(plan)}`}
+                </EnglishText>{" "}
+                לחודש
+              </p>
+            )}
 
             {session ? (
               <motion.button
@@ -95,21 +165,60 @@ export default function PricingCards() {
               </MotionLink>
             )}
           </motion.div>
-        ))}
+          );
+        })}
       </div>
 
-      <p className="max-w-3xl mx-auto mt-8 text-center text-sm text-muted leading-relaxed">
-        המחירים בשקלים והם סופיים: העסק רשום כעוסק פטור ואינו גובה מע״מ. כל מסלול משולם מראש, בתשלום אחד, ומתחדש
-        אוטומטית לאותה תקופה עד שתבטלו. אפשר לבטל את החידוש בכל עת בעמוד הפרופיל. פרטים ב
-        <Link href="/terms" className="text-primary hover:underline">
-          תנאי השימוש
-        </Link>{" "}
-        וב
-        <Link href="/refunds" className="text-primary hover:underline">
-          מדיניות הביטולים וההחזרים
-        </Link>
-        .
-      </p>
+      {!isNative && (
+        <p className="max-w-3xl mx-auto mt-8 text-center text-sm text-muted leading-relaxed">
+          המחירים בשקלים והם סופיים: העסק רשום כעוסק פטור ואינו גובה מע״מ. כל מסלול משולם מראש, בתשלום אחד, ומתחדש
+          אוטומטית לאותה תקופה עד שתבטלו. אפשר לבטל את החידוש בכל עת בעמוד הפרופיל. פרטים ב
+          <Link href="/terms" className="text-primary hover:underline">
+            תנאי השימוש
+          </Link>{" "}
+          וב
+          <Link href="/refunds" className="text-primary hover:underline">
+            מדיניות הביטולים וההחזרים
+          </Link>
+          .
+        </p>
+      )}
+
+      {isNative && (
+        <div className="max-w-3xl mx-auto mt-8 text-center space-y-3">
+          {session && (
+            <button
+              onClick={handleRestore}
+              disabled={restoring}
+              className="text-sm text-primary font-medium hover:underline disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            >
+              {restoring ? "משחזר..." : "שחזור רכישות"}
+            </button>
+          )}
+          {restoreMessage && (
+            <p role="status" className="text-sm text-muted">
+              {restoreMessage}
+            </p>
+          )}
+          <p className="text-xs text-muted leading-relaxed">
+            המנוי מתחדש אוטומטית בתום כל תקופה, באותו מחיר ובאותו משך, אלא אם בוטל לפחות 24 שעות לפני סיומה. החיוב
+            נעשה דרך חשבון ה-Apple שלכם, ואפשר לנהל או לבטל את המנוי בכל עת בהגדרות ה-Apple ID.
+          </p>
+          <p className="text-xs">
+            <a href="/terms" className="text-primary hover:underline">
+              תנאי שימוש
+            </a>
+            {" · "}
+            <a href="/privacy" className="text-primary hover:underline">
+              מדיניות פרטיות
+            </a>
+            {" · "}
+            <a href="/refunds" className="text-primary hover:underline">
+              ביטולים והחזרים
+            </a>
+          </p>
+        </div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}
