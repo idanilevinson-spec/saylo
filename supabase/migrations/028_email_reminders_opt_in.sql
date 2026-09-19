@@ -7,8 +7,7 @@
 
 alter table public.profiles alter column email_reminders_enabled set default false;
 
--- Existing rows are deliberately NOT changed here: whether people who never
--- touched the toggle should be switched off (or re-asked) is a decision for
--- the site owner. To switch everyone off until they opt in from their
--- profile, run manually:
---   update public.profiles set email_reminders_enabled = false;
+-- Existing users never gave explicit consent, so switch them off too. They can
+-- turn reminders back on from their profile settings. Deliberately one-way:
+-- the previous per-user values are not preserved.
+update public.profiles set email_reminders_enabled = false where email_reminders_enabled;
