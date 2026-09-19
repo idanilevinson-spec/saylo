@@ -12,9 +12,7 @@ export const CONTACT_EMAIL = "saylo20037@gmail.com";
 export const BUSINESS_NAME = "לוינסון עידן";
 export const BUSINESS_TYPE = "עוסק פטור";
 export const BUSINESS_ID: string | null = "214191074";
-// A mailing address the business is willing to publish (for example a PO box),
-// not a home address. Hidden while null.
-export const BUSINESS_ADDRESS: string | null = null;
+export const BUSINESS_ADDRESS: string | null = "ארתור רובינשטיין 6, תל אביב-יפו";
 export const BUSINESS_PHONE: string | null = "054-976-2426";
 export const BUSINESS_PHONE_TEL = "+972549762426";
 
