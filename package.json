@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "ios:icons": "node scripts/generate-app-icon.mjs && npx capacitor-assets generate --ios",
     "ios:sync": "npx cap sync ios"
