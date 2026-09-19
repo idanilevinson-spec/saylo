@@ -10,7 +10,13 @@ import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
-import { DAILY_CONVERSATION_LIMIT, DAILY_WRITING_LIMIT } from "@/lib/legal/siteInfo";
+import {
+  BUSINESS_ADDRESS,
+  BUSINESS_NAME,
+  BUSINESS_REGISTRATION,
+  DAILY_CONVERSATION_LIMIT,
+  DAILY_WRITING_LIMIT,
+} from "@/lib/legal/siteInfo";
 import {
   configureNativeIap,
   getNativePlanPackages,
@@ -181,6 +187,11 @@ export default function PricingCards() {
             מדיניות הביטולים וההחזרים
           </Link>
           .
+          <span className="block mt-2">
+            המוכר: {BUSINESS_NAME}
+            {BUSINESS_REGISTRATION ? `, ${BUSINESS_REGISTRATION}` : ""}
+            {BUSINESS_ADDRESS ? `, ${BUSINESS_ADDRESS}` : ""}.
+          </span>
         </p>
       )}
 

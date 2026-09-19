@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import LegalPage, { EmailLink, LegalSection, LegalList, PhoneLink } from "@/components/LegalPage";
-import { ACCESSIBILITY_COORDINATOR_NAME, ACCESSIBILITY_COORDINATOR_PHONE } from "@/lib/legal/siteInfo";
+import LegalPage, { EmailLink, LegalSection, LegalList } from "@/components/LegalPage";
 
 export const metadata: Metadata = {
   title: "הצהרת נגישות — Saylo",
@@ -49,19 +48,9 @@ export default function AccessibilityPage() {
 
       <LegalSection title="נתקלתם בבעיה? פנו אלינו">
         <p>
-          מצאתם בעיית נגישות או שיש לכם הצעה לשיפור? פנו אל רכז הנגישות של Saylo. נטפל בפנייה בהקדם האפשרי.
+          מצאתם בעיית נגישות, חסרה לכם התאמה, או שיש לכם הצעה לשיפור? כתבו לנו ל-<EmailLink />. נטפל בפנייה בהקדם
+          האפשרי.
         </p>
-        <LegalList>
-          {ACCESSIBILITY_COORDINATOR_NAME && <li>שם: {ACCESSIBILITY_COORDINATOR_NAME}</li>}
-          {ACCESSIBILITY_COORDINATOR_PHONE && (
-            <li>
-              טלפון: <PhoneLink />
-            </li>
-          )}
-          <li>
-            אימייל: <EmailLink />
-          </li>
-        </LegalList>
       </LegalSection>
     </LegalPage>
   );

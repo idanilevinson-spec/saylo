@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import LegalPage, { BusinessDetails, LegalSection, LegalList } from "@/components/LegalPage";
+import LegalPage, { ContactDetails, LegalSection, LegalList } from "@/components/LegalPage";
 import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
     <LegalPage title="מדיניות פרטיות">
       <LegalSection title="מי אחראי על המידע">
         <p>המידע נאסף ומנוהל על ידי העסק שפרטיו להלן. לכל שאלה בנושא פרטיות אפשר לפנות אליו בכל אחת מהדרכים:</p>
-        <BusinessDetails />
+        <ContactDetails />
       </LegalSection>
 
       <LegalSection title="איזה מידע אנחנו אוספים">

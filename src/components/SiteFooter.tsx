@@ -1,14 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import EnglishText from "@/components/EnglishText";
-import {
-  BUSINESS_ADDRESS,
-  BUSINESS_NAME,
-  BUSINESS_PHONE,
-  BUSINESS_PHONE_TEL,
-  BUSINESS_REGISTRATION,
-  CONTACT_EMAIL,
-} from "@/lib/legal/siteInfo";
 
 const LINKS = [
   { href: "/pricing", label: "מסלולים" },
@@ -21,6 +13,8 @@ const LINKS = [
   { href: "/login", label: "התחברות" },
 ];
 
+// Seller details (name, business number, address) live on the pages tied to a
+// purchase: pricing, terms and refunds. Nothing personal is repeated here.
 export default function SiteFooter() {
   return (
     <footer className="border-t border-card-border px-4 py-10 mt-auto">
@@ -38,23 +32,8 @@ export default function SiteFooter() {
             </Link>
           ))}
         </nav>
-        <address className="not-italic text-center text-xs leading-relaxed">
-          {[BUSINESS_NAME, BUSINESS_REGISTRATION, BUSINESS_ADDRESS].filter(Boolean).join(" · ")}
-          {BUSINESS_PHONE && (
-            <>
-              {" · "}
-              <a href={`tel:${BUSINESS_PHONE_TEL}`} dir="ltr" className="inline-block hover:text-foreground transition-colors">
-                {BUSINESS_PHONE}
-              </a>
-            </>
-          )}
-          {" · "}
-          <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-foreground transition-colors">
-            {CONTACT_EMAIL}
-          </a>
-        </address>
         <span className="text-center">
-          © {new Date().getFullYear()} <EnglishText as="span">Saylo</EnglishText>. כל הזכויות שמורות ל{BUSINESS_NAME}
+          © {new Date().getFullYear()} <EnglishText as="span">Saylo</EnglishText>. כל הזכויות שמורות
         </span>
       </div>
     </footer>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import LegalPage, { BusinessDetails, EmailLink, LegalSection, LegalList, PhoneLink } from "@/components/LegalPage";
+import LegalPage, { BusinessDetails, EmailLink, LegalSection, LegalList } from "@/components/LegalPage";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 export const metadata: Metadata = {
@@ -53,10 +53,9 @@ export default function RefundsPage() {
           באינטרנט בתוך 14 ימים מיום ביצוע העסקה, או מיום קבלת אישור העסקה בכתב אם הוא התקבל מאוחר יותר.
         </p>
         <p>
-          כדי לבטל, כתבו אל <EmailLink /> מכתובת האימייל של החשבון, וציינו את המסלול שרכשתם. אפשר גם להתקשר:{" "}
-          <PhoneLink />. אנחנו נחזיר את התשלום בתוך 14 ימים מקבלת הודעת
-          הביטול, באותו אמצעי תשלום, בניכוי דמי ביטול בשיעור 5% ממחיר העסקה או 100 ש״ח, הנמוך מביניהם, כפי שהחוק
-          מתיר.
+          כדי לבטל, כתבו אל <EmailLink /> מכתובת האימייל של החשבון, וציינו את המסלול שרכשתם. אנחנו נחזיר את התשלום
+          בתוך 14 ימים מקבלת הודעת הביטול, באותו אמצעי תשלום, בניכוי דמי ביטול בשיעור 5% ממחיר העסקה או 100 ש״ח,
+          הנמוך מביניהם, כפי שהחוק מתיר.
         </p>
       </LegalSection>
 
