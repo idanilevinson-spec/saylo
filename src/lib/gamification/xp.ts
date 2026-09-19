@@ -19,13 +19,12 @@ export async function awardXp(
   source: string,
   amount: number
 ): Promise<{ totalXp: number; level: number }> {
-  await supabase.from("xp_events").insert({ profile_id: profileId, source, amount });
-
-  const { data: existing } = await supabase
-    .from("user_xp")
-    .select("total_xp")
-    .eq("profile_id", profileId)
-    .maybeSingle();
+  // The event log write and the running-total read don't depend on each
+  // other, so they share one round trip.
+  const [, { data: existing }] = await Promise.all([
+    supabase.from("xp_events").insert({ profile_id: profileId, source, amount }),
+    supabase.from("user_xp").select("total_xp").eq("profile_id", profileId).maybeSingle(),
+  ]);
 
   const totalXp = (existing?.total_xp ?? 0) + amount;
   const level = levelForXp(totalXp);

@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/browserClient";
 import { regenerateHearts, loseHeart } from "./hearts";
+import { rememberPracticeAccess } from "./practiceAccessCache";
 import type { Hearts } from "@/types/database";
 
 const DEFAULT_MAX_HEARTS = 5;
@@ -49,6 +50,10 @@ export async function spendHeartOnMistake(profileId: string): Promise<{ current:
     .from("hearts")
     .update({ current_hearts: afterLoss.current, last_regen_at: afterLoss.lastRegenAt.toISOString() })
     .eq("profile_id", profileId);
+
+  // Losing the last heart must not leave the gate believing the learner may
+  // still practise.
+  if (afterLoss.current <= 0) rememberPracticeAccess(profileId, "blocked");
 
   return { current: afterLoss.current, max: afterLoss.max };
 }

@@ -1,4 +1,5 @@
 import type { CefrLevel, SkillArea } from "@/types/database";
+import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
 
 export interface SkillScore {
   skill: SkillArea;
@@ -27,5 +28,7 @@ export function buildPlacementSummaryPrompt(scores: SkillScore[], overallCefr: C
 פירוט לפי תחום:
 ${scoreLines}
 
-כתוב סיכום מעודד שמזכיר את החוזקה הבולטת ביותר ואת התחום שהכי כדאי להתמקד בו בהמשך. אל תמציא נתונים שלא ניתנו כאן. החזר רק את הטקסט של הסיכום עצמו, בלי כותרות ובלי מרכאות.`;
+כתוב סיכום מעודד שמזכיר את החוזקה הבולטת ביותר ואת התחום שהכי כדאי להתמקד בו בהמשך. אל תמציא נתונים שלא ניתנו כאן. החזר רק את הטקסט של הסיכום עצמו, בלי כותרות ובלי מרכאות.
+
+${HEBREW_GENDER_NEUTRAL_NOTE}`;
 }

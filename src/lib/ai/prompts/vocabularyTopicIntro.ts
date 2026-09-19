@@ -1,4 +1,5 @@
 import type { CefrLevel } from "@/types/database";
+import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
 
 export interface VocabularyTopicIntroContext {
   nameHe: string;
@@ -12,5 +13,7 @@ export function buildVocabularyTopicIntroPrompt(context: VocabularyTopicIntroCon
   return `אתה מורה AI חם ומעודד ללימוד אנגלית עבור דוברי עברית. תלמיד עומד להתחיל לתרגל את נושא אוצר המילים "${context.nameHe}" (${context.nameEn}), ברמה ${context.cefrLevel}.
 דוגמאות למילים בנושא: ${wordsList}.
 
-כתוב הסבר קצר (2-4 משפטים, בעברית, בגוף שני, טון חם ומעודד) שמסביר לתלמיד מה הוא עומד ללמוד בנושא הזה ולמה זה שימושי, לפני שהוא מתחיל לתרגל. אפשר להזכיר דוגמה או שתיים מהמילים שניתנו. אל תמציא מידע מעבר למה שניתן כאן. החזר רק את טקסט ההסבר עצמו, בלי כותרות ובלי מרכאות.`;
+כתוב הסבר קצר (2-4 משפטים, בעברית, בגוף שני, טון חם ומעודד) שמסביר לתלמיד מה הוא עומד ללמוד בנושא הזה ולמה זה שימושי, לפני שהוא מתחיל לתרגל. אפשר להזכיר דוגמה או שתיים מהמילים שניתנו. אל תמציא מידע מעבר למה שניתן כאן. החזר רק את טקסט ההסבר עצמו, בלי כותרות ובלי מרכאות.
+
+${HEBREW_GENDER_NEUTRAL_NOTE}`;
 }

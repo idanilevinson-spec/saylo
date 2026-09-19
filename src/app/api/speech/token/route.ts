@@ -13,18 +13,28 @@ import { hasParentalClearance } from "@/lib/auth/consentServer";
 // needs granted consent — including a bare call with no purpose. (An Azure
 // token can't be scoped, so this can't stop a client that lies about its
 // purpose; it does stop every honest client and any direct call.)
+// Azure tokens live 10 minutes. A client may in turn keep what it receives for
+// up to the same span below, so the two must add up to comfortably less.
+const TOKEN_REUSE_MS = 4 * 60 * 1000;
+let cachedToken: { token: string; region: string; expiresAt: number } | null = null;
+
 export async function GET(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  if (!(await isPremiumServer(supabase, user.id))) {
+  const purpose = new URL(request.url).searchParams.get("purpose");
+  // Independent checks, both required: one round trip instead of two. Premium
+  // is still reported first when both fail.
+  const [premium, cleared] = await Promise.all([
+    isPremiumServer(supabase, user.id),
+    purpose === "tts" ? Promise.resolve(true) : hasParentalClearance(supabase, user.id),
+  ]);
+  if (!premium) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
   }
-
-  const purpose = new URL(request.url).searchParams.get("purpose");
-  if (purpose !== "tts" && !(await hasParentalClearance(supabase, user.id))) {
+  if (!cleared) {
     return NextResponse.json({ error: "parental consent required" }, { status: 403 });
   }
 
@@ -32,6 +42,15 @@ export async function GET(request: Request) {
   const region = process.env.AZURE_SPEECH_REGION;
   if (!key || !region) {
     return NextResponse.json({ error: "speech provider not configured" }, { status: 503 });
+  }
+
+  // The token belongs to the app, not to the user, and is good for ~10
+  // minutes. Every authorised request used to trigger a fresh call to Azure;
+  // a warm server instance now reuses one for a few minutes (see
+  // TOKEN_REUSE_MS) instead of adding that round trip to each voice turn.
+  const now = Date.now();
+  if (cachedToken && cachedToken.region === region && now < cachedToken.expiresAt) {
+    return NextResponse.json({ token: cachedToken.token, region });
   }
 
   const res = await fetch(`https://${region}.api.cognitive.microsoft.com/sts/v1.0/issueToken`, {
@@ -43,5 +62,6 @@ export async function GET(request: Request) {
   }
 
   const token = await res.text();
+  cachedToken = { token, region, expiresAt: now + TOKEN_REUSE_MS };
   return NextResponse.json({ token, region });
 }

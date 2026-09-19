@@ -8,24 +8,32 @@ import IconBadge from "@/components/IconBadge";
 import { useAuth } from "@/context/AuthProvider";
 import { isUserPremium } from "@/lib/subscriptions/subscriptionService";
 import { getCurrentHearts } from "@/lib/subscriptions/heartsService";
+import { recentlyAllowedToPractise, rememberPracticeAccess } from "@/lib/subscriptions/practiceAccessCache";
 
 // Wraps any practice UI (exercise player, daily review) and blocks entry
 // once a non-premium user is out of hearts — premium/trialing users always
 // pass straight through.
 export default function HeartsGate({ children }: { children: ReactNode }) {
   const { profile } = useAuth();
-  const [status, setStatus] = useState<"checking" | "blocked" | "ok">("checking");
+  // A learner who was let in a moment ago goes straight to the question; the
+  // check below still runs and can block them if anything changed.
+  const [status, setStatus] = useState<"checking" | "blocked" | "ok">(() =>
+    profile && recentlyAllowedToPractise(profile.id) ? "ok" : "checking"
+  );
 
   useEffect(() => {
     if (!profile) return;
     (async () => {
       const premium = await isUserPremium(profile.id);
       if (premium) {
+        rememberPracticeAccess(profile.id, "ok");
         setStatus("ok");
         return;
       }
       const hearts = await getCurrentHearts(profile.id);
-      setStatus(hearts.current > 0 ? "ok" : "blocked");
+      const access = hearts.current > 0 ? "ok" : "blocked";
+      rememberPracticeAccess(profile.id, access);
+      setStatus(access);
     })();
   }, [profile]);
 

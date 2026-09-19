@@ -1,4 +1,5 @@
 import type { CefrLevel } from "@/types/database";
+import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
 
 export interface McqResultSummary {
   prompt: string;
@@ -45,5 +46,7 @@ ${openLines || "(none answered)"}
 Do not repeat any of the individual feedback above verbatim — synthesize a holistic view across all of it instead.
 
 Write a short (2-4 sentences), warm, encouraging summary IN HEBREW of the student's overall performance on this exam. Name one specific strength and one specific, actionable thing to focus on next time (e.g. a type of question they missed, or reading for detail vs. main idea). Do not just restate the scores. Respond with ONLY valid JSON, no markdown code fences, in exactly this shape:
-{"summaryHe": "<2-4 sentences in Hebrew>"}`;
+{"summaryHe": "<2-4 sentences in Hebrew>"}
+
+${HEBREW_GENDER_NEUTRAL_NOTE}`;
 }

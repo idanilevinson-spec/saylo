@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Timer, ChevronDown, ChevronUp, Sparkles, Trophy, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
-import { recordAttempt } from "@/lib/exercises/recordAttempt";
+import { startAttempt } from "@/lib/exercises/recordAttempt";
 import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import McqQuestion from "@/components/McqQuestion";
@@ -130,15 +130,18 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
     setPhase("exam");
   }
 
-  async function handleMcqSubmit(exercise: Exercise, response: McqResponse) {
+  function handleMcqSubmit(exercise: Exercise, response: McqResponse) {
     if (!profile || answeredThisStep) return;
     setAnsweredThisStep(true);
-    const result = await recordAttempt(profile.id, exercise, response as unknown as Record<string, unknown>);
-    setLastCorrect(result.isCorrect);
-    if (result.isCorrect) playCorrectSound();
+    // Graded locally, so the verdict is instant; saving the attempt carries on
+    // in the background, in order.
+    const attempt = startAttempt(profile.id, exercise, response as unknown as Record<string, unknown>);
+    attempt.done.catch(() => undefined);
+    setLastCorrect(attempt.isCorrect);
+    if (attempt.isCorrect) playCorrectSound();
     else playIncorrectSound();
     const prompt = (exercise.content as { prompt?: string }).prompt ?? "";
-    setMcqOutcomes((prev) => [...prev, { prompt, correct: result.isCorrect }]);
+    setMcqOutcomes((prev) => [...prev, { prompt, correct: attempt.isCorrect }]);
   }
 
   function nextStep() {

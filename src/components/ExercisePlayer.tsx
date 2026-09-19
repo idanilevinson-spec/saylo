@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, Heart, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
-import { recordAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
+import { startAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
 import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import type { Exercise } from "@/types/database";
@@ -29,18 +29,22 @@ interface ExercisePlayerProps {
 export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel, progress }: ExercisePlayerProps) {
   const { profile } = useAuth();
   const router = useRouter();
-  const [result, setResult] = useState<AttemptResult | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  // The verdict is graded locally, so it shows the instant the learner
+  // answers. Streak, hearts and badges need the server and fill in a moment
+  // later (`details`) — the learner never waits on them to see right/wrong.
+  const [result, setResult] = useState<{ isCorrect: boolean; xpAwarded: number } | null>(null);
+  const [details, setDetails] = useState<AttemptResult | null>(null);
+  const answeredRef = useRef(false);
 
-  async function handleSubmit(response: Record<string, unknown>) {
-    if (!profile || submitting) return;
-    setSubmitting(true);
-    const res = await recordAttempt(profile.id, exercise, response);
-    setResult(res);
-    setSubmitting(false);
-    if (res.isCorrect) playCorrectSound();
+  function handleSubmit(response: Record<string, unknown>) {
+    if (!profile || answeredRef.current) return;
+    answeredRef.current = true;
+    const attempt = startAttempt(profile.id, exercise, response);
+    setResult({ isCorrect: attempt.isCorrect, xpAwarded: attempt.xpAwarded });
+    if (attempt.isCorrect) playCorrectSound();
     else playIncorrectSound();
     if (!nextHref) setTimeout(playCompleteSound, 350);
+    attempt.done.then(setDetails).catch(() => undefined);
   }
 
   // A correct answer moves on by itself — the feedback is still shown
@@ -74,9 +78,6 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
 
         <motion.div
           key={exercise.id}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
           className="mt-6 bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           {exercise.type === "mcq" && (
@@ -113,14 +114,14 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                 </p>
               )}
               <p className="mt-1 text-sm text-muted">
-                +{result.xpAwarded} XP · רצף {result.currentStreak} ימים
+                +{result.xpAwarded} XP{details ? ` · רצף ${details.currentStreak} ימים` : ""}
               </p>
-              {result.heartsRemaining !== null && (
+              {details && details.heartsRemaining !== null && (
                 <p className="mt-1 flex items-center gap-1.5 text-sm text-danger">
-                  <Heart size={14} className="fill-current" /> נשארו לכם {result.heartsRemaining} לבבות
+                  <Heart size={14} className="fill-current" /> נשארו לכם {details.heartsRemaining} לבבות
                 </p>
               )}
-              {result.newBadges.length > 0 && (
+              {details && details.newBadges.length > 0 && (
                 <motion.p
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -128,7 +129,7 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                   className="mt-2 flex items-center justify-center gap-1.5 text-sm font-medium text-accent-hover"
                 >
                   <PartyPopper size={16} className="shrink-0" aria-hidden="true" />
-                  קיבלתם תג חדש: {result.newBadges.map((b) => b.name_he).join(", ")}
+                  קיבלתם תג חדש: {details?.newBadges.map((b) => b.name_he).join(", ")}
                 </motion.p>
               )}
             </motion.div>
