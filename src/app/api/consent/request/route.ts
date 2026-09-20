@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
+import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { sendGuardianConsentEmail } from "@/lib/notifications/resend";
 
 // A minor can ask a handful of times a day (typo, lost email) — enough for a
@@ -36,8 +37,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "already granted" }, { status: 409 });
   }
 
+  // Everything below writes with the service role: a signed-in user has no
+  // direct write access to guardian_links or to parental_consent_status
+  // (migration 031), so a minor can never mint or read the guardian's token.
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { count } = await supabase
+  const { count } = await supabaseAdmin
     .from("guardian_links")
     .select("id", { count: "exact", head: true })
     .eq("minor_profile_id", user.id)
@@ -46,7 +50,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "too many requests" }, { status: 429 });
   }
 
-  const { data: link, error } = await supabase
+  const { data: link, error } = await supabaseAdmin
     .from("guardian_links")
     .insert({ minor_profile_id: user.id, guardian_email: guardianEmail })
     .select()
@@ -55,12 +59,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "failed to create consent request" }, { status: 500 });
   }
 
-  await supabase.from("profiles").update({ parental_consent_status: "pending" }).eq("id", user.id);
-
   const consentUrl = `${new URL(request.url).origin}/consent/${link.consent_token}`;
   const emailSent = await sendGuardianConsentEmail(guardianEmail, profile.display_name ?? "", consentUrl);
+  if (!emailSent) {
+    // Fail closed: the token is never handed to the browser, because the
+    // minor must not be able to approve their own request. Drop the unsent
+    // request so it neither counts toward the daily limit nor stays valid.
+    await supabaseAdmin.from("guardian_links").delete().eq("id", link.id);
+    return NextResponse.json({ error: "email not sent" }, { status: 502 });
+  }
 
-  // The link only goes back to the browser when the email could not be sent —
-  // otherwise the minor would be holding the very link meant for the parent.
-  return NextResponse.json({ emailSent, consentToken: emailSent ? null : link.consent_token });
+  // Only the newest link stays valid, so an older one sent to a mistyped
+  // address cannot be used to approve.
+  await supabaseAdmin
+    .from("guardian_links")
+    .delete()
+    .eq("minor_profile_id", user.id)
+    .eq("status", "pending")
+    .neq("id", link.id);
+  await supabaseAdmin.from("profiles").update({ parental_consent_status: "pending" }).eq("id", user.id);
+  return NextResponse.json({ emailSent: true });
 }

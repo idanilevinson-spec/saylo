@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import type { ParentalConsentStatus } from "@/types/database";
 import { EMAIL_INPUT } from "@/lib/utils/inputProps";
+import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 interface ConsentRequestFormProps {
   status: ParentalConsentStatus;
@@ -17,8 +18,6 @@ export default function ConsentRequestForm({ status }: ConsentRequestFormProps) 
   // Where the last request went, read back from the pending request so the
   // notice survives a reload.
   const [sentTo, setSentTo] = useState<string | null>(null);
-  // Only set when the email could not be sent, so the request is never lost.
-  const [fallbackLink, setFallbackLink] = useState<string | null>(null);
   const [resending, setResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,14 +54,12 @@ export default function ConsentRequestForm({ status }: ConsentRequestFormProps) 
         setError("כתובת המייל לא נראית תקינה.");
         return;
       }
-      if (!res.ok) throw new Error("request failed");
-      const data = (await res.json()) as { emailSent: boolean; consentToken: string | null };
-      if (data.emailSent) {
-        setSentTo(email.trim());
-        setFallbackLink(null);
-      } else if (data.consentToken) {
-        setFallbackLink(`${window.location.origin}/consent/${data.consentToken}`);
+      if (res.status === 502) {
+        setError(`לא הצלחנו לשלוח מייל לכתובת הזו. בדקו אותה ונסו שוב, או כתבו לנו ל-${CONTACT_EMAIL}.`);
+        return;
       }
+      if (!res.ok) throw new Error("request failed");
+      setSentTo(email.trim());
       setResending(false);
       await refreshProfile();
     } catch {
@@ -70,20 +67,6 @@ export default function ConsentRequestForm({ status }: ConsentRequestFormProps) 
     } finally {
       setSubmitting(false);
     }
-  }
-
-  if (fallbackLink) {
-    return (
-      <div className="bg-card border border-card-border rounded-lg p-6 text-center">
-        <p className="font-bold">ממתינים לאישור ההורה</p>
-        <p className="mt-2 text-sm text-muted">
-          לא הצלחנו לשלוח מייל להורה. שלחו את הקישור הזה להורה או לאפוטרופוס שלכם כדי שיאשרו, בוואטסאפ, במייל או בכל דרך אחרת:
-        </p>
-        <div dir="ltr" className="mt-3 p-3 rounded-lg bg-background-2 text-sm break-all font-content">
-          {fallbackLink}
-        </div>
-      </div>
-    );
   }
 
   if ((status === "pending" || sentTo) && !resending) {
