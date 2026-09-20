@@ -1,6 +1,7 @@
 import "server-only";
 import { Resend } from "resend";
 import type { ScoreSummary } from "@/lib/reports/buildScoreSummary";
+import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 let client: Resend | null = null;
 
@@ -23,6 +24,38 @@ function escapeHtml(value: string): string {
 
 // Every optional email says why it was sent and how to stop it.
 const OPT_OUT_FOOTER = `<p style="margin-top: 24px; font-size: 12px; color: #6b7280;">קיבלתם מייל זה כי הפעלתם אותו בהגדרות הפרופיל. כדי להפסיק לקבל אותו, כבו אותו ב<a href="https://saylolearn.com/profile" style="color: #0066d6;">הגדרות הפרופיל</a>.</p>`;
+
+// A one-off transactional message the minor asked for, so it carries no
+// opt-out link: it explains who triggered it and that ignoring it changes
+// nothing.
+export async function sendGuardianConsentEmail(
+  to: string,
+  minorDisplayName: string,
+  consentUrl: string
+): Promise<boolean> {
+  const resend = getClient();
+  if (!resend) return false;
+
+  const name = minorDisplayName.trim() ? escapeHtml(minorDisplayName.trim()) : "מי שנרשמ/ה";
+  const { error } = await resend.emails.send({
+    from: "Saylo <consent@saylolearn.com>",
+    to,
+    subject: "בקשת אישור הורה ל-Saylo",
+    html: `
+      <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+        <h1 style="color: #0066d6;">בקשת אישור הורה</h1>
+        <p><strong>${name}</strong> נרשמ/ה ל-Saylo, אפליקציה ללימוד אנגלית, והזינ/ה את כתובת המייל שלכם כדי לבקש את אישורכם, כהורים או כאפוטרופוסים, לתכונות שמקליטות קול ומשוחחות עם מורה AI.</p>
+        <p>בקישור תראו מה בדיוק מאושר ואיך המידע מטופל, ותוכלו לאשר או לדחות.</p>
+        <a href="${escapeHtml(consentUrl)}" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: #0066d6; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
+          לצפייה בבקשה ולהחלטה
+        </a>
+        <p style="margin-top: 24px; font-size: 12px; color: #6b7280;">קיבלתם מייל זה כי מישהו הזין את כתובתכם בבקשה לאישור הורה. אם הבקשה לא מוכרת לכם, אפשר להתעלם ממנו: בלי אישור, התכונות האלה לא יופעלו. שאלות: <a href="mailto:${CONTACT_EMAIL}" style="color: #0066d6;">${CONTACT_EMAIL}</a>.</p>
+      </div>
+    `,
+  });
+
+  return !error;
+}
 
 export async function sendStreakReminderEmail(to: string, displayName: string): Promise<boolean> {
   const resend = getClient();
