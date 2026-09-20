@@ -1,28 +1,48 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getUser, profileSingle, recentCount, insertSingle, updateEq, sendEmail } = vi.hoisted(() => ({
+const { getUser, profileSingle, recentCount, insertSingle, deleteCalls, profileUpdates, sendEmail } = vi.hoisted(() => ({
   getUser: vi.fn(),
   profileSingle: vi.fn(),
   recentCount: vi.fn(),
   insertSingle: vi.fn(),
-  updateEq: vi.fn(),
+  deleteCalls: vi.fn(),
+  profileUpdates: vi.fn(),
   sendEmail: vi.fn(),
 }));
 
+// The signed-in user's client can only read their own profile; every write
+// goes through the service-role client below.
 vi.mock("@/lib/supabase/serverClient", () => ({
   createClient: async () => ({
     auth: { getUser },
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: profileSingle }) }) }),
+  }),
+}));
+
+// A thenable chain that records the filters a delete was built with.
+function deleteChain(filters: unknown[][] = []) {
+  const chain = {
+    eq: (...args: unknown[]) => deleteChain([...filters, ["eq", ...args]]),
+    neq: (...args: unknown[]) => deleteChain([...filters, ["neq", ...args]]),
+    then: (resolve: (value: unknown) => void) => {
+      deleteCalls(filters);
+      resolve({ error: null });
+    },
+  };
+  return chain;
+}
+
+vi.mock("@/lib/supabase/adminClient", () => ({
+  supabaseAdmin: {
     from: (table: string) =>
       table === "profiles"
-        ? {
-            select: () => ({ eq: () => ({ maybeSingle: profileSingle }) }),
-            update: () => ({ eq: updateEq }),
-          }
+        ? { update: (values: unknown) => ({ eq: async () => profileUpdates(values) }) }
         : {
             select: () => ({ eq: () => ({ gte: recentCount }) }),
             insert: () => ({ select: () => ({ single: insertSingle }) }),
+            delete: () => deleteChain(),
           },
-  }),
+  },
 }));
 
 vi.mock("@/lib/notifications/resend", () => ({ sendGuardianConsentEmail: sendEmail }));
@@ -44,8 +64,7 @@ beforeEach(() => {
     data: { display_name: "נועם", age_band: "child", parental_consent_status: "not_required" },
   });
   recentCount.mockResolvedValue({ count: 0 });
-  insertSingle.mockResolvedValue({ data: { consent_token: "tok-123" }, error: null });
-  updateEq.mockResolvedValue({ error: null });
+  insertSingle.mockResolvedValue({ data: { id: "link-1", consent_token: "tok-123" }, error: null });
   sendEmail.mockResolvedValue(true);
 });
 
@@ -78,20 +97,35 @@ describe("POST /api/consent/request", () => {
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
-  it("emails the guardian the consent link and does not hand the token back", async () => {
+  it("emails the guardian, never returns the token, and marks the request pending", async () => {
     const res = await POST(request({ guardianEmail: " p@example.com " }));
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ emailSent: true, consentToken: null });
+    const body = await res.json();
+    expect(body).toEqual({ emailSent: true });
+    expect(JSON.stringify(body)).not.toContain("tok-123");
     expect(sendEmail).toHaveBeenCalledExactlyOnceWith(
       "p@example.com",
       "נועם",
       "https://saylolearn.com/consent/tok-123"
     );
+    expect(profileUpdates).toHaveBeenCalledExactlyOnceWith({ parental_consent_status: "pending" });
   });
 
-  it("falls back to returning the link when the email cannot be sent", async () => {
+  it("invalidates the minor's earlier pending links once the new one is sent", async () => {
+    await POST(request({ guardianEmail: "p@example.com" }));
+    expect(deleteCalls).toHaveBeenCalledExactlyOnceWith([
+      ["eq", "minor_profile_id", "kid-1"],
+      ["eq", "status", "pending"],
+      ["neq", "id", "link-1"],
+    ]);
+  });
+
+  it("fails closed when the email cannot be sent: no token, request dropped, status unchanged", async () => {
     sendEmail.mockResolvedValue(false);
     const res = await POST(request({ guardianEmail: "p@example.com" }));
-    expect(await res.json()).toEqual({ emailSent: false, consentToken: "tok-123" });
+    expect(res.status).toBe(502);
+    expect(JSON.stringify(await res.json())).not.toContain("tok-123");
+    expect(deleteCalls).toHaveBeenCalledExactlyOnceWith([["eq", "id", "link-1"]]);
+    expect(profileUpdates).not.toHaveBeenCalled();
   });
 });

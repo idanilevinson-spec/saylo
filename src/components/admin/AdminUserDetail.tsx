@@ -5,7 +5,7 @@ import { Flame } from "lucide-react";
 import { supabase } from "@/lib/supabase/browserClient";
 import { useAuth } from "@/context/AuthProvider";
 import StatusBadge from "@/components/admin/StatusBadge";
-import type { AgeBand, GuardianLink, Profile, Streak, Subscription, UserXp } from "@/types/database";
+import type { AgeBand, GuardianLinkPublic, Profile, Streak, Subscription, UserXp } from "@/types/database";
 
 const AGE_BAND_LABELS: Record<AgeBand, string> = { child: "ילד/ה", teen: "נוער", adult: "מבוגר/ת" };
 const CONSENT_LABELS: Record<string, string> = {
@@ -20,7 +20,7 @@ interface DetailState {
   subscription: Subscription | null;
   xp: UserXp | null;
   streak: Streak | null;
-  guardianLinks: GuardianLink[];
+  guardianLinks: GuardianLinkPublic[];
 }
 
 export default function AdminUserDetail({ profileId }: { profileId: string }) {
@@ -40,7 +40,7 @@ export default function AdminUserDetail({ profileId }: { profileId: string }) {
         supabase.from("subscriptions").select("*").eq("profile_id", profileId).maybeSingle(),
         supabase.from("user_xp").select("*").eq("profile_id", profileId).maybeSingle(),
         supabase.from("streaks").select("*").eq("profile_id", profileId).maybeSingle(),
-        supabase.from("guardian_links").select("*").eq("minor_profile_id", profileId),
+        supabase.from("guardian_links").select("id, minor_profile_id, guardian_email, status, resolved_at, created_at").eq("minor_profile_id", profileId),
       ]);
 
     if (!profile) {

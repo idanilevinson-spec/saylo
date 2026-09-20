@@ -28,6 +28,10 @@ export interface GuardianLink {
   created_at: string;
 }
 
+// What a signed-in user or an admin may read. consent_token is the guardian's
+// one-time secret and is readable server-side only (migration 031).
+export type GuardianLinkPublic = Omit<GuardianLink, "consent_token">;
+
 export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
 export type ContentStatus = "draft" | "ai_generated_pending_review" | "published";
