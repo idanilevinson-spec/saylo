@@ -25,6 +25,16 @@ export default function SignupForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  // The confirmation mail may be slow, land in spam, or be sent to a mistyped
+  // address — none of which the learner can fix from a page that only says
+  // "check your email". This is the way out.
+  async function handleResend() {
+    setResendStatus("sending");
+    const { error: resendError } = await supabase.auth.resend({ type: "signup", email });
+    setResendStatus(resendError ? "error" : "sent");
+  }
 
   function requireAccepted() {
     if (accepted) return true;
@@ -121,7 +131,42 @@ export default function SignupForm() {
         <h1 className="text-2xl font-black tracking-tight">בדקו את המייל שלכם</h1>
         <p className="mt-3 text-muted">
           שלחנו קישור אישור לכתובת <span dir="ltr" className="inline-block">{email}</span>. לחצו עליו כדי
-          להשלים את ההרשמה.
+          להשלים את ההרשמה. אם המייל לא הגיע, בדקו גם בתיקיית הספאם.
+        </p>
+        <p className="mt-2 text-sm text-muted">אחרי שאישרתם, חזרו לכאן והתחברו עם האימייל והסיסמה שבחרתם.</p>
+
+        <div className="mt-8 space-y-3">
+          <Link
+            href="/login"
+            className="block w-full px-4 py-3 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          >
+            אישרתי, אפשר להתחבר
+          </Link>
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resendStatus === "sending"}
+            className="w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          >
+            {resendStatus === "sending" ? "שולחים..." : "שלחו לי את המייל שוב"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setAwaitingConfirmation(false);
+              setResendStatus("idle");
+            }}
+            className="w-full px-4 py-2 text-sm text-muted hover:text-foreground transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          >
+            הכתובת שגויה? חזרו לתיקון
+          </button>
+        </div>
+
+        <p role="status" className="mt-4 min-h-5 text-sm">
+          {resendStatus === "sent" && <span className="text-success">שלחנו שוב. זה יכול לקחת דקה.</span>}
+          {resendStatus === "error" && (
+            <span className="text-danger">לא הצלחנו לשלוח שוב כרגע. נסו שוב בעוד דקה.</span>
+          )}
         </p>
       </div>
     );
