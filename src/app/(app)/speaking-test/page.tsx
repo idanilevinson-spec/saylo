@@ -10,6 +10,7 @@ import { buildSpeakingTest, type SpeakingTestStep } from "@/lib/games/speakingTe
 import type { VocabularyItemLite } from "@/lib/games/testContent";
 import SpeakingTest from "@/components/SpeakingTest";
 import ParentalConsentGuard from "@/components/ParentalConsentGuard";
+import AiConsentGate from "@/components/AiConsentGate";
 import IconBadge from "@/components/IconBadge";
 import type { Topic } from "@/types/database";
 
@@ -23,9 +24,11 @@ type Phase = "picker" | "generating" | "ready" | "empty";
 export default function SpeakingTestPage() {
   return (
     <ParentalConsentGuard title="מבחן דיבור">
-      <Suspense fallback={<div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>}>
-        <SpeakingTestPageInner />
-      </Suspense>
+      <AiConsentGate>
+        <Suspense fallback={<div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>}>
+          <SpeakingTestPageInner />
+        </Suspense>
+      </AiConsentGate>
     </ParentalConsentGuard>
   );
 }

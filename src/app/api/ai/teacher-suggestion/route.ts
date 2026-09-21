@@ -4,6 +4,7 @@ import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
 import { buildTeacherSuggestionPrompt } from "@/lib/ai/prompts/teacherSuggestion";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
+import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -13,6 +14,9 @@ export async function GET() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!hasAiConsent(user)) {
+    return NextResponse.json({ error: AI_CONSENT_REQUIRED_ERROR }, { status: 403 });
+  }
   if (!(await isPremiumServer(supabase, user.id))) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
   }

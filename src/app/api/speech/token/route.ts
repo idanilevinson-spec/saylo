@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
 import { hasParentalClearance } from "@/lib/auth/consentServer";
+import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 
 // Issues a short-lived Azure Speech auth token so the browser can run
 // live pronunciation assessment via the mic without ever seeing
@@ -25,6 +26,11 @@ export async function GET(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const purpose = new URL(request.url).searchParams.get("purpose");
+  // Recognition streams the learner's voice to Azure, so it needs their
+  // agreement first; text-to-speech only reads out fixed lesson text.
+  if (purpose !== "tts" && !hasAiConsent(user)) {
+    return NextResponse.json({ error: AI_CONSENT_REQUIRED_ERROR }, { status: 403 });
+  }
   // Independent checks, both required: one round trip instead of two. Premium
   // is still reported first when both fail.
   const [premium, cleared] = await Promise.all([

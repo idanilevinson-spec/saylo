@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Timer, ChevronDown, ChevronUp, Sparkles, Trophy, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import { useAiConsent } from "@/components/AiConsentGate";
 import { startAttempt } from "@/lib/exercises/recordAttempt";
 import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
@@ -56,6 +57,7 @@ function formatTime(totalSeconds: number): string {
 // attempt, not just each open question's own per-answer feedback.
 export default function ReadingExam({ text, exercises, openQuestions, vocabByWord }: ReadingExamProps) {
   const { profile } = useAuth();
+  const aiConsented = useAiConsent();
   const [phase, setPhase] = useState<Phase>("intro");
   const [stepIndex, setStepIndex] = useState(0);
   const [answeredThisStep, setAnsweredThisStep] = useState(false);
@@ -92,7 +94,9 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
     if (phase === "finished") return;
     setPhase("finished");
     playCompleteSound();
-    if (!profile) return;
+    // The written wrap-up comes from the AI, so it is only requested once the
+    // learner has agreed to that sharing; the scores themselves don't need it.
+    if (!profile || !aiConsented) return;
     setSummaryLoading(true);
     try {
       const res = await fetch("/api/ai/reading-exam-summary", {

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Crown } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import IconBadge from "@/components/IconBadge";
+import AiConsentGate from "@/components/AiConsentGate";
 
 interface WritingFeedbackResult {
   overall_score: number;
@@ -17,7 +18,7 @@ interface WritingCoachFormProps {
   writingPromptId: string;
 }
 
-export default function WritingCoachForm({ writingPromptId }: WritingCoachFormProps) {
+function WritingCoachFormInner({ writingPromptId }: WritingCoachFormProps) {
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<WritingFeedbackResult | null>(null);
@@ -141,5 +142,13 @@ export default function WritingCoachForm({ writingPromptId }: WritingCoachFormPr
         {submitting ? "מנתח את הכתיבה שלכם..." : "קבלו משוב"}
       </button>
     </div>
+  );
+}
+
+export default function WritingCoachForm(props: WritingCoachFormProps) {
+  return (
+    <AiConsentGate compact declineHref={null}>
+      <WritingCoachFormInner {...props} />
+    </AiConsentGate>
   );
 }

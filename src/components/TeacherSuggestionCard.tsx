@@ -3,12 +3,17 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Lightbulb } from "lucide-react";
+import { useAiConsent } from "@/components/AiConsentGate";
 
 export default function TeacherSuggestionCard() {
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
+  // The suggestion is written by the AI from the learner's practice stats, so
+  // it is only requested once they have agreed to that sharing.
+  const consented = useAiConsent();
 
   useEffect(() => {
+    if (!consented) return;
     fetch("/api/ai/teacher-suggestion")
       .then((res) => {
         if (!res.ok) throw new Error("failed");
@@ -16,9 +21,9 @@ export default function TeacherSuggestionCard() {
       })
       .then((data) => setSuggestion(data.suggestion))
       .catch(() => setFailed(true));
-  }, []);
+  }, [consented]);
 
-  if (failed || !suggestion) return null;
+  if (!consented || failed || !suggestion) return null;
 
   return (
     <motion.div

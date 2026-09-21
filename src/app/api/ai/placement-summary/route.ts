@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
 import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/ai/claudeClient";
-import { buildPlacementSummaryPrompt, type SkillScore } from "@/lib/ai/prompts/placementSummary";
+import {
+  buildPlacementFallbackSummary,
+  buildPlacementSummaryPrompt,
+  type SkillScore,
+} from "@/lib/ai/prompts/placementSummary";
 import { buildWritingCoachPrompt } from "@/lib/ai/prompts/writingCoach";
 import { logAiUsage } from "@/lib/ai/usageLog";
+import { hasAiConsent } from "@/lib/ai/consent";
 import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import { cefrLevelFromPercent } from "@/lib/assessment/cefrScoring";
 import type { SkillArea } from "@/types/database";
@@ -60,8 +65,13 @@ export async function POST(request: Request) {
   const overallPercent = Math.round((totalCorrect / responses.length) * 100);
   const overallCefr = cefrLevelFromPercent(overallPercent);
 
+  // The level is computed from the answers alone. The writing sample and the
+  // written summary go to the AI provider, so they only happen once the
+  // learner has agreed to that; without it the test still completes.
+  const aiAllowed = hasAiConsent(user);
+
   let writingUsage = { input_tokens: 0, output_tokens: 0 };
-  if (writingSample?.trim()) {
+  if (aiAllowed && writingSample?.trim()) {
     const writingMessage = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       // thinking disabled: on by default, and silently eats into max_tokens
@@ -86,15 +96,17 @@ export async function POST(request: Request) {
     }
   }
 
-  const message = await anthropic.messages.create({
-    model: CLAUDE_MODEL,
-    // thinking disabled: on by default, and would silently eat into this
-    // already-tight 300-token budget before any output text is written.
-    max_tokens: 300,
-    thinking: { type: "disabled" },
-    messages: [{ role: "user", content: buildPlacementSummaryPrompt(scores, overallCefr) }],
-  });
-  const summary = extractText(message);
+  const message = aiAllowed
+    ? await anthropic.messages.create({
+        model: CLAUDE_MODEL,
+        // thinking disabled: on by default, and would silently eat into this
+        // already-tight 300-token budget before any output text is written.
+        max_tokens: 300,
+        thinking: { type: "disabled" },
+        messages: [{ role: "user", content: buildPlacementSummaryPrompt(scores, overallCefr) }],
+      })
+    : null;
+  const summary = message ? extractText(message) : buildPlacementFallbackSummary(overallCefr);
 
   await supabase
     .from("placement_tests")
@@ -117,13 +129,15 @@ export async function POST(request: Request) {
     )
   );
 
-  await logAiUsage(
-    supabase,
-    user.id,
-    "placement_scoring",
-    message.usage.input_tokens + writingUsage.input_tokens,
-    message.usage.output_tokens + writingUsage.output_tokens
-  );
+  if (message) {
+    await logAiUsage(
+      supabase,
+      user.id,
+      "placement_scoring",
+      message.usage.input_tokens + writingUsage.input_tokens,
+      message.usage.output_tokens + writingUsage.output_tokens
+    );
+  }
 
   return NextResponse.json({ overallCefr, summary, scores });
 }

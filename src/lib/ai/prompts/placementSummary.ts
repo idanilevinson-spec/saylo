@@ -32,3 +32,9 @@ ${scoreLines}
 
 ${HEBREW_GENDER_NEUTRAL_NOTE}`;
 }
+
+// Shown instead of the AI's summary when the learner hasn't agreed to share
+// their results with the AI provider — the level itself doesn't need the AI.
+export function buildPlacementFallbackSummary(overallCefr: CefrLevel): string {
+  return `הרמה הכוללת שנקבעה: ${overallCefr}. התוצאות לפי תחום מוצגות כאן.`;
+}
