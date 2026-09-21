@@ -10,6 +10,7 @@ import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
 import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import type { CefrLevel } from "@/types/database";
+import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 
 interface ExamSummaryResult {
   summaryHe: string;
@@ -25,6 +26,9 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!hasAiConsent(user)) {
+    return NextResponse.json({ error: AI_CONSENT_REQUIRED_ERROR }, { status: 403 });
+  }
   if (!(await isPremiumServer(supabase, user.id))) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
   }

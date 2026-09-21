@@ -6,6 +6,7 @@ import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
 import { setSkillLevelFromScore } from "@/lib/assessment/skillLevel";
 import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
+import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 
 interface WritingCoachResult {
   overallScore: number;
@@ -19,6 +20,9 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!hasAiConsent(user)) {
+    return NextResponse.json({ error: AI_CONSENT_REQUIRED_ERROR }, { status: 403 });
+  }
   if (!(await isPremiumServer(supabase, user.id))) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
   }

@@ -27,7 +27,7 @@ function request() {
 
 beforeEach(() => {
   vi.resetAllMocks();
-  getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
+  getUser.mockResolvedValue({ data: { user: { id: "user-1", user_metadata: { ai_consent_at: "2026-09-21T09:00:00.000Z" } } } });
   isPaidServer.mockResolvedValue(true);
   const chain: Chain = { select: () => chain, eq: () => chain, maybeSingle };
   from.mockImplementation(() => chain);
@@ -38,6 +38,17 @@ interface Chain {
   eq: () => Chain;
   maybeSingle: typeof maybeSingle;
 }
+
+describe("POST /api/ai/conversation AI-sharing consent", () => {
+  it("refuses a learner who has not agreed to share their messages with the AI, before touching any data", async () => {
+    getUser.mockResolvedValue({ data: { user: { id: "user-1", user_metadata: {} } } });
+    const res = await POST(request());
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({ error: "ai consent required" });
+    expect(from).not.toHaveBeenCalled();
+    expect(isPaidServer).not.toHaveBeenCalled();
+  });
+});
 
 describe("POST /api/ai/conversation consent gate", () => {
   it("refuses a minor whose guardian has not granted consent, before touching any conversation", async () => {

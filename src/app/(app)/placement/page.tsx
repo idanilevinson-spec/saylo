@@ -7,6 +7,7 @@ import { Volume2, Turtle, Target } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import CefrBadge from "@/components/CefrBadge";
+import AiConsentGate from "@/components/AiConsentGate";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { speak } from "@/lib/speech/browserTts";
@@ -263,15 +264,21 @@ export default function PlacementPage() {
           <p className="mt-1 text-sm text-muted">
             זה עוזר לנו להעריך גם את רמת הכתיבה שלכם. אפשר לדלג אם אתם מעדיפים.
           </p>
-          <textarea
-            {...ENGLISH_TEXT_INPUT}
-            aria-label="דגימת כתיבה למבחן ההתחלה"
-            value={writingSample}
-            onChange={(e) => setWritingSample(e.target.value)}
-            rows={5}
-            placeholder="Write your answer here..."
-            className="mt-4 w-full px-4 py-3 rounded-lg border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
+          {/* The writing sample and the summary are read by the AI, so the
+              text box only appears once the learner has agreed to that.
+              Skipping needs no agreement — the result is then computed
+              from the answers alone, with no AI involved. */}
+          <AiConsentGate compact declineHref={null}>
+            <textarea
+              {...ENGLISH_TEXT_INPUT}
+              aria-label="דגימת כתיבה למבחן ההתחלה"
+              value={writingSample}
+              onChange={(e) => setWritingSample(e.target.value)}
+              rows={5}
+              placeholder="Write your answer here..."
+              className="mt-4 w-full px-4 py-3 rounded-lg border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+          </AiConsentGate>
 
           {error && <p role="alert" className="mt-4 text-sm text-danger">{error}</p>}
 

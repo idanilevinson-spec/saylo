@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ComponentProps } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, X } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
@@ -13,6 +13,7 @@ import type {
   SpeechConfig as AzureSpeechConfig,
   PronunciationAssessmentConfig,
 } from "microsoft-cognitiveservices-speech-sdk";
+import AiConsentGate from "@/components/AiConsentGate";
 
 type Status = "idle" | "connecting" | "listening" | "scoring" | "error" | "done";
 
@@ -50,7 +51,7 @@ type AttemptOutcome =
 // The SDK is imported dynamically inside the click handler — it touches
 // browser-only APIs (mic, AudioContext), so it must never load during SSR
 // of this "use client" component's initial server pass.
-export default function PronunciationRecorder({ targetPhrase }: { targetPhrase: string }) {
+function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) {
   const { profile } = useAuth();
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<ScoreResult | null>(null);
@@ -398,5 +399,13 @@ function ScorePill({ label, value, highlight }: { label: string; value: number; 
       <p className="font-bold">{value}</p>
       <p className={`text-[10px] ${highlight ? "opacity-90" : "text-muted"}`}>{label}</p>
     </div>
+  );
+}
+
+export default function PronunciationRecorder(props: ComponentProps<typeof PronunciationRecorderInner>) {
+  return (
+    <AiConsentGate compact declineHref={null}>
+      <PronunciationRecorderInner {...props} />
+    </AiConsentGate>
   );
 }

@@ -5,6 +5,7 @@ import { buildConversationSystemPrompt } from "@/lib/ai/prompts/conversationPart
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
 import { hasParentalClearance } from "@/lib/auth/consentServer";
+import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -12,6 +13,9 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!hasAiConsent(user)) {
+    return NextResponse.json({ error: AI_CONSENT_REQUIRED_ERROR }, { status: 403 });
+  }
   // Both gates must pass before anything else is touched, but neither needs
   // the other's answer — one round trip instead of two. Paid status is still
   // reported first when both fail.

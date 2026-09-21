@@ -1,12 +1,13 @@
 "use client";
 
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Crown } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import IconBadge from "@/components/IconBadge";
+import AiConsentGate from "@/components/AiConsentGate";
 
 interface ReadingResponseResult {
   score: number;
@@ -27,7 +28,7 @@ interface ReadingResponseFormProps {
   onGraded?: (result: ReadingResponseResult) => void;
 }
 
-export default function ReadingResponseForm({
+function ReadingResponseFormInner({
   readingTextId,
   questionEn,
   questionId,
@@ -161,5 +162,13 @@ export default function ReadingResponseForm({
         {submitting ? "מנתח את ההבנה שלכם..." : "בדקו את התשובה שלי"}
       </button>
     </div>
+  );
+}
+
+export default function ReadingResponseForm(props: ComponentProps<typeof ReadingResponseFormInner>) {
+  return (
+    <AiConsentGate compact declineHref={null}>
+      <ReadingResponseFormInner {...props} />
+    </AiConsentGate>
   );
 }
