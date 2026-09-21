@@ -1,6 +1,6 @@
 # אפיון: "הדפוסים שלי" — מאמן טעויות לדוברי עברית
 
-סטטוס: טיוטה לאישור. לא נכתב קוד. תאריך: 21.9.2026.
+סטטוס: טיוטה. הבעלים אישר שהרשימה אומתה (21.9.2026). לא נכתב קוד.
 
 ## 1. הבעיה והמטרה
 
@@ -33,7 +33,7 @@
 
 ## 4. הדפוסים
 
-**חשוב:** חיפוש ברשת מצא מקור מפורט לארבעה בלבד (סומנו "מקור"). את השאר אני מציעה מידע לשוני מקובל, ו**חייבים אישור של מורה לאנגלית או דובר מקצועי לפני שדפוס עולה**. דפוס שלא אושר נשאר `enabled: false`.
+**חשוב:** חיפוש ברשת מצא מקור מפורט לארבעה בלבד (סומנו "מקור"). את השאר כתבתי ממידע לשוני מקובל, והבעלים אישר ב-21.9.2026 שהרשימה אומתה. **עדיין נדרש אישור נפרד של משפטי התרגול** לפני שהם עולים, ודפוס שלא אושר נשאר `enabled: false`.
 
 בהודעות קודמות נתתי כדוגמאות *I'm agree* ו-*I have 30 years*. אלה טעויות נפוצות אצל דוברי שפות אחרות (ספרדית, צרפתית, רוסית), **לא מובהקות לעברית**, ולכן הן לא ברשימה.
 
@@ -43,14 +43,14 @@
 | 2 | `OBJECT_GENDER` | *I love my car, she is fast* ← *it* | כל שם עצם בעברית זכר או נקבה | מקור |
 | 3 | `INVITE_RESERVE_ORDER` | *I invited a table* ← *reserved* | "להזמין" מכסה invite, reserve ו-order | מקור |
 | 4 | `INDEFINITE_ARTICLE` | *She is doctor* ← *a doctor* | אין ב"א" ו-"אן" בעברית | מקור |
-| 5 | `GENERIC_THE` | *I love the music* ← *I love music* | "אני אוהב את המוזיקה" עם ה' הידיעה | לאימות |
-| 6 | `VERB_PREPOSITION` | *enter to the room*, *arrive to*, *married with* | מילת יחס שונה בעברית (נכנס ל-, הגיע ל-, נשוי ל-) | לאימות |
-| 7 | `DO_SUPPORT` | *Where you live?*, *He not like it* | בעברית אין פועל עזר בשאלה ובשלילה | לאימות |
-| 8 | `MAKE_DO` | *I did a mistake* ← *made* | "לעשות" מכסה גם make וגם do | לאימות |
-| 9 | `SAY_TELL` | *He said me* ← *told me* | "אמר לי" | לאימות |
-| 10 | `PRESENT_PERFECT` | *I live here since 2020* ← *have lived* | בעברית ההווה מספיק: "גר כאן מאז" | לאימות |
-| 11 | `SIMPLE_VS_CONTINUOUS` | *Now I work in Tel Aviv* ← *I'm working* | ההווה העברי כולל את שניהם | לאימות |
-| 12 | `UNCOUNTABLE_PLURAL` | *advices*, *informations* ← *advice* | לימוד לפי הצורה העברית | לאימות |
+| 5 | `GENERIC_THE` | *I love the music* ← *I love music* | "אני אוהב את המוזיקה" עם ה' הידיעה | אומת (בעלים) |
+| 6 | `VERB_PREPOSITION` | *enter to the room*, *arrive to*, *married with* | מילת יחס שונה בעברית (נכנס ל-, הגיע ל-, נשוי ל-) | אומת (בעלים) |
+| 7 | `DO_SUPPORT` | *Where you live?*, *He not like it* | בעברית אין פועל עזר בשאלה ובשלילה | אומת (בעלים) |
+| 8 | `MAKE_DO` | *I did a mistake* ← *made* | "לעשות" מכסה גם make וגם do | אומת (בעלים) |
+| 9 | `SAY_TELL` | *He said me* ← *told me* | "אמר לי" | אומת (בעלים) |
+| 10 | `PRESENT_PERFECT` | *I live here since 2020* ← *have lived* | בעברית ההווה מספיק: "גר כאן מאז" | אומת (בעלים) |
+| 11 | `SIMPLE_VS_CONTINUOUS` | *Now I work in Tel Aviv* ← *I'm working* | ההווה העברי כולל את שניהם | אומת (בעלים) |
+| 12 | `UNCOUNTABLE_PLURAL` | *advices*, *informations* ← *advice* | לימוד לפי הצורה העברית | אומת (בעלים) |
 
 **קטגוריית `OTHER`:** טעות ששייכת לדפוס שלא ברשימה נספרת כ-`OTHER` (קוד בלבד, בלי טקסט). כך רואים אחרי כמה שבועות אילו דפוסים חסרים ברשימה.
 
