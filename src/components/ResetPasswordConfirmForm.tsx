@@ -2,29 +2,44 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import IconBadge from "@/components/IconBadge";
 import { supabase } from "@/lib/supabase/browserClient";
 import PasswordField from "@/components/PasswordField";
 
-// Reached only via the link in the password-reset email. Supabase's client
-// auto-detects the recovery token in the URL on load and fires a
-// PASSWORD_RECOVERY auth event once the session is ready — only then do we
-// know it's safe to show the "set a new password" form.
+// Reached via the link in the password-reset email. The link either signs the
+// learner in on the server first (/auth/confirm, works in any browser) or
+// carries a code the client exchanges on load — which only works in the same
+// browser that asked for the reset. Either way a session exists once it has
+// worked, so the form is shown as soon as there is one. If there is none, the
+// page says so and offers a new link, instead of waiting forever.
 export default function ResetPasswordConfirmForm() {
   const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const [status, setStatus] = useState<"checking" | "ready" | "invalid">("checking");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setReady(true);
+    let cancelled = false;
+
+    // Resolves once the client has finished reading the URL, so a failed
+    // exchange shows up here as "no session" rather than as silence.
+    supabase.auth.getSession().then(({ data }) => {
+      if (!cancelled) setStatus(data.session ? "ready" : "invalid");
     });
-    return () => listener.subscription.unsubscribe();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) setStatus("ready");
+    });
+
+    return () => {
+      cancelled = true;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   async function handleSubmit(e: FormEvent) {
@@ -66,10 +81,28 @@ export default function ResetPasswordConfirmForm() {
     );
   }
 
-  if (!ready) {
+  if (status === "checking") {
     return (
       <div className="max-w-md mx-auto px-4 py-24 text-center text-muted">
         מאמת את הקישור...
+      </div>
+    );
+  }
+
+  if (status === "invalid") {
+    return (
+      <div className="max-w-md mx-auto px-4 py-24 text-center">
+        <h1 className="text-2xl font-black tracking-tight">הקישור לא תקף</h1>
+        <p className="mt-3 text-muted">
+          הקישור פג תוקף, כבר נוצל, או נפתח בדפדפן אחר מזה שביקשתם ממנו את האיפוס. בקשו קישור חדש ופתחו אותו באותו
+          דפדפן.
+        </p>
+        <Link
+          href="/reset-password"
+          className="mt-6 inline-block px-6 py-3 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        >
+          בקשת קישור חדש
+        </Link>
       </div>
     );
   }
