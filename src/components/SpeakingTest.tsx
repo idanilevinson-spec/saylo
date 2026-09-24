@@ -8,6 +8,8 @@ import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { awardXp } from "@/lib/gamification/xp";
 import { normalizeSpokenWord, type SpeakingTestStep } from "@/lib/games/speakingTestContent";
 import { useSingleShotRecognition } from "@/lib/speech/useSingleShotRecognition";
+import { openIosAppSettings } from "@/lib/speech/micPermission";
+import { Capacitor } from "@capacitor/core";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import { supabase } from "@/lib/supabase/browserClient";
 import HeartsGate from "@/components/HeartsGate";
@@ -28,6 +30,8 @@ interface StepOutcome {
   score: number | null;
   feedbackHe: string | null;
 }
+
+const isNative = Capacitor.isNativePlatform();
 
 const XP_CORRECT = 10;
 const XP_ATTEMPT = 2;
@@ -384,9 +388,20 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
                   <p role="alert" className="text-danger">
                     {recognition.errorMessage}
                   </p>
-                  <button onClick={recognition.start} className="mt-1 text-primary hover:underline">
-                    נסו שוב
-                  </button>
+                  {recognition.permissionDenied ? (
+                    // Once denied, neither the browser nor the app can ask again — a
+                    // "try again" button here would just silently fail. Settings is
+                    // the only real next step, and only reachable from the native app.
+                    isNative && (
+                      <button onClick={openIosAppSettings} className="mt-1 text-primary hover:underline">
+                        פתיחת הגדרות
+                      </button>
+                    )
+                  ) : (
+                    <button onClick={recognition.start} className="mt-1 text-primary hover:underline">
+                      נסו שוב
+                    </button>
+                  )}
                 </div>
               )}
 

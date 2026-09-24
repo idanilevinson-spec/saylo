@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { SpeechRecognizer } from "microsoft-cognitiveservices-speech-sdk";
+import { isMicPermissionDeniedError } from "./micPermission";
 
 export type RecognitionStatus = "idle" | "connecting" | "listening" | "processing" | "error" | "done";
 
@@ -31,6 +32,9 @@ export function useSingleShotRecognition() {
   const [status, setStatus] = useState<RecognitionStatus>("idle");
   const [transcript, setTranscript] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Set only when the error is a denied mic permission — the UI must not
+  // offer a "try again" for that, see micPermission.ts.
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const recognizerRef = useRef<SpeechRecognizer | null>(null);
   const dismissedRef = useRef(false);
 
@@ -47,6 +51,7 @@ export function useSingleShotRecognition() {
     setStatus("idle");
     setTranscript(null);
     setErrorMessage(null);
+    setPermissionDenied(false);
   }
 
   function dismiss() {
@@ -56,12 +61,17 @@ export function useSingleShotRecognition() {
     setStatus("idle");
     setTranscript(null);
     setErrorMessage(null);
+    setPermissionDenied(false);
   }
 
   async function attemptOnce(
     sdk: typeof import("microsoft-cognitiveservices-speech-sdk"),
     speechConfig: import("microsoft-cognitiveservices-speech-sdk").SpeechConfig
-  ): Promise<{ kind: "success"; text: string } | { kind: "retryable-no-match" } | { kind: "fatal"; message: string }> {
+  ): Promise<
+    | { kind: "success"; text: string }
+    | { kind: "retryable-no-match" }
+    | { kind: "fatal"; message: string; permissionDenied: boolean }
+  > {
     return new Promise((resolve) => {
       const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
       const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
@@ -92,6 +102,7 @@ export function useSingleShotRecognition() {
               resolve({
                 kind: "fatal",
                 message: "לא נקלט שום קול — ודאו שהמיקרופון הנכון נבחר בדפדפן ושהוא לא מושתק, ונסו לדבר מיד אחרי הלחיצה.",
+                permissionDenied: false,
               });
             } else {
               resolve({ kind: "retryable-no-match" });
@@ -105,12 +116,11 @@ export function useSingleShotRecognition() {
           safeClose(recognizer);
           if (recognizerRef.current === recognizer) recognizerRef.current = null;
           if (dismissedRef.current) return;
+          const denied = isMicPermissionDeniedError(err);
           resolve({
             kind: "fatal",
-            message:
-              String(err).includes("Permission denied") || String(err).includes("NotAllowedError")
-                ? "צריך לאשר גישה למיקרופון כדי לענות בקול."
-                : "אירעה שגיאה בגישה למיקרופון. נסו שוב.",
+            message: denied ? "לא ניתנה גישה למיקרופון, ולכן אי אפשר לענות בקול." : "אירעה שגיאה בגישה למיקרופון. נסו שוב.",
+            permissionDenied: denied,
           });
         }
       );
@@ -159,6 +169,7 @@ export function useSingleShotRecognition() {
       if (outcome.kind === "fatal") {
         setStatus("error");
         setErrorMessage(outcome.message);
+        setPermissionDenied(outcome.permissionDenied);
         return;
       }
 
@@ -171,5 +182,5 @@ export function useSingleShotRecognition() {
     }
   }
 
-  return { status, transcript, errorMessage, start, dismiss };
+  return { status, transcript, errorMessage, permissionDenied, start, dismiss };
 }

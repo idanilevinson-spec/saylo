@@ -50,7 +50,7 @@ export default function ProfilePage() {
       });
       if (!res.ok) throw new Error("delete failed");
       await signOut();
-      router.push("/");
+      router.push("/?accountDeleted=1");
     } catch {
       setDeleteError(`לא הצלחנו למחוק את החשבון. נסו שוב, או פנו אלינו ב-${CONTACT_EMAIL}.`);
       setDeleteLoading(false);
