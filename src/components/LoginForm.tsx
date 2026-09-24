@@ -149,7 +149,7 @@ export default function LoginForm() {
           onClick={handleAppleLogin}
           className="mt-2.5 flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
         >
-          <AppleLogo size={18} /> המשך עם Apple
+          <AppleLogo size={24} /> המשך עם Apple
         </motion.button>
 
         <p className="mt-4 text-xs text-muted leading-relaxed">

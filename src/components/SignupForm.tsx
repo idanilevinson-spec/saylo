@@ -288,7 +288,7 @@ export default function SignupForm() {
           onClick={handleAppleSignup}
           className="mt-2.5 flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
         >
-          <AppleLogo size={18} /> המשך עם Apple
+          <AppleLogo size={24} /> המשך עם Apple
         </motion.button>
       </motion.div>
 
