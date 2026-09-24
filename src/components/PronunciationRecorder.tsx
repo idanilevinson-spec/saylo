@@ -14,6 +14,8 @@ import type {
   PronunciationAssessmentConfig,
 } from "microsoft-cognitiveservices-speech-sdk";
 import AiConsentGate from "@/components/AiConsentGate";
+import { isMicPermissionDeniedError, openIosAppSettings } from "@/lib/speech/micPermission";
+import { Capacitor } from "@capacitor/core";
 
 type Status = "idle" | "connecting" | "listening" | "scoring" | "error" | "done";
 
@@ -31,7 +33,7 @@ type AttemptOutcome =
   // phrase awkwardly, a moment of background noise) worth silently
   // retrying once before bothering the learner.
   | { kind: "retryable-no-match" }
-  | { kind: "fatal"; message: string };
+  | { kind: "fatal"; message: string; permissionDenied: boolean };
 
 // Live mic-based pronunciation scoring via Azure AI Speech's Pronunciation
 // Assessment, using recognizeOnceAsync — the same single-shot,
@@ -51,11 +53,16 @@ type AttemptOutcome =
 // The SDK is imported dynamically inside the click handler — it touches
 // browser-only APIs (mic, AudioContext), so it must never load during SSR
 // of this "use client" component's initial server pass.
+const isNative = Capacitor.isNativePlatform();
+
 function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) {
   const { profile } = useAuth();
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<ScoreResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Set only when the error is a denied mic permission — a "try again" is
+  // useless there, since neither the browser nor the app can re-prompt.
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const recognizerRef = useRef<SpeechRecognizer | null>(null);
   // Guards recognizer callbacks: if the learner dismisses the recorder
   // while a recognition is still in flight, the eventual callback must not
@@ -81,6 +88,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
     setStatus("idle");
     setResult(null);
     setErrorMessage(null);
+    setPermissionDenied(false);
   }
 
   // One full listen-and-score cycle: builds a fresh recognizer (Azure
@@ -137,6 +145,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
               resolve({
                 kind: "fatal",
                 message: "לא נקלט שום קול — ודאו שהמיקרופון הנכון נבחר בדפדפן ושהוא לא מושתק, ונסו לדבר מיד אחרי הלחיצה.",
+                permissionDenied: false,
               });
             } else {
               resolve({ kind: "retryable-no-match" });
@@ -157,7 +166,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
               targetPhrase,
               score,
             });
-            resolve({ kind: "fatal", message: "לא הצלחנו לנתח את ההגייה הפעם — נסו שוב." });
+            resolve({ kind: "fatal", message: "לא הצלחנו לנתח את ההגייה הפעם — נסו שוב.", permissionDenied: false });
             return;
           }
           // A recognized-but-unrelated utterance (e.g. only the headword
@@ -173,6 +182,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
             resolve({
               kind: "fatal",
               message: `לא זיהינו את המשפט המלא — נסו לומר בדיוק: "${targetPhrase}"`,
+              permissionDenied: false,
             });
             return;
           }
@@ -183,12 +193,11 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
           safeClose(recognizer);
           if (recognizerRef.current === recognizer) recognizerRef.current = null;
           if (dismissedRef.current) return;
+          const denied = isMicPermissionDeniedError(err);
           resolve({
             kind: "fatal",
-            message:
-              String(err).includes("Permission denied") || String(err).includes("NotAllowedError")
-                ? "צריך לאשר גישה למיקרופון כדי לתרגל הגייה."
-                : "אירעה שגיאה בגישה למיקרופון. נסו שוב.",
+            message: denied ? "לא ניתנה גישה למיקרופון, ולכן אי אפשר לתרגל הגייה." : "אירעה שגיאה בגישה למיקרופון. נסו שוב.",
+            permissionDenied: denied,
           });
         }
       );
@@ -199,6 +208,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
     dismissedRef.current = false;
     setStatus("connecting");
     setErrorMessage(null);
+    setPermissionDenied(false);
     setResult(null);
 
     try {
@@ -266,6 +276,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
       if (outcome.kind === "fatal") {
         setStatus("error");
         setErrorMessage(outcome.message);
+        setPermissionDenied(outcome.permissionDenied);
         return;
       }
 
@@ -285,6 +296,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
       if (dismissedRef.current) return;
       setStatus("error");
       setErrorMessage(err instanceof Error ? err.message : "אירעה שגיאה");
+      setPermissionDenied(false);
     }
   }
 
@@ -343,9 +355,17 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
         <div className="text-sm flex items-start gap-2">
           <div>
             <p role="alert" className="text-danger">{errorMessage}</p>
-            <button onClick={startRecording} className="mt-1 text-primary hover:underline">
-              נסו שוב
-            </button>
+            {permissionDenied ? (
+              isNative && (
+                <button onClick={openIosAppSettings} className="mt-1 text-primary hover:underline">
+                  פתיחת הגדרות
+                </button>
+              )
+            ) : (
+              <button onClick={startRecording} className="mt-1 text-primary hover:underline">
+                נסו שוב
+              </button>
+            )}
           </div>
           <button
             onClick={dismiss}

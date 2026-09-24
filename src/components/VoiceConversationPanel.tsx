@@ -8,6 +8,8 @@ import SayloAvatar, { type AvatarExpression } from "@/components/SayloAvatar";
 import { loadVoicePref, saveVoicePref, NEURAL_VOICE, type VoicePref } from "@/lib/speech/voicePref";
 import { NEURAL_SPEECH_RATES } from "@/lib/speech/useNeuralSpeech";
 import type { SpeechRecognizer } from "microsoft-cognitiveservices-speech-sdk";
+import { isMicPermissionDeniedError, openIosAppSettings } from "@/lib/speech/micPermission";
+import { Capacitor } from "@capacitor/core";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
 
@@ -18,6 +20,8 @@ interface VoiceConversationPanelProps {
   ending: boolean;
   canEnd: boolean;
 }
+
+const isNative = Capacitor.isNativePlatform();
 
 const MAX_SILENT_RETRIES = 3;
 // Azure speech tokens last 10 minutes; the token route may already have kept
@@ -71,6 +75,10 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
   const [state, setState] = useState<CallState>("connecting");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Set only when the error is a denied mic permission — offering "try
+  // again" there is pointless, since neither the browser nor the app can
+  // re-prompt once denied.
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const [restartTick, setRestartTick] = useState(0);
   const [voicePref, setVoicePref] = useState<VoicePref>(() => loadVoicePref());
   const [viseme, setViseme] = useState<number | undefined>(undefined);
@@ -201,6 +209,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
             if (!reply) {
               setErrorMessage("לא הצלחנו לשלוח את ההודעה. נסו שוב.");
+              setPermissionDenied(false);
               setState("error");
               return;
             }
@@ -211,17 +220,16 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
             safeClose(recognizer);
             if (activeRecognizerRef.current === recognizer) activeRecognizerRef.current = null;
             if (cancelled) return;
-            setErrorMessage(
-              String(err).includes("Permission denied") || String(err).includes("NotAllowedError")
-                ? "צריך לאשר גישה למיקרופון כדי לדבר עם ה-AI."
-                : "אירעה שגיאה בגישה למיקרופון."
-            );
+            const denied = isMicPermissionDeniedError(err);
+            setErrorMessage(denied ? "לא ניתנה גישה למיקרופון, ולכן אי אפשר לדבר עם ה-AI." : "אירעה שגיאה בגישה למיקרופון.");
+            setPermissionDenied(denied);
             setState("error");
           }
         );
       } catch (err) {
         if (cancelled) return;
         setErrorMessage(err instanceof Error ? err.message : "אירעה שגיאה");
+        setPermissionDenied(false);
         setState("error");
       }
     }
@@ -349,6 +357,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   function resume() {
     silentTurnsRef.current = 0;
     setErrorMessage(null);
+    setPermissionDenied(false);
     setRestartTick((t) => t + 1);
   }
 
@@ -535,13 +544,33 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         {!ending && state === "error" && errorMessage}
       </p>
 
-      {!ending && (state === "paused" || state === "error") && (
+      {!ending && state === "paused" && (
         <button
           onClick={resume}
           className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
-          {state === "paused" ? "המשך האזנה" : "נסו שוב"}
+          המשך האזנה
         </button>
+      )}
+
+      {!ending && state === "error" && (
+        permissionDenied ? (
+          isNative && (
+            <button
+              onClick={openIosAppSettings}
+              className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+            >
+              פתיחת הגדרות
+            </button>
+          )
+        ) : (
+          <button
+            onClick={resume}
+            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          >
+            נסו שוב
+          </button>
+        )
       )}
 
       <button
