@@ -6,17 +6,28 @@ interface AppleLogoProps {
 // The real Apple glyph, from Apple's own "Sign in with Apple" button assets
 // (Apple Design Resources, "Logo - SIWA - Logo-only - Black.svg") — App
 // Review checks this specifically (Guideline 4) and a generic icon-library
-// apple silhouette does not pass. viewBox is 56x56 on purpose: Apple's own
-// asset already bakes in the required clear space around the mark, so
-// nothing here needs extra padding. `currentColor` (not the asset's
-// hardcoded black/white) lets the glyph follow the button's own text color
-// across the light/dark theme, same as every other icon in this app.
+// apple silhouette does not pass.
+//
+// The official asset's own canvas is 56x56, with the mark occupying only
+// roughly x:[20.5,35.5] y:[16,35] of it — the rest is Apple's mandatory
+// "clear space" margin baked into the file. Rendered at a normal icon size
+// with that full canvas as the viewBox, the mark itself comes out only a
+// few pixels tall next to the button's text. The viewBox below is cropped
+// tight to the mark plus a small margin instead — the path data itself
+// (the actual trademarked shape) is untouched, this only changes which part
+// of the canvas an icon-sized box scales to, exactly like lucide's icons do
+// with their own tight viewBoxes.
+const VIEW_X = 19;
+const VIEW_Y = 14.5;
+const VIEW_W = 18;
+const VIEW_H = 22;
+
 export default function AppleLogo({ size = 18, className }: AppleLogoProps) {
   return (
     <svg
-      width={size}
+      width={(size * VIEW_W) / VIEW_H}
       height={size}
-      viewBox="0 0 56 56"
+      viewBox={`${VIEW_X} ${VIEW_Y} ${VIEW_W} ${VIEW_H}`}
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
