@@ -102,7 +102,7 @@ function greeting() {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { profile, loading } = useAuth();
+  const { session, profile, loading } = useAuth();
   const [stats, setStats] = useState<{ totalXp: number; level: number; currentStreak: number; todayXp: number } | null>(
     null
   );
@@ -110,11 +110,14 @@ export default function DashboardPage() {
   const [hearts, setHearts] = useState<{ current: number; max: number } | null>(null);
   const [placementDone, setPlacementDone] = useState<boolean | null>(null);
 
+  // Same session guard as profile/page.tsx: without it, this effect also
+  // fires right after sign-out (session and profile clear together) and
+  // races the Navbar sign-out button's own navigation to "/".
   useEffect(() => {
-    if (!loading && !profile) {
+    if (!loading && session && !profile) {
       router.replace("/profile/setup");
     }
-  }, [loading, profile, router]);
+  }, [loading, session, profile, router]);
 
   useEffect(() => {
     if (!profile) return;
