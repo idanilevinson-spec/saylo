@@ -4,7 +4,8 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Play, Apple } from "lucide-react";
+import { Play } from "lucide-react";
+import AppleLogo from "@/components/icons/AppleLogo";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/lib/supabase/browserClient";
 import { deriveAgeBand } from "@/lib/auth/ageBand";
@@ -287,7 +288,7 @@ export default function SignupForm() {
           onClick={handleAppleSignup}
           className="mt-2.5 flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
         >
-          <Apple size={18} fill="currentColor" /> המשך עם Apple
+          <AppleLogo size={18} /> המשך עם Apple
         </motion.button>
       </motion.div>
 
