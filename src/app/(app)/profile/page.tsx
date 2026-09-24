@@ -26,7 +26,7 @@ function formatDate(iso: string | null): string {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { profile, loading, signOut, refreshProfile } = useAuth();
+  const { session, profile, loading, signOut, refreshProfile } = useAuth();
   const [savingEmailPref, setSavingEmailPref] = useState(false);
   const [savingReportPref, setSavingReportPref] = useState<"weekly" | "monthly" | null>(null);
   const [stats, setStats] = useState<ProfileStats | null>(null);
@@ -79,11 +79,17 @@ export default function ProfilePage() {
     setSavingReportPref(null);
   }
 
+  // Only a signed-in user with no profile row yet genuinely needs setup.
+  // Without the session check, this also fired right after sign-out (session
+  // and profile both clear together) and raced the sign-out/delete button's
+  // own navigation: replacing to /profile/setup with no session left proxy.ts
+  // bouncing to /login instead of wherever sign-out/delete actually meant to
+  // land the visitor.
   useEffect(() => {
-    if (!loading && !profile) {
+    if (!loading && session && !profile) {
       router.replace("/profile/setup");
     }
-  }, [loading, profile, router]);
+  }, [loading, session, profile, router]);
 
   useEffect(() => {
     if (!profile) return;
