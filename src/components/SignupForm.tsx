@@ -178,6 +178,12 @@ export default function SignupForm() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h1 className="text-3xl font-black tracking-tight text-center">יוצרים חשבון</h1>
         <p className="mt-2 text-center text-muted">3 ימים ראשונים חינם, בלי כרטיס אשראי</p>
+        {/* App Store Review Guideline 5.1.1: says explicitly, at the exact
+            point registration is required, why it's required — every
+            feature past this point is tied to the account itself. */}
+        <p className="mt-1 text-center text-xs text-muted">
+          החשבון הוא מה שמאפשר מסלול לימוד אישי, מורה AI שזוכר אתכם, ושמירת ההתקדמות בכל המכשירים שלכם.
+        </p>
       </motion.div>
 
       {/* The same plate language as the rest of the site: a card with a
