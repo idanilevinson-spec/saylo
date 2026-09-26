@@ -8,8 +8,7 @@ import SayloAvatar, { type AvatarExpression } from "@/components/SayloAvatar";
 import { loadVoicePref, saveVoicePref, NEURAL_VOICE, type VoicePref } from "@/lib/speech/voicePref";
 import { NEURAL_SPEECH_RATES } from "@/lib/speech/useNeuralSpeech";
 import type { SpeechRecognizer } from "microsoft-cognitiveservices-speech-sdk";
-import { isMicPermissionDeniedError, openIosAppSettings } from "@/lib/speech/micPermission";
-import { Capacitor } from "@capacitor/core";
+import { isMicPermissionDeniedError } from "@/lib/speech/micPermission";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
 
@@ -20,8 +19,6 @@ interface VoiceConversationPanelProps {
   ending: boolean;
   canEnd: boolean;
 }
-
-const isNative = Capacitor.isNativePlatform();
 
 const MAX_SILENT_RETRIES = 3;
 // Azure speech tokens last 10 minutes; the token route may already have kept
@@ -553,24 +550,20 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         </button>
       )}
 
-      {!ending && state === "error" && (
-        permissionDenied ? (
-          isNative && (
-            <button
-              onClick={openIosAppSettings}
-              className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
-            >
-              פתיחת הגדרות
-            </button>
-          )
-        ) : (
-          <button
-            onClick={resume}
-            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
-          >
-            נסו שוב
-          </button>
-        )
+      {/* A denied mic permission gets no call to action at all here — no
+          "try again" (the OS/browser won't re-prompt anyway) and, per App
+          Review, not even an opt-in "open Settings" link: Apple's Guideline
+          5.1.1(iv) treats any UI that leads back toward granting the
+          permission as "directing" the learner to reconsider their choice.
+          The message above already says what happened; "להמשיך בהקלדה בלי
+          לסיים" below is the real way out — switch to text, no mic needed. */}
+      {!ending && state === "error" && !permissionDenied && (
+        <button
+          onClick={resume}
+          className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+        >
+          נסו שוב
+        </button>
       )}
 
       <button

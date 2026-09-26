@@ -14,8 +14,7 @@ import type {
   PronunciationAssessmentConfig,
 } from "microsoft-cognitiveservices-speech-sdk";
 import AiConsentGate from "@/components/AiConsentGate";
-import { isMicPermissionDeniedError, openIosAppSettings } from "@/lib/speech/micPermission";
-import { Capacitor } from "@capacitor/core";
+import { isMicPermissionDeniedError } from "@/lib/speech/micPermission";
 
 type Status = "idle" | "connecting" | "listening" | "scoring" | "error" | "done";
 
@@ -53,8 +52,6 @@ type AttemptOutcome =
 // The SDK is imported dynamically inside the click handler — it touches
 // browser-only APIs (mic, AudioContext), so it must never load during SSR
 // of this "use client" component's initial server pass.
-const isNative = Capacitor.isNativePlatform();
-
 function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) {
   const { profile } = useAuth();
   const [status, setStatus] = useState<Status>("idle");
@@ -355,13 +352,12 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
         <div className="text-sm flex items-start gap-2">
           <div>
             <p role="alert" className="text-danger">{errorMessage}</p>
-            {permissionDenied ? (
-              isNative && (
-                <button onClick={openIosAppSettings} className="mt-1 text-primary hover:underline">
-                  פתיחת הגדרות
-                </button>
-              )
-            ) : (
+            {/* No call to action once permission was denied — not even an
+                opt-in "open Settings" link. Per App Review (Guideline
+                5.1.1(iv)), any UI that leads back toward granting the
+                permission counts as directing the learner to reconsider
+                their choice. The X button below is the way out. */}
+            {!permissionDenied && (
               <button onClick={startRecording} className="mt-1 text-primary hover:underline">
                 נסו שוב
               </button>

@@ -97,6 +97,19 @@ export default function PricingCards() {
     <section className="px-4 py-12">
       {error && <p role="alert" className="max-w-md mx-auto mb-6 text-center text-sm text-danger">{error}</p>}
 
+      {/* App Store Review Guideline 5.1.1: every plan below unlocks
+          account-specific functionality (an adaptive learning path, an AI
+          teacher that remembers the learner's own recurring mistakes,
+          per-skill progress, XP/streaks), which is why starting one means
+          creating an account first — spelled out here, not just asserted to
+          a reviewer after the fact. */}
+      {!session && (
+        <p className="max-w-2xl mx-auto mb-8 text-center text-sm text-muted leading-relaxed">
+          כל המסלולים למטה מותאמים אישית: מסלול לימוד שמתעדכן לפי הביצועים שלכם, ומורה AI שזוכר את הטעויות החוזרות
+          שלכם. לכן ההרשמה היא הצעד הראשון — היא גם מה שמאפשר לגשת למנוי מכל אחד מהמכשירים שלכם.
+        </p>
+      )}
+
       <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
         {PRICING_PLANS.map((plan, i) => {
           // On the native app the price shown must be exactly what Apple
