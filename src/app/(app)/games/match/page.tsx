@@ -208,6 +208,7 @@ export default function MatchGamePage() {
     dragStateRef.current = { endpoint, startX: e.clientX, startY: e.clientY, isDragging: false };
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerCancel);
   }
 
   // The tap-to-select half of the pointer-up logic below, pulled out so
@@ -258,9 +259,29 @@ export default function MatchGamePage() {
     }
   }, []);
 
+  // iOS fires pointercancel instead of pointerup whenever it decides the
+  // gesture belongs to something else — its own scroll/zoom recognizer
+  // briefly claiming a touch is enough, and happens most easily on quick,
+  // repeated tapping, exactly how this game is played. Without this handler
+  // the window-level move/up listeners from that gesture were never
+  // removed, and dragStateRef stayed set to a dead drag — so the *next* tap
+  // could land on stale state and silently do nothing. This mirrors
+  // handlePointerUp's cleanup but never attempts a match: the gesture was
+  // aborted, not completed, so the safe thing is just to reset and let the
+  // learner tap again.
+  const handlePointerCancel = useCallback(() => {
+    window.removeEventListener("pointermove", handlePointerMove);
+    window.removeEventListener("pointerup", handlePointerUp);
+    window.removeEventListener("pointercancel", handlePointerCancel);
+    dragStateRef.current = null;
+    setDragLine(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handlePointerUp = useCallback((e: PointerEvent) => {
     window.removeEventListener("pointermove", handlePointerMove);
     window.removeEventListener("pointerup", handlePointerUp);
+    window.removeEventListener("pointercancel", handlePointerCancel);
     const drag = dragStateRef.current;
     dragStateRef.current = null;
     setDragLine(null);
@@ -410,8 +431,8 @@ export default function MatchGamePage() {
             )}
           </svg>
 
-          <div className="relative grid grid-cols-2 gap-x-8 gap-y-3">
-            <div className="space-y-3">
+          <div className="relative grid grid-cols-2 gap-x-8 gap-y-3.5">
+            <div className="space-y-3.5">
               {pairs.map((p) => {
                 const isMatched = matchedIds.has(p.id);
                 const isWrong = wrongPulse?.sourceId === p.id;
@@ -431,7 +452,7 @@ export default function MatchGamePage() {
                     animate={isWrong ? { x: [0, -6, 6, -4, 4, 0] } : {}}
                     transition={{ duration: 0.4 }}
                     style={{ touchAction: "none" }}
-                    className={`select-none rounded-lg border px-3 py-2.5 text-sm cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                    className={`select-none rounded-lg border px-3 py-3 min-h-11 flex items-center text-sm cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched
                         ? "border-success/40 bg-success/10 opacity-70 cursor-default"
                         : selectedEndpoint?.side === "source" && selectedEndpoint.id === p.id
@@ -446,7 +467,7 @@ export default function MatchGamePage() {
                 );
               })}
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               {targetOrder.map((t) => {
                 const isMatched = pairs.some((p) => matchedIds.has(p.id) && p.target === t);
                 const isWrong = wrongPulse?.target === t;
@@ -466,7 +487,7 @@ export default function MatchGamePage() {
                     animate={isWrong ? { x: [0, 6, -6, 4, -4, 0] } : {}}
                     transition={{ duration: 0.4 }}
                     style={{ touchAction: "none" }}
-                    className={`select-none rounded-lg border px-3 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                    className={`select-none rounded-lg border px-3 py-3 min-h-11 flex items-center text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched
                         ? "border-success/40 bg-success/10 opacity-70 cursor-default"
                         : selectedEndpoint?.side === "target" && selectedEndpoint.id === t
