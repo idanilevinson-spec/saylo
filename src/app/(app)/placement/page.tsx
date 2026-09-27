@@ -208,11 +208,20 @@ export default function PlacementPage() {
     if (!testId) return;
     setFinishing(true);
     setError(null);
+    // This call has no upper bound otherwise — it waits on two sequential
+    // Claude calls (writing sample scoring, then the summary), which can
+    // legitimately take a while. Without a timeout, a request that hangs
+    // (weak connection, the app backgrounded mid-request) leaves the
+    // learner stuck on "מנתח את התוצאות שלכם..." with no way back; see the
+    // same fix on account deletion for the same underlying gap.
+    const timeout = new AbortController();
+    const timer = setTimeout(() => timeout.abort(), 30_000);
     try {
       const res = await fetch("/api/ai/placement-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ placementTestId: testId, writingSample: sample }),
+        signal: timeout.signal,
       });
       if (!res.ok) throw new Error("request failed");
       const data = (await res.json()) as PlacementResult;
@@ -220,6 +229,7 @@ export default function PlacementPage() {
     } catch {
       setError("אירעה שגיאה בניתוח התוצאות. נסו שוב.");
     } finally {
+      clearTimeout(timer);
       setFinishing(false);
     }
   }
