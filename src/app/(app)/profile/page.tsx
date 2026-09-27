@@ -42,11 +42,21 @@ export default function ProfilePage() {
   async function deleteAccount() {
     setDeleteLoading(true);
     setDeleteError(null);
+    // A request that never resolves (the app backgrounded mid-request — e.g.
+    // switching to Control Center, or a call coming in — is the one that
+    // actually happened during an early App Review test recording) used to
+    // leave the button stuck on "מוחק..." forever, with no way to tell
+    // whether the account was actually deleted or to retry. This aborts the
+    // attempt after a generous 20s and surfaces the same error as any other
+    // failure, so the learner is never just stuck.
+    const timeout = new AbortController();
+    const timer = setTimeout(() => timeout.abort(), 20_000);
     try {
       const res = await fetch("/api/account/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ confirm: true }),
+        signal: timeout.signal,
       });
       if (!res.ok) throw new Error("delete failed");
       await signOut();
@@ -54,6 +64,8 @@ export default function ProfilePage() {
     } catch {
       setDeleteError(`לא הצלחנו למחוק את החשבון. נסו שוב, או פנו אלינו ב-${CONTACT_EMAIL}.`);
       setDeleteLoading(false);
+    } finally {
+      clearTimeout(timer);
     }
   }
 
