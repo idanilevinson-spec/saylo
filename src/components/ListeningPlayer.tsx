@@ -7,11 +7,18 @@ import EnglishText from "@/components/EnglishText";
 
 interface ListeningPlayerProps {
   transcriptEn: string;
+  // Natural-speech clips (docs/specs/connected-speech-listening.md) start
+  // slower than regular clips — connected/reduced forms are the whole point
+  // of that content, and full speed makes them too hard to notice at all.
+  defaultRate?: (typeof NEURAL_SPEECH_RATES)[number];
 }
 
-export default function ListeningPlayer({ transcriptEn }: ListeningPlayerProps) {
+export default function ListeningPlayer({ transcriptEn, defaultRate = 1 }: ListeningPlayerProps) {
   const [showTranscript, setShowTranscript] = useState(false);
-  const { state: playback, rate, togglePlayPause, setRate } = useNeuralSpeech([transcriptEn]);
+  const { state: playback, rate, togglePlayPause, setRate } = useNeuralSpeech(
+    [transcriptEn],
+    defaultRate
+  );
 
   return (
     <div className="bg-card border border-card-border rounded-lg p-6 sm:p-8">

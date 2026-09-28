@@ -56,8 +56,17 @@ export default async function ListeningClipPage({ params }: PageProps) {
         </EnglishText>
       </div>
 
+      {clip.style === "natural_speech" && (
+        <p className="mt-4 text-sm text-muted">
+          קטע דיבור טבעי — כולל קיצורים והססות כמו בשיחה אמיתית. מתחילים לאט; אפשר להאיץ בבקרת המהירות.
+        </p>
+      )}
+
       <div className="mt-8">
-        <ListeningPlayer transcriptEn={clip.transcript_en} />
+        <ListeningPlayer
+          transcriptEn={clip.transcript_en}
+          defaultRate={clip.style === "natural_speech" ? 0.75 : 1}
+        />
       </div>
 
       {firstExercise && (

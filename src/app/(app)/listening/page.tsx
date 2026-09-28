@@ -1,15 +1,36 @@
 import type { Metadata } from "next";
+import { Waves } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ContentCard from "@/components/ContentCard";
-import { listListeningClips } from "@/lib/content/listening";
+import { groupListeningClipsByStyle, listListeningClips } from "@/lib/content/listening";
+import type { ListeningClip } from "@/types/database";
 
 export const metadata: Metadata = {
   title: "האזנה — Saylo",
 };
 
+function ClipGrid({ clips }: { clips: ListeningClip[] }) {
+  return (
+    <div className="grid sm:grid-cols-2 gap-4">
+      {clips.map((clip, i) => (
+        <ContentCard key={clip.id} href={`/listening/${clip.id}`} index={i}>
+          <div className="flex flex-col items-start gap-1.5">
+            <EnglishText as="h2" className="text-lg font-bold">
+              {clip.title_en}
+            </EnglishText>
+            <p className="text-sm font-medium text-foreground/70">{clip.title_he}</p>
+            <CefrBadge level={clip.cefr_level} />
+          </div>
+        </ContentCard>
+      ))}
+    </div>
+  );
+}
+
 export default async function ListeningPage() {
   const clips = await listListeningClips();
+  const { standard, naturalSpeech } = groupListeningClipsByStyle(clips);
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
@@ -31,18 +52,23 @@ export default async function ListeningPage() {
       {clips.length === 0 ? (
         <p className="mt-10 text-muted">אין עדיין קטעים זמינים — יתווספו בקרוב.</p>
       ) : (
-        <div className="mt-8 grid sm:grid-cols-2 gap-4">
-          {clips.map((clip, i) => (
-            <ContentCard key={clip.id} href={`/listening/${clip.id}`} index={i}>
-              <div className="flex flex-col items-start gap-1.5">
-                <EnglishText as="h2" className="text-lg font-bold">
-                  {clip.title_en}
-                </EnglishText>
-                <p className="text-sm font-medium text-foreground/70">{clip.title_he}</p>
-                <CefrBadge level={clip.cefr_level} />
+        <div className="mt-8 space-y-10">
+          {standard.length > 0 && <ClipGrid clips={standard} />}
+
+          {naturalSpeech.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2">
+                <Waves size={18} className="text-primary" />
+                <h2 className="text-lg font-bold">דיבור טבעי</h2>
               </div>
-            </ContentCard>
-          ))}
+              <p className="mt-1 text-sm text-muted">
+                שיחות אמיתיות, עם קיצורים, הססות ומשפטים לא גמורים — כמו שאנשים באמת מדברים, לא כמו טקסט כתוב.
+              </p>
+              <div className="mt-4">
+                <ClipGrid clips={naturalSpeech} />
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

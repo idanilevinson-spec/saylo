@@ -21,3 +21,17 @@ export async function getListeningClip(id: string): Promise<ListeningClip | null
     .maybeSingle();
   return data;
 }
+
+// "natural_speech" clips (docs/specs/connected-speech-listening.md) are an
+// additive section on the same /listening page, not a replacement for
+// "standard" ones — pure so the grouping itself is unit-testable without a
+// database.
+export function groupListeningClipsByStyle(clips: ListeningClip[]): {
+  standard: ListeningClip[];
+  naturalSpeech: ListeningClip[];
+} {
+  return {
+    standard: clips.filter((clip) => clip.style !== "natural_speech"),
+    naturalSpeech: clips.filter((clip) => clip.style === "natural_speech"),
+  };
+}
