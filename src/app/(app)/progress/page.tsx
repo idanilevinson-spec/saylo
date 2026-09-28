@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -14,6 +14,7 @@ import {
   Headphones,
   NotebookPen,
   MessageCircle,
+  Snowflake,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -51,6 +52,7 @@ interface ProgressData {
   level: number;
   currentStreak: number;
   longestStreak: number;
+  freezeCount: number;
   skillAccuracy: Partial<Record<SkillArea, { correct: number; total: number }>>;
   skillLevels: Partial<Record<SkillArea, CefrLevel>>;
   conversationScores: number[];
@@ -92,7 +94,7 @@ export default function ProgressPage() {
       supabase.from("user_xp").select("total_xp, current_level").eq("profile_id", profile.id).maybeSingle(),
       supabase
         .from("streaks")
-        .select("current_streak, longest_streak")
+        .select("current_streak, longest_streak, freeze_count")
         .eq("profile_id", profile.id)
         .maybeSingle(),
       supabase
@@ -142,6 +144,7 @@ export default function ProgressPage() {
         level: xpRes.data?.current_level ?? 1,
         currentStreak: streakRes.data?.current_streak ?? 0,
         longestStreak: streakRes.data?.longest_streak ?? 0,
+        freezeCount: streakRes.data?.freeze_count ?? 0,
         skillAccuracy,
         skillLevels,
         conversationScores,
@@ -238,7 +241,23 @@ export default function ProgressPage() {
         <div className="relative grid grid-cols-2 sm:grid-cols-4 gap-6">
           <StatHero icon={Star} tone="text-primary" value={data.totalXp} label="XP סה״כ" />
           <StatHero icon={Trophy} tone="text-accent-hover" value={data.level} label="רמה" />
-          <StatHero icon={Flame} tone="text-accent-hover" value={data.currentStreak} label="ימים ברצף" />
+          <StatHero
+            icon={Flame}
+            tone="text-accent-hover"
+            value={data.currentStreak}
+            label="ימים ברצף"
+            badge={
+              data.freezeCount > 0 ? (
+                <span
+                  className="flex items-center gap-0.5 text-xs text-primary"
+                  title={`${data.freezeCount} ${data.freezeCount === 1 ? "הקפאת רצף זמינה" : "הקפאות רצף זמינות"} — שומרת על הרצף אם מפספסים יום אחד`}
+                >
+                  <Snowflake size={12} />
+                  {data.freezeCount}
+                </span>
+              ) : null
+            }
+          />
           <StatHero icon={Flame} tone="text-muted" value={data.longestStreak} label="השיא שלכם" />
         </div>
       </motion.div>
@@ -525,11 +544,13 @@ function StatHero({
   tone,
   value,
   label,
+  badge,
 }: {
   icon: typeof Star;
   tone: string;
   value: number;
   label: string;
+  badge?: ReactNode;
 }) {
   return (
     <div>
@@ -538,6 +559,7 @@ function StatHero({
         <EnglishText as="span" className="text-2xl sm:text-3xl font-bold">
           {value}
         </EnglishText>
+        {badge}
       </div>
       <p className="mt-1 text-xs text-muted">{label}</p>
     </div>
