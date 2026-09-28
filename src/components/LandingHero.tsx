@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
+import { useAuth } from "@/context/AuthProvider";
 
 // Strong custom ease-out — the built-in framer-motion/CSS easings read as
 // weak/default; this is the curve emil-design-eng recommends for anything
@@ -12,6 +13,13 @@ import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function LandingHero() {
+  // A signed-in visitor (e.g. bouncing back to "/" from a bookmark or a
+  // share link) lands on /signup uselessly otherwise — /dashboard is always
+  // the right target either way, since the proxy-level placement gate sends
+  // anyone who hasn't finished the level test there automatically.
+  const { session } = useAuth();
+  const ctaHref = session ? "/dashboard" : "/signup";
+
   return (
     <section className="relative overflow-hidden bg-primary">
       {/* One uniform blue field, the exact hue sampled from the real
@@ -77,7 +85,7 @@ export default function LandingHero() {
                   transition={{ duration: 0.16, ease: EASE_OUT }}
                 >
                   <Link
-                    href="/signup"
+                    href={ctaHref}
                     className="flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-lg bg-primary text-primary-ink font-bold text-lg hover:bg-primary-hover transition-colors"
                   >
                     <Play size={18} fill="currentColor" strokeWidth={0} />

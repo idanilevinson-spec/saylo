@@ -3,10 +3,16 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Play } from "lucide-react";
+import { useAuth } from "@/context/AuthProvider";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function LandingFinalCta() {
+  // Same reasoning as LandingHero's CTA: a signed-in visitor should never
+  // be sent back through /signup.
+  const { session } = useAuth();
+  const ctaHref = session ? "/dashboard" : "/signup";
+
   return (
     <section className="relative overflow-hidden bg-primary px-4 py-20 sm:py-24">
       <motion.div
@@ -33,7 +39,7 @@ export default function LandingFinalCta() {
           transition={{ duration: 0.16, ease: EASE_OUT }}
         >
           <Link
-            href="/signup"
+            href={ctaHref}
             className="flex items-center gap-2.5 px-10 py-4 rounded-lg bg-background text-foreground font-bold text-lg hover:bg-background-2 transition-colors"
           >
             <Play size={18} fill="currentColor" strokeWidth={0} />
