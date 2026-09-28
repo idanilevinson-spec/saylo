@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
-import { sendWeeklyReportEmail } from "@/lib/notifications/resend";
+import { sendWeeklyReportEmail, sendGuardianActivityReportEmail } from "@/lib/notifications/resend";
 import { buildScoreSummary } from "@/lib/reports/buildScoreSummary";
+import { getGuardianActivitySummary } from "@/lib/reports/guardianActivitySummary";
 
 // Fires Saturday evening Israel time (see vercel.json) — deliberately
 // before the Israeli week actually rolls over at Sunday midnight, so
@@ -29,5 +30,29 @@ export async function GET(request: Request) {
     if (await sendWeeklyReportEmail(email, profile.display_name, summary)) sent++;
   }
 
-  return NextResponse.json({ candidates: (profiles ?? []).length, sent });
+  // Independent of the loop above — a minor may have consented to the
+  // guardian report without enabling their own weekly email, and vice
+  // versa (docs/specs/guardian-ongoing-report.md). Same cron trigger, no
+  // new schedule needed.
+  const { data: guardianConsents } = await supabaseAdmin
+    .from("guardian_report_consents")
+    .select("minor_profile_id, guardian_email, consent_token, profiles(display_name)")
+    .eq("status", "granted");
+
+  let guardianReportsSent = 0;
+  for (const consent of guardianConsents ?? []) {
+    const displayName = (consent.profiles as unknown as { display_name: string } | null)?.display_name ?? "";
+    const summary = await getGuardianActivitySummary(supabaseAdmin, consent.minor_profile_id);
+    const unsubscribeUrl = `${new URL(request.url).origin}/guardian-report/${consent.consent_token}`;
+    if (await sendGuardianActivityReportEmail(consent.guardian_email, displayName, summary, unsubscribeUrl)) {
+      guardianReportsSent++;
+    }
+  }
+
+  return NextResponse.json({
+    candidates: (profiles ?? []).length,
+    sent,
+    guardianCandidates: (guardianConsents ?? []).length,
+    guardianReportsSent,
+  });
 }
