@@ -5,6 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
 import Navbar from "@/components/Navbar";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import OfflineBanner from "@/components/OfflineBanner";
 import PageTransition from "@/components/PageTransition";
 import AccessibilityProvider from "@/components/AccessibilityProvider";
 import CookieNotice from "@/components/CookieNotice";
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           דלגו לתוכן הראשי
         </a>
         <ServiceWorkerRegister />
+        <OfflineBanner />
         <AccessibilityProvider>
           <AuthProvider>
             <Navbar />
