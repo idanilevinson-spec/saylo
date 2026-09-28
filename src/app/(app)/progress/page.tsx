@@ -20,6 +20,7 @@ import { supabase } from "@/lib/supabase/browserClient";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
+import { getCanDoStatement } from "@/lib/content/canDoStatements";
 import { buildScoreSummary, type ScoreRange, type ScoreSummary } from "@/lib/reports/buildScoreSummary";
 import type { CefrLevel, SkillArea } from "@/types/database";
 
@@ -497,9 +498,14 @@ function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillAr
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm">{meta.label}</p>
                   {level ? (
-                    <span className="mt-0.5 inline-block">
-                      <CefrBadge level={level} />
-                    </span>
+                    <>
+                      <span className="mt-0.5 inline-block">
+                        <CefrBadge level={level} />
+                      </span>
+                      {getCanDoStatement(skill, level) && (
+                        <p className="mt-1 text-xs text-muted leading-relaxed">{getCanDoStatement(skill, level)}</p>
+                      )}
+                    </>
                   ) : (
                     <p className="text-xs text-muted">
                       {skill === "speaking" ? "יבדק בשיחה עם ה-AI" : "טרם נבדק"}
