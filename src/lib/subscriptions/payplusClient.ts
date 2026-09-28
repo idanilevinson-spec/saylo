@@ -66,9 +66,19 @@ export async function generatePaymentPageLink(params: GenerateLinkParams): Promi
     }),
   });
 
-  const body = await res.json();
+  const raw = await res.text();
+  let body: GenerateLinkResponse & { results?: { status?: string } };
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    // PayPlus returned something that isn't JSON at all (a gateway/WAF
+    // rejection, most likely) — surface the exact text instead of losing it
+    // to a JSON.parse "Unexpected token" message that only shows a few
+    // characters.
+    throw new Error(`PayPlus generateLink returned non-JSON (status ${res.status}): ${raw}`);
+  }
   if (!res.ok || body?.results?.status !== "success") {
-    throw new Error(`PayPlus generateLink failed: ${JSON.stringify(body)}`);
+    throw new Error(`PayPlus generateLink failed (status ${res.status}): ${raw}`);
   }
   return body.data;
 }
