@@ -49,6 +49,22 @@ export interface GuardianReportConsent {
 
 export type GuardianReportConsentPublic = Omit<GuardianReportConsent, "consent_token">;
 
+// The unified mistake-review queue (docs/specs/mistake-notebook.md) —
+// vocabulary keeps living only in srs_items, deliberately not merged here.
+export type MistakeItemType = "grammar_topic" | "pattern";
+
+export interface MistakeReviewItem {
+  id: string;
+  profile_id: string;
+  item_type: MistakeItemType;
+  item_ref: string;
+  ease_factor: number;
+  interval_days: number;
+  repetitions: number;
+  due_at: string;
+  updated_at: string;
+}
+
 export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
 export type ContentStatus = "draft" | "ai_generated_pending_review" | "published";
