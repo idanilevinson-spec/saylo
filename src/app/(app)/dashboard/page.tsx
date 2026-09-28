@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -24,6 +24,7 @@ import {
   Gamepad2,
   Mic,
   ChevronLeft,
+  Snowflake,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -103,9 +104,9 @@ function greeting() {
 export default function DashboardPage() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
-  const [stats, setStats] = useState<{ totalXp: number; level: number; currentStreak: number; todayXp: number } | null>(
-    null
-  );
+  const [stats, setStats] = useState<
+    { totalXp: number; level: number; currentStreak: number; freezeCount: number; todayXp: number } | null
+  >(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [hearts, setHearts] = useState<{ current: number; max: number } | null>(null);
   const [placementDone, setPlacementDone] = useState<boolean | null>(null);
@@ -125,7 +126,7 @@ export default function DashboardPage() {
     startOfToday.setHours(0, 0, 0, 0);
     Promise.all([
       supabase.from("user_xp").select("total_xp, current_level").eq("profile_id", profile.id).maybeSingle(),
-      supabase.from("streaks").select("current_streak").eq("profile_id", profile.id).maybeSingle(),
+      supabase.from("streaks").select("current_streak, freeze_count").eq("profile_id", profile.id).maybeSingle(),
       supabase.from("subscriptions").select("*").eq("profile_id", profile.id).maybeSingle(),
       supabase
         .from("xp_events")
@@ -143,6 +144,7 @@ export default function DashboardPage() {
         totalXp: xpRes.data?.total_xp ?? 0,
         level: xpRes.data?.current_level ?? 1,
         currentStreak: streakRes.data?.current_streak ?? 0,
+        freezeCount: streakRes.data?.freeze_count ?? 0,
         todayXp: (todayXpRes.data ?? []).reduce((sum, e) => sum + e.amount, 0),
       });
       setSubscription(subRes.data ?? null);
@@ -205,7 +207,23 @@ export default function DashboardPage() {
 
         {stats && (
           <div className="flex divide-x divide-x-reverse divide-card-border sm:divide-none">
-            <StatField icon={Flame} tone="accent" value={String(stats.currentStreak)} label="רצף ימים" />
+            <StatField
+              icon={Flame}
+              tone="accent"
+              value={String(stats.currentStreak)}
+              label="רצף ימים"
+              badge={
+                stats.freezeCount > 0 ? (
+                  <span
+                    className="flex items-center gap-0.5 text-[10px] text-primary"
+                    title={`${stats.freezeCount} ${stats.freezeCount === 1 ? "הקפאת רצף זמינה" : "הקפאות רצף זמינות"} — שומרת על הרצף אם מפספסים יום אחד`}
+                  >
+                    <Snowflake size={10} />
+                    {stats.freezeCount}
+                  </span>
+                ) : null
+              }
+            />
             <StatField icon={Star} tone="primary" value={String(stats.totalXp)} label={`XP · רמה ${stats.level}`} />
             {hearts && (
               <StatField icon={Heart} tone="danger" value={`${hearts.current}/${hearts.max}`} label="לבבות" />
@@ -369,11 +387,13 @@ function StatField({
   tone,
   value,
   label,
+  badge,
 }: {
   icon: LucideIcon;
   tone: "accent" | "primary" | "danger";
   value: string;
   label: string;
+  badge?: ReactNode;
 }) {
   const toneClass =
     tone === "accent" ? "text-accent-hover" : tone === "primary" ? "text-primary" : "text-danger";
@@ -384,6 +404,7 @@ function StatField({
         <Icon size={15} className="fill-current" />
         {value}
       </span>
+      {badge}
       <span className="mt-0.5 text-[11px] text-muted">{label}</span>
     </div>
   );

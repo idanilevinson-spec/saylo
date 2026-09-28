@@ -211,6 +211,8 @@ export interface Streak {
   longest_streak: number;
   last_active_date: string | null;
   last_reminder_sent_at: string | null;
+  freeze_count: number;
+  last_freeze_award_streak: number;
   updated_at: string;
 }
 
