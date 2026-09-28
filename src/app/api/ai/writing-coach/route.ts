@@ -7,11 +7,13 @@ import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
 import { setSkillLevelFromScore } from "@/lib/assessment/skillLevel";
 import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
+import { recordPatternObservations } from "@/lib/patterns/recordObservations";
 
 interface WritingCoachResult {
   overallScore: number;
   feedbackHe: string;
   improvedVersion: string;
+  patterns?: unknown;
 }
 
 export async function POST(request: Request) {
@@ -87,6 +89,18 @@ export async function POST(request: Request) {
 
   await logAiUsage(supabase, user.id, "writing_coach", message.usage.input_tokens, message.usage.output_tokens);
   await setSkillLevelFromScore(supabase, user.id, "writing", parsed.overallScore ?? 0, prompt.cefr_level);
+
+  const { data: profile } = await supabase.from("profiles").select("age_band").eq("id", user.id).maybeSingle();
+  if (profile) {
+    await recordPatternObservations({
+      profileId: user.id,
+      ageBand: profile.age_band,
+      source: "writing",
+      sourceId: submission.id,
+      sourceText: submittedText,
+      rawAiPatterns: parsed.patterns,
+    });
+  }
 
   return NextResponse.json({ submission, feedback });
 }

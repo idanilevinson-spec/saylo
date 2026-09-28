@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Flame,
@@ -241,6 +242,19 @@ export default function ProgressPage() {
           <StatHero icon={Flame} tone="text-muted" value={data.longestStreak} label="השיא שלכם" />
         </div>
       </motion.div>
+
+      {profile.age_band === "adult" && (
+        <Link
+          href="/patterns"
+          className="mt-6 flex items-center justify-between gap-3 rounded-lg border border-card-border p-4 hover:bg-background-2 transition-colors"
+        >
+          <span>
+            <span className="block font-bold">הדפוסים שלי</span>
+            <span className="block text-sm text-muted">טעויות שקשורות לעברית וחוזרות אצלכם — ומה לתרגל בעקבותיהן</span>
+          </span>
+          <span className="text-primary text-sm shrink-0">לצפייה ←</span>
+        </Link>
+      )}
 
       <div className="mt-6 flex items-center justify-end">
         <div className="flex items-center gap-1 bg-card/60 border border-card-border rounded-xl p-1">

@@ -8,12 +8,14 @@ import { isPaidServer } from "@/lib/subscriptions/requirePremium";
 import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import type { ConversationFeedback } from "@/types/database";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
+import { recordPatternObservations } from "@/lib/patterns/recordObservations";
 
 interface ScoringResult extends ConversationFeedback {
   fluencyScore: number;
   grammarScore: number;
   vocabularyScore: number;
   overallScore: number;
+  patterns?: unknown;
 }
 
 export async function POST(request: Request) {
@@ -134,6 +136,19 @@ export async function POST(request: Request) {
 
   await logAiUsage(supabase, user.id, "conversation_scoring", inputTokens, outputTokens);
   await setSkillLevelFromScore(supabase, user.id, "speaking", parsed.overallScore ?? 0);
+
+  const { data: profile } = await supabase.from("profiles").select("age_band").eq("id", user.id).maybeSingle();
+  if (profile) {
+    const studentText = userTurns.map((t) => t.content).join("\n");
+    await recordPatternObservations({
+      profileId: user.id,
+      ageBand: profile.age_band,
+      source: "conversation",
+      sourceId: conversationId,
+      sourceText: studentText,
+      rawAiPatterns: parsed.patterns,
+    });
+  }
 
   return NextResponse.json({ score });
 }
