@@ -32,6 +32,23 @@ export interface GuardianLink {
 // one-time secret and is readable server-side only (migration 031).
 export type GuardianLinkPublic = Omit<GuardianLink, "consent_token">;
 
+// The separate, narrower "ongoing activity report to a guardian" consent —
+// docs/specs/guardian-ongoing-report.md. Deliberately its own table, not a
+// reuse of GuardianLink/guardian_links (migration 037).
+export type GuardianReportConsentStatus = "pending" | "granted" | "denied" | "revoked";
+
+export interface GuardianReportConsent {
+  id: string;
+  minor_profile_id: string;
+  guardian_email: string;
+  consent_token: string;
+  status: GuardianReportConsentStatus;
+  created_at: string;
+  resolved_at: string | null;
+}
+
+export type GuardianReportConsentPublic = Omit<GuardianReportConsent, "consent_token">;
+
 export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
 export type ContentStatus = "draft" | "ai_generated_pending_review" | "published";

@@ -11,6 +11,7 @@ import type { Subscription } from "@/types/database";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
+import GuardianReportRequestForm from "@/components/GuardianReportRequestForm";
 import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 interface ProfileStats {
@@ -394,6 +395,10 @@ export default function ProfilePage() {
         </label>
         <PushSubscribeButton />
       </motion.div>
+
+      <div className="mt-4">
+        <GuardianReportRequestForm />
+      </div>
 
       <motion.button
         initial={{ opacity: 0, y: 16 }}

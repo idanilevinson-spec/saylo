@@ -155,3 +155,89 @@ export async function sendMonthlyReportEmail(to: string, displayName: string, su
 
   return !error;
 }
+
+// A one-off transactional message the minor asked for, asking a guardian to
+// approve a SEPARATE, narrower consent than the existing voice-feature one
+// (docs/specs/guardian-ongoing-report.md) — this one only covers a coarse,
+// periodic activity summary, never conversation content.
+export async function sendGuardianReportConsentEmail(
+  to: string,
+  minorDisplayName: string,
+  consentUrl: string
+): Promise<boolean> {
+  const resend = getClient();
+  if (!resend) return false;
+
+  const name = minorDisplayName.trim() ? escapeHtml(minorDisplayName.trim()) : "מי שנרשמ/ה";
+  const { error } = await resend.emails.send({
+    from: "Saylo <consent@saylolearn.com>",
+    to,
+    subject: "בקשה לדוח פעילות תקופתי — Saylo",
+    html: `
+      <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+        <h1 style="color: #0066d6;">בקשה לדוח פעילות תקופתי</h1>
+        <p><strong>${name}</strong> מבקש/ת את אישורכם לקבל מדי פעם, במייל, סיכום קצר של הפעילות שלו/ה ב-Saylo: כמה ימים תרגל/ה, הרצף הנוכחי ורמת האנגלית הכללית.</p>
+        <p style="margin-top: 12px;">זו בקשה נפרדת מאישור השימוש בקול ובמורה ה-AI שכבר נתתם בעבר, אם נתתם. הדוח <strong>לא</strong> כולל תוכן שיחות, טעויות ספציפיות או כל פירוט אחר מעבר לסיכום הכללי שתואר למעלה.</p>
+        <a href="${escapeHtml(consentUrl)}" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: #0066d6; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
+          לצפייה בבקשה ולהחלטה
+        </a>
+        <p style="margin-top: 24px; font-size: 12px; color: #6b7280;">קיבלתם מייל זה כי מישהו הזין את כתובתכם בבקשה לדוח פעילות. אם הבקשה לא מוכרת לכם, אפשר להתעלם ממנו: בלי אישור, שום דוח לא יישלח. שאלות: <a href="mailto:${CONTACT_EMAIL}" style="color: #0066d6;">${CONTACT_EMAIL}</a>.</p>
+      </div>
+    `,
+  });
+
+  return !error;
+}
+
+export interface GuardianActivitySummary {
+  testsCount: number;
+  xpEarned: number;
+  currentStreak: number;
+  // null when the minor hasn't completed a placement test yet.
+  cefrLevel: string | null;
+}
+
+// The periodic report itself — deliberately built from a narrower type than
+// ScoreSummary (no `items`), so there is nothing granular to accidentally
+// pass in here even by mistake. Every send includes an unsubscribe link the
+// guardian can use without signing in.
+export async function sendGuardianActivityReportEmail(
+  to: string,
+  minorDisplayName: string,
+  summary: GuardianActivitySummary,
+  unsubscribeUrl: string
+): Promise<boolean> {
+  const resend = getClient();
+  if (!resend) return false;
+
+  const name = escapeHtml(minorDisplayName.trim() || "התלמיד/ה");
+  const { error } = await resend.emails.send({
+    from: "Saylo <reports@saylolearn.com>",
+    to,
+    subject: `דוח הפעילות של ${minorDisplayName.trim() || "התלמיד/ה"} ב-Saylo`,
+    html: `
+      <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+        <h1 style="color: #0066d6;">הדוח התקופתי של ${name}</h1>
+        <p>סיכום קצר של הפעילות ב-Saylo, לפי האישור שנתתם:</p>
+        <div style="display: flex; gap: 12px; margin: 20px 0;">
+          <div style="flex: 1; background: #f9fafb; border-radius: 12px; padding: 14px; text-align: center;">
+            <div style="font-size: 22px; font-weight: 700;">${summary.testsCount}</div>
+            <div style="font-size: 12px; color: #6b7280;">פעילויות</div>
+          </div>
+          <div style="flex: 1; background: #f9fafb; border-radius: 12px; padding: 14px; text-align: center;">
+            <div style="font-size: 22px; font-weight: 700;">${summary.currentStreak}</div>
+            <div style="font-size: 12px; color: #6b7280;">ימי רצף</div>
+          </div>
+          <div style="flex: 1; background: #f9fafb; border-radius: 12px; padding: 14px; text-align: center;">
+            <div style="font-size: 22px; font-weight: 700;">${summary.cefrLevel ?? "—"}</div>
+            <div style="font-size: 12px; color: #6b7280;">רמה כללית</div>
+          </div>
+        </div>
+        <p style="font-size: 13px; color: #6b7280;">הדוח הזה מכיל רק סיכום כללי — לא תוכן שיחות, לא טעויות ספציפיות ולא שום פרט אישי מעבר למה שמוצג כאן.</p>
+        <p style="margin-top: 24px; font-size: 12px; color: #6b7280;">קיבלתם מייל זה כי אישרתם לקבל דוח פעילות תקופתי. אפשר להפסיק בכל עת: <a href="${escapeHtml(unsubscribeUrl)}" style="color: #0066d6;">הסרה מרשימת התפוצה</a>. שאלות: <a href="mailto:${CONTACT_EMAIL}" style="color: #0066d6;">${CONTACT_EMAIL}</a>.</p>
+      </div>
+    `,
+  });
+
+  return !error;
+}
