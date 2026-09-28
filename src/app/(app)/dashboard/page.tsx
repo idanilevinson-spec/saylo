@@ -25,6 +25,7 @@ import {
   Mic,
   ChevronLeft,
   Snowflake,
+  GraduationCap,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -88,6 +89,12 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
     items: [
       { icon: Gamepad2, title: "משחקי אוצר מילים", body: "סיבוב מהירות, איות ואתגר יומי", href: "/games" },
       { icon: Mic, title: 'מבחן דיבור', body: 'עונים בקול על מילים ושאלות פתוחות, מדורג ע"י AI', href: "/speaking-test" },
+    ],
+  },
+  {
+    title: "הכנה לבגרות",
+    items: [
+      { icon: GraduationCap, title: "תרגול בגרות באנגלית", body: "לפי מבנה הבחינה האמיתי, מודול אחר מודול", href: "/bagrut" },
     ],
   },
 ];

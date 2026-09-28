@@ -31,6 +31,11 @@ export interface BagrutReadingQuestion {
   formatHe: string;
   promptEn: string;
   options?: string[];
+  // Only set (and only meaningful) when `options` is set — the UI uses this
+  // to color a multiple-choice answer, rather than trying to infer
+  // correctness by string-matching the option text against modelAnswerHe,
+  // which isn't reliable (modelAnswerHe is free text like "תשובה נכונה: B.").
+  correctOptionIndex?: number;
   // Not shown to a learner even once published — this is a reviewer/grading
   // aid, not part of the exercise itself.
   modelAnswerHe: string;
@@ -45,6 +50,7 @@ export interface BagrutVocabularyQuestion {
   formatHe: string;
   promptEn: string;
   options?: string[];
+  correctOptionIndex?: number;
   modelAnswerHe: string;
 }
 
@@ -95,6 +101,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
           "A parking lot for teachers",
           "A second sports field",
         ],
+        correctOptionIndex: 1,
         modelAnswerHe: "תשובה נכונה: B.",
       },
       {
@@ -116,6 +123,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
           "Learning about composting",
           "Keeping records of what was planted",
         ],
+        correctOptionIndex: 1,
         modelAnswerHe: "תשובה נכונה: B — מכירת ירקות מחוץ לבית הספר אינה מוזכרת בטקסט.",
       },
       {
@@ -146,6 +154,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
           "Residents demanded free public transportation",
           "The city wanted to close all its bus lines",
         ],
+        correctOptionIndex: 1,
         modelAnswerHe: "תשובה נכונה: B.",
       },
       {
@@ -167,6 +176,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
           "Some stations ran out of bikes during busy hours",
           "The bikes were too expensive to maintain",
         ],
+        correctOptionIndex: 2,
         modelAnswerHe: "תשובה נכונה: C.",
       },
       {
@@ -188,6 +198,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
           "It is too expensive to continue",
           "It was successful only among tourists",
         ],
+        correctOptionIndex: 1,
         modelAnswerHe: "תשובה נכונה: B.",
       },
       {
@@ -206,6 +217,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "רב-ברירה",
         promptEn: 'Choose the word closest in meaning to "convince":',
         options: ["persuade", "ignore", "forbid", "delay"],
+        correctOptionIndex: 0,
         modelAnswerHe: "תשובה נכונה: persuade.",
       },
       {
@@ -223,6 +235,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "רב-ברירה",
         promptEn: '"Foot traffic" in the text refers to:',
         options: ["people walking to or through a place", "traffic jams", "shoes sold in stores", "hiking trails"],
+        correctOptionIndex: 0,
         modelAnswerHe: "תשובה נכונה: people walking to or through a place.",
       },
       {

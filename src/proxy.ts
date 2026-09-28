@@ -22,6 +22,7 @@ const PROTECTED_PREFIXES = [
   "/games",
   "/progress",
   "/patterns",
+  "/bagrut",
 ];
 const ADMIN_PREFIXES = ["/admin"];
 
@@ -128,6 +129,7 @@ export const config = {
     "/games/:path*",
     "/progress/:path*",
     "/patterns/:path*",
+    "/bagrut/:path*",
     "/admin/:path*",
   ],
 };

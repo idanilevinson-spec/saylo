@@ -39,6 +39,17 @@ describe("BAGRUT_SAMPLE_UNITS", () => {
     }
   });
 
+  it("gives every multiple-choice question a correctOptionIndex within range", () => {
+    for (const unit of BAGRUT_SAMPLE_UNITS) {
+      for (const q of [...unit.readingQuestions, ...(unit.vocabularyQuestions ?? [])]) {
+        if (q.formatHe !== "רב-ברירה") continue;
+        expect(q.correctOptionIndex).toBeDefined();
+        expect(q.correctOptionIndex!).toBeGreaterThanOrEqual(0);
+        expect(q.correctOptionIndex!).toBeLessThan(q.options!.length);
+      }
+    }
+  });
+
   it("has no teacher-reviewed content yet — that review is a separate, explicit step", () => {
     // Expected to start failing the day a unit is genuinely checked by a
     // teacher and flipped to teacherReviewed: true — that's the point, same
