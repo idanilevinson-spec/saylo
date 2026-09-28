@@ -133,7 +133,7 @@ export default function AdminModerationPage() {
               <li key={report.id} className="bg-card border border-card-border rounded-lg p-4 flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium">
-                    {report.target_type} · {report.target_id.slice(0, 8)}
+                    {report.target_type} · <span dir="ltr" className="font-mono text-xs select-all">{report.target_id}</span>
                   </p>
                   <p className="mt-1 text-sm text-muted">{report.reason}</p>
                   <p className="mt-1 text-xs text-muted">{new Date(report.created_at).toLocaleString("he-IL")}</p>
