@@ -17,6 +17,7 @@ import ReorderQuestion from "@/components/ReorderQuestion";
 import DictationQuestion from "@/components/DictationQuestion";
 import HeartsGate from "@/components/HeartsGate";
 import MotionLink from "@/components/MotionLink";
+import ReportContentError from "@/components/ReportContentError";
 
 interface ExercisePlayerProps {
   exercise: Exercise;
@@ -179,6 +180,10 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
             </motion.div>
           )}
         </motion.div>
+
+        <div className="mt-3 flex justify-end">
+          <ReportContentError targetType="exercise" targetId={exercise.id} />
+        </div>
       </div>
     </HeartsGate>
   );
