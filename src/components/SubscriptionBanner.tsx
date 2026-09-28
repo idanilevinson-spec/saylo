@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Gift } from "lucide-react";
+import { Gift, Clock } from "lucide-react";
 import { isPremiumActive } from "@/lib/subscriptions/entitlements";
 import type { Subscription } from "@/types/database";
 
@@ -43,6 +43,26 @@ export default function SubscriptionBanner({ subscription }: SubscriptionBannerP
   }
 
   if (subscription.status === "trialing" && daysLeft !== null) {
+    // Last day of the trial gets its own, more urgent treatment (solid
+    // primary fill, not the calm accent tint) instead of just showing "0
+    // days left" in the same low-key style used for days 2-3.
+    if (daysLeft <= 1) {
+      return (
+        <motion.div
+          {...bannerMotion}
+          className="mt-4 flex items-center justify-between gap-3 flex-wrap px-4 py-3 rounded-lg bg-primary"
+        >
+          <p className="flex items-center gap-1.5 text-sm font-bold text-primary-ink">
+            <Clock size={16} className="shrink-0" /> היום היום האחרון בניסיון החינמי — אחר כך נסגר הדיבור, הכתיבה
+            וההמלצות של ה-AI
+          </p>
+          <Link href="/pricing" className="text-sm font-bold text-primary-ink underline underline-offset-2">
+            שדרגו עכשיו ←
+          </Link>
+        </motion.div>
+      );
+    }
+
     return (
       <motion.div
         {...bannerMotion}
