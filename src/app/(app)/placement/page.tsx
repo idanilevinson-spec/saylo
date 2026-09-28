@@ -1,7 +1,7 @@
 "use client";
 
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Volume2, Turtle, Target } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
@@ -26,6 +26,26 @@ const SKILL_ORDER: SkillArea[] = ["vocabulary", "grammar", "reading", "listening
 
 const WRITING_SAMPLE_PROMPT_HE =
   "כתבו 2-4 משפטים באנגלית על עצמכם: מה שמכם, מאיפה אתם, ודבר אחד שאתם אוהבים לעשות.";
+
+// Fill-in-the-blank prompts mark the missing word with a run of underscores
+// in the source text (e.g. "She ___ a teacher."), but content authors don't
+// all type the same number of them — and a blank whose width happens to
+// match the missing word's length gives away how many letters it has. This
+// renders every such run as the same fixed-width line regardless of how
+// many underscores are actually in the text, so the blank never hints at
+// the answer. Screen readers get "מילה חסרה" instead of a run of literal
+// underscore characters (mostly ignored by TTS anyway).
+function renderPromptWithUniformBlanks(prompt: string): ReactNode[] {
+  return prompt.split(/(_{2,})/g).map((part, i) =>
+    /^_{2,}$/.test(part) ? (
+      <span key={i} className="inline-block w-14 align-middle border-b-2 border-current mx-1" aria-label="מילה חסרה">
+        &nbsp;
+      </span>
+    ) : (
+      part
+    )
+  );
+}
 
 interface SkillScore {
   skill: SkillArea;
@@ -254,6 +274,21 @@ export default function PlacementPage() {
     setShowWritingStep(true);
   }
 
+  // No response is recorded for a skipped question — it's excluded from
+  // that skill's score entirely (same as a skill nobody got any questions
+  // for: the results screen already shows "טרם נבדק" for it) rather than
+  // counted wrong, since a guess-free skip isn't evidence the learner
+  // doesn't know the material.
+  function handleSkip() {
+    if (!testId) return;
+    setSelected(null);
+    if (!isLast) {
+      setIndex((i) => i + 1);
+      return;
+    }
+    setShowWritingStep(true);
+  }
+
   if (finishing) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">מנתח את התוצאות שלכם...</div>
@@ -337,7 +372,7 @@ export default function PlacementPage() {
       >
         {question.skill_area === "listening" && question.audio_text ? (
           <div>
-            <p className="font-medium text-lg mb-3">{question.prompt}</p>
+            <p className="font-medium text-lg mb-3">{renderPromptWithUniformBlanks(question.prompt)}</p>
             <div className="flex gap-2">
               <button
                 onClick={() => speak(question.audio_text as string, 1)}
@@ -355,7 +390,7 @@ export default function PlacementPage() {
           </div>
         ) : (
           <EnglishText as="p" className="font-medium text-lg">
-            {question.prompt}
+            {renderPromptWithUniformBlanks(question.prompt)}
           </EnglishText>
         )}
 
@@ -386,6 +421,13 @@ export default function PlacementPage() {
         >
           {isLast ? "לשלב האחרון →" : "הבא →"}
         </motion.button>
+
+        <button
+          onClick={handleSkip}
+          className="mt-2.5 w-full px-4 py-2 rounded-lg text-sm text-muted font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        >
+          לא יודע/ת · דלגו לשאלה הבאה
+        </button>
       </motion.div>
     </div>
   );
