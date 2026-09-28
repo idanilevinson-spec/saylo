@@ -18,8 +18,19 @@ const PROTECTED_PREFIXES = [
   "/placement",
   "/writing",
   "/speaking",
+  "/speaking-test",
+  "/games",
+  "/progress",
+  "/patterns",
 ];
 const ADMIN_PREFIXES = ["/admin"];
+
+// A learner can't do anything else in the app until they've taken the level
+// test — everything is built around "your track, from your own result",
+// not a one-size-fits-all lesson order. /placement is the test itself, and
+// /profile stays reachable so someone stuck here can still sign out or
+// delete their account instead of being trapped.
+const PLACEMENT_EXEMPT_PREFIXES = ["/placement", "/profile"];
 
 export async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -80,6 +91,18 @@ export async function proxy(request: NextRequest) {
       if (!profile?.is_admin) {
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }
+    } else if (!PLACEMENT_EXEMPT_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+      const { data: placementTest } = await supabase
+        .from("placement_tests")
+        .select("id")
+        .eq("profile_id", userId)
+        .eq("status", "completed")
+        .limit(1)
+        .maybeSingle();
+
+      if (!placementTest) {
+        return NextResponse.redirect(new URL("/placement", request.url));
+      }
     }
   }
 
@@ -101,6 +124,10 @@ export const config = {
     "/placement/:path*",
     "/writing/:path*",
     "/speaking/:path*",
+    "/speaking-test/:path*",
+    "/games/:path*",
+    "/progress/:path*",
+    "/patterns/:path*",
     "/admin/:path*",
   ],
 };
