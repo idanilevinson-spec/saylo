@@ -286,6 +286,12 @@ export interface ReadingOpenQuestion {
   created_at: string;
 }
 
+// "natural_speech" clips (docs/specs/connected-speech-listening.md) are
+// written and read like real conversation — fillers, contractions,
+// unfinished sentences — as an additive section alongside "standard"
+// clips, not a replacement for them.
+export type ListeningClipStyle = "standard" | "natural_speech";
+
 export interface ListeningClip {
   id: string;
   title_he: string;
@@ -293,6 +299,7 @@ export interface ListeningClip {
   transcript_en: string;
   cefr_level: CefrLevel;
   status: ContentStatus;
+  style: ListeningClipStyle;
   sort_order: number;
   created_at: string;
 }
