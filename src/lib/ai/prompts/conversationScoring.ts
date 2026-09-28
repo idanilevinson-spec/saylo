@@ -1,4 +1,5 @@
 import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
+import { buildPatternDetectionInstructions } from "@/lib/ai/prompts/patternDetection";
 
 export interface TranscriptTurn {
   role: "user" | "assistant";
@@ -26,10 +27,13 @@ Respond with ONLY valid JSON, no markdown code fences, in exactly this shape:
   "grammarMistakes": ["<short description of a real mistake found, in Hebrew>", ...],
   "overusedWords": ["<word or phrase the student repeated too much>", ...],
   "suggestedVocabulary": ["<English word/phrase the student could have used instead>", ...],
-  "generalSuggestionsHe": "<2-3 sentences in Hebrew with encouraging, specific advice for next time>"
+  "generalSuggestionsHe": "<2-3 sentences in Hebrew with encouraging, specific advice for next time>",
+  "patterns": [...]
 }
 
 If there isn't enough student text to judge something, use an empty array or a reasonable middle score rather than inventing detail. Base every item strictly on what the student actually wrote.
+
+${buildPatternDetectionInstructions("conversation", "student")}
 
 ${HEBREW_GENDER_NEUTRAL_NOTE}`;
 }
