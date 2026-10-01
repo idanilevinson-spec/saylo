@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, XCircle, Eye } from "lucide-react";
+import { AlertTriangle, CheckCircle2, XCircle, Eye, Headphones, BookOpenText, PenLine } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import ListeningPlayer from "@/components/ListeningPlayer";
 import type { BagrutSampleUnit, BagrutReadingQuestion, BagrutVocabularyQuestion } from "@/lib/content/bagrut/sampleUnits";
 import { BAGRUT_AI_CONTENT_DISCLAIMER } from "@/lib/content/bagrut/sampleUnits";
 import type { BagrutModuleFormat } from "@/lib/content/bagrut/moduleFormats";
@@ -20,6 +21,8 @@ interface BagrutPracticeUnitProps {
 // docs/specs/bagrut-track.md §6). The writing task is just a counted
 // textarea, not submitted or graded anywhere.
 export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitProps) {
+  const isLiterature = unit.moduleCode === "D";
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <Link href="/bagrut" className="text-sm text-primary">
@@ -42,12 +45,53 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
         </div>
       )}
 
-      <section className="mt-6 bg-card border border-card-border rounded-lg p-6">
-        <h2 className="font-bold text-sm text-muted">הבנת הנקרא</h2>
-        <EnglishText as="div" className="mt-3 leading-relaxed whitespace-pre-line">
-          {unit.readingBodyEn}
-        </EnglishText>
-      </section>
+      {/* Module D's real exam tests a specific story/poem chosen by the
+          Ministry and studied in advance — this practice text is original,
+          not an assigned work, so the gap is called out plainly rather than
+          left for the learner to assume otherwise. */}
+      {isLiterature && (
+        <div className="mt-4 flex gap-3 rounded-lg border border-card-border bg-background-2 p-4 text-sm leading-relaxed text-muted">
+          <BookOpenText size={18} className="shrink-0 mt-0.5" />
+          <p>
+            בבחינה האמיתית של מודול D לומדים מראש יצירה ספציפית (סיפור ושיר) שנקבעת על ידי משרד החינוך. הטקסט כאן{" "}
+            <strong className="text-foreground">מקורי</strong> ונועד לתרגל את סוג הניתוח הספרותי הנדרש — הוא אינו
+            תחליף ללימוד היצירות הרשמיות שנבחרו לבית הספר שלכם.
+          </p>
+        </div>
+      )}
+
+      {unit.listeningTask && (
+        <section className="relative overflow-hidden mt-6 bg-card border border-card-border rounded-lg p-6">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+          <h2 className="flex items-center gap-2 font-bold text-sm text-muted">
+            <Headphones size={16} /> הבנת הנשמע
+          </h2>
+          <div className="mt-3">
+            <ListeningPlayer transcriptEn={unit.listeningTask.transcriptEn} />
+          </div>
+        </section>
+      )}
+
+      {unit.listeningTask && (
+        <div className="mt-6 space-y-4">
+          {unit.listeningTask.questions.map((q, i) => (
+            <QuestionCard key={i} index={i + 1} question={q} />
+          ))}
+        </div>
+      )}
+
+      {unit.readingPassages.map((passage, passageIndex) => (
+        <section key={passageIndex} className="relative overflow-hidden mt-6 bg-card border border-card-border rounded-lg p-6">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+          <h2 className="flex items-center gap-2 font-bold text-sm text-muted">
+            <BookOpenText size={16} />
+            הבנת הנקרא{unit.readingPassages.length > 1 ? ` — קטע ${passageIndex + 1}` : ""}
+          </h2>
+          <EnglishText as="div" className="mt-3 leading-relaxed whitespace-pre-line">
+            {passage}
+          </EnglishText>
+        </section>
+      ))}
 
       <div className="mt-6 space-y-4">
         {unit.readingQuestions.map((q, i) => (
@@ -57,7 +101,9 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
 
       {unit.vocabularyQuestions && unit.vocabularyQuestions.length > 0 && (
         <>
-          <h2 className="mt-8 font-bold text-sm text-muted">אוצר מילים</h2>
+          <h2 className="mt-8 flex items-center gap-2 font-bold text-sm text-muted">
+            <BookOpenText size={16} /> אוצר מילים
+          </h2>
           <div className="mt-3 space-y-4">
             {unit.vocabularyQuestions.map((q, i) => (
               <QuestionCard key={i} index={i + 1} question={q} />
@@ -66,7 +112,9 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
         </>
       )}
 
-      {unit.writingTask && <WritingTaskCard promptEn={unit.writingTask.promptEn} wordCountRange={unit.writingTask.wordCountRange} />}
+      {unit.writingTask && (
+        <WritingTaskCard promptEn={unit.writingTask.promptEn} wordCountRange={unit.writingTask.wordCountRange} />
+      )}
     </div>
   );
 }
@@ -143,8 +191,11 @@ function WritingTaskCard({ promptEn, wordCountRange }: { promptEn: string; wordC
   const inRange = wordCount >= min && wordCount <= max;
 
   return (
-    <section className="mt-8 bg-card border border-card-border rounded-lg p-6">
-      <h2 className="font-bold text-sm text-muted">מטלת כתיבה</h2>
+    <section className="relative overflow-hidden mt-8 bg-card border border-card-border rounded-lg p-6">
+      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+      <h2 className="flex items-center gap-2 font-bold text-sm text-muted">
+        <PenLine size={16} /> מטלת כתיבה
+      </h2>
       <EnglishText as="p" className="mt-2 leading-relaxed">
         {promptEn}
       </EnglishText>

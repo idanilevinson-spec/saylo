@@ -41,9 +41,23 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
   A: {
     code: "A",
     studyUnitTracks: [3],
-    sections: [],
-    verified: false,
-    sourceNotesHe: "לא נמצא מקור מפורט מספיק לחלוקת הנקודות/הזמן. יש לאמת מול שאלון רשמי לפני בניית תוכן.",
+    timeMinutes: 75,
+    sections: [
+      {
+        nameHe: "הבנת הנשמע",
+        points: 30,
+        notesHe: "קטע שמע קצר (כ-3 דקות) — שיחה, ראיון, תיאור או דוח.",
+      },
+      {
+        nameHe: "הבנת הנקרא",
+        points: 70,
+        wordCountRange: [300, 350],
+        notesHe: "שני קטעי קריאה נפרדים, כל אחד כ-300–350 מילים.",
+      },
+    ],
+    verified: true,
+    sourceNotesHe:
+      "kidum.com (מדריך 3 יח\"ל) + high-q.co.il (סקירת שאלונים) — שני מקורות עצמאיים מסכימים על 30/70 ו-75 דק'. ראו docs/specs/bagrut-track.md §2.1.",
   },
   B: {
     code: "B",
@@ -61,14 +75,24 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
     studyUnitTracks: [3, 4],
     sections: [],
     verified: false,
-    sourceNotesHe: "לא נמצא מקור מפורט מספיק. יש לאמת מול שאלון רשמי לפני בניית תוכן.",
+    sourceNotesHe:
+      "מקורות סותרים, לא רק חסרים: kidum.com ו-limudnaim.co.il מתארים גרסה ללא כתיבה כלל (קריאה בלבד, קטע 280–320 מילים, 100 נק'), בעוד high-q.co.il ו-matic.co.il מתארים גרסה חדשה יותר עם כתיבה (קריאה 70% + כתיבה 30%, חיבור 70–90 מילים) — high-q מציין במפורש ש\"הפורמט השתנה\" בין מחזורים. סביר שזה הבדל אמיתי בין גרסאות ישנה/חדשה של השאלון, לא טעות מקור. אין לבנות תוכן על בסיס ניחוש איזו גרסה רלוונטית כרגע; דרוש שאלון רשמי עדכני כדי להכריע.",
   },
   D: {
     code: "D",
     studyUnitTracks: [4],
-    sections: [],
-    verified: false,
-    sourceNotesHe: "לא נמצא מקור מפורט מספיק. יש לאמת מול שאלון רשמי לפני בניית תוכן.",
+    timeMinutes: 75,
+    sections: [
+      {
+        nameHe: "הבנת הנקרא",
+        points: 70,
+        notesHe: "קטעי ספרות (סיפור קצר ושיר, מתוך רשימה שמתעדכנת מדי מחזור) שנלמדים מראש — לא טקסט לא מוכר.",
+      },
+      { nameHe: "כתיבה", points: 30, wordCountRange: [100, 120] },
+    ],
+    verified: true,
+    sourceNotesHe:
+      "kidum.com + limudnaim.co.il — שני מדריכי הכנה עצמאיים מסכימים על 70/30, 100–120 מילים ו-75 דק'. מקור שלישי (matic.co.il) תיאר את המודול כציון פנימי של בית הספר בלבד; זה לא תואם את ארכיון הבחינות הרשמי של משרד החינוך (pop.education.gov.il), שמראה שמדובר בבחינה חיצונית מלאה עם קוד שאלון (16483/16484) — לכן המקור הזה נפסל. ראו docs/specs/bagrut-track.md §2.1.",
   },
   E: {
     code: "E",
@@ -108,9 +132,19 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
   G: {
     code: "G",
     studyUnitTracks: [5],
-    sections: [],
-    verified: false,
-    sourceNotesHe: "לא נמצא מקור מפורט מספיק. יש לאמת מול שאלון רשמי לפני בניית תוכן.",
+    timeMinutes: 105,
+    sections: [
+      { nameHe: "הבנת הנקרא", points: 60, notesHe: "קטע ברמת קושי גבוהה יותר ואוצר מילים מתקדם יותר ממודולים קודמים." },
+      {
+        nameHe: "חיבור",
+        points: 40,
+        wordCountRange: [120, 140],
+        notesHe: "סוגי חיבור אפשריים: תיאורי, דעה, ולעיתים נדירות מכתב רשמי.",
+      },
+    ],
+    verified: true,
+    sourceNotesHe:
+      "jpostlite.co.il (מדריך ייעודי למודול G) + high-q.co.il (סקירה כללית) — שני מקורות עצמאיים מסכימים על חלוקת 60/40 ועל 105 דק'. ראו docs/specs/bagrut-track.md §2.1.",
   },
 };
 
