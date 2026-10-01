@@ -1,25 +1,95 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Menu,
+  X,
+  LayoutDashboard,
+  Target,
+  Map,
+  BookOpen,
+  PenLine,
+  BookOpenText,
+  MessageCircle,
+  Gamepad2,
+  User,
+  LogOut,
+  ShieldCheck,
+  ChevronLeft,
+  type LucideIcon,
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthProvider";
 import EnglishText from "@/components/EnglishText";
 import ThemeToggle from "@/components/ThemeToggle";
 import ScrollProgress from "@/components/ScrollProgress";
 
-const AUTHED_LINKS = [
-  { href: "/dashboard", label: "לוח בקרה" },
-  { href: "/placement", label: "מבחן רמה" },
-  { href: "/learn", label: "מסלול לימוד" },
-  { href: "/vocabulary", label: "אוצר מילים" },
-  { href: "/grammar", label: "דקדוק" },
-  { href: "/reading", label: "קריאה" },
-  { href: "/speaking", label: "מורה AI" },
-  { href: "/games", label: "משחקים" },
+// Same client-mounted idiom as OfflineBanner's useSyncExternalStore (not a
+// setState-in-effect) — true only after hydration, so the mobile menu's
+// createPortal target (document.body) is never touched during SSR.
+function subscribeNever() {
+  return () => {};
+}
+function getMountedSnapshot() {
+  return true;
+}
+function getServerMountedSnapshot() {
+  return false;
+}
+
+// Icons mirror the same concept-to-icon mapping the dashboard's module
+// groups already use (Target for placement, Map for the learning path,
+// BookOpen for vocabulary, etc.) — the mobile nav reuses the vocabulary
+// the rest of the app already taught the learner, rather than inventing
+// its own.
+const AUTHED_LINKS: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/dashboard", label: "לוח בקרה", icon: LayoutDashboard },
+  { href: "/placement", label: "מבחן רמה", icon: Target },
+  { href: "/learn", label: "מסלול לימוד", icon: Map },
+  { href: "/vocabulary", label: "אוצר מילים", icon: BookOpen },
+  { href: "/grammar", label: "דקדוק", icon: PenLine },
+  { href: "/reading", label: "קריאה", icon: BookOpenText },
+  { href: "/speaking", label: "מורה AI", icon: MessageCircle },
+  { href: "/games", label: "משחקים", icon: Gamepad2 },
 ];
+
+function MobileNavRow({
+  href,
+  label,
+  icon: Icon,
+  active,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+        active ? "bg-primary text-primary-ink" : "text-foreground hover:bg-background-2"
+      }`}
+    >
+      <span
+        className={`flex items-center justify-center w-9 h-9 rounded-lg shrink-0 ${
+          active ? "bg-primary-ink/15" : "bg-background-2"
+        }`}
+      >
+        <Icon size={18} />
+      </span>
+      <span className="flex-1">{label}</span>
+      <ChevronLeft size={16} className={active ? "opacity-70" : "text-muted"} />
+    </Link>
+  );
+}
 
 export default function Navbar() {
   const { session, profile, signOut } = useAuth();
@@ -27,6 +97,10 @@ export default function Navbar() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
+  // The panel below is portaled to <body> (see return), so this only
+  // guards against the SSR/client markup mismatch a portal would
+  // otherwise cause on first render.
+  const mounted = useSyncExternalStore(subscribeNever, getMountedSnapshot, getServerMountedSnapshot);
 
   // Exposes the navbar's real rendered height (safe-area padding, mobile
   // menu open/closed, font metrics and all) as a CSS var, so any page that
@@ -45,21 +119,27 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, [menuOpen]);
 
-  const links = profile?.is_admin ? [...AUTHED_LINKS, { href: "/admin", label: "ניהול" }] : AUTHED_LINKS;
+  const links = profile?.is_admin
+    ? [...AUTHED_LINKS, { href: "/admin", label: "ניהול", icon: ShieldCheck }]
+    : AUTHED_LINKS;
 
-  const linkClass = (href: string) => {
-    const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
-    return `shrink-0 whitespace-nowrap px-3 py-2 rounded-lg text-sm transition-colors ${
-      active ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground hover:bg-background-2"
-    }`;
-  };
+  // Full-screen takeover locks the dashboard behind it from scrolling, the
+  // way a native app's own menu would — without this, the page underneath
+  // keeps scrolling along with the open menu on a long dashboard.
+  useEffect(() => {
+    if (!menuOpen) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
-  const mobileLinkClass = (href: string) => {
-    const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
-    return `whitespace-nowrap px-3 py-2.5 rounded-lg text-sm transition-colors ${
-      active ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground hover:bg-background-2"
+  const isActive = (href: string) => (href === "/dashboard" ? pathname === href : pathname.startsWith(href));
+
+  const linkClass = (href: string) =>
+    `shrink-0 whitespace-nowrap px-3 py-2 rounded-lg text-sm transition-colors ${
+      isActive(href) ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground hover:bg-background-2"
     }`;
-  };
 
   async function handleSignOut() {
     setMenuOpen(false);
@@ -136,29 +216,60 @@ export default function Navbar() {
         </div>
       </div>
 
-      {session && menuOpen && (
-        <nav className="md:hidden border-t border-card-border bg-background px-4 py-3 flex flex-col gap-1">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={mobileLinkClass(link.href)}
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link href="/profile" className={mobileLinkClass("/profile")} onClick={() => setMenuOpen(false)}>
-            {profile?.display_name ?? "פרופיל"}
-          </Link>
-          <button
-            onClick={handleSignOut}
-            className="px-3 py-2.5 rounded-lg text-sm text-right text-muted hover:text-danger transition-colors"
-          >
-            התנתקות
-          </button>
-        </nav>
-      )}
+      {mounted &&
+        createPortal(
+          // Portaled to <body>: the header above has `backdrop-blur`
+          // (a `backdrop-filter`), which — like `filter`/`transform` —
+          // establishes a new containing block for `position: fixed`
+          // descendants. Left nested inside <header>, this panel's
+          // "fixed, full height below the header" sizing resolves
+          // against the header's own ~60px box instead of the
+          // viewport and collapses to nothing. Portaling out of that
+          // subtree is the standard fix, not a layout workaround.
+          <AnimatePresence>
+            {session && menuOpen && (
+              <motion.nav
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.16 }}
+                className="md:hidden fixed inset-x-0 bottom-0 z-30 bg-background overflow-y-auto"
+                style={{ top: "var(--navbar-h)" }}
+              >
+                <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-1">
+                  {links.map((link) => (
+                    <MobileNavRow
+                      key={link.href}
+                      {...link}
+                      active={isActive(link.href)}
+                      onClick={() => setMenuOpen(false)}
+                    />
+                  ))}
+                </div>
+
+                <div className="max-w-6xl mx-auto mt-2 border-t border-card-border px-4 py-4 flex flex-col gap-1">
+                  <MobileNavRow
+                    href="/profile"
+                    label={profile?.display_name ?? "פרופיל"}
+                    icon={User}
+                    active={isActive("/profile")}
+                    onClick={() => setMenuOpen(false)}
+                  />
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-danger hover:bg-danger/10 transition-colors"
+                  >
+                    <span className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0 bg-danger/10">
+                      <LogOut size={18} />
+                    </span>
+                    <span className="flex-1 text-right">התנתקות</span>
+                  </button>
+                </div>
+              </motion.nav>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
     </header>
   );
 }
