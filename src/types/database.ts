@@ -49,6 +49,22 @@ export interface GuardianReportConsent {
 
 export type GuardianReportConsentPublic = Omit<GuardianReportConsent, "consent_token">;
 
+// The unified mistake-review queue (docs/specs/mistake-notebook.md) —
+// vocabulary keeps living only in srs_items, deliberately not merged here.
+export type MistakeItemType = "grammar_topic" | "pattern";
+
+export interface MistakeReviewItem {
+  id: string;
+  profile_id: string;
+  item_type: MistakeItemType;
+  item_ref: string;
+  ease_factor: number;
+  interval_days: number;
+  repetitions: number;
+  due_at: string;
+  updated_at: string;
+}
+
 export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 
 export type ContentStatus = "draft" | "ai_generated_pending_review" | "published";
@@ -270,6 +286,12 @@ export interface ReadingOpenQuestion {
   created_at: string;
 }
 
+// "natural_speech" clips (docs/specs/connected-speech-listening.md) are
+// written and read like real conversation — fillers, contractions,
+// unfinished sentences — as an additive section alongside "standard"
+// clips, not a replacement for them.
+export type ListeningClipStyle = "standard" | "natural_speech";
+
 export interface ListeningClip {
   id: string;
   title_he: string;
@@ -277,6 +299,7 @@ export interface ListeningClip {
   transcript_en: string;
   cefr_level: CefrLevel;
   status: ContentStatus;
+  style: ListeningClipStyle;
   sort_order: number;
   created_at: string;
 }

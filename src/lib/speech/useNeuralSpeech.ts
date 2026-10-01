@@ -14,15 +14,15 @@ export const NEURAL_SPEECH_RATES = [0.75, 1, 1.25, 1.5] as const;
 // fallback to the browser's built-in Web Speech API if Azure is unavailable
 // or fails. Extracted from ReadingTextViewer, which was the original (and
 // until now, only) place this pattern existed.
-export function useNeuralSpeech(segments: string[]) {
+export function useNeuralSpeech(segments: string[], initialRate: number = 1) {
   const [state, setState] = useState<NeuralSpeechState>("idle");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [rate, setRateState] = useState(1);
+  const [rate, setRateState] = useState(initialRate);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCacheRef = useRef<Map<number, string>>(new Map());
   const usingFallbackRef = useRef(false);
-  const rateRef = useRef(1);
+  const rateRef = useRef(initialRate);
   // Bumped on every jump/unmount so a slow in-flight synthesis call for a
   // segment the caller already moved away from can't land late and hijack
   // playback out from under whatever's actually active now.

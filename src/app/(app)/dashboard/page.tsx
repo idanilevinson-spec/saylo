@@ -70,7 +70,7 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
       { icon: Sparkles, title: "שיעור יומי", body: "נושא אחד, נבחר בשבילכם להיום", href: "/learn/today" },
       { icon: Map, title: "מסלול לימוד", body: "כל הנושאים מ-A1 עד C2", href: "/learn" },
       { icon: Target, title: "מבחן רמה", body: "גלו את רמת האנגלית שלכם", href: "/placement" },
-      { icon: Brain, title: "חזרה חכמה", body: "המילים שהגיע זמנן", href: "/review" },
+      { icon: Brain, title: "חזרה חכמה", body: "מילים ונושאי דקדוק שהגיע זמנם", href: "/mistakes" },
     ],
   },
   {

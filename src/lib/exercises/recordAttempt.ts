@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase/browserClient";
 import { gradeExercise } from "./grade";
 import { updateSrsForVocabularyItem } from "@/lib/srs/queue";
+import { touchMistakeReviewItem } from "@/lib/mistakes/mistakeReview";
 import { runSerially, settleAnswer, XP_ATTEMPT, XP_CORRECT } from "@/lib/gamification/answerTail";
 import { refreshSkillLevelFromAttempts } from "@/lib/assessment/skillLevel";
 import type { Exercise, Badge } from "@/types/database";
@@ -55,6 +56,13 @@ export function startAttempt(
         ? updateSrsForVocabularyItem(profileId, exercise.vocabulary_item_id, isCorrect)
         : Promise.resolve(null);
 
+    // Unlike vocabulary SRS above, this covers every exercise type on a
+    // grammar topic (not just mcq), and only ever starts tracking a topic
+    // once it's actually been gotten wrong — see mistakeReview.ts.
+    const mistakeUpdate = exercise.grammar_topic_id
+      ? touchMistakeReviewItem(profileId, "grammar_topic", exercise.grammar_topic_id, isCorrect)
+      : Promise.resolve();
+
     const [tail] = await Promise.all([
       settleAnswer(profileId, {
         isCorrect,
@@ -62,6 +70,7 @@ export function startAttempt(
         attemptWritten,
       }),
       srsUpdate,
+      mistakeUpdate,
       attemptWritten,
     ]);
 

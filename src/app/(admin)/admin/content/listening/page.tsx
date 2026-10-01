@@ -3,13 +3,24 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/browserClient";
 import StatusBadge from "@/components/admin/StatusBadge";
-import type { CefrLevel, ContentStatus, ListeningClip } from "@/types/database";
+import type { CefrLevel, ContentStatus, ListeningClip, ListeningClipStyle } from "@/types/database";
 
 const CEFR_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const STATUSES: ContentStatus[] = ["draft", "ai_generated_pending_review", "published"];
+const STYLES: { value: ListeningClipStyle; label: string }[] = [
+  { value: "standard", label: "רגיל" },
+  { value: "natural_speech", label: "דיבור טבעי" },
+];
 
-type Form = Pick<ListeningClip, "title_he" | "title_en" | "transcript_en" | "cefr_level" | "status">;
-const emptyForm: Form = { title_he: "", title_en: "", transcript_en: "", cefr_level: "A1", status: "draft" };
+type Form = Pick<ListeningClip, "title_he" | "title_en" | "transcript_en" | "cefr_level" | "status" | "style">;
+const emptyForm: Form = {
+  title_he: "",
+  title_en: "",
+  transcript_en: "",
+  cefr_level: "A1",
+  status: "draft",
+  style: "standard",
+};
 
 export default function AdminListeningPage() {
   const [clips, setClips] = useState<ListeningClip[] | null>(null);
@@ -32,6 +43,7 @@ export default function AdminListeningPage() {
       transcript_en: clip.transcript_en,
       cefr_level: clip.cefr_level,
       status: clip.status,
+      style: clip.style,
     });
     setEditingId(clip.id);
   }
@@ -121,6 +133,18 @@ export default function AdminListeningPage() {
               ))}
             </select>
           </div>
+          <select
+            aria-label="סגנון"
+            value={form.style}
+            onChange={(e) => setForm({ ...form, style: e.target.value as ListeningClipStyle })}
+            className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
+          >
+            {STYLES.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
           <div className="flex gap-2">
             <button onClick={save} className="px-3 py-1.5 rounded-lg bg-primary text-primary-ink text-sm font-medium">
               שמירה
@@ -140,6 +164,9 @@ export default function AdminListeningPage() {
               <div className="mt-1 flex items-center gap-2">
                 <span className="text-xs text-muted">{clip.cefr_level}</span>
                 <StatusBadge status={clip.status} />
+                {clip.style === "natural_speech" && (
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">דיבור טבעי</span>
+                )}
               </div>
             </div>
             <div className="flex gap-3 text-xs shrink-0">

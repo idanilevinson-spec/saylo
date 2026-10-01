@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Exercise } from "@/types/database";
 
-const { insert, settleAnswer, updateSrs, refreshSkill } = vi.hoisted(() => ({
+const { insert, settleAnswer, updateSrs, refreshSkill, touchMistake } = vi.hoisted(() => ({
   insert: vi.fn(),
   settleAnswer: vi.fn(),
   updateSrs: vi.fn(),
   refreshSkill: vi.fn(),
+  touchMistake: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/browserClient", () => ({ supabase: { from: () => ({ insert }) } }));
@@ -17,6 +18,7 @@ vi.mock("@/lib/gamification/answerTail", () => ({
 }));
 vi.mock("@/lib/srs/queue", () => ({ updateSrsForVocabularyItem: updateSrs }));
 vi.mock("@/lib/assessment/skillLevel", () => ({ refreshSkillLevelFromAttempts: refreshSkill }));
+vi.mock("@/lib/mistakes/mistakeReview", () => ({ touchMistakeReviewItem: touchMistake }));
 
 import { startAttempt } from "./recordAttempt";
 
@@ -26,6 +28,14 @@ const mcq = {
   skill_area: "vocabulary",
   vocabulary_item_id: "v1",
   content: { prompt: "?", options: ["a", "b"], correctIndex: 1 },
+} as unknown as Exercise;
+
+const grammarFillBlank = {
+  id: "e2",
+  type: "fill_blank",
+  skill_area: "grammar",
+  grammar_topic_id: "topic-1",
+  content: { sentence: "She ___ a doctor.", correctAnswer: "is" },
 } as unknown as Exercise;
 
 beforeEach(() => {
@@ -41,6 +51,7 @@ beforeEach(() => {
   });
   updateSrs.mockResolvedValue({ repetitions: 1, intervalDays: 1, easeFactor: 2.5 });
   refreshSkill.mockResolvedValue(undefined);
+  touchMistake.mockResolvedValue(undefined);
 });
 
 describe("startAttempt", () => {
@@ -66,5 +77,15 @@ describe("startAttempt", () => {
     expect(updateSrs).toHaveBeenCalledWith("p1", "v1", true);
     expect(settleAnswer).toHaveBeenCalledWith("p1", expect.objectContaining({ isCorrect: true, xpSource: "exercise_correct" }));
     expect(result).toMatchObject({ isCorrect: true, totalXp: 50, currentStreak: 2 });
+  });
+
+  it("does not touch the mistake queue for an exercise with no grammar topic", async () => {
+    await startAttempt("p1", mcq, { selectedIndex: 1 }).done;
+    expect(touchMistake).not.toHaveBeenCalled();
+  });
+
+  it("touches the mistake queue for a grammar-topic exercise, right or wrong", async () => {
+    await startAttempt("p1", grammarFillBlank, { text: "is" }).done;
+    expect(touchMistake).toHaveBeenCalledExactlyOnceWith("p1", "grammar_topic", "topic-1", true);
   });
 });
