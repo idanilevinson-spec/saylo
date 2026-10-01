@@ -65,7 +65,7 @@ describe("proxy", () => {
     expect(redirectPathname(res)).toBeNull();
   });
 
-  it.each(["/games", "/progress", "/patterns", "/speaking-test", "/vocabulary", "/writing", "/mistakes"])(
+  it.each(["/games", "/progress", "/patterns", "/speaking-test", "/vocabulary", "/writing", "/mistakes", "/bagrut"])(
     "gates %s behind placement completion too",
     async (path) => {
       placementMaybeSingle.mockResolvedValue({ data: null });
