@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ReadingExam from "@/components/ReadingExam";
+import ReportContentError from "@/components/ReportContentError";
 import { getReadingText } from "@/lib/content/reading";
 import { getVocabularyLookupMap } from "@/lib/content/vocabulary";
 import { createClient } from "@/lib/supabase/serverClient";
@@ -64,6 +65,10 @@ export default async function ReadingTextPage({ params }: PageProps) {
             {text.title_en}
           </EnglishText>
         </div>
+      </div>
+
+      <div className="flex justify-end">
+        <ReportContentError targetType="reading_text" targetId={text.id} />
       </div>
 
       <ReadingExam
