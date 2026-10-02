@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { BAGRUT_SAMPLE_UNITS, getPublishableSampleUnit, getSampleUnit, BAGRUT_AI_CONTENT_DISCLAIMER } from "./sampleUnits";
-import { getModuleFormat } from "./moduleFormats";
+import { getModuleFormat, type BagrutModuleCode } from "./moduleFormats";
 import { countWords } from "@/lib/patterns/textAnalysis";
 
 describe("BAGRUT_SAMPLE_UNITS", () => {
@@ -110,11 +110,12 @@ describe("getPublishableSampleUnit", () => {
     }
   });
 
-  it("returns undefined for a module with no sample content at all", () => {
-    // C is the one verified-structure-less-ironclad module left unbuilt —
-    // see moduleFormats.ts's sourceNotesHe for why (sources disagree on
-    // whether it even includes a writing section).
-    expect(getPublishableSampleUnit("C")).toBeUndefined();
+  it("returns undefined for a module code with no sample content registered", () => {
+    // Every verified module (A–G) now has sample content as of 2026-10-02 —
+    // there's no real gap left to assert against, so this exercises the
+    // "not found" path with a code that was never a valid module to begin
+    // with, via a type assertion.
+    expect(getPublishableSampleUnit("Z" as BagrutModuleCode)).toBeUndefined();
   });
 });
 
