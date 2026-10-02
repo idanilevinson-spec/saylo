@@ -110,11 +110,50 @@ export default function PricingCards() {
         </p>
       )}
 
-      <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
+      {/* Below lg this collapses from a 5-up grid to a single stack — at
+          that width, 5 full-size, near-identical cards read as pure
+          repetition and bury the recommended plan at the bottom of a long
+          scroll. The badge plan floats to the top of the stack (order-first,
+          canceled again at lg so the desktop grid position is untouched),
+          and the other four collapse into a compact comparison row (label +
+          price left, a small button right) instead of repeating the same
+          tall block four times. pb-24 keeps the last row clear of the fixed
+          accessibility-widget button that otherwise overlaps it. */}
+      <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-5 pb-24 lg:pb-0">
         {PRICING_PLANS.map((plan, i) => {
           // On the native app the price shown must be exactly what Apple
           // charges, so it comes from StoreKit rather than plans.ts.
           const native = isNative ? nativePackages.find((p) => p.planCode === plan.code) : undefined;
+          const priceNode = (
+            <>
+              <EnglishText as="span" className={plan.badge ? "text-3xl font-bold" : "text-xl lg:text-3xl font-bold"}>
+                {native ? native.priceString : `₪${plan.totalPrice}`}
+              </EnglishText>
+              <span className="text-muted text-sm">
+                {" "}
+                / {plan.months === 1 ? "חודש" : plan.months === 12 ? "שנה" : `${plan.months} חודשים`}
+              </span>
+            </>
+          );
+          const equivalentNode = plan.months > 1 && (
+            <p className={`mt-1 text-xs text-muted ${plan.badge ? "" : "hidden lg:block"}`}>
+              שווה ערך ל־
+              <EnglishText as="span">
+                {native
+                  ? new Intl.NumberFormat("en", {
+                      style: "currency",
+                      currency: native.currencyCode,
+                      maximumFractionDigits: 0,
+                    }).format(native.price / plan.months)
+                  : `₪${monthlyEquivalent(plan)}`}
+              </EnglishText>{" "}
+              לחודש
+            </p>
+          );
+          const buttonLabel = loadingCode === plan.code ? "פותח תשלום..." : "התחילו עכשיו";
+          const buttonClassName = plan.badge
+            ? "mt-auto px-4 py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            : "shrink-0 px-3 py-2 text-sm lg:mt-auto lg:block lg:w-full lg:px-4 lg:py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2";
           return (
           <motion.div
             key={plan.code}
@@ -123,8 +162,10 @@ export default function PricingCards() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.4, delay: i * 0.06, ease: EASE_OUT }}
             whileHover={{ y: -3 }}
-            className={`relative overflow-visible rounded-lg p-6 border flex flex-col transition-shadow hover:shadow-lg hover:shadow-primary/5 ${
-              plan.badge ? "border-primary bg-card shadow-xl shadow-primary/10" : "border-card-border bg-card"
+            className={`relative overflow-visible rounded-lg border transition-shadow hover:shadow-lg hover:shadow-primary/5 ${
+              plan.badge
+                ? "order-first lg:order-none p-6 flex flex-col border-primary bg-card shadow-xl shadow-primary/10"
+                : "p-4 lg:p-6 flex flex-row lg:flex-col items-center lg:items-stretch gap-4 lg:gap-0 border-card-border bg-card"
             }`}
           >
             {plan.badge && (
@@ -139,31 +180,12 @@ export default function PricingCards() {
                 </span>
               </>
             )}
-            <h2 className="font-bold text-lg">{plan.label}</h2>
-            <div className="mt-4">
-              <EnglishText as="span" className="text-3xl font-bold">
-                {native ? native.priceString : `₪${plan.totalPrice}`}
-              </EnglishText>
-              <span className="text-muted text-sm">
-                {" "}
-                / {plan.months === 1 ? "חודש" : plan.months === 12 ? "שנה" : `${plan.months} חודשים`}
-              </span>
+
+            <div className={plan.badge ? "" : "flex-1 lg:flex-none min-w-0"}>
+              <h2 className={plan.badge ? "font-bold text-lg" : "font-bold text-base lg:text-lg"}>{plan.label}</h2>
+              <div className={plan.badge ? "mt-4" : "mt-1 lg:mt-4"}>{priceNode}</div>
+              {equivalentNode}
             </div>
-            {plan.months > 1 && (
-              <p className="mt-1 text-xs text-muted">
-                שווה ערך ל־
-                <EnglishText as="span">
-                  {native
-                    ? new Intl.NumberFormat("en", {
-                        style: "currency",
-                        currency: native.currencyCode,
-                        maximumFractionDigits: 0,
-                      }).format(native.price / plan.months)
-                    : `₪${monthlyEquivalent(plan)}`}
-                </EnglishText>{" "}
-                לחודש
-              </p>
-            )}
 
             {session ? (
               <motion.button
@@ -171,16 +193,16 @@ export default function PricingCards() {
                 whileTap={loadingCode === null ? { scale: 0.97 } : undefined}
                 onClick={() => handleCheckout(plan.code)}
                 disabled={loadingCode !== null}
-                className="mt-auto px-4 py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className={buttonClassName}
               >
-                {loadingCode === plan.code ? "פותח תשלום..." : "התחילו עכשיו"}
+                {buttonLabel}
               </motion.button>
             ) : (
               <MotionLink
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 href="/signup"
-                className="mt-auto block text-center px-4 py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className={`text-center ${buttonClassName}`}
               >
                 התחילו עכשיו
               </MotionLink>
