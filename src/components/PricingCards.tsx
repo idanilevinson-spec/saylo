@@ -123,16 +123,18 @@ export default function PricingCards() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.4, delay: i * 0.06, ease: EASE_OUT }}
             whileHover={{ y: -3 }}
-            className={`relative overflow-hidden rounded-lg p-6 border flex flex-col transition-shadow hover:shadow-lg hover:shadow-primary/5 ${
-              plan.badge
-                ? "pt-14 border-primary bg-card shadow-xl shadow-primary/10 lg:-translate-y-2"
-                : "border-card-border bg-card"
+            className={`relative overflow-visible rounded-lg p-6 border flex flex-col transition-shadow hover:shadow-lg hover:shadow-primary/5 ${
+              plan.badge ? "border-primary bg-card shadow-xl shadow-primary/10" : "border-card-border bg-card"
             }`}
           >
             {plan.badge && (
               <>
-                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
-                <span className="absolute top-4 right-6 px-2.5 py-1 rounded-md bg-primary text-primary-ink text-xs font-bold">
+                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
+                {/* Floats above the card's own border instead of pushing the
+                    title down with extra padding — that padding (plus a
+                    translate-up on the card itself) used to be what made
+                    this card alone sit taller and higher than its siblings. */}
+                <span className="absolute -top-3 inset-x-0 mx-auto w-fit px-2.5 py-1 rounded-md bg-primary text-primary-ink text-xs font-bold">
                   {plan.badge}
                 </span>
               </>
@@ -169,7 +171,7 @@ export default function PricingCards() {
                 whileTap={loadingCode === null ? { scale: 0.97 } : undefined}
                 onClick={() => handleCheckout(plan.code)}
                 disabled={loadingCode !== null}
-                className="mt-6 px-4 py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className="mt-auto px-4 py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 {loadingCode === plan.code ? "פותח תשלום..." : "התחילו עכשיו"}
               </motion.button>
@@ -178,7 +180,7 @@ export default function PricingCards() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 href="/signup"
-                className="mt-6 block text-center px-4 py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className="mt-auto block text-center px-4 py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 התחילו עכשיו
               </MotionLink>
