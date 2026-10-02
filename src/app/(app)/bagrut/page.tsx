@@ -7,7 +7,7 @@ import {
   type BagrutModuleCode,
   type BagrutStudyUnits,
 } from "@/lib/content/bagrut/moduleFormats";
-import { getPublishableSampleUnit } from "@/lib/content/bagrut/sampleUnits";
+import { getPublishableSampleUnits } from "@/lib/content/bagrut/sampleUnits";
 
 export const metadata: Metadata = {
   title: "תרגול בגרות באנגלית — Saylo",
@@ -45,11 +45,11 @@ function moduleMeta(code: BagrutModuleCode): string {
 }
 
 function ModuleCard({ code, index }: { code: BagrutModuleCode; index: number }) {
-  const unit = getPublishableSampleUnit(code);
+  const units = getPublishableSampleUnits(code);
   const Icon = MODULE_ICON[code];
   const meta = moduleMeta(code);
 
-  if (!unit) {
+  if (units.length === 0) {
     return (
       <div className="h-full rounded-lg border border-dashed border-card-border p-5 opacity-70">
         <div className="flex items-center gap-3">
@@ -75,10 +75,10 @@ function ModuleCard({ code, index }: { code: BagrutModuleCode; index: number }) 
           <Icon size={18} />
         </span>
         <div>
-          <p className="font-bold">{unit.titleHe}</p>
+          <p className="font-bold">מודול {code}</p>
           <p className="text-xs text-muted mt-0.5">
-            מודול {code}
-            {meta ? ` · ${meta}` : ""}
+            {meta ? `${meta} · ` : ""}
+            {units.length} {units.length === 1 ? "ערכת תרגול" : "ערכות תרגול"}
           </p>
         </div>
       </div>

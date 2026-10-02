@@ -80,6 +80,11 @@ export interface BagrutListeningTask {
 
 export interface BagrutSampleUnit {
   moduleCode: BagrutModuleCode;
+  // Unique only within a module (not globally) — "1", "2", ... in the order
+  // a learner would naturally want to work through them. Lets a module have
+  // more than one practice set without changing the URL shape for modules
+  // that still only have one.
+  unitSlug: string;
   titleHe: string;
   teacherReviewed: boolean;
   aiContentDisclosed: boolean;
@@ -187,9 +192,114 @@ Other voices in the debate take a different view entirely, arguing that the disc
 
 Whichever view one takes, few dispute the underlying fact uncovered by the research: it is often not the message itself, but the quiet, half-conscious sense of being expected to answer it, that exacts the greater cost.`;
 
+// ============ Second unit per module (2026-10-02) ============
+// Same discipline as the first batch: every passage below is original,
+// composed from scratch, and not adapted from anything real.
+
+const SILENT_DISCO_TRANSCRIPT = `This is your Friday morning update from Sunrise Radio. Before the news, here's something a little different: this Saturday, the community center on Maple Street is hosting its very first "silent disco" afternoon in the park. If you haven't heard of a silent disco before, everyone wears wireless headphones instead of listening to speakers, so people dancing right next to each other might actually be listening to completely different songs.
+
+Organizers say they chose this format specifically because it means the event won't disturb nearby apartments with loud music, something that caused complaints during last year's outdoor festival. There will be three channels to choose from: pop, eighties classics, and local community requests.
+
+Entry is free, though organizers are asking people to bring their own water bottles, since none will be sold on-site this year to cut down on plastic waste. The event runs from two until six in the afternoon, and headphones will be available to borrow at the entrance, first come, first served. In case of rain, the whole thing moves indoors to the community hall instead.`;
+
+const TUTORING_EXCHANGE_PASSAGE = `When Daniel Cohen struggled with algebra in ninth grade, it was a classmate, not a teacher, who finally helped the concepts make sense to him. Two years later, remembering how much that help had mattered, Daniel decided to set up something similar for other students at his school: a free, student-run tutoring exchange.
+
+The idea was simple. Students who felt confident in one subject could offer to tutor others, in exchange for receiving help in a subject where they themselves struggled. A tenth-grader good at chemistry but weak in English literature, for example, could be matched with another student willing to make the opposite trade.
+
+Daniel expected maybe ten or fifteen students to sign up in the first month. Instead, word spread quickly through the school's group chats, and within three weeks over eighty students had registered, covering nearly every subject taught at the school. Daniel and two friends spent most evenings that month manually matching students by hand, before eventually building a simple spreadsheet system to manage requests more efficiently.
+
+Teachers at the school noticed the change as well. Several reported that students who had rarely asked questions in class were now arriving with much more specific, confident questions, clearly having already discussed the material with a peer tutor beforehand. The school's guidance counselor began recommending the exchange to students who seemed hesitant to ask teachers directly for extra help, especially those worried about appearing behind their classmates.
+
+Not every match worked out perfectly. A handful of students dropped out after a session or two, usually because personalities or teaching styles didn't fit well together. Daniel says he stopped seeing this as a failure and started treating it as useful information, simply re-matching students until something clicked. Two years after starting with a handful of friends, the exchange now runs every semester, entirely organized by students, with no teacher supervision required at all.`;
+
+const FREE_PANTRY_PASSAGE = `Outside a small house on Birch Avenue, a wooden box about the size of a large mailbox sits attached to the garden fence, its glass door visible from the sidewalk. Inside, instead of mail, there are usually a few cans of soup, a box of pasta, sometimes a jar of peanut butter, and occasionally a handwritten note.
+
+The box, known locally as a "little free pantry," was built two summers ago by a retired carpenter named Ruth Feldman, after she read about similar projects in other cities. The idea is simple: anyone can take what they need, and anyone can leave something to share, no questions asked and no registration required.
+
+At first, Ruth kept the pantry stocked almost entirely by herself, checking it every morning and refilling it whenever it ran low. Within a few months, however, she began noticing that other neighbors were quietly contributing too, often leaving items without ever mentioning it to her directly. A box that usually emptied out by evening would somehow be half-full again by the next morning.
+
+Ruth says the hardest part was convincing some neighbors that taking food from the box wasn't something to feel embarrassed about. She started leaving a small handwritten sign inside reading, "Take what you need, leave what you can, no explanation necessary," which seemed to make a noticeable difference.
+
+Three other little free pantries have since appeared in nearby neighborhoods, each maintained independently by different residents, with no official organization connecting them. Ruth says she never expected the project to spread, but she isn't surprised either. "People want to help," she says. "Sometimes they just need to see that someone else started first."
+
+Local schools have also taken notice. A nearby elementary school now runs a short project each spring where students help build and paint new pantry boxes, which are then donated to streets that don't yet have one of their own.`;
+
+const ROBOTICS_CLUB_PASSAGE = `Two years ago, Lior Mizrahi wanted to start a robotics club at his school, but there was one problem: nobody else seemed interested, and the school had no budget for new equipment.
+
+Lior didn't give up easily. He asked his physics teacher for permission to use the science lab after school, and he brought his own old motors and spare parts from home. At first, only two other students joined him, both friends he had known since elementary school. They spent most afternoons simply figuring out how things worked, often making careless mistakes along the way.
+
+Slowly, things changed. The small group entered a local competition, and even though they didn't win, other students at school noticed and became curious. By the end of the year, the club had grown to fifteen members, and the school finally agreed to give them a small budget.
+
+Lior says the hardest part was never the robots themselves — it was convincing people to try something new when nothing was guaranteed to work. These days, the club meets twice a week, and several of its first members have gone on to study engineering. Looking back, he's proud that the club started with almost nothing, and he hopes future students will remember that it doesn't take much to begin, just someone willing to start and a few spare parts from home.`;
+
+const SUSPENDED_COFFEE_PASSAGE = `At Marlowe's, a small coffee shop on the corner of Fifth and Main, customers are sometimes surprised to find they don't need to pay for their drink at all. The shop runs on something it calls the "suspended coffee" system, where customers can choose to pay for an extra coffee in advance, leaving it for whoever might need one later.
+
+The idea isn't new — it has existed in cafés in several countries for many years — but Marlowe's owner, Teresa Ruiz, only introduced it after a regular customer suggested it during a particularly difficult winter. "We had people walking past every day who clearly couldn't afford a hot drink," she explains, "and we also had plenty of customers who said they'd happily pay a little extra if it helped someone else."
+
+The system works on a simple honor basis. A small chalkboard near the register shows how many suspended coffees are currently available. Anyone, regardless of whether they look like they need help, can simply ask for a "suspended coffee" and receive one, no explanation required and no questions asked.
+
+In its first year, the program covered just over four hundred drinks. Teresa says what surprised her most wasn't how many people took a free coffee, but who did: students studying during exam season, delivery workers taking a short break, and even, occasionally, someone who later came back to pay for several suspended coffees themselves once their own situation improved.
+
+Not every customer uses the system, and Teresa has never pressured anyone to participate. Still, she says the chalkboard tally has become something regular customers check almost automatically, treating it less like charity and more like a small, ongoing habit the whole neighborhood quietly takes part in together.`;
+
+const HOUSE_REMEMBERS_POEM = `The paint has changed three times since we moved in,
+the kitchen tiles get colder every year,
+yet standing in the hallway, I begin
+to hear the voices no one else can hear.
+
+My father's keys, dropped twice upon this floor.
+My mother, singing softly, slightly off.
+The door that always stuck, the broken drawer,
+the winter that the heating coughed and coughed.
+
+New families will walk these halls one day,
+and paint again, and fix what time has bent.
+They will not hear the songs that drift away,
+or know the names of those who also went.
+
+A house keeps nothing, really, for itself —
+it only holds what we have chosen to leave
+on walls, in corners, on a dusty shelf:
+not objects, but the people we still grieve.`;
+
+const TOOL_LIBRARY_PASSAGE = `In most neighborhoods, owning a power drill that gets used twice a year seems like an unavoidable waste, but residents of Elm Heights have found an alternative: a tool library, where borrowing equipment works exactly like borrowing books.
+
+The idea began when a local handyman, Victor Osei, realized that many of his neighbors owned expensive tools that sat unused in garages for months at a time, while others avoided small home repairs simply because buying the right tool seemed like an unnecessary expense for a single job. He proposed converting an unused storage room at the community center into a shared tool collection, funded partly by small membership fees and partly by donated equipment that residents no longer needed.
+
+Within its first year, the tool library had collected over two hundred items, ranging from basic hammers and screwdrivers to specialized equipment like tile cutters and pressure washers, tools that would be expensive for any single household to justify buying outright. Members pay a small annual fee, considerably less than the cost of buying even one or two of the pricier tools themselves, and can borrow items for up to a week at a time.
+
+Victor insists the project is about more than simply saving money. "When someone comes to return a drill," he says, "they often end up talking to whoever is staffing the desk about what they're actually building or fixing, and sometimes that turns into advice, or even someone offering to help." The tool library has, somewhat by accident, become a place where neighbors with no obvious reason to interact now regularly do.
+
+Not every tool survives heavy community use. Volunteers maintain a small repair bench specifically for equipment that gets returned in poor condition, and a few older, less durable donations have had to be retired entirely rather than repaired. Victor says this was expected from the beginning and considers a certain amount of wear simply the cost of the system working as intended.
+
+Local officials from two neighboring towns have since visited Elm Heights to learn how the tool library operates, hoping to start similar projects of their own. Victor jokes that he never expected to become, in his words, "an accidental expert in borrowed hammers," but he has clearly grown fond of the role.`;
+
+const ROOFTOP_BEES_PASSAGE = `Few people walking past the Grantham Hotel in the city center would guess that its flat roof, fourteen floors above the street, is home to six beehives and roughly two hundred thousand bees. The hotel installed the hives three years ago, part of a small but growing trend of urban beekeeping that has spread to office buildings, rooftop gardens, and even a handful of schools.
+
+The idea came from the hotel's head chef, Marco Dellacqua, who had read that honeybee populations were declining in many rural areas due to pesticide use and the loss of wildflower meadows, while cities, somewhat surprisingly, often provide a wider variety of flowering plants across parks, gardens, and balconies than large stretches of modern farmland. Rooftops, it turns out, can be unexpectedly good places for bees to thrive, as long as someone is willing to manage the hives properly.
+
+Managing urban hives, however, is not as simple as placing a few wooden boxes on a roof and waiting. The hotel hired a professional beekeeper, Priya Nair, who visits weekly to check the health of each colony, monitor for disease, and ensure the bees have enough space as their numbers grow throughout the warmer months. Guests staying at the hotel can request a short rooftop tour, viewed safely from behind protective netting, and the hotel's restaurant now serves its own rooftop honey at breakfast, something Marco says guests find far more interesting than a generic honey packet ever could.
+
+The project has not been entirely without challenges. During the first summer, one hive became unexpectedly aggressive, likely due to a change in queen bee, and had to be relocated to a quieter section of the roof away from the guest terrace. Priya also notes that urban beekeeping requires constant attention to local regulations, since not every city permits hives within a certain distance of windows or public walkways.
+
+Still, the benefits have been significant enough that two nearby hotels have since installed their own rooftop hives, partly inspired by the Grantham's example and partly by simple curiosity from guests who ask about it. Marco hopes the trend continues to spread, not just for the honey itself, but for what he sees as a small, visible reminder, fourteen floors above a busy street, that even a dense city center can support more life than most people walking beneath it ever notice. "You just have to look up," he says, "or in this case, remember to look up at all."`;
+
+const RIGHT_TO_BE_FORGOTTEN_PASSAGE = `In 2014, a Spanish citizen successfully argued before a European court that outdated, personally embarrassing information about him should no longer appear in search engine results for his name, even though the original article reporting it had been entirely accurate at the time of publication. The ruling established what has since become widely known as the "right to be forgotten," and it continues to generate fierce debate nearly a decade later.
+
+Supporters of the right to be forgotten argue that the internet has fundamentally changed what it means for information to fade from public memory. Before search engines existed, an old newspaper article about a minor financial mistake or a teenage arrest would typically require a trip to a physical archive to locate, effectively allowing most people's past missteps to recede naturally with time. Today, the same information can resurface instantly and permanently attached to a person's name, regardless of how much they may have changed in the intervening years, or how irrelevant the information has become to who they currently are.
+
+Critics, however, warn that the right to be forgotten sits uneasily alongside another principle many societies value just as strongly: freedom of information, and the public's right to access an accurate historical record. Journalists and historians in particular have expressed concern that allowing individuals to request the removal of search results, even when the underlying facts are true, risks quietly erasing inconvenient but legitimate public history, especially in cases involving public figures, former officials, or individuals convicted of serious crimes.
+
+Search engine companies, caught in the middle of this debate, have generally been required to evaluate each removal request individually, weighing the requester's privacy interest against the public's interest in the information remaining accessible. This has placed technology companies in the unusual position of making judgment calls that resemble legal or journalistic decisions, despite being neither courts nor news organizations themselves, a role many of these companies have publicly stated they never sought and remain uncomfortable occupying.
+
+The debate has also expanded well beyond Europe, as other countries consider whether to adopt similar protections, often adapting the underlying principle to fit very different legal traditions around free expression. Some legal scholars argue that a version of the right to be forgotten will eventually become a global norm, simply because the discomfort of a permanent, searchable past is not unique to any one culture or legal system. Others remain skeptical, pointing out that any right which depends on selectively hiding true information will always sit in tension with the basic premise that history, however uncomfortable, generally serves the public better recorded than erased.
+
+Whatever position one takes, the underlying tension is unlikely to resolve itself cleanly, if only because it pits two deeply held values against one another rather than pitting a clear right against a clear wrong — and disputes of that particular shape, history suggests, tend to persist for a very long time.`;
+
 export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "A",
+    unitSlug: "1",
     titleHe: "דוגמה למודול A — הדרכה בקמפוס",
     teacherReviewed: false,
     aiContentDisclosed: true,
@@ -280,6 +390,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   },
   {
     moduleCode: "B",
+    unitSlug: "1",
     titleHe: "דוגמה למודול B — הפינה הירוקה",
     teacherReviewed: false,
     aiContentDisclosed: true,
@@ -333,6 +444,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   },
   {
     moduleCode: "C",
+    unitSlug: "1",
     titleHe: "דוגמה למודול C — קפה התיקונים",
     teacherReviewed: false,
     aiContentDisclosed: true,
@@ -388,6 +500,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   },
   {
     moduleCode: "D",
+    unitSlug: "1",
     titleHe: "דוגמה לתרגול ניתוח ספרותי בסגנון מודול D — \"השיעור האחרון\"",
     teacherReviewed: false,
     aiContentDisclosed: true,
@@ -433,6 +546,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   },
   {
     moduleCode: "E",
+    unitSlug: "1",
     titleHe: "דוגמה למודול E — אופניים שיתופיים",
     teacherReviewed: false,
     aiContentDisclosed: true,
@@ -540,6 +654,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   },
   {
     moduleCode: "F",
+    unitSlug: "1",
     titleHe: "דוגמה למודול F — הספרייה שלא נסגרת",
     teacherReviewed: false,
     aiContentDisclosed: true,
@@ -596,6 +711,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   },
   {
     moduleCode: "G",
+    unitSlug: "1",
     titleHe: "דוגמה למודול G — המחיר של זמינות מתמדת",
     teacherReviewed: false,
     aiContentDisclosed: true,
@@ -650,19 +766,500 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
       wordCountRange: [120, 140],
     },
   },
+  {
+    moduleCode: "A",
+    unitSlug: "2",
+    titleHe: "דוגמה שנייה למודול A — מסיבה שקטה",
+    teacherReviewed: false,
+    aiContentDisclosed: true,
+    listeningTask: {
+      transcriptEn: SILENT_DISCO_TRANSCRIPT,
+      questions: [
+        {
+          formatHe: "רב-ברירה",
+          promptEn: "Why did the organizers choose a silent disco format for this event?",
+          options: [
+            "It was cheaper than hiring a sound system",
+            "It would not disturb nearby apartments with loud music",
+            "It was the only equipment available",
+            "It was requested by the local council",
+          ],
+          correctOptionIndex: 1,
+          modelAnswerHe: "תשובה נכונה: B.",
+        },
+        {
+          formatHe: "השלמת משפט",
+          promptEn: "This year, organizers are not selling water bottles on-site in order to ___.",
+          modelAnswerHe: "תשובה: cut down on plastic waste.",
+        },
+        {
+          formatHe: "רב-ברירה",
+          promptEn: "How many music channels will be available at the event?",
+          options: ["One", "Two", "Three", "Four"],
+          correctOptionIndex: 2,
+          modelAnswerHe: "תשובה נכונה: C.",
+        },
+        {
+          formatHe: "שאלה פתוחה",
+          promptEn: "What will happen to the event if it rains? Answer in your own words.",
+          modelAnswerHe: "תשובה מקובלת: האירוע יעבור לאולם הקהילתי במקום להתקיים בפארק.",
+        },
+      ],
+    },
+    readingPassages: [TUTORING_EXCHANGE_PASSAGE, FREE_PANTRY_PASSAGE],
+    readingQuestions: [
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "Why did Daniel decide to set up the tutoring exchange?",
+        options: [
+          "A teacher asked him to organize it",
+          "He remembered how much a classmate's help had mattered to him",
+          "He needed volunteer hours for school",
+          "He wanted to start a business",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "Within three weeks, over eighty students had registered, covering ___.",
+        modelAnswerHe: "תשובה: nearly every subject taught at the school.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to the text, how did some teachers notice a change in their students? Answer in your own words.",
+        modelAnswerHe:
+          "תשובה מקובלת: תלמידים שלא שאלו שאלות בעבר התחילו להגיע עם שאלות ספציפיות ובטוחות יותר, אחרי שכבר דנו בחומר עם בן/בת זוג.",
+      },
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "What did Ruth do to help neighbors feel less embarrassed about taking food from the pantry?",
+        options: [
+          "She removed the glass door",
+          "She left a sign saying no explanation was necessary",
+          "She asked neighbors to register first",
+          "She only stocked it at night",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "A box that usually emptied out by evening would somehow be ___ by the next morning.",
+        modelAnswerHe: "תשובה: half-full again.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to Ruth, why does she think the project has spread to other neighborhoods? Support your answer with information from the text.",
+        modelAnswerHe:
+          "תשובה מקובלת: לדעתה אנשים רוצים לעזור, אבל לפעמים צריך לראות שמישהו אחר כבר התחיל כדי להעז לעשות את זה בעצמם.",
+      },
+    ],
+  },
+  {
+    moduleCode: "B",
+    unitSlug: "2",
+    titleHe: "דוגמה שנייה למודול B — מועדון הרובוטיקה",
+    teacherReviewed: false,
+    aiContentDisclosed: true,
+    readingPassages: [ROBOTICS_CLUB_PASSAGE],
+    readingQuestions: [
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "What was the first problem Lior faced when starting the club?",
+        options: [
+          "The school had no budget and nobody else seemed interested",
+          "The science lab was closed after school",
+          "His physics teacher refused permission",
+          "He didn't know how robots worked",
+        ],
+        correctOptionIndex: 0,
+        modelAnswerHe: "תשובה נכונה: A.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "At first, only two other students joined him, and they spent most afternoons ___.",
+        modelAnswerHe: "תשובה: simply figuring out how things worked, often making mistakes.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to the text, what changed after the club entered a local competition? Answer in your own words.",
+        modelAnswerHe: "תשובה מקובלת: למרות שלא ניצחו, תלמידים אחרים בבית הספר שמו לב והתעניינו, והמועדון גדל.",
+      },
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "According to Lior, what was the hardest part of starting the club?",
+        options: [
+          "Finding good equipment",
+          "Convincing people to try something new with no guarantee of success",
+          "Getting permission from the principal",
+          "Finding a time that worked for everyone",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "אוצר מילים בהקשר",
+        promptEn: 'Find a phrase in the last paragraph that means "thinking back about the past."',
+        modelAnswerHe: "תשובה: Looking back.",
+      },
+    ],
+    writingTask: {
+      promptEn:
+        "Write a short message to a friend about a club, team, or group you'd like to start or join. Say what it is and why it interests you.",
+      wordCountRange: [35, 40],
+    },
+  },
+  {
+    moduleCode: "C",
+    unitSlug: "2",
+    titleHe: "דוגמה שנייה למודול C — קפה שמחכה למישהו",
+    teacherReviewed: false,
+    aiContentDisclosed: true,
+    readingPassages: [SUSPENDED_COFFEE_PASSAGE],
+    readingQuestions: [
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "What is a 'suspended coffee'?",
+        options: [
+          "A coffee that is paid for in advance by one customer for someone else to receive later",
+          "A type of iced coffee served without sugar",
+          "A coffee that is free only for regular customers",
+          "A coffee ordered online in advance",
+        ],
+        correctOptionIndex: 0,
+        modelAnswerHe: "תשובה נכונה: A.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "Teresa introduced the suspended coffee system after a regular customer suggested it during ___.",
+        modelAnswerHe: "תשובה: a particularly difficult winter.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to the text, how does a customer receive a suspended coffee? Answer in your own words.",
+        modelAnswerHe: "תשובה מקובלת: פשוט מבקשים 'suspended coffee' ליד הקופה, בלי לתת הסבר ובלי שאלות — על בסיס אמון.",
+      },
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "What surprised Teresa most about the program's first year?",
+        options: [
+          "How many drinks were given away",
+          "Who actually used the system",
+          "How much money the café lost",
+          "How quickly the chalkboard needed replacing",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to the text, what did some customers do once their own situation improved? Support your answer with information from the text.",
+        modelAnswerHe: "תשובה מקובלת: חלקם חזרו מאוחר יותר ושילמו עבור כמה 'suspended coffees' בעצמם.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "Teresa says regular customers now treat the chalkboard tally less like charity and more like ___.",
+        modelAnswerHe: "תשובה: a small, ongoing habit the whole neighborhood quietly takes part in together.",
+      },
+    ],
+    writingTask: {
+      promptEn: "Describe a small act of kindness you witnessed or took part in. What happened, and why do you think it mattered?",
+      wordCountRange: [70, 90],
+    },
+  },
+  {
+    moduleCode: "D",
+    unitSlug: "2",
+    titleHe: "דוגמה שנייה לתרגול ניתוח ספרותי בסגנון מודול D — \"מה שהבית זוכר\" (שיר)",
+    teacherReviewed: false,
+    aiContentDisclosed: true,
+    readingPassages: [HOUSE_REMEMBERS_POEM],
+    readingQuestions: [
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "What is the main subject the speaker reflects on in this poem?",
+        options: [
+          "How a house changes physically over time",
+          "Memories of family connected to the house",
+          "Plans to renovate the house",
+          "A disagreement between neighbors",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "שאלת ניתוח",
+        promptEn:
+          "What does the phrase 'A house keeps nothing, really, for itself' suggest about the speaker's view of a house's true meaning? Answer in your own words, referring to the poem.",
+        modelAnswerHe:
+          "תשובה מקובלת אם מתייחסת לרעיון שהבית עצמו הוא רק מסגרת ריקה — המשמעות האמיתית שלו היא האנשים והזכרונות שחיו בו, לא המבנה הפיזי.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "According to the third stanza, new families who live in the house in the future will not ___.",
+        modelAnswerHe: "תשובה: hear the songs that drift away, or know the names of those who also went.",
+      },
+      {
+        formatHe: "שאלת ניתוח",
+        promptEn:
+          "Why do you think the poet repeats small, ordinary details (keys dropped, a stuck door, singing slightly off-key) instead of describing one dramatic event? What effect does this create? Answer in your own words.",
+        modelAnswerHe:
+          "תשובה פתוחה — התלמיד צריך להתייחס לכך שפרטים קטנים ויומיומיים דווקא ממחישים טוב יותר איך זיכרון אמיתי נשמר, יותר מאירוע דרמטי בודד; חשוב שהתשובה תתייחס לטקסט.",
+      },
+    ],
+    writingTask: {
+      promptEn:
+        "Write a short composition about a place that holds special memories for you. Describe the place and explain why it matters to you.",
+      wordCountRange: [100, 120],
+    },
+  },
+  {
+    moduleCode: "E",
+    unitSlug: "2",
+    titleHe: "דוגמה שנייה למודול E — ספריית הכלים",
+    teacherReviewed: false,
+    aiContentDisclosed: true,
+    readingPassages: [TOOL_LIBRARY_PASSAGE],
+    readingQuestions: [
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "What problem did Victor Osei notice that led him to start the tool library?",
+        options: [
+          "Many neighbors owned expensive tools that sat unused for months",
+          "The community center needed more storage space",
+          "Local stores had stopped selling tools",
+          "Residents were stealing tools from each other",
+        ],
+        correctOptionIndex: 0,
+        modelAnswerHe: "תשובה נכונה: A.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "The tool library was funded partly by membership fees and partly by ___.",
+        modelAnswerHe: "תשובה: donated equipment that residents no longer needed.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to the text, how much does it cost to be a member compared to buying the pricier tools yourself? Answer in your own words.",
+        modelAnswerHe: "תשובה מקובלת: התשלום השנתי זול משמעותית מקניית אפילו כלי אחד או שניים מהיקרים יותר.",
+      },
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "According to Victor, what often happens when someone returns a borrowed tool?",
+        options: [
+          "They are charged a late fee",
+          "They end up talking to the desk volunteer about their project",
+          "They must fill out a damage report",
+          "They receive a discount on their next rental",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "What happens to tools that are returned in poor condition? Support your answer with information from the text.",
+        modelAnswerHe: "תשובה מקובלת: יש ספסל תיקונים קטן של מתנדבים; חלק מהתרומות הישנות יותר לא ניתנות לתיקון ונגרעות לגמרי.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "Victor considers a certain amount of wear on the tools to be ___.",
+        modelAnswerHe: "תשובה: simply the cost of the system working as intended.",
+      },
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "Why have officials from two neighboring towns visited Elm Heights?",
+        options: [
+          "To inspect the community center's safety standards",
+          "To learn how the tool library operates",
+          "To ask Victor to run for office",
+          "To buy tools for their own towns",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "How does Victor describe his own role in the project, according to the last paragraph? Explain in your own words.",
+        modelAnswerHe: "תשובה מקובלת: הוא מתאר את עצמו בבדיחות כ'מומחה בטעות' להשאלת פטישים — לא תפקיד שציפה לקחת על עצמו.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "Before the tool library existed, residents often avoided small home repairs because ___.",
+        modelAnswerHe: "תשובה: buying the right tool seemed like an unnecessary expense for a single job.",
+      },
+    ],
+    vocabularyQuestions: [
+      {
+        formatHe: "רב-ברירה",
+        promptEn: 'Choose the word closest in meaning to "unavoidable":',
+        options: ["inevitable", "optional", "forbidden", "temporary"],
+        correctOptionIndex: 0,
+        modelAnswerHe: "תשובה נכונה: inevitable.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "The company tried to __________ (justify) the high price by pointing to the product's quality.",
+        modelAnswerHe: "תשובה: justify.",
+      },
+      {
+        formatHe: "התאמה",
+        promptEn:
+          "Match each word to its meaning: (1) durable (2) considerably (3) retired — (a) by a significant amount (b) long-lasting, not easily damaged (c) taken permanently out of use.",
+        modelAnswerHe: "תשובה: 1-b, 2-a, 3-c.",
+      },
+      {
+        formatHe: "רב-ברירה",
+        promptEn: '"Staffing the desk" in the text refers to:',
+        options: [
+          "working at or being responsible for the desk",
+          "building a wooden desk",
+          "cleaning the desk",
+          "selling the desk",
+        ],
+        correctOptionIndex: 0,
+        modelAnswerHe: "תשובה נכונה: working at or being responsible for the desk.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "The volunteers __________ (maintain) a small repair bench for damaged tools.",
+        modelAnswerHe: "תשובה: maintain.",
+      },
+    ],
+  },
+  {
+    moduleCode: "F",
+    unitSlug: "2",
+    titleHe: "דוגמה שנייה למודול F — דבורים על הגג",
+    teacherReviewed: false,
+    aiContentDisclosed: true,
+    readingPassages: [ROOFTOP_BEES_PASSAGE],
+    readingQuestions: [
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "Why, according to the text, can cities sometimes be unexpectedly good places for bees?",
+        options: [
+          "Cities have fewer insects competing for food",
+          "Cities often have more varied flowering plants than large farmland areas",
+          "Cities are warmer than rural areas year-round",
+          "Cities have no pesticide use at all",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "The hotel hired a professional beekeeper who visits weekly to ___.",
+        modelAnswerHe:
+          "תשובה: check the health of each colony, monitor for disease, and ensure the bees have enough space.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to the text, what happened to one of the hives during the first summer, and why? Answer in your own words.",
+        modelAnswerHe:
+          "תשובה מקובלת: אחת הכוורות הפכה לאגרסיבית במפתיע, כנראה בגלל שינוי במלכת הדבורים, ונאלצו להעביר אותה למקום שקט יותר בגג, רחוק ממרפסת האורחים.",
+      },
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "What does Priya say urban beekeeping requires constant attention to?",
+        options: [
+          "The hotel's breakfast menu",
+          "Local regulations about hive placement",
+          "The color of the hives",
+          "Guest reviews online",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "Why have two nearby hotels installed their own rooftop hives, according to the text? Support your answer with information from the text.",
+        modelAnswerHe: "תשובה מקובלת: בהשראת ההצלחה של מלון גרנתהאם וגם בגלל סקרנות של אורחים ששאלו על זה.",
+      },
+    ],
+    writingTask: {
+      promptEn:
+        "Write a composition about an unusual or unexpected place where nature (plants, animals, or insects) has found a way to thrive. Describe it and explain why it interests you.",
+      wordCountRange: [120, 140],
+    },
+  },
+  {
+    moduleCode: "G",
+    unitSlug: "2",
+    titleHe: "דוגמה שנייה למודול G — הזכות להישכח",
+    teacherReviewed: false,
+    aiContentDisclosed: true,
+    readingPassages: [RIGHT_TO_BE_FORGOTTEN_PASSAGE],
+    readingQuestions: [
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "According to the text, what changed about personal information because of the internet, according to supporters of the right to be forgotten?",
+        options: [
+          "Information became more expensive to access",
+          "Old information can resurface instantly and permanently, rather than naturally fading over time",
+          "Newspapers stopped publishing physical archives",
+          "Courts became slower at processing requests",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to critics, what principle does the right to be forgotten conflict with? Explain in your own words.",
+        modelAnswerHe:
+          "תשובה מקובלת: חופש המידע וזכות הציבור לגשת לרשומה היסטורית מדויקת — יש חשש שמחיקת תוצאות חיפוש אמיתיות תמחק בשקט היסטוריה ציבורית לגיטימית.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn: "Search engine companies have generally been required to weigh the requester's privacy interest against ___.",
+        modelAnswerHe: "תשובה: the public's interest in the information remaining accessible.",
+      },
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "What unusual position does the text say search engine companies have been placed in?",
+        options: [
+          "Acting as courts or news organizations despite being neither",
+          "Being required to publish more information than before",
+          "Losing all legal responsibility for search results",
+          "Becoming official government agencies",
+        ],
+        correctOptionIndex: 0,
+        modelAnswerHe: "תשובה נכונה: A.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to the final paragraph, why does the text suggest this debate is unlikely to resolve itself cleanly? Support your answer with information from the text.",
+        modelAnswerHe:
+          "תשובה מקובלת: כי זה מעמיד שני ערכים חשובים זה מול זה, לא ערך ברור מול טעות ברורה — ומחלוקות מהסוג הזה נוטות להימשך זמן רב.",
+      },
+    ],
+    writingTask: {
+      promptEn:
+        "Some people argue that individuals should have the right to request removal of true but embarrassing information about them from internet search results. Do you agree or disagree? Give reasons and examples to support your opinion.",
+      wordCountRange: [120, 140],
+    },
+  },
 ] as const;
 
-export function getSampleUnit(moduleCode: BagrutModuleCode): BagrutSampleUnit | undefined {
-  return BAGRUT_SAMPLE_UNITS.find((u) => u.moduleCode === moduleCode);
+export function getSampleUnit(moduleCode: BagrutModuleCode, unitSlug: string): BagrutSampleUnit | undefined {
+  return BAGRUT_SAMPLE_UNITS.find((u) => u.moduleCode === moduleCode && u.unitSlug === unitSlug);
 }
 
-// The only function a future learner-facing screen should call. See the
-// module-level comment above for what the two flags mean and why they
-// never merge into one.
-export function getPublishableSampleUnit(moduleCode: BagrutModuleCode): BagrutSampleUnit | undefined {
-  const unit = getSampleUnit(moduleCode);
+// The only function a future learner-facing practice screen should call for
+// ONE specific unit. See the module-level comment above for what the two
+// flags mean and why they never merge into one.
+export function getPublishableSampleUnit(moduleCode: BagrutModuleCode, unitSlug: string): BagrutSampleUnit | undefined {
+  const unit = getSampleUnit(moduleCode, unitSlug);
   if (!unit) return undefined;
   return unit.teacherReviewed || unit.aiContentDisclosed ? unit : undefined;
+}
+
+// Every publishable unit for a module, in the order they appear above — for
+// a "choose a practice set" listing page, not for grading or exam logic.
+export function getPublishableSampleUnits(moduleCode: BagrutModuleCode): BagrutSampleUnit[] {
+  return BAGRUT_SAMPLE_UNITS.filter(
+    (u) => u.moduleCode === moduleCode && (u.teacherReviewed || u.aiContentDisclosed)
+  );
 }
 
 // Building sample content for a module whose own structure isn't verified

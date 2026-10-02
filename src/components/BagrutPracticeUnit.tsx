@@ -25,8 +25,8 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
-      <Link href="/bagrut" className="text-sm text-primary">
-        ← כל המודולים
+      <Link href={`/bagrut/${unit.moduleCode}`} className="text-sm text-primary">
+        ← ערכות התרגול של מודול {unit.moduleCode}
       </Link>
 
       <h1 className="mt-3 text-2xl font-bold">{unit.titleHe}</h1>

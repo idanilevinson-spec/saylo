@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BAGRUT_SAMPLE_UNITS, getPublishableSampleUnit, getSampleUnit, BAGRUT_AI_CONTENT_DISCLAIMER } from "./sampleUnits";
+import {
+  BAGRUT_SAMPLE_UNITS,
+  getPublishableSampleUnit,
+  getPublishableSampleUnits,
+  getSampleUnit,
+  BAGRUT_AI_CONTENT_DISCLAIMER,
+} from "./sampleUnits";
 import { getModuleFormat, type BagrutModuleCode } from "./moduleFormats";
 import { countWords } from "@/lib/patterns/textAnalysis";
 
@@ -26,11 +32,16 @@ describe("BAGRUT_SAMPLE_UNITS", () => {
     }
   });
 
-  it("gives module D's pre-assigned-literature passage a plausible short-story length anyway", () => {
-    const moduleD = BAGRUT_SAMPLE_UNITS.find((u) => u.moduleCode === "D")!;
-    const words = countWords(moduleD.readingPassages[0]);
-    expect(words).toBeGreaterThanOrEqual(150);
-    expect(words).toBeLessThanOrEqual(500);
+  it("gives every module D unit a plausible literature-passage length anyway", () => {
+    // Unit 2 is a short poem rather than a story, so the floor is lower
+    // than unit 1's prose-story minimum — both still read as "a real
+    // literary text," not a one-line placeholder or a full novella.
+    for (const unit of BAGRUT_SAMPLE_UNITS) {
+      if (unit.moduleCode !== "D") continue;
+      const words = countWords(unit.readingPassages[0]);
+      expect(words).toBeGreaterThanOrEqual(60);
+      expect(words).toBeLessThanOrEqual(500);
+    }
   });
 
   it("only builds sample content for modules whose structure is verified", () => {
@@ -80,20 +91,34 @@ describe("BAGRUT_SAMPLE_UNITS", () => {
     }
   });
 
-  it("gives module E a vocabulary section instead of a writing task, and vice versa for B", () => {
-    const moduleE = BAGRUT_SAMPLE_UNITS.find((u) => u.moduleCode === "E")!;
-    expect(moduleE.writingTask).toBeUndefined();
-    expect(moduleE.vocabularyQuestions?.length).toBe(5);
-
-    const moduleB = BAGRUT_SAMPLE_UNITS.find((u) => u.moduleCode === "B")!;
-    expect(moduleB.writingTask).toBeDefined();
-    expect(moduleB.vocabularyQuestions).toBeUndefined();
+  it("gives every module E unit a vocabulary section instead of a writing task, and vice versa for B", () => {
+    for (const unit of BAGRUT_SAMPLE_UNITS) {
+      if (unit.moduleCode === "E") {
+        expect(unit.writingTask).toBeUndefined();
+        expect(unit.vocabularyQuestions?.length).toBe(5);
+      }
+      if (unit.moduleCode === "B") {
+        expect(unit.writingTask).toBeDefined();
+        expect(unit.vocabularyQuestions).toBeUndefined();
+      }
+    }
   });
 
-  it("gives module E between 8 and 10 reading questions, per its verified format", () => {
-    const moduleE = BAGRUT_SAMPLE_UNITS.find((u) => u.moduleCode === "E")!;
-    expect(moduleE.readingQuestions.length).toBeGreaterThanOrEqual(8);
-    expect(moduleE.readingQuestions.length).toBeLessThanOrEqual(10);
+  it("gives every module E unit between 8 and 10 reading questions, per its verified format", () => {
+    for (const unit of BAGRUT_SAMPLE_UNITS) {
+      if (unit.moduleCode !== "E") continue;
+      expect(unit.readingQuestions.length).toBeGreaterThanOrEqual(8);
+      expect(unit.readingQuestions.length).toBeLessThanOrEqual(10);
+    }
+  });
+
+  it("gives every module a unique unitSlug per module (no two units with the same slug)", () => {
+    const seen = new Set<string>();
+    for (const unit of BAGRUT_SAMPLE_UNITS) {
+      const key = `${unit.moduleCode}:${unit.unitSlug}`;
+      expect(seen.has(key)).toBe(false);
+      seen.add(key);
+    }
   });
 });
 
@@ -106,21 +131,42 @@ describe("BAGRUT_AI_CONTENT_DISCLAIMER", () => {
 describe("getPublishableSampleUnit", () => {
   it("serves content that is disclosed as AI-written, even without teacher review", () => {
     for (const unit of BAGRUT_SAMPLE_UNITS) {
-      expect(getPublishableSampleUnit(unit.moduleCode)).toBe(unit);
+      expect(getPublishableSampleUnit(unit.moduleCode, unit.unitSlug)).toBe(unit);
     }
   });
 
-  it("returns undefined for a module code with no sample content registered", () => {
+  it("returns undefined for a module/unitSlug combination with no sample content registered", () => {
     // Every verified module (A–G) now has sample content as of 2026-10-02 —
     // there's no real gap left to assert against, so this exercises the
     // "not found" path with a code that was never a valid module to begin
     // with, via a type assertion.
-    expect(getPublishableSampleUnit("Z" as BagrutModuleCode)).toBeUndefined();
+    expect(getPublishableSampleUnit("Z" as BagrutModuleCode, "1")).toBeUndefined();
+  });
+
+  it("returns undefined for a unitSlug that doesn't exist on an otherwise real module", () => {
+    expect(getPublishableSampleUnit("B", "99")).toBeUndefined();
+  });
+});
+
+describe("getPublishableSampleUnits", () => {
+  it("returns every unit for a module, all publishable", () => {
+    for (const code of ["A", "B", "C", "D", "E", "F", "G"] as const) {
+      const units = getPublishableSampleUnits(code);
+      expect(units.length).toBeGreaterThanOrEqual(2);
+      for (const unit of units) {
+        expect(unit.moduleCode).toBe(code);
+        expect(unit.teacherReviewed || unit.aiContentDisclosed).toBe(true);
+      }
+    }
+  });
+
+  it("returns an empty array for a module with no units", () => {
+    expect(getPublishableSampleUnits("Z" as BagrutModuleCode)).toEqual([]);
   });
 });
 
 describe("getSampleUnit", () => {
   it("returns the unit regardless of review status", () => {
-    expect(getSampleUnit("B")).toBeDefined();
+    expect(getSampleUnit("B", "1")).toBeDefined();
   });
 });
