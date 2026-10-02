@@ -12,11 +12,11 @@ import { supabase } from "@/lib/supabase/browserClient";
 // to them). No separate admin screen needed.
 //
 // targetType started as a union of one on purpose — widen it (and the DB
-// policy in migration 036/039) together, one content type at a time, rather
-// than opening every content type before the reporting flow has been used
-// for real. Now also covers the reading and listening content pages
-// themselves (the passage/clip, not their exercises).
-export type ReportableContentType = "exercise" | "reading_text" | "listening_clip";
+// policy in migration 036/040/041) together, one content type at a time,
+// rather than opening every content type before the reporting flow has been
+// used for real. Now also covers the reading/listening/grammar content
+// pages themselves (the passage/clip/topic, not their exercises).
+export type ReportableContentType = "exercise" | "reading_text" | "listening_clip" | "grammar_topic";
 
 interface ReportContentErrorProps {
   targetType: ReportableContentType;

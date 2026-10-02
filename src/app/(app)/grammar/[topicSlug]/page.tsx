@@ -5,6 +5,7 @@ import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import GrammarLessonContent from "@/components/GrammarLessonContent";
 import MotionLink from "@/components/MotionLink";
+import ReportContentError from "@/components/ReportContentError";
 import { Target } from "lucide-react";
 import { getGrammarTopicBySlug, listGrammarLessons } from "@/lib/content/grammar";
 import { createClient } from "@/lib/supabase/serverClient";
@@ -72,7 +73,10 @@ export default async function GrammarTopicPage({ params }: PageProps) {
 
       {lessons.length > 0 && (
         <>
-          <h2 className="mt-8 text-lg font-bold text-muted">הסבר מהמורה</h2>
+          <div className="mt-8 flex items-center justify-between gap-3">
+            <h2 className="text-lg font-bold text-muted">הסבר מהמורה</h2>
+            <ReportContentError targetType="grammar_topic" targetId={topic.id} />
+          </div>
           <div className="mt-3 space-y-10">
             {lessons.map((lesson) => (
               <article key={lesson.id} className="bg-card border border-card-border rounded-lg p-6 sm:p-8">
