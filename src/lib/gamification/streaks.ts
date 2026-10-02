@@ -8,8 +8,8 @@ import type { Streak } from "@/types/database";
 // background job that "spends" a freeze automatically at midnight the way
 // Duolingo's does, so a freeze only ever helps once the learner is back,
 // not while they're still away.
-export const MAX_FREEZES = 2;
-export const FREEZE_EARN_INTERVAL_DAYS = 7;
+import { MAX_FREEZES, FREEZE_EARN_INTERVAL_DAYS } from "./streakRules";
+export { MAX_FREEZES, FREEZE_EARN_INTERVAL_DAYS };
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10);

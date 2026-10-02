@@ -9,6 +9,7 @@ import OfflineBanner from "@/components/OfflineBanner";
 import PageTransition from "@/components/PageTransition";
 import AccessibilityProvider from "@/components/AccessibilityProvider";
 import CookieNotice from "@/components/CookieNotice";
+import SupportChat from "@/components/support/SupportChat";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -102,6 +103,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
               <PageTransition>{children}</PageTransition>
             </main>
+            <SupportChat />
           </AuthProvider>
           <CookieNotice />
         </AccessibilityProvider>

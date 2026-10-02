@@ -9,6 +9,7 @@ const TABS = [
   { href: "/admin", label: "סקירה" },
   { href: "/admin/users", label: "משתמשים" },
   { href: "/admin/content", label: "תוכן" },
+  { href: "/admin/support", label: "פניות" },
   { href: "/admin/moderation", label: "בקרת תוכן" },
   { href: "/admin/analytics", label: "אנליטיקס" },
 ];

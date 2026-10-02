@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage, { EmailLink, LegalSection } from "@/components/LegalPage";
+import OpenSupportButton from "@/components/support/OpenSupportButton";
 
 export const metadata: Metadata = {
   title: "תמיכה — Saylo",
@@ -14,8 +15,12 @@ export default function SupportPage() {
     <LegalPage title="תמיכה">
       <LegalSection title="יצירת קשר">
         <p>
-          נתקלתם בבעיה או שיש לכם שאלה? כתבו לנו ל-<EmailLink />, ונחזור אליכם בהקדם האפשרי.
+          נתקלתם בבעיה או שיש לכם שאלה? עוזר התמיכה עונה מיד על רוב השאלות, ואפשר גם להשאיר פרטים ונחזור אליכם
+          במייל, בטלפון או בוואטסאפ. מעדיפים מייל? כתבו לנו ל-<EmailLink />.
         </p>
+        <div className="pt-1">
+          <OpenSupportButton label="שיחה עם עוזר התמיכה" />
+        </div>
       </LegalSection>
 
       <LegalSection title="איך מבטלים מנוי">
