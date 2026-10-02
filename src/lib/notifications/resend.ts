@@ -2,6 +2,8 @@ import "server-only";
 import { Resend } from "resend";
 import type { ScoreSummary } from "@/lib/reports/buildScoreSummary";
 import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
+import { SUPPORT_CHANNEL_LABELS, SUPPORT_TOPIC_LABELS, type SupportChannel, type SupportTopic } from "@/lib/support/topics";
+import { formatPhoneForDisplay, whatsappLink } from "@/lib/support/contact";
 
 let client: Resend | null = null;
 
@@ -235,6 +237,65 @@ export async function sendGuardianActivityReportEmail(
         </div>
         <p style="font-size: 13px; color: #6b7280;">הדוח הזה מכיל רק סיכום כללי — לא תוכן שיחות, לא טעויות ספציפיות ולא שום פרט אישי מעבר למה שמוצג כאן.</p>
         <p style="margin-top: 24px; font-size: 12px; color: #6b7280;">קיבלתם מייל זה כי אישרתם לקבל דוח פעילות תקופתי. אפשר להפסיק בכל עת: <a href="${escapeHtml(unsubscribeUrl)}" style="color: #0066d6;">הסרה מרשימת התפוצה</a>. שאלות: <a href="mailto:${CONTACT_EMAIL}" style="color: #0066d6;">${CONTACT_EMAIL}</a>.</p>
+      </div>
+    `,
+  });
+
+  return !error;
+}
+
+export interface SupportRequestNotification {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  preferredChannel: SupportChannel;
+  topic: SupportTopic;
+  message: string;
+  aiSummary: string | null;
+  pagePath: string | null;
+  signedIn: boolean;
+  adminUrl: string;
+}
+
+// Internal: tells the team a visitor asked to be contacted. Goes to the
+// contact inbox, with Reply-To set to the visitor when they left an email,
+// so answering is one click from the mail app.
+export async function sendSupportRequestNotification(req: SupportRequestNotification): Promise<boolean> {
+  const resend = getClient();
+  if (!resend) return false;
+
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding: 4px 0 4px 12px; color: #6b7280; white-space: nowrap; vertical-align: top;">${label}</td><td style="padding: 4px 0;">${value}</td></tr>`;
+  const phoneLinks = req.phone
+    ? `<a href="tel:${escapeHtml(req.phone)}" style="color: #0066d6;">${escapeHtml(formatPhoneForDisplay(req.phone))}</a> · <a href="${escapeHtml(whatsappLink(req.phone))}" style="color: #0066d6;">וואטסאפ</a>`
+    : null;
+
+  const { error } = await resend.emails.send({
+    from: "Saylo <support@saylolearn.com>",
+    to: CONTACT_EMAIL,
+    ...(req.email ? { replyTo: req.email } : {}),
+    subject: `פנייה חדשה: ${SUPPORT_TOPIC_LABELS[req.topic]} — ${req.name}`,
+    html: `
+      <div dir="rtl" style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
+        <h1 style="font-size: 20px; color: #0066d6; margin: 0 0 16px;">פנייה חדשה מעוזר התמיכה</h1>
+        <table style="font-size: 14px; border-collapse: collapse;">
+          ${row("שם", escapeHtml(req.name))}
+          ${row("נושא", SUPPORT_TOPIC_LABELS[req.topic])}
+          ${row("לחזור ב", `<strong>${SUPPORT_CHANNEL_LABELS[req.preferredChannel]}</strong>`)}
+          ${req.email ? row("אימייל", `<a href="mailto:${escapeHtml(req.email)}" style="color: #0066d6;">${escapeHtml(req.email)}</a>`) : ""}
+          ${phoneLinks ? row("טלפון", phoneLinks) : ""}
+          ${row("משתמש רשום", req.signedIn ? "כן" : "לא")}
+          ${req.pagePath ? row("עמוד", escapeHtml(req.pagePath)) : ""}
+        </table>
+        <h2 style="font-size: 15px; margin: 20px 0 6px;">ההודעה</h2>
+        <p style="white-space: pre-wrap; margin: 0; font-size: 14px;">${escapeHtml(req.message)}</p>
+        ${
+          req.aiSummary
+            ? `<h2 style="font-size: 15px; margin: 20px 0 6px;">סיכום השיחה (נכתב אוטומטית)</h2><p style="margin: 0; font-size: 14px; color: #374151;">${escapeHtml(req.aiSummary)}</p>`
+            : ""
+        }
+        <a href="${escapeHtml(req.adminUrl)}" style="display: inline-block; margin-top: 20px; padding: 10px 18px; background: #0066d6; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">לפנייה ולתמלול השיחה</a>
       </div>
     `,
   });

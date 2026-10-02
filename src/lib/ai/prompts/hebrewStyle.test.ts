@@ -9,6 +9,7 @@ import { buildSpeakingTestResponsePrompt } from "./speakingTestResponse";
 import { buildTeacherSuggestionPrompt } from "./teacherSuggestion";
 import { buildVocabularyTopicIntroPrompt } from "./vocabularyTopicIntro";
 import { buildWritingCoachPrompt } from "./writingCoach";
+import { SUPPORT_SYSTEM_PROMPT } from "@/lib/support/systemPrompt";
 
 // Every prompt whose reply is Hebrew shown to a learner must carry the
 // gender-neutral rule — a missing note is how a female-form "שימי לב" reached
@@ -30,6 +31,7 @@ describe("Hebrew gender-neutral note", () => {
       sampleWords: [{ headword: "shirt", translationHe: "חולצה" }],
     }),
     writingCoach: buildWritingCoachPrompt("Describe your day", "I woke up."),
+    supportAssistant: SUPPORT_SYSTEM_PROMPT,
   };
 
   for (const [name, prompt] of Object.entries(prompts)) {
