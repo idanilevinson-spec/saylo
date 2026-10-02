@@ -4,16 +4,33 @@ import { getModuleFormat } from "./moduleFormats";
 import { countWords } from "@/lib/patterns/textAnalysis";
 
 describe("BAGRUT_SAMPLE_UNITS", () => {
-  it("keeps every reading passage within its verified module's word-count range", () => {
+  it("keeps every reading passage within its verified module's word-count range, where one is defined", () => {
     for (const unit of BAGRUT_SAMPLE_UNITS) {
       const format = getModuleFormat(unit.moduleCode);
       const readingSection = format.sections.find((s) => s.nameHe === "הבנת הנקרא");
-      expect(readingSection?.wordCountRange).toBeDefined();
-      const [min, max] = readingSection!.wordCountRange!;
-      const words = countWords(unit.readingBodyEn);
-      expect(words).toBeGreaterThanOrEqual(min);
-      expect(words).toBeLessThanOrEqual(max);
+      expect(unit.readingPassages.length).toBeGreaterThan(0);
+      // Module D is pre-assigned literature, not a word-count-controlled
+      // passage — its format intentionally has no wordCountRange, so there's
+      // nothing to check it against here (see moduleFormats.ts).
+      if (!readingSection?.wordCountRange) continue;
+      const [min, max] = readingSection.wordCountRange;
+      // Module A has two separate passages, each independently expected to
+      // fall in range (not their combined word count) — every other
+      // verified module has exactly one passage, where this is equivalent
+      // to the old single-passage check.
+      for (const passage of unit.readingPassages) {
+        const words = countWords(passage);
+        expect(words).toBeGreaterThanOrEqual(min);
+        expect(words).toBeLessThanOrEqual(max);
+      }
     }
+  });
+
+  it("gives module D's pre-assigned-literature passage a plausible short-story length anyway", () => {
+    const moduleD = BAGRUT_SAMPLE_UNITS.find((u) => u.moduleCode === "D")!;
+    const words = countWords(moduleD.readingPassages[0]);
+    expect(words).toBeGreaterThanOrEqual(150);
+    expect(words).toBeLessThanOrEqual(500);
   });
 
   it("only builds sample content for modules whose structure is verified", () => {
@@ -94,7 +111,10 @@ describe("getPublishableSampleUnit", () => {
   });
 
   it("returns undefined for a module with no sample content at all", () => {
-    expect(getPublishableSampleUnit("G")).toBeUndefined();
+    // C is the one verified-structure-less-ironclad module left unbuilt —
+    // see moduleFormats.ts's sourceNotesHe for why (sources disagree on
+    // whether it even includes a writing section).
+    expect(getPublishableSampleUnit("C")).toBeUndefined();
   });
 });
 
