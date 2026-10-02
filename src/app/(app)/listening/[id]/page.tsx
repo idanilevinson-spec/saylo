@@ -5,6 +5,7 @@ import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ListeningPlayer from "@/components/ListeningPlayer";
 import MotionLink from "@/components/MotionLink";
+import ReportContentError from "@/components/ReportContentError";
 import { Target } from "lucide-react";
 import { getListeningClip } from "@/lib/content/listening";
 import { createClient } from "@/lib/supabase/serverClient";
@@ -79,6 +80,10 @@ export default async function ListeningClipPage({ params }: PageProps) {
           בדקו את ההבנה שלכם <Target size={16} />
         </MotionLink>
       )}
+
+      <div className="mt-3 flex justify-end">
+        <ReportContentError targetType="listening_clip" targetId={clip.id} />
+      </div>
     </div>
   );
 }
