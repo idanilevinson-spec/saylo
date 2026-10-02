@@ -7,6 +7,14 @@
 // exams are STRUCTURED (sections, point values, word counts), never at real
 // exam text, specifically so there would be nothing to accidentally echo.
 //
+// Module C is a special case worth flagging too: its structure was finally
+// confirmed (2026-10-02) by checking the real current official exam's own
+// instructions page (duration, point split, essay word-count instruction) —
+// not a third-party guide. The passage and questions in that real exam were
+// NOT read, used, or adapted for anything below; "The Repair Café" is an
+// unrelated, original topic composed independently, same discipline as
+// every other module here.
+//
 // Module D is a special case worth flagging explicitly: the real exam tests
 // specific literary works (a story and a poem) chosen by the Ministry and
 // studied in advance — we don't know, and can't guess, which works are on
@@ -134,6 +142,16 @@ What happened next surprised many residents. Instead of everyone retreating indo
 One elderly resident, who had lived on the street for over twenty years, later said it reminded her of neighborhood gatherings from decades earlier, before every building had its own security gate and every resident kept mostly to themselves. A teenager who lived two buildings down said it was the first time he had actually spoken to most of his neighbors, despite living there his whole life.
 
 The power finally returned just after midnight, four hours after it first went out. Most residents went back inside fairly quickly, but something had shifted. In the weeks that followed, several neighbors who met that night began organizing a monthly outdoor gathering, power outage or not — proof, some said, that it sometimes takes losing something ordinary to notice what had been missing all along.`;
+
+const REPAIR_CAFE_PASSAGE = `Every second Saturday of the month, the community hall in Oakdale fills up with an unusual kind of visitor. People arrive carrying broken toasters, torn jackets, wobbly chairs, and old radios that stopped working years ago. They are not there to sell these items or throw them away — they are there to fix them, with help from volunteers who call their gathering the Repair Café.
+
+The idea started three years ago when a retired electrician, Mr. Harel, grew frustrated watching neighbors throw away appliances that needed only a small part replaced. He put up a notice offering free repairs one Saturday a month, expecting perhaps a handful of people to show up. Instead, over thirty people arrived on the very first day, many of them simply curious to watch rather than needing anything fixed themselves.
+
+Word spread quickly, and other volunteers with different skills joined Mr. Harel: a seamstress who could mend torn clothing, a young engineering student who specialized in small electronics, and a carpenter who repaired wobbly furniture in exchange for nothing more than a cup of coffee. Visitors are never charged a fee, though many choose to leave a small donation toward the cost of tools and spare parts.
+
+What surprised the organizers most was not how many items got fixed, but how many friendships formed between people who had lived on the same street for years without ever really speaking. Teenagers waiting for their turn would end up chatting with elderly visitors about appliances neither of them actually understood, and several regular volunteers now meet for coffee outside of the monthly event entirely.
+
+Mr. Harel says the Repair Café was never really about the toasters. "People bring us their broken things," he says, "but what they actually leave with is time spent with a neighbor — something just as hard to find these days as a spare part for a thirty-year-old radio."`;
 
 const LAST_LESSON_STORY = `Mrs. Avram had taught the same classroom for thirty-one years. On her last day before retirement, she arrived earlier than usual, carrying a small cardboard box she planned to fill before noon.
 
@@ -311,6 +329,61 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
       promptEn:
         "Write a short message to a friend about a school or class project you took part in. Say what you did and how you felt about it.",
       wordCountRange: [35, 40],
+    },
+  },
+  {
+    moduleCode: "C",
+    titleHe: "דוגמה למודול C — קפה התיקונים",
+    teacherReviewed: false,
+    aiContentDisclosed: true,
+    readingPassages: [REPAIR_CAFE_PASSAGE],
+    readingQuestions: [
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "Why did Mr. Harel start the Repair Café?",
+        options: [
+          "He wanted to start a business repairing appliances",
+          "He was frustrated that neighbors threw away items that needed only small repairs",
+          "He needed extra income after retiring",
+          "A local company asked him to organize it",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "השלמת משפט",
+        promptEn:
+          "On the first day of the Repair Café, about thirty people showed up, and many of them came only to ___.",
+        modelAnswerHe: "תשובה: watch, not because they needed anything fixed themselves.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn: "According to the text, what different skills did the volunteers who joined Mr. Harel bring? Answer in your own words.",
+        modelAnswerHe: "תשובה מקובלת: תפירה ותיקון בגדים, תיקון מכשירים אלקטרוניים קטנים, ותיקון רהיטים.",
+      },
+      {
+        formatHe: "רב-ברירה",
+        promptEn: "How much do visitors pay to have something fixed at the Repair Café?",
+        options: [
+          "A fixed fee set by the organizers",
+          "Nothing, though many leave a small donation",
+          "Only the cost of spare parts",
+          "A membership fee paid once a year",
+        ],
+        correctOptionIndex: 1,
+        modelAnswerHe: "תשובה נכונה: B.",
+      },
+      {
+        formatHe: "שאלה פתוחה",
+        promptEn:
+          "According to Mr. Harel, what do people actually leave the Repair Café with, besides a fixed item? Support your answer with information from the text.",
+        modelAnswerHe: "תשובה מקובלת: זמן שבילו עם שכן — חיבור חברתי, לא רק הפריט המתוקן עצמו.",
+      },
+    ],
+    writingTask: {
+      promptEn:
+        "Describe a time when you helped someone or were helped by someone in your community. What happened, and how did it make you feel?",
+      wordCountRange: [70, 90],
     },
   },
   {
