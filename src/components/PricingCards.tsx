@@ -224,11 +224,6 @@ export default function PricingCards() {
             מדיניות הביטולים וההחזרים
           </Link>
           .
-          <span className="block mt-2">
-            המוכר: {BUSINESS_NAME}
-            {BUSINESS_REGISTRATION ? `, ${BUSINESS_REGISTRATION}` : ""}
-            {BUSINESS_ADDRESS ? `, ${BUSINESS_ADDRESS}` : ""}.
-          </span>
         </p>
       )}
 
@@ -297,6 +292,19 @@ export default function PricingCards() {
           שעות. שיחה עם המורה זמינה במנוי בתשלום בלבד, ולא בניסיון החינם.
         </p>
       </motion.div>
+
+      {/* Seller identification (name, business number, address) is required
+          on a page a sale happens from — Consumer Protection Law s.14C —
+          so it can't be dropped, only made quiet: smallest text on the
+          page, muted, and the last thing before the footer rather than
+          sitting right under the price cards. */}
+      {!isNative && (
+        <p className="max-w-3xl mx-auto mt-6 text-center text-[11px] text-muted/70 leading-relaxed">
+          המוכר: {BUSINESS_NAME}
+          {BUSINESS_REGISTRATION ? `, ${BUSINESS_REGISTRATION}` : ""}
+          {BUSINESS_ADDRESS ? `, ${BUSINESS_ADDRESS}` : ""}.
+        </p>
+      )}
     </section>
   );
 }
