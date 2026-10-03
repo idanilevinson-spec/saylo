@@ -85,6 +85,7 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
   const launcherRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const stickToBottomRef = useRef(true);
 
@@ -122,13 +123,46 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
     const small = window.matchMedia("(max-width: 639px)").matches;
     const previousOverflow = document.body.style.overflow;
     if (small) document.body.style.overflow = "hidden";
-    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 50);
+    // On a phone, focusing the input opens the keyboard over half the
+    // screen before the person has seen the suggestions; let them tap in.
+    const focusTimer = small ? undefined : window.setTimeout(() => inputRef.current?.focus(), 50);
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
       window.clearTimeout(focusTimer);
     };
   }, [open, close]);
+
+  // iOS (Safari and the app's WebView alike) shrinks only the *visual*
+  // viewport when the keyboard opens; a full-screen fixed panel keeps the
+  // full height, so its header and messages slide up off-screen and the
+  // input floats over nothing. On phones, pin the panel to the visual
+  // viewport instead: its height and offset follow the keyboard. Written
+  // straight to the element (not state) because it fires on every frame of
+  // the keyboard animation.
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!open || !viewport || !window.matchMedia("(max-width: 639px)").matches) return;
+    function fit() {
+      const panel = panelRef.current;
+      if (!panel || !viewport) return;
+      panel.style.height = `${viewport.height}px`;
+      panel.style.transform = `translateY(${viewport.offsetTop}px)`;
+      // With the keyboard up, the home-indicator inset sits under the
+      // keyboard, so padding for it would leave a gap above the keys.
+      const keyboardOpen = window.innerHeight - viewport.height > 120;
+      panel.style.paddingBottom = keyboardOpen ? "0px" : "env(safe-area-inset-bottom)";
+      const list = listRef.current;
+      if (list && stickToBottomRef.current) list.scrollTop = list.scrollHeight;
+    }
+    fit();
+    viewport.addEventListener("resize", fit);
+    viewport.addEventListener("scroll", fit);
+    return () => {
+      viewport.removeEventListener("resize", fit);
+      viewport.removeEventListener("scroll", fit);
+    };
+  }, [open]);
 
   // Follow the answer as it streams, unless the person scrolled up to
   // re-read something — then leave them where they are.
@@ -338,11 +372,14 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
 
       {open && (
         <section
+          ref={panelRef}
           id="support-panel"
           role="dialog"
           aria-modal="false"
           aria-labelledby="support-title"
-          className="fixed z-[59] inset-0 sm:inset-auto sm:bottom-20 sm:end-4 sm:w-[25rem] sm:h-[min(40rem,calc(100dvh-7rem))] flex flex-col bg-card sm:border sm:border-card-border sm:rounded-lg shadow-2xl overflow-hidden"
+          // z-[61]: above the accessibility button (z-60), which otherwise
+          // sits on top of the send button on a full-screen phone panel.
+          className="fixed z-[61] inset-x-0 top-0 h-[100dvh] sm:inset-auto sm:top-auto sm:bottom-20 sm:end-4 sm:w-[25rem] sm:h-[min(40rem,calc(100dvh-7rem))] flex flex-col bg-card sm:border sm:border-card-border sm:rounded-lg shadow-2xl overflow-hidden"
           style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
         >
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary sm:rounded-t-lg" />
