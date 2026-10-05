@@ -127,7 +127,7 @@ export default function AccessibilityWidget({ prefs, setPrefs }: AccessibilityWi
           role="dialog"
           aria-modal="false"
           aria-label="אפשרויות נגישות"
-          className="fixed bottom-20 end-4 z-[60] w-72 max-w-[calc(100vw-2rem)] bg-card border border-card-border rounded-lg shadow-2xl p-4"
+          className="fixed bottom-36 end-4 z-[60] w-72 max-w-[calc(100vw-2rem)] bg-card border border-card-border rounded-lg shadow-2xl p-4"
           style={{ marginBottom: "env(safe-area-inset-bottom)" }}
         >
           <div className="flex items-center justify-between mb-3">

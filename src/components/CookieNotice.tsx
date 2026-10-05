@@ -53,7 +53,7 @@ export default function CookieNotice() {
     <div
       role="region"
       aria-label="הודעה על עוגיות"
-      className="fixed inset-x-3 z-[55] bg-card border border-card-border rounded-lg shadow-2xl p-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] sm:inset-x-auto sm:start-4 sm:bottom-4 sm:max-w-md"
+      className="fixed inset-x-3 z-[55] bg-card border border-card-border rounded-lg shadow-2xl p-4 bottom-[calc(9rem+env(safe-area-inset-bottom))] sm:inset-x-auto sm:start-4 sm:bottom-4 sm:max-w-md"
     >
       <p className="text-sm leading-relaxed">
         האתר משתמש רק בעוגיות ובאחסון מקומי הכרחיים: כדי לשמור אתכם מחוברים ולזכור את ההעדפות שבחרתם. אין אצלנו

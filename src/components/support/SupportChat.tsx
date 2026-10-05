@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ReactMarkdown, { type Components } from "react-markdown";
 import { Capacitor } from "@capacitor/core";
-import { LifeBuoy, X, ArrowUp, Square, RotateCcw, ThumbsUp, ThumbsDown, UserRound, ShieldCheck, Loader2 } from "lucide-react";
+import { MessageCircleQuestionMark, X, ArrowUp, Square, RotateCcw, ThumbsUp, ThumbsDown, UserRound, ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { SUPPORT_MAX_MESSAGE_LENGTH, type SupportTopic } from "@/lib/support/topics";
 import SupportCallbackForm from "./SupportCallbackForm";
@@ -360,14 +360,21 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
         onClick={() => (open ? close() : setOpen(true))}
         aria-expanded={open}
         aria-controls="support-panel"
-        aria-haspopup="dialog"
-        className={`fixed bottom-4 end-20 z-[58] h-12 ps-3.5 pe-4 rounded-lg bg-card text-foreground border border-card-border shadow-lg flex items-center gap-2 text-sm font-medium hover:border-primary/60 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+        aria-label={open ? "סגירת חלון העזרה" : "עזרה ותמיכה"}
+        title={open ? "סגירה" : "עזרה ותמיכה"}
+        // Stacked directly above the accessibility button (bottom-4 end-4,
+        // also a 48px circle), so the two read as one column of tools in
+        // the corner instead of a wide bar across the bottom of a phone.
+        className={`fixed bottom-20 end-4 z-[58] w-12 h-12 rounded-full bg-card text-primary border border-card-border shadow-lg flex items-center justify-center hover:border-primary/60 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
           open ? "max-sm:hidden" : ""
         }`}
         style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       >
-        {open ? <X size={18} aria-hidden="true" /> : <LifeBuoy size={18} className="text-primary" aria-hidden="true" />}
-        <span>{open ? "סגירה" : "עזרה"}</span>
+        {open ? (
+          <X size={22} className="text-foreground" aria-hidden="true" />
+        ) : (
+          <MessageCircleQuestionMark size={24} aria-hidden="true" />
+        )}
       </button>
 
       {open && (
@@ -379,7 +386,7 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
           aria-labelledby="support-title"
           // z-[61]: above the accessibility button (z-60), which otherwise
           // sits on top of the send button on a full-screen phone panel.
-          className="fixed z-[61] inset-x-0 top-0 h-[100dvh] sm:inset-auto sm:top-auto sm:bottom-20 sm:end-4 sm:w-[25rem] sm:h-[min(40rem,calc(100dvh-7rem))] flex flex-col bg-card sm:border sm:border-card-border sm:rounded-lg shadow-2xl overflow-hidden"
+          className="fixed z-[61] inset-x-0 top-0 h-[100dvh] sm:inset-auto sm:top-auto sm:bottom-[8.5rem] sm:end-4 sm:w-[25rem] sm:h-[min(40rem,calc(100dvh-10rem))] flex flex-col bg-card sm:border sm:border-card-border sm:rounded-lg shadow-2xl overflow-hidden"
           style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
         >
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary sm:rounded-t-lg" />
