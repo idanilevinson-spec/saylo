@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/serverClient";
@@ -11,6 +11,8 @@ import { redactSensitiveNumbers } from "@/lib/support/redact";
 import { clientIp, ownerKey, supportHash, VISITOR_TOKEN_PATTERN } from "@/lib/support/identity";
 import { consumeRateLimit, SUPPORT_LIMITS } from "@/lib/support/rateLimit";
 import { SUPPORT_MAX_MESSAGE_LENGTH } from "@/lib/support/topics";
+import { OPENS_CONTACT_FORM, QUICK_REPLIES, isQuickReplyId, type QuickReplyId } from "@/lib/support/quickReplies";
+import { buildQuickAnswer, needsAccount } from "@/lib/support/quickAnswers";
 
 // A normal answer takes a few seconds; one with an account lookup and a
 // fallback re-run can take longer. Well under the platform ceiling.
@@ -22,13 +24,19 @@ const HISTORY_LIMIT = 30;
 const Body = z.object({
   conversationId: z.uuid().nullish(),
   visitorToken: z.string().regex(VISITOR_TOKEN_PATTERN),
-  message: z.string().trim().min(1).max(SUPPORT_MAX_MESSAGE_LENGTH),
+  // Either free text for the AI, or the id of a suggested question, whose
+  // answer is built instantly without it (quickReplies.ts).
+  message: z.string().trim().min(1).max(SUPPORT_MAX_MESSAGE_LENGTH).optional(),
+  quickReplyId: z
+    .string()
+    .refine((id) => isQuickReplyId(id) && id !== OPENS_CONTACT_FORM)
+    .optional(),
   pagePath: z.string().max(200).startsWith("/").nullish(),
   isNativeApp: z.boolean().optional(),
   // The widget only sends a message after the person agreed to the notice
   // about AI and data; the server records when.
   consent: z.literal(true),
-});
+}).refine((b) => b.message || b.quickReplyId);
 
 // The response is a stream of newline-delimited JSON events:
 //   {type:"conversation", id}   once, first
@@ -42,6 +50,14 @@ export async function POST(request: Request) {
   const parsed = Body.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "invalid_request" }, { status: 400 });
   const { conversationId, visitorToken, pagePath, isNativeApp } = parsed.data;
+
+  // A suggested question: answered without the AI, before any of the
+  // bookkeeping below (the schema already rejects OPENS_CONTACT_FORM, which
+  // the widget handles itself).
+  const quickReplyId = parsed.data.quickReplyId;
+  if (quickReplyId && isQuickReplyId(quickReplyId)) {
+    return answerQuickReply(request, parsed.data, quickReplyId);
+  }
 
   const supabase = await createClient();
   const {
@@ -91,7 +107,7 @@ export async function POST(request: Request) {
   }
   const convId = conversation.id;
 
-  const { text: message, redacted } = redactSensitiveNumbers(parsed.data.message);
+  const { text: message, redacted } = redactSensitiveNumbers(parsed.data.message ?? "");
 
   const [{ data: prior }, { data: profile }] = await Promise.all([
     supabaseAdmin
@@ -203,5 +219,87 @@ export async function POST(request: Request) {
       // Stops proxies from buffering the stream into one late chunk.
       "X-Accel-Buffering": "no",
     },
+  });
+}
+
+type AnswerableQuickReply = Exclude<QuickReplyId, typeof OPENS_CONTACT_FORM>;
+
+const ACCOUNT_LOOKUP_FAILED = "לא הצלחתי לבדוק את החשבון כרגע. אפשר לנסות שוב בעוד רגע, או לבדוק ב[פרופיל](/profile).";
+
+// The instant path for a suggested question. Only what the answer itself
+// needs happens before replying — nothing for general questions, one
+// account read for account questions. Saving the exchange (so the AI sees it
+// as context for a follow-up), the rate-limit record and the ownership
+// check all run after the response has gone out, via after(). That's the
+// difference between ~2s of sequential database round trips and an answer
+// that appears as soon as it's tapped.
+async function answerQuickReply(request: Request, body: z.infer<typeof Body>, id: AnswerableQuickReply) {
+  const supabase = await createClient();
+  const user = needsAccount(id) ? (await supabase.auth.getUser()).data.user : null;
+  const account = user ? await readAccountStatus(supabase, user).catch(() => null) : null;
+  const answer =
+    user && !account
+      ? ACCOUNT_LOOKUP_FAILED
+      : buildQuickAnswer(id, { signedIn: !!user, isNativeApp: !!body.isNativeApp, account });
+
+  // Ids are minted here so the widget can keep the conversation and rate
+  // the answer before the background save has finished.
+  const conversationId = body.conversationId ?? crypto.randomUUID();
+  const assistantMessageId = crypto.randomUUID();
+  const ip = clientIp(request);
+
+  after(async () => {
+    const db = await createClient();
+    const knownUser = user ?? (await db.auth.getUser()).data.user;
+    const limits: { hash: string; limit: number }[] = [{ hash: supportHash("ip", ip), limit: SUPPORT_LIMITS.messagesPerIp }];
+    if (knownUser) limits.push({ hash: supportHash("profile", knownUser.id), limit: SUPPORT_LIMITS.messagesPerProfile });
+    if (!(await consumeRateLimit(limits, "message"))) return;
+
+    const ownerKeyHash = ownerKey(knownUser?.id ?? null, body.visitorToken);
+    const { data: existing } = await supabaseAdmin
+      .from("support_conversations")
+      .select("id, message_count")
+      .eq("id", conversationId)
+      .eq("owner_key_hash", ownerKeyHash)
+      .maybeSingle();
+    let messageCount = existing?.message_count ?? 0;
+    if (!existing) {
+      // Fails on an id that belongs to someone else (primary key taken):
+      // then nothing is saved, and the widget's next AI message simply
+      // starts a fresh conversation.
+      const { error } = await supabaseAdmin.from("support_conversations").insert({
+        id: conversationId,
+        profile_id: knownUser?.id ?? null,
+        owner_key_hash: ownerKeyHash,
+        page_path: body.pagePath ?? null,
+        consented_at: new Date().toISOString(),
+      });
+      if (error) return;
+      messageCount = 0;
+    }
+    await supabaseAdmin.from("support_messages").insert({ conversation_id: conversationId, role: "user", content: QUICK_REPLIES[id] });
+    await Promise.all([
+      supabaseAdmin.from("support_messages").insert({
+        id: assistantMessageId,
+        conversation_id: conversationId,
+        role: "assistant",
+        content: answer,
+        input_tokens: 0,
+        output_tokens: 0,
+      }),
+      supabaseAdmin
+        .from("support_conversations")
+        .update({ message_count: messageCount + 2, last_message_at: new Date().toISOString() })
+        .eq("id", conversationId),
+    ]);
+  });
+
+  const events = [
+    { type: "conversation", id: conversationId },
+    { type: "text", delta: answer },
+    { type: "done", messageId: assistantMessageId },
+  ];
+  return new Response(events.map((event) => JSON.stringify(event)).join("\n") + "\n", {
+    headers: { "Content-Type": "application/x-ndjson; charset=utf-8", "Cache-Control": "no-store" },
   });
 }
