@@ -8,6 +8,7 @@ import { Capacitor } from "@capacitor/core";
 import { MessageCircleQuestionMark, X, ArrowUp, Square, RotateCcw, ThumbsUp, ThumbsDown, UserRound, ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { SUPPORT_MAX_MESSAGE_LENGTH, type SupportTopic } from "@/lib/support/topics";
+import { OPENS_CONTACT_FORM, QUICK_REPLIES, suggestionsFor, type QuickReplyId } from "@/lib/support/quickReplies";
 import SupportCallbackForm from "./SupportCallbackForm";
 import {
   OPEN_SUPPORT_EVENT,
@@ -31,24 +32,6 @@ const ERROR_TEXT: Record<string, string> = {
   offline: "אין חיבור לאינטרנט. בדקו את החיבור ונסו שוב.",
   failed: "משהו השתבש בתשובה. נסו שוב, או השאירו פרטים ונחזור אליכם.",
 };
-
-// Starting points that match where the person is, so the first tap is
-// already a real question. Plain wording a person would actually type.
-function suggestionsFor(pathname: string, signedIn: boolean): string[] {
-  if (pathname.startsWith("/pricing")) {
-    return ["מה ההבדל בין המסלולים?", "אפשר לבטל מתי שרוצים?", "מה כלול בתקופת הניסיון?"];
-  }
-  if (pathname.startsWith("/profile")) {
-    return ["איך מבטלים את המנוי?", "איך מכבים את המיילים?", "איך מוחקים את החשבון?"];
-  }
-  if (pathname.startsWith("/speaking")) {
-    return ["למה השיחה עם המורה לא זמינה לי?", "המיקרופון לא עובד", "יש מגבלה על מספר השיחות?"];
-  }
-  if (!signedIn) {
-    return ["מה זה Saylo?", "כמה זה עולה?", "זה מתאים גם לילדים?"];
-  }
-  return ["מה מצב המנוי שלי?", "למה אין לי לבבות?", "אפשר לדבר עם מישהו מהצוות?"];
-}
 
 function localId() {
   return Math.random().toString(36).slice(2, 10);
@@ -185,7 +168,9 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
     });
   }
 
-  async function send(text: string) {
+  // quickReplyId: a suggested question, answered instantly by the server
+  // without the AI (quickReplies.ts); the text is still shown as asked.
+  async function send(text: string, quickReplyId?: QuickReplyId) {
     const message = text.trim().slice(0, SUPPORT_MAX_MESSAGE_LENGTH);
     if (!message || streaming) return;
     if (typeof navigator !== "undefined" && !navigator.onLine) {
@@ -218,7 +203,7 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
         body: JSON.stringify({
           conversationId,
           visitorToken: visitorToken(),
-          message,
+          ...(quickReplyId ? { quickReplyId } : { message }),
           pagePath: pathname,
           isNativeApp: Capacitor.isNativePlatform(),
           consent: true,
@@ -485,14 +470,14 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
                       שלום. אפשר לשאול כאן על המנוי, החשבון, תקלות או כל דבר אחר ב-Saylo.
                     </p>
                     <div className="mt-3 flex flex-col items-start gap-1.5">
-                      {suggestionsFor(pathname, !!userId).map((s) => (
+                      {suggestionsFor(pathname, !!userId).map((id) => (
                         <button
-                          key={s}
+                          key={id}
                           type="button"
-                          onClick={() => send(s)}
+                          onClick={() => (id === OPENS_CONTACT_FORM ? setManualForm(true) : send(QUICK_REPLIES[id], id))}
                           className="text-start text-sm px-3 py-1.5 rounded-lg border border-card-border hover:border-primary/60 hover:bg-background-2 transition-colors"
                         >
-                          {s}
+                          {QUICK_REPLIES[id]}
                         </button>
                       ))}
                     </div>
