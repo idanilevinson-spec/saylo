@@ -10,6 +10,7 @@ const TABS = [
   { href: "/admin/users", label: "משתמשים" },
   { href: "/admin/content", label: "תוכן" },
   { href: "/admin/support", label: "פניות" },
+  { href: "/admin/billing", label: "קבלות" },
   { href: "/admin/moderation", label: "בקרת תוכן" },
   { href: "/admin/analytics", label: "אנליטיקס" },
 ];

@@ -510,6 +510,30 @@ export interface ContentReport {
   resolved_at: string | null;
 }
 
+export interface BillingDocument {
+  id: string;
+  profile_id: string | null;
+  payment_ref: string;
+  source: "checkout" | "renewal" | "manual";
+  doc_type: "receipt";
+  status: "pending" | "issued" | "failed";
+  amount_ils: number;
+  payment_method: "credit-card" | "bank-transfer" | "cash" | "payment-app" | "other";
+  description: string;
+  customer_name: string;
+  customer_email: string | null;
+  paid_at: string;
+  doc_uid: string | null;
+  doc_number: string | null;
+  pdf_url: string | null;
+  issued_at: string | null;
+  attempts: number;
+  last_error: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AdminAuditLog {
   id: string;
   admin_profile_id: string;
@@ -710,6 +734,12 @@ export interface Database {
         Row: ContentReport;
         Insert: Partial<ContentReport> & Pick<ContentReport, "target_type" | "target_id" | "reason">;
         Update: Partial<ContentReport>;
+      };
+      billing_documents: {
+        Row: BillingDocument;
+        Insert: Partial<BillingDocument> &
+          Pick<BillingDocument, "payment_ref" | "source" | "amount_ils" | "description" | "customer_name">;
+        Update: Partial<BillingDocument>;
       };
       admin_audit_log: {
         Row: AdminAuditLog;
