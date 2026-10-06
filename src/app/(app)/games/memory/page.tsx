@@ -2,17 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Brain, Trophy } from "lucide-react";
+import { Brain } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import GameResults, { withReplay } from "@/components/games/GameResults";
 import { getDailyReview } from "@/lib/srs/queue";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import { supabase } from "@/lib/supabase/browserClient";
 import { shuffle } from "@/lib/utils/shuffle";
 import IconBadge from "@/components/IconBadge";
-import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
-import { GameCompletionScore } from "@/components/games/GameMoments";
 
 const PAIR_COUNT = 6;
 const COMPARE_DELAY = 700;
@@ -26,8 +25,9 @@ interface Card {
 
 type Phase = "loading" | "empty" | "playing" | "finished";
 
-export default function MemoryGamePage() {
+function MemoryGamePage({ onReplay }: { onReplay: () => void }) {
   const { profile, loading: authLoading } = useAuth();
+  const [startedAt] = useState(() => Date.now());
   const [phase, setPhase] = useState<Phase>("loading");
   const [cards, setCards] = useState<Card[]>([]);
   const [flipped, setFlipped] = useState<string[]>([]);
@@ -139,33 +139,19 @@ export default function MemoryGamePage() {
   }
 
   if (phase === "finished") {
+    const pairs = cards
+      .filter((c) => c.isEnglish)
+      .map((c) => ({ headword: c.label, translationHe: cards.find((o) => !o.isEnglish && o.vocabularyItemId === c.vocabularyItemId)?.label ?? "" }));
     return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">משחק הזיכרון הושלם!</h1>
-        <GameCompletionScore>
-          <EnglishText as="span">{comparisons}</EnglishText>
-        </GameCompletionScore>
-        <p className="mt-1 text-muted">ניסיונות למצוא את כל {pairTotal} הזוגות</p>
-        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games/memory"
-            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            עוד סיבוב
-          </MotionLink>
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games"
-            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            חזרה למשחקים
-          </MotionLink>
-        </div>
-      </div>
+      <GameResults
+        title="כל הזוגות נמצאו"
+        score={comparisons}
+        detail={<>ניסיונות למצוא את כל {pairTotal} הזוגות. פחות ניסיונות = זיכרון טוב יותר.</>}
+        startedAt={startedAt}
+        missed={[]}
+        recap={{ title: "המילים בסיבוב", words: pairs }}
+        onReplay={onReplay}
+      />
     );
   }
 
@@ -223,3 +209,5 @@ export default function MemoryGamePage() {
     </div>
   );
 }
+
+export default withReplay(MemoryGamePage);

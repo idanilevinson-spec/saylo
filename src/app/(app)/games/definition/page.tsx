@@ -2,22 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpenCheck, Trophy, CheckCircle2, XCircle } from "lucide-react";
+import { BookOpenCheck, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { supabase } from "@/lib/supabase/browserClient";
 import { getDefinitionGameWords, type DefinitionGameItem } from "@/lib/games/definitionWords";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
-import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
-import { GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
+import { GameFeedback } from "@/components/games/GameMoments";
 
 const ROUND_SIZE = 10;
 
-export default function DefinitionGamePage() {
+function DefinitionGamePage({ onReplay }: { onReplay: () => void }) {
   const { profile, loading } = useAuth();
+  const [startedAt] = useState(() => Date.now());
+  const [missed, setMissed] = useState<MissedWord[]>([]);
   const [items, setItems] = useState<DefinitionGameItem[] | null>(null);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -46,6 +48,7 @@ export default function DefinitionGamePage() {
       setCorrectCount(correctCountRef.current);
     } else {
       playIncorrectSound();
+      setMissed((m) => [...m, { headword: item.headword, translationHe: item.translationHe }]);
     }
     const res = await recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_definition");
     xpAwardedRef.current += res.xpAwarded;
@@ -85,32 +88,16 @@ export default function DefinitionGamePage() {
   }
 
   if (finished) {
-    const accuracy = Math.round((correctCount / items.length) * 100);
     return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">זיהוי לפי הגדרה הושלם!</h1>
-        <GameCompletionScore>{accuracy}%</GameCompletionScore>
-        <p className="mt-2 text-muted">{correctCount} מתוך {items.length} נכונות</p>
-        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games/definition"
-            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            עוד סיבוב
-          </MotionLink>
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games"
-            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            חזרה למשחקים
-          </MotionLink>
-        </div>
-      </div>
+      <GameResults
+        title="סיבוב ההגדרות הסתיים"
+        percent={Math.round((correctCount / items.length) * 100)}
+        detail=<>{correctCount} מתוך {items.length} נכונות</>
+        gameType="definition"
+        startedAt={startedAt}
+        missed={missed}
+        onReplay={onReplay}
+      />
     );
   }
 
@@ -172,3 +159,5 @@ export default function DefinitionGamePage() {
     </HeartsGate>
   );
 }
+
+export default withReplay(DefinitionGamePage);
