@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { chargeToken } from "@/lib/subscriptions/payplusClient";
+import { planDescription, recordPaymentAndIssueReceipt, retryOpenReceipts } from "@/lib/billing/receipts";
+import { customerForProfile } from "@/lib/billing/customer";
 
 // Daily job (see vercel.json). The PayPlus account has no permission for
 // PayPlus's own recurring-billing engine, only for card tokenization (see
@@ -20,7 +22,7 @@ export async function GET(request: Request) {
 
   const { data: due, error: queryError } = await supabaseAdmin
     .from("subscriptions")
-    .select("profile_id, current_period_end, payplus_token, payplus_customer_uid, subscription_plans(months, price_ils)")
+    .select("profile_id, current_period_end, payplus_token, payplus_customer_uid, subscription_plans(months, price_ils, code)")
     .eq("billing_provider", "payplus")
     .eq("status", "active")
     .eq("cancel_at_period_end", false)
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
   let skipped = 0;
 
   for (const sub of due ?? []) {
-    const plan = sub.subscription_plans as unknown as { months: number; price_ils: number } | null;
+    const plan = sub.subscription_plans as unknown as { months: number; price_ils: number; code: string } | null;
     if (!plan || !sub.payplus_token || !sub.payplus_customer_uid) {
       console.error("payplus renewals: skipping", sub.profile_id, "— missing token, customer_uid or plan");
       skipped++;
@@ -62,6 +64,19 @@ export async function GET(request: Request) {
         .update({ current_period_end: nextPeriodEnd.toISOString(), updated_at: new Date().toISOString() })
         .eq("profile_id", sub.profile_id);
       charged++;
+
+      // Keyed on the period being paid for, so a rerun of this job on the
+      // same day can't record the same renewal twice.
+      const customer = await customerForProfile(sub.profile_id);
+      await recordPaymentAndIssueReceipt({
+        paymentRef: `renewal:${sub.profile_id}:${String(sub.current_period_end).slice(0, 10)}`,
+        source: "renewal",
+        profileId: sub.profile_id,
+        amountIls: plan.price_ils,
+        description: planDescription(plan.code),
+        customerName: customer.name,
+        customerEmail: customer.email,
+      });
     } catch (err) {
       console.error("payplus renewals: charge failed for", sub.profile_id, err);
       await supabaseAdmin
@@ -72,5 +87,9 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({ charged, failed, skipped });
+  // Receipts that couldn't be issued earlier (Invoice+ down, not yet
+  // switched on) get another try every day.
+  const receipts = await retryOpenReceipts();
+
+  return NextResponse.json({ charged, failed, skipped, receipts });
 }

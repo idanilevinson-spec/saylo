@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Star, Trophy, Flame, CreditCard } from "lucide-react";
+import { Star, Trophy, Flame, CreditCard, FileText } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { AGE_BAND_LABELS } from "@/lib/auth/ageBand";
 import { supabase } from "@/lib/supabase/browserClient";
-import type { Subscription } from "@/types/database";
+import type { BillingDocument, Subscription } from "@/types/database";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
@@ -33,6 +33,7 @@ export default function ProfilePage() {
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [planLabel, setPlanLabel] = useState<string | null>(null);
+  const [receipts, setReceipts] = useState<Pick<BillingDocument, "id" | "doc_number" | "amount_ils" | "paid_at" | "pdf_url">[]>([]);
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
@@ -136,6 +137,15 @@ export default function ProfilePage() {
           if (plan) setPlanLabel(plan.months === 1 ? "מנוי חודשי" : `מנוי ל-${plan.months} חודשים`);
         }
       });
+    // RLS only returns this person's own issued receipts.
+    supabase
+      .from("billing_documents")
+      .select("id, doc_number, amount_ils, paid_at, pdf_url")
+      .eq("profile_id", profile.id)
+      .eq("status", "issued")
+      .order("paid_at", { ascending: false })
+      .limit(24)
+      .then(({ data }) => setReceipts(data ?? []));
   }, [profile]);
 
   async function submitCancelToggle(cancelAtPeriodEnd: boolean) {
@@ -352,6 +362,29 @@ export default function ProfilePage() {
             <p role="alert" className="text-sm text-danger">
               {cancelError}
             </p>
+          )}
+
+          {receipts.length > 0 && (
+            <div className="pt-3 border-t border-card-border">
+              <h3 className="text-sm font-medium flex items-center gap-1.5">
+                <FileText size={14} aria-hidden="true" /> קבלות
+              </h3>
+              <ul className="mt-2 divide-y divide-card-border text-sm">
+                {receipts.map((r) => (
+                  <li key={r.id} className="flex items-center justify-between gap-3 py-2">
+                    <span className="text-muted tabular-nums">{formatDate(r.paid_at)}</span>
+                    <span className="tabular-nums">₪{Number(r.amount_ils).toLocaleString("he-IL")}</span>
+                    {r.pdf_url ? (
+                      <a href={r.pdf_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline tabular-nums">
+                        קבלה {r.doc_number}
+                      </a>
+                    ) : (
+                      <span className="tabular-nums">קבלה {r.doc_number}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </motion.div>
       )}

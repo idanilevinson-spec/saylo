@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { isValidPayplusCallback } from "@/lib/subscriptions/payplusClient";
+import { planDescription, recordPaymentAndIssueReceipt } from "@/lib/billing/receipts";
+import { customerForProfile } from "@/lib/billing/customer";
 
 // PayPlus calls this directly (server-to-server) for the initial checkout
 // charge — there's no user session here, so the HMAC hash check IS the
@@ -16,19 +18,22 @@ import { isValidPayplusCallback } from "@/lib/subscriptions/payplusClient";
 // result synchronously and doesn't need a callback at all. So this is also
 // the only place the card token/customer_uid is ever captured, which makes
 // getting it right on this call the one thing that matters for every later
-// renewal to work. PayPlus's own IPN docs don't give a concrete example
-// payload for create_token, so the full raw body is logged unconditionally
-// (not just on a parse failure) — check it after the first real signup to
-// confirm these paths are actually where the token/customer_uid land.
+// renewal to work.
+//
+// PayPlus's own IPN docs don't give a concrete example payload, and the
+// first real test charge proved the generic docs example was wrong: status
+// and more_info are nested under `transaction`, NOT top-level, which meant
+// every successful charge was silently falling into the `else` (failure)
+// branch below and never writing a subscription row at all. The shape here
+// is taken from that real logged payload, not the docs — see the raw body
+// log line if PayPlus ever changes it again.
 interface PayplusCallback {
-  status_code?: string;
-  more_info?: string;
-  recurring_charge_information?: { recurring_uid?: string };
+  transaction?: { uid?: string; status_code?: string; more_info?: string };
   data?: {
-    token?: string;
     customer_uid?: string;
     card_information?: { token?: string };
-    data?: { token?: string; customer_uid?: string };
+    transaction_uid?: string;
+    transaction?: { uid?: string };
   };
 }
 
@@ -43,17 +48,16 @@ export async function POST(request: Request) {
   const event = JSON.parse(rawBody) as PayplusCallback;
   let moreInfo: { profile_id?: string; plan_id?: string } = {};
   try {
-    moreInfo = event.more_info ? JSON.parse(event.more_info) : {};
+    moreInfo = event.transaction?.more_info ? JSON.parse(event.transaction.more_info) : {};
   } catch {
     return NextResponse.json({ error: "unparseable more_info" }, { status: 400 });
   }
   const profileId = moreInfo.profile_id;
   if (!profileId) return NextResponse.json({ error: "missing profile_id" }, { status: 400 });
 
-  const succeeded = event.status_code === "000";
-  const recurringUid = event.recurring_charge_information?.recurring_uid ?? null;
-  const token = event.data?.token ?? event.data?.card_information?.token ?? event.data?.data?.token ?? null;
-  const customerUid = event.data?.customer_uid ?? event.data?.data?.customer_uid ?? null;
+  const succeeded = event.transaction?.status_code === "000";
+  const token = event.data?.card_information?.token ?? null;
+  const customerUid = event.data?.customer_uid ?? null;
 
   if (succeeded) {
     if (!token || !customerUid) {
@@ -63,7 +67,7 @@ export async function POST(request: Request) {
 
     const { data: plan } = await supabaseAdmin
       .from("subscription_plans")
-      .select("months")
+      .select("months, price_ils, code")
       .eq("id", moreInfo.plan_id ?? "")
       .maybeSingle();
     const months = plan?.months ?? 1;
@@ -75,7 +79,6 @@ export async function POST(request: Request) {
       plan_id: moreInfo.plan_id ?? null,
       status: "active",
       billing_provider: "payplus",
-      payplus_recurring_uid: recurringUid,
       payplus_token: token,
       payplus_customer_uid: customerUid,
       current_period_end: periodEnd.toISOString(),
@@ -85,6 +88,22 @@ export async function POST(request: Request) {
     if (error) {
       console.error("payplus webhook write failed:", error.message);
       return NextResponse.json({ error: "write failed" }, { status: 500 });
+    }
+
+    // The receipt. Keyed on PayPlus's transaction uid so a redelivered
+    // callback finds the same row instead of issuing a second document.
+    const transactionUid = event.transaction?.uid ?? event.data?.transaction_uid ?? event.data?.transaction?.uid ?? null;
+    if (plan?.price_ils) {
+      const customer = await customerForProfile(profileId);
+      await recordPaymentAndIssueReceipt({
+        paymentRef: transactionUid ? `payplus:${transactionUid}` : `checkout:${profileId}:${periodEnd.toISOString().slice(0, 10)}`,
+        source: "checkout",
+        profileId,
+        amountIls: plan.price_ils,
+        description: planDescription(plan.code),
+        customerName: customer.name,
+        customerEmail: customer.email,
+      });
     }
   } else {
     const { error } = await supabaseAdmin
