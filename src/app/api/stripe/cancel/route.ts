@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { stripe } from "@/lib/subscriptions/stripeClient";
-import { setRecurringValid } from "@/lib/subscriptions/payplusClient";
 
 // Cancels (or un-cancels) at period end, never immediately — the user keeps
 // the access they already paid for through current_period_end, and billing
@@ -27,7 +26,7 @@ export async function POST(request: Request) {
 
   const { data: sub } = await supabase
     .from("subscriptions")
-    .select("stripe_subscription_id, payplus_recurring_uid, status, billing_provider")
+    .select("stripe_subscription_id, status, billing_provider")
     .eq("profile_id", user.id)
     .maybeSingle();
 
@@ -50,10 +49,9 @@ export async function POST(request: Request) {
   }
 
   if (sub.billing_provider === "payplus") {
-    if (!sub.payplus_recurring_uid) {
-      return NextResponse.json({ error: "no active paid subscription to update" }, { status: 400 });
-    }
-    await setRecurringValid(sub.payplus_recurring_uid, !cancelAtPeriodEnd);
+    // No PayPlus-side toggle needed: renewals are charged by our own
+    // api/cron/payplus-renewals job, which already skips any row with
+    // cancel_at_period_end set, so flipping it here is the whole operation.
     await supabaseAdmin
       .from("subscriptions")
       .update({ cancel_at_period_end: cancelAtPeriodEnd, updated_at: new Date().toISOString() })

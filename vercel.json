@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/support-cleanup",
       "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/api/cron/payplus-renewals",
+      "schedule": "0 5 * * *"
     }
   ]
 }

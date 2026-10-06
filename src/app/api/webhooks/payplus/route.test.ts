@@ -66,11 +66,11 @@ describe("POST /api/webhooks/payplus", () => {
     expect(res.status).toBe(400);
   });
 
-  it("activates the subscription on a successful charge", async () => {
+  it("activates the subscription and stores the card token on a successful charge", async () => {
     const body = JSON.stringify({
       status_code: "000",
       more_info: JSON.stringify({ profile_id: "profile-1", plan_id: "plan-1" }),
-      recurring_charge_information: { recurring_uid: "rec-1" },
+      data: { token: "tok-1", customer_uid: "cust-1" },
     });
 
     const res = await POST(request(body));
@@ -82,9 +82,25 @@ describe("POST /api/webhooks/payplus", () => {
         plan_id: "plan-1",
         status: "active",
         billing_provider: "payplus",
-        payplus_recurring_uid: "rec-1",
+        payplus_token: "tok-1",
+        payplus_customer_uid: "cust-1",
         cancel_at_period_end: false,
       })
+    );
+  });
+
+  it("logs an error but still activates when no token comes back on a successful charge", async () => {
+    const body = JSON.stringify({
+      status_code: "000",
+      more_info: JSON.stringify({ profile_id: "profile-1", plan_id: "plan-1" }),
+    });
+
+    const res = await POST(request(body));
+
+    expect(res.status).toBe(200);
+    expect(console.error).toHaveBeenCalledWith(expect.stringContaining("no card token captured"), "profile-1");
+    expect(upsert).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ payplus_token: null, payplus_customer_uid: null })
     );
   });
 

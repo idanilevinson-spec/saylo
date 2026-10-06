@@ -463,6 +463,9 @@ export interface Subscription {
   billing_provider: "stripe" | "payplus" | "apple";
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
+  payplus_recurring_uid: string | null;
+  payplus_customer_uid: string | null;
+  payplus_token: string | null;
   trial_ends_at: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;

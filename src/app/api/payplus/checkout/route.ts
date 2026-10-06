@@ -25,7 +25,6 @@ export async function POST(request: Request) {
     const { payment_page_link } = await generatePaymentPageLink({
       amount: plan.price_ils,
       planLabel: plan.code,
-      months: plan.months,
       customerName: user.user_metadata?.display_name ?? user.email ?? "Saylo",
       customerEmail: user.email ?? "",
       moreInfo: JSON.stringify({ profile_id: user.id, plan_id: plan.id }),

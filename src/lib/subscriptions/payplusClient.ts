@@ -15,7 +15,6 @@ function requiredEnv(name: string): string {
 interface GenerateLinkParams {
   amount: number;
   planLabel: string;
-  months: number;
   customerName: string;
   customerEmail: string;
   moreInfo: string;
@@ -28,9 +27,12 @@ interface GenerateLinkResponse {
   data: { payment_page_link: string; page_request_uid: string };
 }
 
-// A hosted checkout page that, once paid, PayPlus itself re-charges on the
-// given schedule (charge_method 3) — no separate per-renewal API call is
-// needed on our side, unlike PayPlus's lower-level RecurringPayments/Add.
+// The merchant account isn't approved for PayPlus's own recurring-billing
+// engine (charge_method 3 + recurring_settings — that call returns
+// 422 "dont-have-permission-recurring-payment"), only for tokenization.
+// So this is a plain one-time charge that also asks PayPlus to hand back a
+// reusable card token (create_token) — see chargeToken below, and the
+// api/cron/payplus-renewals job that actually charges it again each period.
 export async function generatePaymentPageLink(params: GenerateLinkParams): Promise<GenerateLinkResponse["data"]> {
   const res = await fetch(`${BASE_URL}/PaymentPages/generateLink`, {
     method: "POST",
@@ -41,7 +43,8 @@ export async function generatePaymentPageLink(params: GenerateLinkParams): Promi
     },
     body: JSON.stringify({
       payment_page_uid: requiredEnv("PAYPLUS_PAYMENT_PAGE_UID"),
-      charge_method: 3,
+      charge_method: 1,
+      create_token: true,
       amount: params.amount,
       currency_code: "ILS",
       sendEmailApproval: true,
@@ -53,16 +56,6 @@ export async function generatePaymentPageLink(params: GenerateLinkParams): Promi
       refURL_failure: params.failureUrl,
       refURL_callback: params.callbackUrl,
       send_failure_callback: true,
-      recurring_settings: {
-        instant_first_payment: true,
-        recurring_type: 2, // monthly
-        recurring_range: params.months, // every `months` months
-        number_of_charges: 0, // unlimited, until cancelled
-        start_date_on_payment_date: true,
-        successful_invoice: true,
-        customer_failure_email: true,
-        send_customer_success_email: true,
-      },
     }),
   });
 
@@ -83,23 +76,50 @@ export async function generatePaymentPageLink(params: GenerateLinkParams): Promi
   return body.data;
 }
 
-// Turns future recurring charges on/off without touching what's already been
-// paid — the same on/off toggle as Stripe's cancel_at_period_end, just an
-// explicit boolean instead of a cancel/reactivate pair of calls. See
-// https://docs.payplus.co.il/reference/post_recurringpayments-uid-valid.
-export async function setRecurringValid(recurringUid: string, isValid: boolean): Promise<void> {
-  const res = await fetch(`${BASE_URL}/RecurringPayments/${recurringUid}/Valid`, {
+interface ChargeTokenParams {
+  amount: number;
+  token: string;
+  customerUid: string;
+  profileId: string;
+}
+
+// Charges a card token saved from an earlier generatePaymentPageLink call
+// (create_token: true) — this is how api/cron/payplus-renewals bills each
+// plan's renewal itself, since the account has no permission to let PayPlus
+// run its own recurring schedule. Synchronous: the result is known from the
+// response here, no separate IPN callback involved for this charge.
+// See https://docs.payplus.co.il/reference/post_transactions-charge.
+export async function chargeToken(params: ChargeTokenParams): Promise<void> {
+  const res = await fetch(`${BASE_URL}/Transactions/Charge`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "api-key": requiredEnv("PAYPLUS_API_KEY"),
       "secret-key": requiredEnv("PAYPLUS_SECRET_KEY"),
     },
-    body: JSON.stringify({ is_valid: isValid }),
+    body: JSON.stringify({
+      terminal_uid: requiredEnv("PAYPLUS_TERMINAL_UID"),
+      cashier_uid: requiredEnv("PAYPLUS_CASHIER_UID"),
+      amount: params.amount,
+      currency_code: "ILS",
+      credit_terms: 1,
+      use_token: true,
+      token: params.token,
+      customer_uid: params.customerUid,
+      more_info_1: params.profileId,
+    }),
   });
-  const body = await res.json();
-  if (!res.ok || body?.results?.status !== "success") {
-    throw new Error(`PayPlus set recurring validity failed: ${JSON.stringify(body)}`);
+
+  const raw = await res.text();
+  let body: { results?: { status?: string }; data?: { transaction?: { status_code?: string } } };
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    throw new Error(`PayPlus charge returned non-JSON (status ${res.status}): ${raw}`);
+  }
+  const succeeded = res.ok && body?.results?.status === "success" && body?.data?.transaction?.status_code === "000";
+  if (!succeeded) {
+    throw new Error(`PayPlus token charge failed (status ${res.status}): ${raw}`);
   }
 }
 
