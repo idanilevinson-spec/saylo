@@ -227,6 +227,16 @@ export default function PricingCards() {
         </p>
       )}
 
+      {/* Apple Pay's own one-time device token can't be charged again for an
+          automatic renewal (confirmed against a real decline, not a guess) —
+          disclosed here rather than left to surprise someone when their
+          subscription quietly lapses. */}
+      {!isNative && (
+        <p className="max-w-3xl mx-auto mt-2 text-center text-[11px] text-muted/70 leading-relaxed">
+          בתשלום דרך Apple Pay החידוש האוטומטי אינו נתמך כרגע — בתום התקופה יהיה צורך לבצע תשלום חדש כדי להמשיך.
+        </p>
+      )}
+
       {isNative && (
         <div className="max-w-3xl mx-auto mt-8 text-center space-y-3">
           {session && (
