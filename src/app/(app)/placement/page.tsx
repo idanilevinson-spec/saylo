@@ -367,12 +367,12 @@ export default function PlacementPage() {
     const answered = bagrutAnswers.filter((a) => a !== null).length;
     return (
       <div className="max-w-2xl mx-auto px-4 py-12">
-        <p className="text-sm text-muted mb-4 flex items-center gap-1.5">
-          <GraduationCap size={15} aria-hidden="true" /> חלק הבגרות · {bagrutSection.units} יח״ל
-        </p>
         <div className="relative overflow-hidden bg-card border border-card-border rounded-lg p-6 sm:p-8">
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
-          <h1 className="text-xl font-bold">קטע קריאה בפורמט הבגרות</h1>
+          <h1 className="text-xl font-bold flex items-center gap-2">
+            <GraduationCap size={20} aria-hidden="true" className="text-primary shrink-0" />
+            קטע קריאה בפורמט הבגרות ({bagrutSection.units} יח״ל)
+          </h1>
           <p className="mt-1 text-sm text-muted leading-relaxed">
             הקטע קצר יותר מזה שבבחינה, אבל השאלות הן מאותם סוגים: רעיון מרכזי, פרטים מהטקסט, מילות הפניה והסקת
             מסקנות. אפשר לחזור לקטע תוך כדי.
@@ -591,17 +591,13 @@ function BagrutResultCard({ bagrut }: { bagrut: NonNullable<PlacementResult["bag
       className="relative overflow-hidden mt-6 bg-card border border-card-border rounded-lg p-6"
     >
       <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
-      <p className="text-xs font-bold text-muted flex items-center gap-1.5">
-        <GraduationCap size={14} aria-hidden="true" /> בגרות {bagrut.units} יח״ל
+      <h2 id="bagrut-result-title" className="text-lg font-bold flex items-center gap-2">
+        <GraduationCap size={18} aria-hidden="true" className="text-primary shrink-0" />
+        בגרות {bagrut.units} יח״ל: {readiness.titleHe}
+      </h2>
+      <p className="mt-1 text-sm text-muted tabular-nums">
+        {bagrut.correct} מתוך {bagrut.total} נכונות בקטע הבגרות
       </p>
-      <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 id="bagrut-result-title" className="text-lg font-bold">
-          {readiness.titleHe}
-        </h2>
-        <span className="text-sm text-muted tabular-nums">
-          {bagrut.correct} מתוך {bagrut.total} בחלק הבגרות
-        </span>
-      </div>
       <p className="mt-2 text-sm leading-relaxed">{readiness.bodyHe}</p>
       <p className="mt-2 text-xs text-muted">זו בדיקה קצרה של ההיכרות עם סוגי השאלות, לא הערכה של ציון בבגרות.</p>
       <div className="mt-4 flex flex-wrap gap-2">
