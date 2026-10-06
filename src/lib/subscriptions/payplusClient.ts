@@ -17,7 +17,8 @@ interface GenerateLinkParams {
   planLabel: string;
   customerName: string;
   customerEmail: string;
-  moreInfo: string;
+  profileId: string;
+  planId: string;
   successUrl: string;
   failureUrl: string;
   callbackUrl: string;
@@ -51,7 +52,14 @@ export async function generatePaymentPageLink(params: GenerateLinkParams): Promi
       sendEmailFailure: false,
       customer: { customer_name: params.customerName, email: params.customerEmail },
       items: [{ name: `Saylo — מנוי ${params.planLabel}`, quantity: 1, price: params.amount }],
-      more_info: params.moreInfo,
+      // PayPlus silently truncates `more_info` at 100 characters — a
+      // combined `{"profile_id":"...","plan_id":"..."}` JSON string (102+
+      // chars) came back cut into invalid JSON on every real charge, so
+      // every webhook call failed JSON.parse and PayPlus kept retrying the
+      // same broken callback every 5 minutes forever. Each id alone (36
+      // chars, a UUID) comfortably fits in its own more_info_N field instead.
+      more_info_1: params.profileId,
+      more_info_2: params.planId,
       refURL_success: params.successUrl,
       refURL_failure: params.failureUrl,
       refURL_callback: params.callbackUrl,

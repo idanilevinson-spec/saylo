@@ -17,17 +17,20 @@ export async function POST(request: Request) {
 
   const origin = request.headers.get("origin") ?? new URL(request.url).origin;
 
-  // profile_id and plan_id travel in more_info and come back unchanged on
-  // the IPN callback (see payplusClient.ts) — that's how the webhook knows
-  // which profile/plan a charge belongs to, since PayPlus has no concept of
-  // our own ids otherwise.
+  // profile_id/plan_id travel in more_info_1/more_info_2 and come back
+  // unchanged on the IPN callback (see payplusClient.ts) — that's how the
+  // webhook knows which profile/plan a charge belongs to, since PayPlus has
+  // no concept of our own ids otherwise. Each id goes in its own field
+  // rather than one combined JSON string: PayPlus truncates more_info at
+  // 100 characters, which silently corrupted the combined JSON.
   try {
     const { payment_page_link } = await generatePaymentPageLink({
       amount: plan.price_ils,
       planLabel: plan.code,
       customerName: user.user_metadata?.display_name ?? user.email ?? "Saylo",
       customerEmail: user.email ?? "",
-      moreInfo: JSON.stringify({ profile_id: user.id, plan_id: plan.id }),
+      profileId: user.id,
+      planId: plan.id,
       successUrl: `${origin}/dashboard?upgraded=1`,
       failureUrl: `${origin}/pricing?checkout=canceled`,
       callbackUrl: `${origin}/api/webhooks/payplus`,
