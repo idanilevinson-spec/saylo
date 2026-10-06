@@ -131,11 +131,19 @@ export async function POST(request: Request) {
       status: "completed",
       result_cefr_overall: overallCefr,
       result_summary_he: summary,
-      bagrut_units: bagrut?.units ?? null,
-      bagrut_percent: bagrut?.percent ?? null,
       completed_at: new Date().toISOString(),
     })
     .eq("id", placementTestId);
+
+  // Separate write so a missing migration 045 can only lose the Bagrut
+  // score, never the test's completion.
+  if (bagrut) {
+    const { error: bagrutError } = await supabase
+      .from("placement_tests")
+      .update({ bagrut_units: bagrut.units, bagrut_percent: bagrut.percent })
+      .eq("id", placementTestId);
+    if (bagrutError) console.error("placement bagrut score not saved:", bagrutError.message);
+  }
 
   await Promise.all(
     scores.map((s) =>
