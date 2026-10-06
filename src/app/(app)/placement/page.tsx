@@ -3,7 +3,7 @@
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Volume2, Turtle, Target } from "lucide-react";
+import { Volume2, Turtle, Target, GraduationCap, AlertTriangle, BookOpenText } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import CefrBadge from "@/components/CefrBadge";
@@ -12,6 +12,9 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { speak } from "@/lib/speech/browserTts";
 import type { CefrLevel, PlacementQuestion, SkillArea } from "@/types/database";
+import { modulesForUnits, type BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
+import { BAGRUT_AI_CONTENT_DISCLAIMER } from "@/lib/content/bagrut/sampleUnits";
+import { BAGRUT_PLACEMENT_SECTIONS, BAGRUT_READINESS_COPY, bagrutReadiness } from "@/lib/content/bagrut/placementItems";
 
 const SKILL_LABELS_HE: Record<SkillArea, string> = {
   vocabulary: "אוצר מילים",
@@ -57,7 +60,17 @@ interface PlacementResult {
   overallCefr: string;
   summary: string;
   scores: SkillScore[];
+  bagrut: { units: BagrutStudyUnits; correct: number; total: number; percent: number } | null;
 }
+
+type Goal = "general" | BagrutStudyUnits;
+
+const GOAL_OPTIONS: { value: Goal; label: string; hint: string }[] = [
+  { value: "general", label: "אנגלית באופן כללי", hint: "בלי הכנה לבגרות" },
+  { value: 3, label: "בגרות 3 יח״ל", hint: "מודולים A, B, C" },
+  { value: 4, label: "בגרות 4 יח״ל", hint: "מודולים C, D, E" },
+  { value: 5, label: "בגרות 5 יח״ל", hint: "מודולים E, F, G" },
+];
 
 export default function PlacementPage() {
   const { profile, loading: authLoading } = useAuth();
@@ -72,6 +85,9 @@ export default function PlacementPage() {
   const [finishing, setFinishing] = useState(false);
   const [result, setResult] = useState<PlacementResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [goal, setGoal] = useState<Goal | null>(null);
+  const [showBagrutStep, setShowBagrutStep] = useState(false);
+  const [bagrutAnswers, setBagrutAnswers] = useState<(number | null)[]>([]);
 
   useEffect(() => {
     if (!profile) return;
@@ -95,9 +111,20 @@ export default function PlacementPage() {
     );
   }
 
+  // Preselect what the learner told us before (on /bagrut or an earlier
+  // test). Someone who never answered has nothing preselected and has to
+  // choose before starting.
+  const chosenGoal: Goal | null = goal ?? profile?.bagrut_units ?? null;
+  const bagrutUnits = chosenGoal !== null && chosenGoal !== "general" ? chosenGoal : null;
+  const bagrutSection = bagrutUnits ? BAGRUT_PLACEMENT_SECTIONS[bagrutUnits] : null;
+
   async function handleStart() {
-    if (!profile || starting) return;
+    if (!profile || starting || chosenGoal === null) return;
     setStarting(true);
+    if ((profile.bagrut_units ?? null) !== bagrutUnits) {
+      await supabase.from("profiles").update({ bagrut_units: bagrutUnits }).eq("id", profile.id);
+    }
+    setBagrutAnswers(bagrutSection ? bagrutSection.questions.map(() => null) : []);
     const { data: test } = await supabase.from("placement_tests").insert({ profile_id: profile.id }).select().single();
     setTestId(test?.id ?? null);
     setStarted(true);
@@ -121,14 +148,43 @@ export default function PlacementPage() {
             {questions.length} שאלות קצרות שבודקות אוצר מילים, דקדוק, קריאה והאזנה — ובסוף אפשרות לדגימת כתיבה
             קצרה. בסיום תקבלו הערכת רמה לפי סולם CEFR, לפי תחום. זו הערכה פנימית של Saylo ולא מבחן רשמי.
           </p>
+          <fieldset className="mt-8 text-start">
+            <legend className="font-bold">בשביל מה תשתמשו ב-Saylo?</legend>
+            <p className="mt-1 text-sm text-muted leading-relaxed">
+              מי שמתכוננים לבגרות יקבלו בסוף המבחן גם קטע קריאה קצר בפורמט הבגרות, לפי מספר היחידות.
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {GOAL_OPTIONS.map((option) => {
+                const active = chosenGoal === option.value;
+                return (
+                  <button
+                    key={String(option.value)}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setGoal(option.value)}
+                    className={`flex flex-col items-start gap-0.5 px-3 py-2.5 rounded-lg border text-start transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                      active ? "border-primary bg-primary/[0.07]" : "border-card-border hover:border-primary/40"
+                    }`}
+                  >
+                    <span className="flex items-center gap-1.5 font-medium">
+                      {option.value !== "general" && <GraduationCap size={15} aria-hidden="true" className="text-primary" />}
+                      {option.label}
+                    </span>
+                    <span className="text-xs text-muted">{option.hint}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={chosenGoal !== null ? { scale: 1.02 } : undefined}
+            whileTap={chosenGoal !== null ? { scale: 0.97 } : undefined}
             onClick={handleStart}
-            disabled={starting}
+            disabled={starting || chosenGoal === null}
             className="mt-8 w-full sm:w-auto px-10 py-3.5 rounded-lg bg-primary text-primary-ink font-medium text-lg disabled:opacity-60 hover:bg-primary-hover transition-colors"
           >
-            {starting ? "מתחילים..." : "התחילו את המבחן"}
+            {starting ? "מתחילים..." : chosenGoal === null ? "בחרו מטרה כדי להתחיל" : "התחילו את המבחן"}
           </motion.button>
         </motion.div>
       </div>
@@ -209,6 +265,8 @@ export default function PlacementPage() {
           </table>
         </motion.div>
 
+        {result.bagrut && <BagrutResultCard bagrut={result.bagrut} />}
+
         <MotionLink
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
@@ -240,7 +298,12 @@ export default function PlacementPage() {
       const res = await fetch("/api/ai/placement-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ placementTestId: testId, writingSample: sample }),
+        body: JSON.stringify({
+          placementTestId: testId,
+          writingSample: sample,
+          bagrutUnits,
+          bagrutAnswers: bagrutUnits ? bagrutAnswers : undefined,
+        }),
         signal: timeout.signal,
       });
       if (!res.ok) throw new Error("request failed");
@@ -271,7 +334,12 @@ export default function PlacementPage() {
       return;
     }
 
-    setShowWritingStep(true);
+    goToEndSteps();
+  }
+
+  function goToEndSteps() {
+    if (bagrutSection) setShowBagrutStep(true);
+    else setShowWritingStep(true);
   }
 
   // No response is recorded for a skipped question — it's excluded from
@@ -286,12 +354,90 @@ export default function PlacementPage() {
       setIndex((i) => i + 1);
       return;
     }
-    setShowWritingStep(true);
+    goToEndSteps();
   }
 
   if (finishing) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">מנתח את התוצאות שלכם...</div>
+    );
+  }
+
+  if (showBagrutStep && bagrutSection) {
+    const answered = bagrutAnswers.filter((a) => a !== null).length;
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12">
+        <p className="text-sm text-muted mb-4 flex items-center gap-1.5">
+          <GraduationCap size={15} aria-hidden="true" /> חלק הבגרות · {bagrutSection.units} יח״ל
+        </p>
+        <div className="relative overflow-hidden bg-card border border-card-border rounded-lg p-6 sm:p-8">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+          <h1 className="text-xl font-bold">קטע קריאה בפורמט הבגרות</h1>
+          <p className="mt-1 text-sm text-muted leading-relaxed">
+            הקטע קצר יותר מזה שבבחינה, אבל השאלות הן מאותם סוגים: רעיון מרכזי, פרטים מהטקסט, מילות הפניה והסקת
+            מסקנות. אפשר לחזור לקטע תוך כדי.
+          </p>
+          <div role="note" className="mt-4 flex gap-2.5 rounded-lg border border-accent/40 bg-accent/[0.07] p-3 text-xs leading-relaxed">
+            <AlertTriangle size={15} aria-hidden="true" className="shrink-0 text-accent-hover mt-0.5" />
+            <p>{BAGRUT_AI_CONTENT_DISCLAIMER}</p>
+          </div>
+
+          <h2 className="mt-6 flex items-center gap-2 font-bold text-sm text-muted">
+            <BookOpenText size={16} aria-hidden="true" /> הבנת הנקרא
+          </h2>
+          <EnglishText as="h3" className="mt-2 text-lg font-bold">
+            {bagrutSection.titleEn}
+          </EnglishText>
+          <EnglishText as="div" className="mt-2 leading-relaxed whitespace-pre-line font-content">
+            {bagrutSection.passageEn}
+          </EnglishText>
+        </div>
+
+        <ol className="mt-6 space-y-4">
+          {bagrutSection.questions.map((q, qi) => (
+            <li key={qi} className="bg-card border border-card-border rounded-lg p-5">
+              <p className="text-xs text-muted">
+                {qi + 1}. {q.formatHe}
+              </p>
+              <EnglishText as="p" className="mt-1.5 font-medium leading-relaxed">
+                {renderPromptWithUniformBlanks(q.promptEn)}
+              </EnglishText>
+              <div className="mt-3 space-y-2" role="radiogroup" aria-label={`שאלה ${qi + 1}`}>
+                {q.options.map((option, oi) => {
+                  const active = bagrutAnswers[qi] === oi;
+                  return (
+                    <button
+                      key={oi}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => setBagrutAnswers((a) => a.map((v, i) => (i === qi ? oi : v)))}
+                      className={`w-full text-start px-4 py-2.5 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                        active ? "border-primary bg-primary/5" : "border-card-border hover:border-primary/40"
+                      }`}
+                    >
+                      <EnglishText>{option}</EnglishText>
+                    </button>
+                  );
+                })}
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <button
+          type="button"
+          onClick={() => {
+            setShowBagrutStep(false);
+            setShowWritingStep(true);
+          }}
+          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        >
+          {answered === bagrutSection.questions.length
+            ? "לשלב האחרון →"
+            : `לשלב האחרון (נענו ${answered} מתוך ${bagrutSection.questions.length}) →`}
+        </button>
+      </div>
     );
   }
 
@@ -430,5 +576,50 @@ export default function PlacementPage() {
         </button>
       </motion.div>
     </div>
+  );
+}
+
+function BagrutResultCard({ bagrut }: { bagrut: NonNullable<PlacementResult["bagrut"]> }) {
+  const readiness = BAGRUT_READINESS_COPY[bagrutReadiness(bagrut.percent)];
+  const startModule = modulesForUnits(bagrut.units)[0];
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.35 }}
+      aria-labelledby="bagrut-result-title"
+      className="relative overflow-hidden mt-6 bg-card border border-card-border rounded-lg p-6"
+    >
+      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+      <p className="text-xs font-bold text-muted flex items-center gap-1.5">
+        <GraduationCap size={14} aria-hidden="true" /> בגרות {bagrut.units} יח״ל
+      </p>
+      <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h2 id="bagrut-result-title" className="text-lg font-bold">
+          {readiness.titleHe}
+        </h2>
+        <span className="text-sm text-muted tabular-nums">
+          {bagrut.correct} מתוך {bagrut.total} בחלק הבגרות
+        </span>
+      </div>
+      <p className="mt-2 text-sm leading-relaxed">{readiness.bodyHe}</p>
+      <p className="mt-2 text-xs text-muted">זו בדיקה קצרה של ההיכרות עם סוגי השאלות, לא הערכה של ציון בבגרות.</p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <MotionLink
+          whileTap={{ scale: 0.97 }}
+          href={`/bagrut/${startModule}`}
+          className="px-4 py-2 rounded-lg bg-primary text-primary-ink text-sm font-medium hover:bg-primary-hover transition-colors"
+        >
+          להתחיל במודול {startModule}
+        </MotionLink>
+        <MotionLink
+          whileTap={{ scale: 0.97 }}
+          href="/bagrut"
+          className="px-4 py-2 rounded-lg border border-card-border text-sm font-medium hover:border-primary/40 transition-colors"
+        >
+          כל מודולי הבגרות
+        </MotionLink>
+      </div>
+    </motion.section>
   );
 }

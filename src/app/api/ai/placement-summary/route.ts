@@ -11,6 +11,7 @@ import { logAiUsage } from "@/lib/ai/usageLog";
 import { hasAiConsent } from "@/lib/ai/consent";
 import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import { cefrLevelFromPercent } from "@/lib/assessment/cefrScoring";
+import { gradeBagrutSection } from "@/lib/content/bagrut/placementItems";
 import type { SkillArea } from "@/types/database";
 
 const PLACEMENT_WRITING_PROMPT =
@@ -23,9 +24,11 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const { placementTestId, writingSample } = (await request.json()) as {
+  const { placementTestId, writingSample, bagrutUnits, bagrutAnswers } = (await request.json()) as {
     placementTestId?: string;
     writingSample?: string;
+    bagrutUnits?: number;
+    bagrutAnswers?: unknown;
   };
   if (!placementTestId) return NextResponse.json({ error: "missing placementTestId" }, { status: 400 });
 
@@ -96,6 +99,20 @@ export async function POST(request: Request) {
     }
   }
 
+  // The optional Bagrut-format section is graded here, against the key in
+  // code, and kept out of the CEFR scores above (see migration 045).
+  const bagrutTrack = bagrutUnits === 3 || bagrutUnits === 4 || bagrutUnits === 5 ? bagrutUnits : null;
+  const bagrut =
+    bagrutTrack && Array.isArray(bagrutAnswers)
+      ? {
+          units: bagrutTrack,
+          ...gradeBagrutSection(
+            bagrutTrack,
+            bagrutAnswers.map((a) => (typeof a === "number" ? a : null))
+          ),
+        }
+      : null;
+
   const message = aiAllowed
     ? await anthropic.messages.create({
         model: CLAUDE_MODEL,
@@ -114,6 +131,8 @@ export async function POST(request: Request) {
       status: "completed",
       result_cefr_overall: overallCefr,
       result_summary_he: summary,
+      bagrut_units: bagrut?.units ?? null,
+      bagrut_percent: bagrut?.percent ?? null,
       completed_at: new Date().toISOString(),
     })
     .eq("id", placementTestId);
@@ -139,5 +158,5 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ overallCefr, summary, scores });
+  return NextResponse.json({ overallCefr, summary, scores, bagrut });
 }

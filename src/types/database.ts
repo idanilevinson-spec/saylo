@@ -14,6 +14,7 @@ export interface Profile {
   push_reminders_enabled: boolean;
   weekly_report_enabled: boolean;
   monthly_report_enabled: boolean;
+  bagrut_units: 3 | 4 | 5 | null;
   created_at: string;
   updated_at: string;
 }
@@ -337,6 +338,8 @@ export interface PlacementTest {
   status: "in_progress" | "completed";
   result_cefr_overall: CefrLevel | null;
   result_summary_he: string | null;
+  bagrut_units: 3 | 4 | 5 | null;
+  bagrut_percent: number | null;
   created_at: string;
   completed_at: string | null;
 }
@@ -532,6 +535,17 @@ export interface BillingDocument {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface BagrutUnitProgress {
+  profile_id: string;
+  module_code: "A" | "B" | "C" | "D" | "E" | "F" | "G";
+  unit_slug: string;
+  mc_correct: number;
+  mc_total: number;
+  best_percent: number;
+  attempts: number;
+  completed_at: string;
 }
 
 export interface AdminAuditLog {
@@ -740,6 +754,12 @@ export interface Database {
         Insert: Partial<BillingDocument> &
           Pick<BillingDocument, "payment_ref" | "source" | "amount_ils" | "description" | "customer_name">;
         Update: Partial<BillingDocument>;
+      };
+      bagrut_unit_progress: {
+        Row: BagrutUnitProgress;
+        Insert: Partial<BagrutUnitProgress> &
+          Pick<BagrutUnitProgress, "profile_id" | "module_code" | "unit_slug" | "mc_correct" | "mc_total" | "best_percent">;
+        Update: Partial<BagrutUnitProgress>;
       };
       admin_audit_log: {
         Row: AdminAuditLog;

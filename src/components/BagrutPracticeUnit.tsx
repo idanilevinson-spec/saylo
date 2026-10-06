@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, XCircle, Eye, Headphones, BookOpenText, PenLine } from "lucide-react";
+import { AlertTriangle, CheckCircle2, XCircle, Eye, Headphones, BookOpenText, PenLine, Timer, Trophy } from "lucide-react";
+import { useAuth } from "@/context/AuthProvider";
+import { supabase } from "@/lib/supabase/browserClient";
 import EnglishText from "@/components/EnglishText";
 import ListeningPlayer from "@/components/ListeningPlayer";
 import type { BagrutSampleUnit, BagrutReadingQuestion, BagrutVocabularyQuestion } from "@/lib/content/bagrut/sampleUnits";
@@ -20,8 +22,57 @@ interface BagrutPracticeUnitProps {
 // need an AI call this v1 deliberately doesn't add, see
 // docs/specs/bagrut-track.md §6). The writing task is just a counted
 // textarea, not submitted or graded anywhere.
+// Multiple-choice questions are the only ones with a right answer to count,
+// so they're what a practice set's score is made of. Keyed by section so the
+// same index in two sections doesn't collide.
+function mcKeys(unit: BagrutSampleUnit): string[] {
+  const keys: string[] = [];
+  unit.listeningTask?.questions.forEach((q, i) => q.options && keys.push(`L${i}`));
+  unit.readingQuestions.forEach((q, i) => q.options && keys.push(`R${i}`));
+  unit.vocabularyQuestions?.forEach((q, i) => q.options && keys.push(`V${i}`));
+  return keys;
+}
+
 export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitProps) {
   const isLiterature = unit.moduleCode === "D";
+  const { profile } = useAuth();
+  const [results, setResults] = useState<Record<string, boolean>>({});
+  const savedRef = useRef(false);
+  const keys = mcKeys(unit);
+  const answered = keys.filter((k) => k in results).length;
+  const correct = keys.filter((k) => results[k]).length;
+  const finished = keys.length > 0 && answered === keys.length;
+
+  function record(key: string, isCorrect: boolean) {
+    setResults((r) => (key in r ? r : { ...r, [key]: isCorrect }));
+  }
+
+  // Saved once, when the last multiple-choice question is answered. Doing a
+  // set again keeps the best score and counts the attempt.
+  useEffect(() => {
+    if (!finished || !profile || savedRef.current) return;
+    savedRef.current = true;
+    const percent = Math.round((correct / keys.length) * 100);
+    void (async () => {
+      const { data: prev } = await supabase
+        .from("bagrut_unit_progress")
+        .select("best_percent, attempts")
+        .eq("profile_id", profile.id)
+        .eq("module_code", unit.moduleCode)
+        .eq("unit_slug", unit.unitSlug)
+        .maybeSingle();
+      await supabase.from("bagrut_unit_progress").upsert({
+        profile_id: profile.id,
+        module_code: unit.moduleCode,
+        unit_slug: unit.unitSlug,
+        mc_correct: correct,
+        mc_total: keys.length,
+        best_percent: Math.max(percent, prev?.best_percent ?? 0),
+        attempts: (prev?.attempts ?? 0) + 1,
+        completed_at: new Date().toISOString(),
+      });
+    })();
+  }, [finished, profile, correct, keys.length, unit.moduleCode, unit.unitSlug]);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
@@ -34,6 +85,8 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
         מודול {unit.moduleCode} · {format.percentOfFinalGrade ? `${format.percentOfFinalGrade}% מהציון · ` : ""}
         {format.timeMinutes ? `${format.timeMinutes} דקות` : ""}
       </p>
+
+      {format.timeMinutes && <ExamTimer minutes={format.timeMinutes} />}
 
       {!unit.teacherReviewed && unit.aiContentDisclosed && (
         <div
@@ -75,7 +128,7 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
       {unit.listeningTask && (
         <div className="mt-6 space-y-4">
           {unit.listeningTask.questions.map((q, i) => (
-            <QuestionCard key={i} index={i + 1} question={q} />
+            <QuestionCard key={i} index={i + 1} question={q} onAnswer={(c) => record(`L${i}`, c)} />
           ))}
         </div>
       )}
@@ -95,7 +148,7 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
 
       <div className="mt-6 space-y-4">
         {unit.readingQuestions.map((q, i) => (
-          <QuestionCard key={i} index={i + 1} question={q} />
+          <QuestionCard key={i} index={i + 1} question={q} onAnswer={(c) => record(`R${i}`, c)} />
         ))}
       </div>
 
@@ -106,7 +159,7 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
           </h2>
           <div className="mt-3 space-y-4">
             {unit.vocabularyQuestions.map((q, i) => (
-              <QuestionCard key={i} index={i + 1} question={q} />
+              <QuestionCard key={i} index={i + 1} question={q} onAnswer={(c) => record(`V${i}`, c)} />
             ))}
           </div>
         </>
@@ -115,11 +168,100 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
       {unit.writingTask && (
         <WritingTaskCard promptEn={unit.writingTask.promptEn} wordCountRange={unit.writingTask.wordCountRange} />
       )}
+
+      {keys.length > 0 && (
+        <section
+          aria-live="polite"
+          className={`mt-8 rounded-lg border p-5 ${finished ? "border-primary/40 bg-primary/[0.05]" : "border-card-border bg-card"}`}
+        >
+          {finished ? (
+            <>
+              <p className="flex items-center gap-2 font-bold">
+                <Trophy size={18} aria-hidden="true" className="text-primary" />
+                {correct} מתוך {keys.length} בשאלות הסגורות
+              </p>
+              <p className="mt-1 text-sm text-muted leading-relaxed">
+                {profile ? "נשמר בהתקדמות שלכם בעמוד הבגרות. " : ""}
+                את השאלות הפתוחות ואת הכתיבה בודקים לבד מול התשובה לדוגמה.
+              </p>
+              <Link href={`/bagrut/${unit.moduleCode}`} className="mt-3 inline-block text-sm text-primary hover:underline">
+                לערכות האחרות של מודול {unit.moduleCode} ←
+              </Link>
+            </>
+          ) : (
+            <p className="text-sm text-muted tabular-nums">
+              נענו {answered} מתוך {keys.length} שאלות סגורות
+            </p>
+          )}
+        </section>
+      )}
     </div>
   );
 }
 
-function QuestionCard({ index, question }: { index: number; question: BagrutReadingQuestion | BagrutVocabularyQuestion }) {
+// Optional exam conditions: the module's real duration, counting down.
+// Nothing locks when it runs out; it only shows where the learner would
+// have stood in the real exam.
+function ExamTimer({ minutes }: { minutes: number }) {
+  const [endsAt, setEndsAt] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (endsAt === null) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [endsAt]);
+
+  if (endsAt === null) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          setNow(Date.now());
+          setEndsAt(Date.now() + minutes * 60_000);
+        }}
+        className="mt-4 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-card-border text-sm font-medium hover:border-primary/40 transition-colors"
+      >
+        <Timer size={15} aria-hidden="true" /> תרגול בזמן של הבחינה ({minutes} דקות)
+      </button>
+    );
+  }
+
+  const left = Math.max(0, endsAt - now);
+  const mm = Math.floor(left / 60_000);
+  const ss = Math.floor((left % 60_000) / 1000);
+  const over = left === 0;
+  return (
+    <div
+      role="timer"
+      aria-live="off"
+      className={`sticky top-2 z-10 mt-4 flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-2 text-sm shadow-sm ${
+        over ? "border-danger text-danger" : left < 10 * 60_000 ? "border-accent" : "border-card-border"
+      }`}
+    >
+      <span className="flex items-center gap-1.5 font-medium">
+        <Timer size={15} aria-hidden="true" />
+        {over ? "הזמן של הבחינה נגמר" : "זמן שנותר"}
+      </span>
+      <span dir="ltr" className="font-bold tabular-nums text-base">
+        {String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
+      </span>
+      <button type="button" onClick={() => setEndsAt(null)} className="text-xs text-muted hover:text-foreground">
+        עצירה
+      </button>
+    </div>
+  );
+}
+
+function QuestionCard({
+  index,
+  question,
+  onAnswer,
+}: {
+  index: number;
+  question: BagrutReadingQuestion | BagrutVocabularyQuestion;
+  onAnswer?: (isCorrect: boolean) => void;
+}) {
   const [selected, setSelected] = useState<number | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
 
@@ -141,7 +283,10 @@ function QuestionCard({ index, question }: { index: number; question: BagrutRead
             return (
               <button
                 key={option}
-                onClick={() => setSelected(i)}
+                onClick={() => {
+                  setSelected(i);
+                  onAnswer?.(i === question.correctOptionIndex);
+                }}
                 disabled={selected !== null}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-start transition-colors ${
                   showState && isCorrectOption
