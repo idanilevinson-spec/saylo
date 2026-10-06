@@ -10,8 +10,15 @@ import { customerForProfile } from "@/lib/billing/customer";
 // success or failure (send_failure_callback is set on checkout), the same
 // shape both times except for status_code.
 //
-// more_info carries our own ids back unchanged (set in the checkout route)
-// since PayPlus has no concept of our profile/plan ids otherwise.
+// more_info_1/more_info_2 carry our own ids back unchanged (set in the
+// checkout route) since PayPlus has no concept of our profile/plan ids
+// otherwise. They're two separate short fields, not one combined JSON
+// string in `more_info`: PayPlus silently truncates `more_info` at 100
+// characters, which corrupted every single real callback's combined
+// `{"profile_id":...,"plan_id":...}` JSON (102+ chars) into invalid JSON —
+// every charge failed JSON.parse with a 400, and PayPlus kept retrying the
+// same broken callback every 5 minutes, which is what full raw-body
+// logging below is for: that's how this got caught.
 //
 // Only the FIRST charge comes through here now — renewals are charged
 // directly by api/cron/payplus-renewals via chargeToken, which gets its
@@ -28,7 +35,7 @@ import { customerForProfile } from "@/lib/billing/customer";
 // is taken from that real logged payload, not the docs — see the raw body
 // log line if PayPlus ever changes it again.
 interface PayplusCallback {
-  transaction?: { uid?: string; status_code?: string; more_info?: string };
+  transaction?: { uid?: string; status_code?: string; more_info_1?: string; more_info_2?: string };
   data?: {
     customer_uid?: string;
     card_information?: { token?: string };
@@ -46,13 +53,8 @@ export async function POST(request: Request) {
   }
 
   const event = JSON.parse(rawBody) as PayplusCallback;
-  let moreInfo: { profile_id?: string; plan_id?: string } = {};
-  try {
-    moreInfo = event.transaction?.more_info ? JSON.parse(event.transaction.more_info) : {};
-  } catch {
-    return NextResponse.json({ error: "unparseable more_info" }, { status: 400 });
-  }
-  const profileId = moreInfo.profile_id;
+  const profileId = event.transaction?.more_info_1 || undefined;
+  const planId = event.transaction?.more_info_2 || undefined;
   if (!profileId) return NextResponse.json({ error: "missing profile_id" }, { status: 400 });
 
   const succeeded = event.transaction?.status_code === "000";
@@ -68,7 +70,7 @@ export async function POST(request: Request) {
     const { data: plan } = await supabaseAdmin
       .from("subscription_plans")
       .select("months, price_ils, code")
-      .eq("id", moreInfo.plan_id ?? "")
+      .eq("id", planId ?? "")
       .maybeSingle();
     const months = plan?.months ?? 1;
     const periodEnd = new Date();
@@ -76,7 +78,7 @@ export async function POST(request: Request) {
 
     const { error } = await supabaseAdmin.from("subscriptions").upsert({
       profile_id: profileId,
-      plan_id: moreInfo.plan_id ?? null,
+      plan_id: planId ?? null,
       status: "active",
       billing_provider: "payplus",
       payplus_token: token,
