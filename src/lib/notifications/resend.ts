@@ -313,10 +313,9 @@ export interface ReceiptNeededNotification {
   adminUrl: string;
 }
 
-// Receipts are issued by hand in חשבון מהיר (its free plan has no API), so
-// every web payment emails the owner the details to copy into a receipt.
-// The law wants the receipt right when the money comes in; this email is
-// what makes "right when" possible without watching the admin screen.
+// PayPlus issues a receipt for every charge on its own; this email goes out
+// only when a payment still has none two days later (see syncOpenReceipts),
+// with everything needed to issue it by hand in PayPlus's חשבונית+.
 export async function sendReceiptNeededNotification(n: ReceiptNeededNotification): Promise<boolean> {
   const resend = getClient();
   if (!resend) return false;
@@ -330,10 +329,11 @@ export async function sendReceiptNeededNotification(n: ReceiptNeededNotification
   const { error } = await resend.emails.send({
     from: "Saylo <billing@saylolearn.com>",
     to: CONTACT_EMAIL,
-    subject: `צריך להוציא קבלה: ${amount} — ${n.customerName}`,
+    subject: `תשלום בלי קבלה: ${amount} — ${n.customerName}`,
     html: `
       <div dir="rtl" style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
-        <h1 style="font-size: 20px; color: #0066d6; margin: 0 0 16px;">התקבל תשלום. צריך להוציא עליו קבלה</h1>
+        <h1 style="font-size: 20px; color: #0066d6; margin: 0 0 16px;">לתשלום הזה עדיין לא נמצאה קבלה</h1>
+        <p style="font-size: 14px; margin: 0 0 12px;">PayPlus אמורה להפיק קבלה אוטומטית על כל חיוב, אבל יומיים אחרי התשלום לא נמצאה קבלה לעסקה הזו.</p>
         <table style="font-size: 14px; border-collapse: collapse;">
           ${row("שם על הקבלה", `<strong>${escapeHtml(n.customerName)}</strong>`)}
           ${n.customerEmail ? row("אימייל לשליחה", escapeHtml(n.customerEmail)) : ""}
@@ -343,7 +343,7 @@ export async function sendReceiptNeededNotification(n: ReceiptNeededNotification
           ${row("אמצעי תשלום", "כרטיס אשראי")}
           ${row("סוג", sourceLabel)}
         </table>
-        <p style="font-size: 14px; margin: 16px 0 0;">מוציאים קבלה בחשבון מהיר, שולחים אותה ללקוח, ואז מסמנים במסך הקבלות שהיא הופקה, עם מספר הקבלה.</p>
+        <p style="font-size: 14px; margin: 16px 0 0;">כדאי לבדוק בממשק PayPlus תחת חשבונית+. אם הקבלה באמת חסרה, מפיקים אותה שם עם הפרטים האלה, ומסמנים במסך הקבלות שהיא הופקה.</p>
         <a href="${escapeHtml(n.adminUrl)}" style="display: inline-block; margin-top: 20px; padding: 10px 18px; background: #0066d6; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">למסך הקבלות</a>
       </div>
     `,

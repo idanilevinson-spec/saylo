@@ -17,12 +17,12 @@ export async function POST(request: Request) {
   if (!parsed.success) return NextResponse.json({ error: "invalid proposal" }, { status: 400 });
   const proposal = parsed.data;
 
-  // With automatic issuing off (receipts made by hand in חשבון מהיר), a
-  // confirmed manual payment is recorded in the ledger as waiting for its
-  // receipt; there is nothing to retry automatically.
+  // Without API issuing (PayPlus issues receipts for card charges itself),
+  // a confirmed manual payment is recorded in the ledger as waiting for the
+  // receipt the owner issues by hand in חשבונית+; nothing to retry.
   const automatic = invoicesEnabled();
   if (!automatic && proposal.kind === "retry_receipt") {
-    return NextResponse.json({ error: "הפקה אוטומטית כבויה. מוציאים את הקבלה בחשבון מהיר ומסמנים אותה כהופקה." }, { status: 409 });
+    return NextResponse.json({ error: "מפיקים את הקבלה ב-PayPlus (חשבונית+) ומסמנים אותה כאן כהופקה." }, { status: 409 });
   }
 
   let doc: BillingDocument;

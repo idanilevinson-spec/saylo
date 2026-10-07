@@ -1,7 +1,7 @@
--- Receipts issued by hand in an external, Tax-Authority-registered invoicing
--- system (חשבון מהיר, free plan — it has no API). The ledger from migration
--- 044 still records every payment; the owner issues the receipt there and
--- marks the row issued in /admin/billing with the receipt's number.
+-- issued_via: 'invoice_plus' = a receipt PayPlus Invoice+ issued (on its
+-- own after a charge, or through our API call); 'external_manual' = one the
+-- owner issued by hand and recorded in /admin/billing with its number.
+-- (Already run on the live DB on 2026-10-07, together with 044.)
 --
 -- 046, not 045: the open Bagrut branch already uses 045 (bagrut_track).
 

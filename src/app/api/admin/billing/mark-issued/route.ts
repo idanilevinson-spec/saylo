@@ -4,7 +4,8 @@ import { requireAdmin } from "@/lib/billing/requireAdmin";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 
 // Records that the receipt for a ledger row was issued by hand in the
-// external invoicing system (חשבון מהיר), with its number and, optionally,
+// PayPlus's חשבונית+ (a payment made outside the site, or one PayPlus
+// missed), with its number and, optionally,
 // a link to the PDF so the learner can open it from their profile.
 const Body = z.object({
   document_id: z.string().uuid(),

@@ -44,6 +44,8 @@ export default function AdminBillingPage() {
   const [draft, setDraft] = useState("");
   const [thinking, setThinking] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -53,6 +55,20 @@ export default function AdminBillingPage() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
   }, [chat, thinking]);
+
+  async function syncNow() {
+    setSyncing(true);
+    setSyncResult(null);
+    const res = await fetch("/api/admin/billing/sync", { method: "POST" });
+    const body = (await res.json().catch(() => ({}))) as { issued?: number; stillOpen?: number; error?: string };
+    setSyncing(false);
+    setSyncResult(
+      res.ok
+        ? `נמצאו ${body.issued ?? 0} קבלות חדשות. ${body.stillOpen ? `${body.stillOpen} תשלומים עדיין בלי קבלה.` : "לכל התשלומים יש קבלה."}`
+        : "הסנכרון נכשל. אפשר לנסות שוב."
+    );
+    void loadDocs();
+  }
 
   async function loadDocs() {
     const { data } = await supabase.from("billing_documents").select("*").order("paid_at", { ascending: false }).limit(100);
@@ -109,10 +125,10 @@ export default function AdminBillingPage() {
     if (res.ok && body.recordedOnly) {
       updateProposal(turn, index, {
         state: "done",
-        result: "התשלום נרשם בטבלה. מוציאים עליו קבלה בחשבון מהיר ומסמנים אותה כהופקה.",
+        result: "התשלום נרשם בטבלה. מפיקים עליו קבלה ב-PayPlus (חשבונית+) ומסמנים כאן שהיא הופקה.",
       });
     } else if (res.ok && body.document) {
-      updateProposal(turn, index, { state: "done", result: `קבלה מס׳ ${body.document.doc_number} הופקה ונשלחה.` });
+      updateProposal(turn, index, { state: "done", result: `הקבלה${body.document.doc_number ? ` מס׳ ${body.document.doc_number}` : ""} הופקה ונשלחה.` });
     } else {
       updateProposal(turn, index, { state: "open", result: `לא הופקה: ${body.error ?? "שגיאה"}` });
     }
@@ -128,12 +144,28 @@ export default function AdminBillingPage() {
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
       <section className="min-w-0">
-        <h2 className="font-bold text-lg">קבלות</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-bold text-lg">קבלות</h2>
+          <button
+            type="button"
+            onClick={syncNow}
+            disabled={syncing}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-card-border text-sm font-medium hover:border-primary/40 transition-colors disabled:opacity-60"
+          >
+            <RotateCw size={14} aria-hidden="true" className={syncing ? "animate-spin" : ""} />
+            {syncing ? "מסנכרן…" : "סנכרון עם PayPlus"}
+          </button>
+        </div>
         <p className="mt-1 text-sm text-muted">
-          כל תשלום באתר ובחידוש נרשם כאן, ונשלח מייל שצריך להוציא עליו קבלה. מוציאים את הקבלה בחשבון מהיר, שולחים
-          אותה ללקוח, ומסמנים כאן שהיא הופקה עם מספר הקבלה. רכישות דרך ה-App Store מקבלות קבלה מאפל ולא מופיעות
-          כאן.
+          PayPlus מפיקה קבלה על כל חיוב באתר ועל כל חידוש, ושולחת אותה ללקוח במייל. כאן רשום כל תשלום, ומספר הקבלה
+          והקובץ שלה נמשכים מ-PayPlus פעם ביום או בכפתור הסנכרון. אם יומיים אחרי תשלום עדיין אין לו קבלה, נשלח מייל.
+          רכישות דרך ה-App Store מקבלות קבלה מאפל ולא מופיעות כאן.
         </p>
+        {syncResult && (
+          <p role="status" className="mt-2 text-sm">
+            {syncResult}
+          </p>
+        )}
 
         <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
           <div className="bg-card border border-card-border rounded-lg p-3">
@@ -185,10 +217,10 @@ export default function AdminBillingPage() {
                         d.pdf_url ? (
                           <a href={d.pdf_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
                             <FileText size={13} aria-hidden="true" />
-                            <span className="tabular-nums">{d.doc_number}</span>
+                            <span className="tabular-nums">{d.doc_number ?? "קבלה"}</span>
                           </a>
                         ) : (
-                          <span className="tabular-nums">{d.doc_number}</span>
+                          <span className="tabular-nums">{d.doc_number ?? "קבלה"}</span>
                         )
                       ) : (
                         <MarkIssued doc={d} onDone={loadDocs} />
@@ -324,7 +356,8 @@ export default function AdminBillingPage() {
   );
 }
 
-// An open row's receipt cell: issue the receipt in חשבון מהיר, then record
+// An open row's receipt cell: when PayPlus didn't issue it (or the payment
+// was made outside the site), issue it by hand in חשבונית+, then record
 // its number here (and the PDF link, if there is one, so the learner can
 // open it from their profile).
 function MarkIssued({ doc, onDone }: { doc: BillingDocument; onDone: () => void }) {
