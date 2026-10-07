@@ -64,7 +64,9 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
     if (!result || result.isCorrect || !nextHref) return;
     function onKey(e: KeyboardEvent) {
       const target = e.target as HTMLElement | null;
-      if (e.key === "Enter" && target?.tagName !== "BUTTON" && target?.tagName !== "A") {
+      // Focus usually still sits on the (now disabled) answer just given.
+      const onAnswer = !!target?.closest('[aria-label="תשובות"]');
+      if (e.key === "Enter" && ((target?.tagName !== "BUTTON" && target?.tagName !== "A") || onAnswer)) {
         e.preventDefault();
         router.push(nextHref as string);
       }

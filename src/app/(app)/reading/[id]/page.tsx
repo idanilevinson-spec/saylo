@@ -53,7 +53,7 @@ export default async function ReadingTextPage({ params }: PageProps) {
       </Link>
 
       <header className="mt-4">
-        <EnglishText as="h1" className="text-3xl sm:text-4xl font-bold leading-tight">
+        <EnglishText as="h1" className="text-right text-3xl sm:text-4xl font-bold leading-tight">
           {text.title_en}
         </EnglishText>
         <p className="mt-1.5 text-lg text-muted">{text.title_he}</p>

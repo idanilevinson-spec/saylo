@@ -164,7 +164,7 @@ export default async function ReadingPage() {
                         className="game-press group flex items-center gap-4 p-4 hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
                       >
                         <span className="flex-1 min-w-0">
-                          <EnglishText as="span" className="block text-lg font-bold leading-snug">
+                          <EnglishText as="span" className="block text-right text-lg font-bold leading-snug">
                             {text.title_en}
                           </EnglishText>
                           <span className="block text-sm text-muted">{text.title_he}</span>

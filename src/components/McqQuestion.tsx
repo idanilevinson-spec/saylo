@@ -37,7 +37,11 @@ export default function McqQuestion({ content, disabled, onSubmit }: McqQuestion
     function onKey(e: KeyboardEvent) {
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) return;
-      if (e.key === "Enter" && target?.tagName !== "BUTTON") {
+      // Enter checks — also when focus is on the answer just tapped (it
+      // stays on that button); any other focused button keeps Enter as its
+      // own click.
+      const onAnswer = !!target?.closest('[aria-label="תשובות"]');
+      if (e.key === "Enter" && (target?.tagName !== "BUTTON" || onAnswer)) {
         e.preventDefault();
         check();
       }
