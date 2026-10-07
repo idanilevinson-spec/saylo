@@ -138,9 +138,9 @@ function ReadingResponseFormInner({
   }
 
   return (
-    <div className="bg-card border border-card-border rounded-lg p-6">
-      <p className="font-bold">שאלה פתוחה</p>
-      <EnglishText as="p" className="mt-2 leading-relaxed">
+    <div>
+      <p className="text-sm text-muted">שאלה פתוחה · עונים באנגלית</p>
+      <EnglishText as="p" className="mt-1.5 text-xl font-bold leading-snug">
         {questionEn}
       </EnglishText>
       <textarea

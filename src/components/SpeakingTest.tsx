@@ -388,7 +388,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
                       an opt-in "open Settings" link (App Review, Guideline
                       5.1.1(iv): any path back toward granting the permission
                       counts as directing the learner to reconsider). "לא
-                      יודע/ת · דלגו" below is the way out. */}
+                      יודעים? דלגו" below is the way out. */}
                   {!recognition.permissionDenied && (
                     <button onClick={recognition.start} className="mt-1 text-primary hover:underline">
                       נסו שוב
@@ -414,7 +414,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
                 onClick={skipStep}
                 className="mt-4 px-4 py-2 rounded-lg border border-card-border text-sm text-muted font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
-                לא יודע/ת · דלגו
+                לא יודעים? דלגו
               </button>
             )}
 

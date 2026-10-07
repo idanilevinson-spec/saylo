@@ -13,7 +13,9 @@ import { speak } from "@/lib/speech/browserTts";
 // (bg-card, rounded-lg, primary top edge), with the On Air chyron face kept
 // for scoreboard numerals only — a game show's score and clock, nothing else.
 
-export type RoundResult = "correct" | "wrong" | null;
+// "done" = answered, but the verdict isn't known here (practice moves to a
+// new page per exercise, so earlier answers only count as done).
+export type RoundResult = "correct" | "wrong" | "done" | null;
 
 // ---------- Top bar ----------
 
@@ -32,16 +34,31 @@ interface GameHudProps {
   subtitle?: ReactNode;
   // Rendered at the end of the top row (match's level clock, for instance).
   aside?: ReactNode;
+  // Where the close button goes; the games hub unless set.
+  exitHref?: string;
+  exitLabel?: string;
 }
 
-export function GameHud({ title, results, current, score, scoreLabel = "ניקוד", scoreIcon: ScoreIcon, showScoreLabel = false, subtitle, aside }: GameHudProps) {
+export function GameHud({
+  title,
+  results,
+  current,
+  score,
+  scoreLabel = "ניקוד",
+  scoreIcon: ScoreIcon,
+  showScoreLabel = false,
+  subtitle,
+  aside,
+  exitHref = "/games",
+  exitLabel = "יציאה מהמשחק",
+}: GameHudProps) {
   const done = results.filter((r) => r !== null).length;
   return (
     <header className="mb-5">
       <div className="flex items-center gap-3">
         <Link
-          href="/games"
-          aria-label="יציאה מהמשחק"
+          href={exitHref}
+          aria-label={exitLabel}
           className="game-press shrink-0 inline-flex w-10 h-10 items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary"
         >
           <X size={20} aria-hidden="true" />
@@ -83,7 +100,15 @@ export function GameHud({ title, results, current, score, scoreLabel = "ניקו
           <span
             key={i}
             className={`h-1.5 flex-1 rounded-[2px] transition-colors duration-200 ${
-              r === "correct" ? "bg-success" : r === "wrong" ? "bg-danger" : i === current ? "bg-primary" : "bg-card-border"
+              r === "correct"
+                ? "bg-success"
+                : r === "wrong"
+                  ? "bg-danger"
+                  : r === "done"
+                    ? "bg-primary/45"
+                    : i === current
+                      ? "bg-primary"
+                      : "bg-card-border"
             }`}
           />
         ))}
@@ -161,6 +186,7 @@ export function ChoiceGrid({ options, correctIndex, selected, locked, onChoose, 
             disabled={locked}
             onClick={() => onChoose(i)}
             aria-label={`${i + 1}. ${option}${showCorrect ? " — התשובה הנכונה" : showWrong ? " — לא נכון" : ""}`}
+            aria-pressed={!locked && isSelected ? true : undefined}
             className={`game-press game-choice group relative flex items-center gap-3 min-h-14 px-3.5 py-3 rounded-lg border text-start transition-[background-color,border-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${
               showCorrect
                 ? "border-success bg-success/10"
@@ -168,7 +194,9 @@ export function ChoiceGrid({ options, correctIndex, selected, locked, onChoose, 
                   ? "game-shake border-danger bg-danger/10"
                   : faded
                     ? "border-card-border opacity-55"
-                    : "border-card-border bg-background/40 hover:border-primary/50 hover:bg-primary/[0.04]"
+                    : isSelected
+                      ? "border-primary bg-primary/[0.08]"
+                      : "border-card-border bg-background/40 hover:border-primary/50 hover:bg-primary/[0.04]"
             }`}
           >
             <span
@@ -178,7 +206,9 @@ export function ChoiceGrid({ options, correctIndex, selected, locked, onChoose, 
                   ? "bg-success text-success-ink"
                   : showWrong
                     ? "bg-danger text-danger-ink"
-                    : "bg-background-2 text-muted group-hover:text-foreground"
+                    : isSelected && !locked
+                      ? "bg-primary text-primary-ink"
+                      : "bg-background-2 text-muted group-hover:text-foreground"
               }`}
             >
               {showCorrect ? <CheckCircle2 size={16} /> : showWrong ? <XCircle size={16} /> : i + 1}
