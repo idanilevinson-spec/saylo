@@ -2,7 +2,11 @@ import "server-only";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { PRICING_PLANS } from "@/lib/subscriptions/plans";
 import type { BillingDocument } from "@/types/database";
+import { sendReceiptNeededNotification } from "@/lib/notifications/resend";
 import { createReceipt, invoicesEnabled } from "./invoicePlusClient";
+
+// Webhooks and crons have no request origin to build the link from.
+const SITE_URL = "https://saylolearn.com";
 
 // Every successful web payment gets exactly one receipt. The flow is always:
 // record the payment as a 'pending' row (idempotent on payment_ref), then ask
@@ -89,6 +93,7 @@ export async function issueReceipt(doc: BillingDocument): Promise<BillingDocumen
       .from("billing_documents")
       .update({
         status: "issued",
+        issued_via: "invoice_plus",
         doc_uid: issued.docUid,
         doc_number: issued.number,
         pdf_url: issued.pdfUrl,
@@ -114,11 +119,37 @@ export async function issueReceipt(doc: BillingDocument): Promise<BillingDocumen
   }
 }
 
+// With automatic issuing off, receipts are made by hand in חשבון מהיר: email
+// the owner once per payment so it gets one promptly.
+async function notifyReceiptNeeded(doc: BillingDocument): Promise<void> {
+  if (doc.status === "issued" || doc.receipt_notified_at) return;
+  const sent = await sendReceiptNeededNotification({
+    customerName: doc.customer_name,
+    customerEmail: doc.customer_email,
+    amountIls: Number(doc.amount_ils),
+    description: doc.description,
+    paidAt: doc.paid_at,
+    source: doc.source,
+    adminUrl: `${SITE_URL}/admin/billing`,
+  });
+  if (sent) {
+    await supabaseAdmin
+      .from("billing_documents")
+      .update({ receipt_notified_at: new Date().toISOString() })
+      .eq("id", doc.id);
+  }
+}
+
 // The one call payment code makes. Never throws: a receipt problem must not
 // turn a successful payment into a failed webhook or a skipped renewal.
 export async function recordPaymentAndIssueReceipt(payment: PaymentRecord): Promise<BillingDocument | null> {
   try {
-    return await issueReceipt(await recordPayment(payment));
+    const doc = await recordPayment(payment);
+    if (!invoicesEnabled()) {
+      await notifyReceiptNeeded(doc);
+      return doc;
+    }
+    return await issueReceipt(doc);
   } catch (err) {
     console.error("receipt bookkeeping failed for", payment.paymentRef, err);
     return null;

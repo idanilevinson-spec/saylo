@@ -302,3 +302,52 @@ export async function sendSupportRequestNotification(req: SupportRequestNotifica
 
   return !error;
 }
+
+export interface ReceiptNeededNotification {
+  customerName: string;
+  customerEmail: string | null;
+  amountIls: number;
+  description: string;
+  paidAt: string;
+  source: "checkout" | "renewal" | "manual";
+  adminUrl: string;
+}
+
+// Receipts are issued by hand in חשבון מהיר (its free plan has no API), so
+// every web payment emails the owner the details to copy into a receipt.
+// The law wants the receipt right when the money comes in; this email is
+// what makes "right when" possible without watching the admin screen.
+export async function sendReceiptNeededNotification(n: ReceiptNeededNotification): Promise<boolean> {
+  const resend = getClient();
+  if (!resend) return false;
+
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding: 4px 0 4px 12px; color: #6b7280; white-space: nowrap; vertical-align: top;">${label}</td><td style="padding: 4px 0;">${value}</td></tr>`;
+  const sourceLabel = { checkout: "רכישה באתר", renewal: "חידוש אוטומטי", manual: "תשלום שהוזן ידנית" }[n.source];
+  const date = new Date(n.paidAt).toLocaleDateString("he-IL", { timeZone: "Asia/Jerusalem" });
+  const amount = `₪${Number(n.amountIls).toLocaleString("he-IL")}`;
+
+  const { error } = await resend.emails.send({
+    from: "Saylo <billing@saylolearn.com>",
+    to: CONTACT_EMAIL,
+    subject: `צריך להוציא קבלה: ${amount} — ${n.customerName}`,
+    html: `
+      <div dir="rtl" style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
+        <h1 style="font-size: 20px; color: #0066d6; margin: 0 0 16px;">התקבל תשלום. צריך להוציא עליו קבלה</h1>
+        <table style="font-size: 14px; border-collapse: collapse;">
+          ${row("שם על הקבלה", `<strong>${escapeHtml(n.customerName)}</strong>`)}
+          ${n.customerEmail ? row("אימייל לשליחה", escapeHtml(n.customerEmail)) : ""}
+          ${row("סכום", `<strong>${amount}</strong> (עוסק פטור, בלי מע״מ)`)}
+          ${row("פירוט", escapeHtml(n.description))}
+          ${row("תאריך התשלום", date)}
+          ${row("אמצעי תשלום", "כרטיס אשראי")}
+          ${row("סוג", sourceLabel)}
+        </table>
+        <p style="font-size: 14px; margin: 16px 0 0;">מוציאים קבלה בחשבון מהיר, שולחים אותה ללקוח, ואז מסמנים במסך הקבלות שהיא הופקה, עם מספר הקבלה.</p>
+        <a href="${escapeHtml(n.adminUrl)}" style="display: inline-block; margin-top: 20px; padding: 10px 18px; background: #0066d6; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">למסך הקבלות</a>
+      </div>
+    `,
+  });
+
+  return !error;
+}
