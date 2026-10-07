@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AlertTriangle, BookOpen, BookOpenText, Headphones, Lock, PenLine, type LucideIcon } from "lucide-react";
 import ContentCard from "@/components/ContentCard";
+import BagrutTrackPanel from "@/components/BagrutTrackPanel";
 import {
   BAGRUT_MODULE_FORMATS,
   modulesForUnits,
@@ -105,6 +106,11 @@ function TrackSection({ units }: { units: BagrutStudyUnits }) {
 }
 
 export default function BagrutIndexPage() {
+  const unitCounts = Object.fromEntries(MODULE_ORDER.map((code) => [code, getPublishableSampleUnits(code).length])) as Record<
+    BagrutModuleCode,
+    number
+  >;
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
@@ -135,6 +141,8 @@ export default function BagrutIndexPage() {
           כתחליף לחומר לימוד רשמי.
         </p>
       </div>
+
+      <BagrutTrackPanel unitCounts={unitCounts} />
 
       <div className="mt-10 space-y-10">
         <TrackSection units={3} />
