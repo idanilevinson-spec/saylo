@@ -30,7 +30,6 @@ const ROUND_RESULT_DELAY = 1000;
 const WAVE_CLEAR_DELAY = 1600;
 const LANE_COUNT = 4;
 const START_LANE = 1;
-const FALL_TARGET_PCT = 88;
 // Pressing ArrowDown speeds up the rest of the fall instead of slamming
 // it straight to the bottom — noticeably quicker, still readable/steerable.
 const SOFT_DROP_MULTIPLIER = 2.5;
@@ -94,8 +93,16 @@ function FallingWord({
       const multiplier = boostRef.current ? SOFT_DROP_MULTIPLIER : 1;
       progressRef.current = Math.min(1, progressRef.current + (dtSeconds * multiplier) / fallSeconds);
       const el = wrapRef.current;
-      const arena = el?.parentElement?.clientHeight ?? 0;
-      if (el) el.style.transform = `translate3d(0, ${(progressRef.current * FALL_TARGET_PCT * arena) / 100}px, 0)`;
+      if (el) {
+        // Land with the whole card still inside the arena: the travel is
+        // the arena height minus the card's own height, not a fixed share
+        // of the arena (which let a tall card on a short phone arena sink
+        // below the bottom edge).
+        const arena = el.parentElement?.clientHeight ?? 0;
+        const card = (el.firstElementChild as HTMLElement | null)?.offsetHeight ?? 0;
+        const travel = Math.max(0, arena - card - 8);
+        el.style.transform = `translate3d(0, ${progressRef.current * travel}px, 0)`;
+      }
       if (progressRef.current >= 1) {
         onLandedRef.current();
         return;
