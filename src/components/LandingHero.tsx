@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
+import AppStoreButton from "@/components/AppStoreButton";
 import { useAuth } from "@/context/AuthProvider";
 
 // Strong custom ease-out — the built-in framer-motion/CSS easings read as
@@ -105,6 +106,7 @@ export default function LandingHero() {
                   </Link>
                 </motion.div>
               </div>
+              <AppStoreButton className="mt-3" />
             </motion.div>
 
             {/* The signature moment: not a screenshot of the product but
