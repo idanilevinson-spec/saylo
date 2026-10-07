@@ -15,8 +15,7 @@ import { awardXp } from "@/lib/gamification/xp";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
-import EnglishText from "@/components/EnglishText";
-import { ChoiceGrid, GameHud, GameStage, LetterTiles, SpeakButton, WordReveal, type RoundResult } from "@/components/games/GameKit";
+import { PromptText, ChoiceGrid, GameHud, GameStage, LetterTiles, SpeakButton, WordReveal, type RoundResult } from "@/components/games/GameKit";
 import type { McqContent } from "@/types/exercises";
 
 const ROUND_SIZE = 10;
@@ -206,9 +205,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
         <GameStage stageKey={index} className={mode === "spelling" ? "text-center" : ""}>
           {mode === "mcq" && mcqContent ? (
             <>
-              <EnglishText as="p" className="text-xl sm:text-2xl font-bold leading-snug">
-                {mcqContent.prompt}
-              </EnglishText>
+              <PromptText text={mcqContent.prompt} className="text-xl sm:text-2xl font-bold leading-snug" />
               <div className="mt-5">
                 <ChoiceGrid
                   options={mcqContent.options}

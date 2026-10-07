@@ -12,8 +12,7 @@ import { awardXp } from "@/lib/gamification/xp";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
-import EnglishText from "@/components/EnglishText";
-import { ChoiceGrid, CountdownBar, GameHud, GameStage, WordReveal, type RoundResult } from "@/components/games/GameKit";
+import { PromptText, ChoiceGrid, CountdownBar, GameHud, GameStage, WordReveal, type RoundResult } from "@/components/games/GameKit";
 import type { McqContent } from "@/types/exercises";
 
 const QUESTION_SECONDS = 8;
@@ -171,9 +170,7 @@ function SpeedRoundPage({ onReplay }: { onReplay: () => void }) {
         <QuestionTimer key={`timer-${index}`} locked={locked} onTimeout={() => submitAnswer(-1)} />
 
         <GameStage stageKey={index} className="mt-4">
-          <EnglishText as="p" className="text-xl sm:text-2xl font-bold leading-snug">
-            {content.prompt}
-          </EnglishText>
+          <PromptText text={content.prompt} className="text-xl sm:text-2xl font-bold leading-snug" />
           {fastAnswer && (
             <p className="mt-1.5 inline-flex items-center gap-1 text-sm font-bold text-accent-hover">
               <Zap size={14} aria-hidden="true" className="fill-current" /> +{SPEED_BONUS_XP} XP על מהירות

@@ -172,6 +172,7 @@ function MemoryGamePage({ onReplay }: { onReplay: () => void }) {
         current={matchedVocabIds.size}
         score={comparisons}
         scoreLabel="ניסיונות"
+        showScoreLabel
       />
 
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 sm:gap-3">

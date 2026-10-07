@@ -25,13 +25,16 @@ interface GameHudProps {
   score?: number;
   scoreLabel?: string;
   scoreIcon?: LucideIcon;
+  // Print the label under the number — for a score that isn't self-evident
+  // (memory counts tries, where a bare "4" reads as points).
+  showScoreLabel?: boolean;
   // Extra line under the title (a level name, an instruction).
   subtitle?: ReactNode;
   // Rendered at the end of the top row (match's level clock, for instance).
   aside?: ReactNode;
 }
 
-export function GameHud({ title, results, current, score, scoreLabel = "ניקוד", scoreIcon: ScoreIcon, subtitle, aside }: GameHudProps) {
+export function GameHud({ title, results, current, score, scoreLabel = "ניקוד", scoreIcon: ScoreIcon, showScoreLabel = false, subtitle, aside }: GameHudProps) {
   const done = results.filter((r) => r !== null).length;
   return (
     <header className="mb-5">
@@ -59,6 +62,11 @@ export function GameHud({ title, results, current, score, scoreLabel = "ניקו
                 {score}
               </span>
             </span>
+            {showScoreLabel && (
+              <span aria-hidden="true" className="block text-[11px] text-muted leading-none mt-0.5">
+                {scoreLabel}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -206,14 +214,24 @@ const POS_HE: Record<string, string> = {
   pronoun: "כינוי גוף",
   conjunction: "מילת חיבור",
   phrase: "ביטוי",
+  "phrasal verb": "פועל צירופי",
+  idiom: "ניב",
+  expression: "ביטוי",
+  determiner: "מילת יידוע",
+  "modal verb": "פועל עזר",
+  number: "מספר",
   interjection: "מילת קריאה",
 };
 
-// The example with the word itself in bold, so the eye lands on it.
+// The example with the word itself in bold, so the eye lands on it. A
+// phrase is matched whole ("gets up", not just "gets"), with the first word
+// allowed to inflect (get → gets/getting) and the rest matched as written.
 function highlight(sentence: string, word: string): ReactNode {
-  const stem = word.trim().split(/\s+/)[0];
-  if (!stem) return sentence;
-  const re = new RegExp(`(${stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\w*)`, "i");
+  const words = word.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return sentence;
+  const escape = (w: string) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = words.map((w, i) => escape(w) + (i === 0 ? "\\w*" : "")).join("\\s+");
+  const re = new RegExp(`(${pattern})`, "i");
   const parts = sentence.split(re);
   return parts.map((part, i) => (i % 2 === 1 ? <strong key={i} className="text-foreground font-bold">{part}</strong> : part));
 }
@@ -375,5 +393,26 @@ export function LetterTiles({ hint, typed, word, verdict }: { hint: string; type
         );
       })}
     </div>
+  );
+}
+
+// ---------- Question text ----------
+
+// Exercise prompts come in both languages: most MCQ prompts are Hebrew
+// ("מה המילה באנגלית עבור …?"), definitions are English. Rendering a Hebrew
+// prompt as left-to-right English text throws its quotes and question mark
+// to the wrong end, so the direction follows the text itself.
+export function PromptText({ text, className = "" }: { text: string; className?: string }) {
+  if (/[֐-׿]/.test(text)) {
+    return (
+      <p dir="rtl" className={className}>
+        {text}
+      </p>
+    );
+  }
+  return (
+    <EnglishText as="p" className={className}>
+      {text}
+    </EnglishText>
   );
 }
