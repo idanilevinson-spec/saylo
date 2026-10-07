@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { Zap, CheckCircle2, XCircle } from "lucide-react";
+import { Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -14,7 +13,7 @@ import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/s
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
-import { GameScorePill, GameFeedback } from "@/components/games/GameMoments";
+import { ChoiceGrid, CountdownBar, GameHud, GameStage, WordReveal, type RoundResult } from "@/components/games/GameKit";
 import type { McqContent } from "@/types/exercises";
 
 const QUESTION_SECONDS = 8;
@@ -42,16 +41,7 @@ function QuestionTimer({ onTimeout, locked }: { onTimeout: () => void; locked: b
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft]);
 
-  const timePct = (timeLeft / QUESTION_SECONDS) * 100;
-  return (
-    <div className="h-2 rounded-full bg-background-2 overflow-hidden">
-      <motion.div
-        className={`h-full rounded-full ${timeLeft <= 3 ? "bg-danger" : "bg-accent"}`}
-        animate={{ width: `${timePct}%` }}
-        transition={{ duration: 0.9, ease: "linear" }}
-      />
-    </div>
-  );
+  return <CountdownBar timeLeft={timeLeft} total={QUESTION_SECONDS} paused={locked} />;
 }
 
 function SpeedRoundPage({ onReplay }: { onReplay: () => void }) {
@@ -66,6 +56,8 @@ function SpeedRoundPage({ onReplay }: { onReplay: () => void }) {
   const [timedOut, setTimedOut] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [bonusXp, setBonusXp] = useState(0);
+  const [results, setResults] = useState<RoundResult[]>([]);
+  const [fastAnswer, setFastAnswer] = useState(false);
   const [finished, setFinished] = useState(false);
   const questionStartRef = useRef<number>(0);
   const correctCountRef = useRef(0);
@@ -75,6 +67,7 @@ function SpeedRoundPage({ onReplay }: { onReplay: () => void }) {
     if (!profile) return;
     getDailyReview(profile.id, ROUND_SIZE).then((fetched) => {
       questionStartRef.current = Date.now();
+      setResults(fetched.map(() => null));
       setItems(fetched);
     });
   }, [profile]);
@@ -93,6 +86,8 @@ function SpeedRoundPage({ onReplay }: { onReplay: () => void }) {
     const attempt = startAttempt(profile.id, item.exercise, { selectedIndex });
     attempt.done.catch(() => undefined);
     setWasCorrect(attempt.isCorrect);
+    setResults((r) => r.map((v, i) => (i === index ? (attempt.isCorrect ? "correct" : "wrong") : v)));
+    setFastAnswer(attempt.isCorrect && elapsed < FAST_ANSWER_THRESHOLD_MS);
 
     if (attempt.isCorrect) {
       playCorrectSound();
@@ -108,30 +103,33 @@ function SpeedRoundPage({ onReplay }: { onReplay: () => void }) {
       setMissed((m) => [...m, { headword: item.headword, translationHe: item.translationHe }]);
     }
 
-    // A wrong (or timed-out) answer needs a beat to actually read which
-    // option was correct; a right answer doesn't need to linger at all —
-    // in a game built around pace, pausing exactly as long either way
-    // dragged down the fast path for no reason.
-    setTimeout(async () => {
-      if (index + 1 >= items.length) {
-        await supabase.from("vocabulary_game_sessions").insert({
-          profile_id: profile.id,
-          game_type: "speed_round",
-          total_questions: items.length,
-          correct_count: correctCountRef.current,
-          xp_awarded: bonusXpRef.current,
-        });
-        playCompleteSound();
-        setFinished(true);
-      } else {
-        questionStartRef.current = Date.now();
-        setIndex((i) => i + 1);
-        setSelected(null);
-        setLocked(false);
-        setWasCorrect(null);
-        setTimedOut(false);
-      }
-    }, attempt.isCorrect ? 350 : 1300);
+    // A right answer moves on almost at once — the game is about pace. A
+    // wrong one stops on the word card until the learner taps "next": the
+    // clock is per question, so reading costs nothing.
+    if (attempt.isCorrect) setTimeout(() => void advance(), 450);
+  }
+
+  async function advance() {
+    if (!profile || !items) return;
+    if (index + 1 >= items.length) {
+      await supabase.from("vocabulary_game_sessions").insert({
+        profile_id: profile.id,
+        game_type: "speed_round",
+        total_questions: items.length,
+        correct_count: correctCountRef.current,
+        xp_awarded: bonusXpRef.current,
+      });
+      playCompleteSound();
+      setFinished(true);
+    } else {
+      questionStartRef.current = Date.now();
+      setIndex((i) => i + 1);
+      setSelected(null);
+      setLocked(false);
+      setWasCorrect(null);
+      setTimedOut(false);
+      setFastAnswer(false);
+    }
   }
 
   if (loading || items === null) {
@@ -157,6 +155,7 @@ function SpeedRoundPage({ onReplay }: { onReplay: () => void }) {
         gameType="speed_round"
         startedAt={startedAt}
         missed={missed}
+        results={results}
         onReplay={onReplay}
       />
     );
@@ -167,58 +166,40 @@ function SpeedRoundPage({ onReplay }: { onReplay: () => void }) {
 
   return (
     <HeartsGate>
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="sr-only">סיבוב מהירות</h1>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm text-muted">
-            שאלה {index + 1} מתוך {items.length}
-          </span>
-          <GameScorePill value={correctCount} icon={Zap} />
-        </div>
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
+        <GameHud title="סיבוב מהירות" results={results} current={index} score={correctCount} scoreLabel="תשובות נכונות" scoreIcon={Zap} />
         <QuestionTimer key={`timer-${index}`} locked={locked} onTimeout={() => submitAnswer(-1)} />
 
-        <motion.div
-          key={`card-${index}`}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="mt-6 bg-card border border-card-border rounded-lg p-6 sm:p-8"
-        >
-          <EnglishText as="p" className="font-medium text-lg">
+        <GameStage stageKey={index} className="mt-4">
+          <EnglishText as="p" className="text-xl sm:text-2xl font-bold leading-snug">
             {content.prompt}
           </EnglishText>
+          {fastAnswer && (
+            <p className="mt-1.5 inline-flex items-center gap-1 text-sm font-bold text-accent-hover">
+              <Zap size={14} aria-hidden="true" className="fill-current" /> +{SPEED_BONUS_XP} XP על מהירות
+            </p>
+          )}
 
-          <div className="mt-4 space-y-2">
-            {content.options.map((option, i) => {
-              const isCorrectOption = i === content.correctIndex;
-              const isSelected = selected === i;
-              let stateClass = "border-card-border hover:border-primary/40";
-              if (locked && isCorrectOption) stateClass = "border-success bg-success/10";
-              else if (locked && isSelected && !isCorrectOption) stateClass = "border-danger bg-danger/10";
-              else if (isSelected) stateClass = "border-primary bg-primary/5";
-              return (
-                <button
-                  key={i}
-                  disabled={locked}
-                  onClick={() => submitAnswer(i)}
-                  className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default active:scale-[0.98] ${stateClass}`}
-                >
-                  <EnglishText>{option}</EnglishText>
-                  {locked && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
-                  {locked && isSelected && !isCorrectOption && <XCircle size={18} className="text-danger shrink-0" />}
-                </button>
-              );
-            })}
+          <div className="mt-5">
+            <ChoiceGrid
+              options={content.options}
+              correctIndex={content.correctIndex}
+              selected={selected}
+              locked={locked}
+              onChoose={submitAnswer}
+            />
           </div>
 
           {wasCorrect !== null && (
-            <GameFeedback correct={wasCorrect}>
-              {wasCorrect
-                ? "כל הכבוד!"
-                : `${timedOut ? "נגמר הזמן" : "לא בדיוק"} — ${item.headword} = ${item.translationHe}`}
-            </GameFeedback>
+            <WordReveal
+              word={item}
+              verdict={wasCorrect ? "correct" : timedOut ? "timeout" : "wrong"}
+              compact={wasCorrect}
+              onNext={wasCorrect ? undefined : () => void advance()}
+              nextLabel={index + 1 >= items.length ? "לתוצאות" : "לשאלה הבאה"}
+            />
           )}
-        </motion.div>
+        </GameStage>
       </div>
     </HeartsGate>
   );

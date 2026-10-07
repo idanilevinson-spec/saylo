@@ -10,6 +10,7 @@ import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import type { VocabularyGameType } from "@/types/database";
 import { GameCompletionScore } from "./GameMoments";
+import type { RoundResult } from "./GameKit";
 
 export interface MissedWord {
   headword: string;
@@ -67,10 +68,12 @@ interface GameResultsProps {
   // For games with no wrong answers to list (memory): show these words
   // under this heading instead of the missed-words recap.
   recap?: { title: string; words: MissedWord[] };
+  // The round, answer by answer — the same segments the top bar showed.
+  results?: RoundResult[];
   onReplay: () => void;
 }
 
-export default function GameResults({ title, percent, score, detail, gameType, startedAt, missed, recap, onReplay }: GameResultsProps) {
+export default function GameResults({ title, percent, score, detail, gameType, startedAt, missed, recap, results, onReplay }: GameResultsProps) {
   const previousBest = usePreviousBest(percent !== undefined && gameType ? gameType : null, startedAt);
   const isNewBest = percent !== undefined && previousBest !== undefined && previousBest !== null && percent > previousBest;
   const words = recap?.words ?? missed;
@@ -83,6 +86,17 @@ export default function GameResults({ title, percent, score, detail, gameType, s
         <h1 className="text-2xl font-bold">{title}</h1>
         <GameCompletionScore>{score ?? `${percent}%`}</GameCompletionScore>
         <p className="mt-2 text-muted tabular-nums">{detail}</p>
+
+        {results && results.length > 0 && (
+          <div className="mt-4 flex justify-center gap-[3px]" aria-hidden="true">
+            {results.map((r, i) => (
+              <span
+                key={i}
+                className={`h-2 w-full max-w-6 rounded-[2px] ${r === "correct" ? "bg-success" : r === "wrong" ? "bg-danger" : "bg-card-border"}`}
+              />
+            ))}
+          </div>
+        )}
 
         {percent !== undefined && previousBest !== undefined && (
           <p className="mt-3 text-sm min-h-5" aria-live="polite">

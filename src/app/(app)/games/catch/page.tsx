@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Hand, Zap } from "lucide-react";
+import { ArrowDown, ArrowLeftRight, Hand, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
@@ -14,7 +14,7 @@ import { awardXp } from "@/lib/gamification/xp";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
-import { GameScorePill, GameFeedback } from "@/components/games/GameMoments";
+import { GameHud, WordReveal, type RoundResult } from "@/components/games/GameKit";
 
 const WAVE_SIZE = 5;
 const WAVE_COUNT = 4;
@@ -63,12 +63,14 @@ function FallingWord({
   fallSeconds: number;
   onLanded: () => void;
 }) {
-  const [topPct, setTopPct] = useState(0);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
   const boostRef = useRef(false);
   const lastTimeRef = useRef(0);
   const onLandedRef = useRef(onLanded);
-  onLandedRef.current = onLanded;
+  useEffect(() => {
+    onLandedRef.current = onLanded;
+  });
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -81,6 +83,9 @@ function FallingWord({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  // The fall is written straight to the element's transform every frame —
+  // no React state per frame, so nothing re-renders 60 times a second and
+  // the motion stays on the compositor (smooth in the iOS app's WebView).
   useEffect(() => {
     lastTimeRef.current = performance.now();
     let raf = requestAnimationFrame(function tick(now) {
@@ -88,7 +93,9 @@ function FallingWord({
       lastTimeRef.current = now;
       const multiplier = boostRef.current ? SOFT_DROP_MULTIPLIER : 1;
       progressRef.current = Math.min(1, progressRef.current + (dtSeconds * multiplier) / fallSeconds);
-      setTopPct(progressRef.current * FALL_TARGET_PCT);
+      const el = wrapRef.current;
+      const arena = el?.parentElement?.clientHeight ?? 0;
+      if (el) el.style.transform = `translate3d(0, ${(progressRef.current * FALL_TARGET_PCT * arena) / 100}px, 0)`;
       if (progressRef.current >= 1) {
         onLandedRef.current();
         return;
@@ -99,14 +106,15 @@ function FallingWord({
   }, [fallSeconds]);
 
   return (
-    <div className="absolute inset-x-0" style={{ top: `${topPct}%` }}>
+    <div ref={wrapRef} className="absolute inset-x-0 top-0 will-change-transform">
       <motion.div
         initial={{ left: `${lanePercent(START_LANE)}%` }}
         animate={{ left: `${lanePercent(lane)}%` }}
-        transition={{ duration: 0.15, ease: "easeOut" }}
-        className="absolute -translate-x-1/2 px-6 py-4 rounded-lg bg-card border border-primary/30 shadow-md"
+        transition={{ duration: 0.12, ease: [0.23, 1, 0.32, 1] }}
+        className="absolute -translate-x-1/2 overflow-hidden px-4 sm:px-6 py-3 sm:py-4 rounded-lg bg-card border border-primary/40 shadow-[0_6px_18px_-6px_rgb(0_0_0/0.35)]"
       >
-        <EnglishText className="text-3xl font-bold">{headword}</EnglishText>
+        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
+        <EnglishText className="text-2xl sm:text-3xl font-bold whitespace-nowrap">{headword}</EnglishText>
       </motion.div>
     </div>
   );
@@ -132,6 +140,7 @@ function WordCatchPage({ onReplay }: { onReplay: () => void }) {
   const scoreRef = useRef(0);
   const laneRef = useRef(START_LANE);
   const [streakBonus, setStreakBonus] = useState(0);
+  const [results, setResults] = useState<RoundResult[]>(() => Array.from({ length: TOTAL_ROUNDS }, () => null));
 
   const waveIndex = Math.floor(round / WAVE_SIZE);
   const roundInWave = round % WAVE_SIZE;
@@ -179,6 +188,7 @@ function WordCatchPage({ onReplay }: { onReplay: () => void }) {
 
       const item = items[round % items.length];
       const isCorrect = outcome === "caught";
+      setResults((r) => r.map((v, i) => (i === round ? (isCorrect ? "correct" : "wrong") : v)));
       if (isCorrect) {
         playCorrectSound();
         caughtRef.current += 1;
@@ -309,6 +319,7 @@ function WordCatchPage({ onReplay }: { onReplay: () => void }) {
         gameType="word_catch"
         startedAt={startedAt}
         missed={missed}
+        results={results}
         onReplay={onReplay}
       />
     );
@@ -318,16 +329,19 @@ function WordCatchPage({ onReplay }: { onReplay: () => void }) {
     const clearedWave = Math.floor(round / WAVE_SIZE) + 1;
     const nextWave = clearedWave + 1;
     return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center">
+      <div className="max-w-xl mx-auto px-4 py-24 text-center" role="status">
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.35 }}
+          initial={{ opacity: 0, transform: "scale(0.92)" }}
+          animate={{ opacity: 1, transform: "scale(1)" }}
+          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
         >
-          <IconBadge icon={Zap} tone="accent" className="mx-auto" />
-          <h1 className="mt-4 text-3xl font-bold">גל {clearedWave} הושלם!</h1>
-          <p className="mt-2 text-muted">ניקוד: {score}</p>
-          <p className="mt-4 text-lg font-bold text-accent-hover">גל {nextWave} מתחיל — קצב מהיר יותר!</p>
+          <p className="text-sm font-bold text-muted">גל {clearedWave} הושלם</p>
+          <p className="mt-2 chyron text-7xl text-primary tabular-nums">{score}</p>
+          <p className="mt-1 text-sm text-muted">נקודות עד עכשיו</p>
+          <p className="mt-6 inline-flex items-center gap-1.5 text-lg font-bold text-accent-hover">
+            <Zap size={18} aria-hidden="true" className="fill-current" />
+            גל {nextWave}: המילים נופלות מהר יותר
+          </p>
         </motion.div>
       </div>
     );
@@ -337,77 +351,81 @@ function WordCatchPage({ onReplay }: { onReplay: () => void }) {
 
   return (
     <HeartsGate>
-      <div className="max-w-4xl mx-auto px-4 py-10">
-        <h1 className="sr-only">תפסו את המילה</h1>
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-muted">
-            גל {waveIndex + 1} מתוך {WAVE_COUNT} · מילה {roundInWave + 1} מתוך {WAVE_SIZE}
-          </p>
-          <GameScorePill value={score} icon={Zap} />
-        </div>
+      <div className="max-w-3xl mx-auto px-4 pt-6 pb-10">
+        <GameHud
+          title="תפסו את המילה"
+          subtitle={`גל ${waveIndex + 1} מתוך ${WAVE_COUNT}`}
+          results={results}
+          current={round}
+          score={score}
+          scoreLabel="נקודות"
+          scoreIcon={Zap}
+        />
 
-        <div className="relative h-96 rounded-lg border border-card-border bg-background-2 overflow-hidden">
+        <div className="relative h-72 sm:h-96 rounded-lg border border-card-border bg-background-2 overflow-hidden">
+          {/* Lane guides: where the word will land, so steering is legible. */}
+          <div aria-hidden="true" className="absolute inset-0 grid grid-cols-4">
+            {Array.from({ length: LANE_COUNT }, (_, i) => (
+              <span
+                key={i}
+                className={`transition-colors duration-150 ${i < LANE_COUNT - 1 ? "border-e border-dashed border-card-border" : ""} ${
+                  lane === i ? "bg-primary/[0.07]" : ""
+                }`}
+              />
+            ))}
+          </div>
           <FallingWord key={round} headword={item.headword} lane={lane} fallSeconds={fallSeconds} onLanded={handleLanded} />
-          <div
-            aria-hidden="true"
-            className="absolute bottom-0 inset-x-0 h-1.5 bg-gradient-to-t from-danger/40 to-transparent"
-          />
+          <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-1 bg-danger/50" />
         </div>
 
-        <p className="mt-6 text-center text-sm text-muted">הזיזו את המילה הנופלת לתרגום הנכון עם החצים</p>
-
-        <div className="mt-4 grid grid-cols-4 gap-4">
+        <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
           {options.map((opt, i) => {
             const isPicked = pickedOption === opt;
             const isCorrectOpt = result && opt === item.translationHe;
             return (
-              <motion.button
+              <button
                 key={`${opt}-${i}`}
-                // Keyboard-focusable: the falling-word steering listens on
-                // `window` with preventDefault (see the ArrowLeft/ArrowRight
-                // effect above), so it fires regardless of which element
-                // has focus — these are plain buttons with no native
-                // arrow-key focus-cycling (that only exists for roles like
-                // radiogroup/listbox, which this isn't), so there's no
-                // actual conflict to avoid by pulling them out of the tab
-                // order. A Tab+Enter user needs a real way to pick an
-                // answer without racing the fall timer.
+                // Keyboard-focusable: steering listens on `window`, so it
+                // works whatever has focus, and a Tab+Enter user needs a
+                // real way to pick without racing the fall.
+                type="button"
                 onClick={(e) => {
                   e.currentTarget.blur();
                   handlePick(opt, i);
                 }}
                 disabled={!!result}
-                whileHover={!result ? { scale: 1.02 } : undefined}
-                whileTap={!result ? { scale: 0.97 } : undefined}
-                className={`px-3 py-5 rounded-lg border text-lg font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                className={`game-press min-h-16 px-1.5 sm:px-3 py-3 rounded-lg border text-sm sm:text-lg font-bold leading-tight transition-[background-color,border-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                   isCorrectOpt
                     ? "border-success bg-success/10 text-success"
                     : isPicked
-                      ? "border-danger bg-danger/10 text-danger"
-                      : "border-card-border bg-card hover:border-primary/40 disabled:opacity-50"
+                      ? "game-shake border-danger bg-danger/10 text-danger"
+                      : lane === i && !result
+                        ? "border-primary bg-primary/[0.06]"
+                        : "border-card-border bg-card hover:border-primary/50 disabled:opacity-50"
                 }`}
               >
                 {opt}
-              </motion.button>
+              </button>
             );
           })}
         </div>
 
-        <p className="mt-3 text-center text-xs text-muted">
-          חצים ⇄ להזזת המילה הנופלת · חץ ⇣ להאצת הנפילה · אפשר גם ללחוץ ישירות
+        <p className="mt-3 text-center text-xs text-muted pointer-coarse:hidden">
+          <span className="inline-flex items-center gap-1 align-middle">
+            <ArrowLeftRight size={13} aria-hidden="true" /> מזיזים את המילה
+          </span>
+          {" · "}
+          <span className="inline-flex items-center gap-1 align-middle">
+            <ArrowDown size={13} aria-hidden="true" /> מאיצים את הנפילה
+          </span>
+          {" · "}
+          או לוחצים ישירות על התרגום
+        </p>
+        <p className="mt-3 text-center text-xs text-muted hidden pointer-coarse:block">
+          מקישים על התרגום הנכון לפני שהמילה נוחתת
         </p>
 
-        {result && (
-          <GameFeedback correct={result === "caught"} centered>
-            {result === "caught" ? (
-              "תפסתם נכון!"
-            ) : (
-              <>
-                <EnglishText>{item.headword}</EnglishText> = {item.translationHe}
-              </>
-            )}
-          </GameFeedback>
-        )}
+        {result && <WordReveal word={item} verdict={result === "caught" ? "correct" : "wrong"} compact />}
       </div>
     </HeartsGate>
   );

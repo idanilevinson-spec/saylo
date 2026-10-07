@@ -422,6 +422,64 @@ textarea::placeholder {
   word-spacing: 0.04em;
 }
 
+/* ---- Games (src/components/games/GameKit.tsx) ----
+   Press feedback lands on pointer-down (:active), not on release, so a tap
+   feels answered the instant the finger lands — including in the iOS app's
+   WKWebView. Hover is already gated to real pointers by Tailwind v4. */
+.game-press {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.game-press:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* Score numeral: a short pop each time it changes (remounted by key). */
+@keyframes game-pop {
+  from { transform: scale(1.35); }
+  to { transform: scale(1); }
+}
+.game-pop {
+  display: inline-block;
+  animation: game-pop 260ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* A wrong choice: one small horizontal shake, then still. */
+@keyframes game-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+.game-shake {
+  animation: game-shake 320ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* The per-question clock (CountdownBar). Linear: it is a clock. */
+@keyframes game-drain {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+.game-drain {
+  animation-name: game-drain;
+  animation-duration: var(--game-clock);
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-pop,
+  .game-shake {
+    animation: none;
+  }
+  .game-press:not(:disabled):active {
+    transform: none;
+  }
+}
+
 /* The manual "stop animations" toggle. framer-motion's own JS-driven
    animations are handled separately (AccessibilityProvider passes
    reducedMotion="always" to MotionConfig when this is on) — this covers
@@ -451,4 +509,10 @@ textarea::placeholder {
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
+}
+
+/* The game clock is information, not decoration: keep it draining when
+   animations are switched off (the blanket rule above would end it at once). */
+:root[data-a11y-motion="reduced"] .game-drain {
+  animation-duration: var(--game-clock) !important;
 }

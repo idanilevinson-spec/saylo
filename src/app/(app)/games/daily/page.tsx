@@ -2,8 +2,7 @@
 
 import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { Sparkles, CheckCircle2, XCircle } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -17,7 +16,7 @@ import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/s
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
-import { GameScorePill, GameFeedback } from "@/components/games/GameMoments";
+import { ChoiceGrid, GameHud, GameStage, LetterTiles, SpeakButton, WordReveal, type RoundResult } from "@/components/games/GameKit";
 import type { McqContent } from "@/types/exercises";
 
 const ROUND_SIZE = 10;
@@ -47,6 +46,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
   const [correctCount, setCorrectCount] = useState(0);
   const [finished, setFinished] = useState(false);
   const [alreadyDoneToday, setAlreadyDoneToday] = useState(false);
+  const [results, setResults] = useState<RoundResult[]>([]);
   const correctCountRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -69,6 +69,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
           .gte("created_at", todayStart.toISOString())
           .limit(1),
       ]);
+      setResults(reviewItems.map(() => null));
       setItems(reviewItems);
       setAlreadyDoneToday((todaySessions ?? []).length > 0);
     })();
@@ -99,25 +100,30 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
     setFinished(true);
   }
 
-  async function advance(isCorrect: boolean) {
+  // Records the verdict; a right answer moves on by itself, a wrong one
+  // waits on the word card until the learner taps "next".
+  function settle(isCorrect: boolean) {
     correctCountRef.current += isCorrect ? 1 : 0;
+    setCorrectCount(correctCountRef.current);
+    setResults((r) => r.map((v, i) => (i === index ? (isCorrect ? "correct" : "wrong") : v)));
     if (!isCorrect && items) {
       const missedItem = items[index];
       setMissed((m) => [...m, { headword: missedItem.headword, translationHe: missedItem.translationHe }]);
     }
-    setCorrectCount(correctCountRef.current);
-    setTimeout(() => {
-      if (!items) return;
-      if (index + 1 >= items.length) {
-        void finishRound(correctCountRef.current);
-      } else {
-        setIndex((i) => i + 1);
-        setSelected(null);
-        setInput("");
-        setLocked(false);
-        setWasCorrect(null);
-      }
-    }, 1100);
+    if (isCorrect) setTimeout(next, 900);
+  }
+
+  function next() {
+    if (!items) return;
+    if (index + 1 >= items.length) {
+      void finishRound(correctCountRef.current);
+    } else {
+      setIndex((i) => i + 1);
+      setSelected(null);
+      setInput("");
+      setLocked(false);
+      setWasCorrect(null);
+    }
   }
 
   function submitMcq(selectedIndex: number) {
@@ -131,7 +137,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
     setWasCorrect(attempt.isCorrect);
     if (attempt.isCorrect) playCorrectSound();
     else playIncorrectSound();
-    void advance(attempt.isCorrect);
+    settle(attempt.isCorrect);
   }
 
   function submitSpelling() {
@@ -143,7 +149,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
     if (isCorrect) playCorrectSound();
     else playIncorrectSound();
     recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_daily").catch(() => undefined);
-    void advance(isCorrect);
+    settle(isCorrect);
   }
 
   if (loading || items === null) {
@@ -174,6 +180,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
         gameType="daily_challenge"
         startedAt={startedAt}
         missed={missed}
+        results={results}
         onReplay={onReplay}
       />
     );
@@ -185,94 +192,91 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
 
   return (
     <HeartsGate>
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="sr-only">האתגר היומי</h1>
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-muted">
-            שאלה {index + 1} מתוך {items.length}
-          </span>
-          <GameScorePill value={correctCount} icon={Sparkles} />
-        </div>
-        <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-6">
-          <div className="h-full bg-accent transition-all" style={{ width: `${((index + 1) / items.length) * 100}%` }} />
-        </div>
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
+        <GameHud
+          title="האתגר היומי"
+          subtitle={alreadyDoneToday ? "כבר השלמתם היום. הסיבוב הזה לתרגול" : `השלמה מזכה ב-${COMPLETION_BONUS_XP} XP`}
+          results={results}
+          current={index}
+          score={correctCount}
+          scoreLabel="תשובות נכונות"
+          scoreIcon={Sparkles}
+        />
 
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
-        >
+        <GameStage stageKey={index} className={mode === "spelling" ? "text-center" : ""}>
           {mode === "mcq" && mcqContent ? (
-            <div>
-              <EnglishText as="p" className="font-medium text-lg">
+            <>
+              <EnglishText as="p" className="text-xl sm:text-2xl font-bold leading-snug">
                 {mcqContent.prompt}
               </EnglishText>
-              <div className="mt-4 space-y-2">
-                {mcqContent.options.map((option, i) => {
-                  const isCorrectOption = i === mcqContent.correctIndex;
-                  const isSelected = selected === i;
-                  let stateClass = "border-card-border hover:border-primary/40";
-                  if (locked && isCorrectOption) stateClass = "border-success bg-success/10";
-                  else if (locked && isSelected && !isCorrectOption) stateClass = "border-danger bg-danger/10";
-                  else if (isSelected) stateClass = "border-primary bg-primary/5";
-                  return (
-                    <button
-                      key={i}
-                      disabled={locked}
-                      onClick={() => submitMcq(i)}
-                      className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default active:scale-[0.98] ${stateClass}`}
-                    >
-                      <EnglishText>{option}</EnglishText>
-                      {locked && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
-                      {locked && isSelected && !isCorrectOption && <XCircle size={18} className="text-danger shrink-0" />}
-                    </button>
-                  );
-                })}
+              <div className="mt-5">
+                <ChoiceGrid
+                  options={mcqContent.options}
+                  correctIndex={mcqContent.correctIndex}
+                  selected={selected}
+                  locked={locked}
+                  onChoose={submitMcq}
+                />
               </div>
-            </div>
+            </>
           ) : (
-            <div className="text-center">
-              <p className="text-sm text-muted">השלימו את המילה באנגלית עבור</p>
-              <p className="mt-1 text-2xl font-bold">{item.translationHe}</p>
-              <p dir="ltr" className="mt-6 font-content text-3xl tracking-widest text-muted select-none">
-                {maskWord(item.headword)}
-              </p>
-              <input
-                ref={inputRef}
-                type="text"
-                {...ENGLISH_WORD_INPUT}
-                aria-label={`השלימו את המילה עבור ${item.translationHe}`}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && submitSpelling()}
-                disabled={locked}
-                placeholder="Type the word..."
-                className="mt-6 w-full px-4 py-3 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
-              />
+            <>
+              <p className="text-sm text-muted">איך כותבים באנגלית</p>
+              <p className="mt-1 text-2xl sm:text-3xl font-bold">{item.translationHe}</p>
+              <div className="mt-6">
+                <LetterTiles
+                  hint={maskWord(item.headword)}
+                  typed={input}
+                  word={item.headword}
+                  verdict={wasCorrect === null ? null : wasCorrect ? "correct" : "wrong"}
+                />
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  submitSpelling();
+                }}
+                className="mt-6 flex gap-2"
+              >
+                <input
+                  ref={inputRef}
+                  type="text"
+                  {...ENGLISH_WORD_INPUT}
+                  aria-label={`איך כותבים באנגלית ${item.translationHe}`}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={locked}
+                  maxLength={item.headword.length + 4}
+                  placeholder="Type the whole word"
+                  className="flex-1 min-w-0 min-h-12 px-4 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70 placeholder:text-muted"
+                />
+                <SpeakButton text={item.headword} label="רמז קולי: השמעת המילה" />
+              </form>
               {!locked && (
                 <button
+                  type="button"
                   onClick={submitSpelling}
                   disabled={!input.trim()}
-                  className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
+                  className="game-press mt-3 w-full min-h-12 px-4 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[background-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
                   בדיקה
                 </button>
               )}
-            </div>
+            </>
           )}
 
           {wasCorrect !== null && (
-            <GameFeedback correct={wasCorrect} centered>
-              {wasCorrect
-                ? "כל הכבוד!"
-                : mode === "spelling"
-                  ? `לא בדיוק — המילה היא "${item.headword}"`
-                  : `לא בדיוק — התשובה הנכונה: "${mcqContent?.options[mcqContent.correctIndex]}"`}
-            </GameFeedback>
+            <div className="text-start">
+              <WordReveal
+                word={item}
+                verdict={wasCorrect ? "correct" : "wrong"}
+                compact={wasCorrect}
+                onNext={wasCorrect ? undefined : next}
+                nextLabel={index + 1 >= items.length ? "לתוצאות" : "לשאלה הבאה"}
+              />
+            </div>
           )}
-        </motion.div>
+        </GameStage>
       </div>
     </HeartsGate>
   );

@@ -4,7 +4,7 @@ import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, Trophy, Sparkles, CheckCircle2, XCircle, PartyPopper } from "lucide-react";
+import { GraduationCap, Sparkles, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import {
   getLearnPool,
@@ -20,9 +20,9 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
-import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
-import { GameScorePill, GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
+import GameResults, { withReplay } from "@/components/games/GameResults";
+import { ChoiceGrid, GameHud, GameStage, SpeakButton, WordReveal, type RoundResult } from "@/components/games/GameKit";
 
 const POOL_SIZE = 12;
 // Mastering a word needs repetitions to reach 4 (new -> learning -> familiar
@@ -54,7 +54,7 @@ const TIER_CLASS: Record<MasteryTier, string> = {
 export default function LearnModePage() {
   return (
     <Suspense fallback={<div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>}>
-      <LearnModePageInner />
+      <ReplayableLearn />
     </Suspense>
   );
 }
@@ -63,7 +63,9 @@ export default function LearnModePage() {
 // can actually see their own SRS mastery state (every other game just
 // uses it silently) — a genuine improvement, not just parity with the
 // arcade games it otherwise follows the shape of.
-function LearnModePageInner() {
+const ReplayableLearn = withReplay(LearnModePageInner);
+
+function LearnModePageInner({ onReplay }: { onReplay: () => void }) {
   const { profile, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const topicSlug = searchParams.get("topic") ?? undefined;
@@ -78,6 +80,13 @@ function LearnModePageInner() {
   const [locked, setLocked] = useState(false);
   const [wasCorrect, setWasCorrect] = useState<boolean | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
+  const [startedAt] = useState(() => Date.now());
+  // Set once a wrong answer is saved: "next" runs it. Right answers move on
+  // by themselves.
+  const [nextAction, setNextAction] = useState<(() => void) | null>(null);
+  // Bumped per question, so the same word asked twice in a row still
+  // remounts its stage.
+  const [turn, setTurn] = useState(0);
 
   const correctCountRef = useRef(0);
   const totalAnsweredRef = useRef(0);
@@ -115,10 +124,12 @@ function LearnModePageInner() {
     }
     setQueue(nextQueue);
     setQuestion(buildLearnQuestion(nextQueue[0], fullPool));
+    setTurn((t) => t + 1);
     setSelected(null);
     setInput("");
     setLocked(false);
     setWasCorrect(null);
+    setNextAction(null);
   }
 
   async function finishSession() {
@@ -158,7 +169,7 @@ function LearnModePageInner() {
     xpAwardedRef.current += res.xpAwarded;
     const newTier = masteryTier(res.repetitions);
 
-    setTimeout(() => {
+    const proceed = () => {
       const restOfQueue = queue.slice(1);
       if (newTier === "mastered") {
         setMasteredWords((prev) => [...prev, { ...item, repetitions: res.repetitions }]);
@@ -171,7 +182,9 @@ function LearnModePageInner() {
         const updatedItem = { ...item, repetitions: res.repetitions };
         advanceTo([...restOfQueue, updatedItem]);
       }
-    }, 900);
+    };
+    if (isCorrect) setTimeout(proceed, 900);
+    else setNextAction(() => proceed);
   }
 
   function submitMcq(index: number) {
@@ -200,172 +213,122 @@ function LearnModePageInner() {
   }
 
   if (phase === "finished") {
-    const total = fullPool.length;
     return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">סבב הלמידה הושלם!</h1>
-        <GameCompletionScore>
-          {masteredWords.length}/{total}
-        </GameCompletionScore>
-        <p className="mt-2 text-muted">מילים הגיעו לשליטה מלאה</p>
-        {masteredWords.length > 0 && (
-          <div className="mt-6 flex flex-wrap justify-center gap-2">
-            {masteredWords.map((w) => (
-              <span
-                key={w.vocabularyItemId}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success/10 border border-success/25 text-sm"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                <EnglishText>{w.headword}</EnglishText>
-              </span>
-            ))}
-          </div>
-        )}
-        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games/learn"
-            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            עוד סיבוב למידה
-          </MotionLink>
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games"
-            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            חזרה למשחקים
-          </MotionLink>
-        </div>
-      </div>
+      <GameResults
+        title="סבב הלמידה הסתיים"
+        score={`${masteredWords.length}/${fullPool.length}`}
+        detail={<>מילים שהגיעו לשליטה מלאה בסבב · {correctCount} תשובות נכונות</>}
+        startedAt={startedAt}
+        missed={[]}
+        recap={{ title: masteredWords.length ? "מילים בשליטה" : "המילים בסבב", words: masteredWords.length ? masteredWords : fullPool }}
+        onReplay={onReplay}
+      />
     );
   }
 
   const total = fullPool.length;
   const remaining = total - masteredWords.length;
+  const masteredIds = new Set(masteredWords.map((w) => w.vocabularyItemId));
+  const results: RoundResult[] = fullPool.map((w) => (masteredIds.has(w.vocabularyItemId) ? "correct" : null));
+  const tier = question ? masteryTier(question.item.repetitions) : "new";
 
   return (
     <HeartsGate>
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <h1 className="sr-only">סבב הלמידה</h1>
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-sm text-muted">
-            {masteredWords.length} מתוך {total} מילים בשליטה
-          </span>
-          <GameScorePill value={correctCount} icon={Sparkles} />
-        </div>
-
-        <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
-          <motion.div
-            className="h-full bg-success"
-            animate={{ width: `${(masteredWords.length / Math.max(total, 1)) * 100}%` }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
+        <GameHud
+          title="למידה"
+          subtitle={`${masteredWords.length} מתוך ${total} מילים בשליטה · ${remaining} נשארו`}
+          results={results}
+          current={masteredWords.length}
+          score={correctCount}
+          scoreLabel="תשובות נכונות"
+          scoreIcon={Sparkles}
+        />
 
         <div className="relative">
           <AnimatePresence>
             {phase === "wordMastered" && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                role="status"
+                initial={{ opacity: 0, transform: "scale(0.96)" }}
+                animate={{ opacity: 1, transform: "scale(1)" }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-background/90 rounded-lg"
+                transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+                className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-background/95 rounded-lg"
               >
                 <p className="flex items-center gap-2 text-xl font-bold text-success">
                   <PartyPopper size={20} className="shrink-0" aria-hidden="true" />
-                  מילה בשליטה מלאה!
+                  מילה בשליטה מלאה
                 </p>
-                {question && <EnglishText className="text-lg text-muted">{question.item.headword}</EnglishText>}
+                {question && <EnglishText className="chyron text-5xl text-foreground normal-case">{question.item.headword}</EnglishText>}
               </motion.div>
             )}
           </AnimatePresence>
 
           {question && (
-            <motion.div
-              key={question.item.vocabularyItemId + question.type}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted">{remaining} מילים נשארו בסבב הזה</p>
-                <span
-                  className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${TIER_CLASS[masteryTier(question.item.repetitions)]}`}
-                >
-                  {TIER_LABEL[masteryTier(question.item.repetitions)]}
-                </span>
+            <GameStage stageKey={turn}>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm text-muted">
+                  {question.type === "mcq" ? "איזו מילה באנגלית מתאימה?" : "איך כותבים באנגלית?"}
+                </p>
+                <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${TIER_CLASS[tier]}`}>{TIER_LABEL[tier]}</span>
               </div>
+              <p className="mt-1 text-2xl sm:text-3xl font-bold">{question.item.translationHe}</p>
 
               {question.type === "mcq" ? (
-                <div className="mt-4">
-                  <p className="text-sm text-muted">איזו מילה מתאימה לתרגום</p>
-                  <p className="mt-1 text-2xl font-bold">{question.item.translationHe}</p>
-                  <div className="mt-5 space-y-2">
-                    {question.options.map((option, i) => {
-                      const isCorrectOption = i === question.correctIndex;
-                      const isSelected = selected === i;
-                      let stateClass = "border-card-border hover:border-primary/40";
-                      if (locked && isCorrectOption) stateClass = "border-success bg-success/10";
-                      else if (locked && isSelected && !isCorrectOption) stateClass = "border-danger bg-danger/10";
-                      else if (isSelected) stateClass = "border-primary bg-primary/5";
-                      return (
-                        <button
-                          key={i}
-                          disabled={locked}
-                          onClick={() => submitMcq(i)}
-                          className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default active:scale-[0.98] ${stateClass}`}
-                        >
-                          <EnglishText>{option}</EnglishText>
-                          {locked && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
-                          {locked && isSelected && !isCorrectOption && <XCircle size={18} className="text-danger shrink-0" />}
-                        </button>
-                      );
-                    })}
-                  </div>
+                <div className="mt-5">
+                  <ChoiceGrid
+                    options={question.options}
+                    correctIndex={question.correctIndex}
+                    selected={selected}
+                    locked={locked}
+                    onChoose={submitMcq}
+                  />
                 </div>
               ) : (
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted">השלימו את המילה באנגלית עבור</p>
-                  <p className="mt-1 text-2xl font-bold">{question.item.translationHe}</p>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    {...ENGLISH_WORD_INPUT}
-                    aria-label={`השלימו את המילה עבור ${question.item.translationHe}`}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && submitRecall()}
-                    disabled={locked}
-                    placeholder="Type the word..."
-                    className="mt-6 w-full px-4 py-3 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
-                  />
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    submitRecall();
+                  }}
+                  className="mt-5"
+                >
+                  <div className="flex gap-2">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      {...ENGLISH_WORD_INPUT}
+                      aria-label={`איך כותבים באנגלית ${question.item.translationHe}`}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      disabled={locked}
+                      placeholder="Type the word"
+                      className="flex-1 min-w-0 min-h-12 px-4 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70 placeholder:text-muted"
+                    />
+                    <SpeakButton text={question.item.headword} label="רמז קולי: השמעת המילה" />
+                  </div>
                   {!locked && (
                     <button
-                      onClick={submitRecall}
+                      type="submit"
                       disabled={!input.trim()}
-                      className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
+                      className="game-press mt-3 w-full min-h-12 px-4 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[background-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                     >
                       בדיקה
                     </button>
                   )}
-                </div>
+                </form>
               )}
 
               {wasCorrect !== null && (
-                <GameFeedback correct={wasCorrect} centered>
-                  {wasCorrect
-                    ? "כל הכבוד!"
-                    : question.type === "recall"
-                      ? `לא בדיוק — המילה היא "${question.item.headword}"`
-                      : "לא בדיוק"}
-                </GameFeedback>
+                <WordReveal
+                  word={question.item}
+                  verdict={wasCorrect ? "correct" : "wrong"}
+                  compact={wasCorrect}
+                  onNext={!wasCorrect && nextAction ? nextAction : undefined}
+                  nextLabel="המשך"
+                />
               )}
-            </motion.div>
+            </GameStage>
           )}
         </div>
       </div>

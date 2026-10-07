@@ -83,7 +83,7 @@ function VocabTestPageInner() {
   }
 
   if (phase === "ready") {
-    return <VocabTest steps={steps} />;
+    return <VocabTest steps={steps} onRestart={() => setPhase("picker")} />;
   }
 
   if (phase === "generating") {
