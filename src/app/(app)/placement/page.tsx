@@ -572,7 +572,7 @@ export default function PlacementPage() {
           onClick={handleSkip}
           className="mt-2.5 w-full px-4 py-2 rounded-lg text-sm text-muted font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
-          לא יודע/ת · דלגו לשאלה הבאה
+          לא יודעים? דלגו לשאלה הבאה
         </button>
       </motion.div>
     </div>

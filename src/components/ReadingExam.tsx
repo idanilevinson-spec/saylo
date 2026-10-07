@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Timer, ChevronDown, ChevronUp, Sparkles, Trophy, CheckCircle2, XCircle } from "lucide-react";
+import { Timer, ChevronDown, ChevronUp, Sparkles, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { useAiConsent } from "@/components/AiConsentGate";
 import { startAttempt } from "@/lib/exercises/recordAttempt";
@@ -14,6 +14,7 @@ import ReadingTextViewer from "@/components/ReadingTextViewer";
 import HeartsGate from "@/components/HeartsGate";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
+import { GameHud, type RoundResult } from "@/components/games/GameKit";
 import type { VocabularyLookupEntry } from "@/lib/content/vocabulary";
 import type { Exercise, ReadingText, ReadingOpenQuestion, CefrLevel } from "@/types/database";
 import type { McqResponse } from "@/types/exercises";
@@ -61,6 +62,9 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
   const [phase, setPhase] = useState<Phase>("intro");
   const [stepIndex, setStepIndex] = useState(0);
   const [answeredThisStep, setAnsweredThisStep] = useState(false);
+  // What the top bar's segments show: right/wrong for MCQs, "done" for
+  // open questions (graded 0–100 by AI, not right/wrong).
+  const [stepResults, setStepResults] = useState<Record<number, RoundResult>>({});
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
   const [showPassage, setShowPassage] = useState(false);
   const [mcqOutcomes, setMcqOutcomes] = useState<McqOutcome[]>([]);
@@ -134,6 +138,10 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
     setPhase("exam");
   }
 
+  function markStep(r: RoundResult) {
+    setStepResults((prev) => ({ ...prev, [stepIndex]: r }));
+  }
+
   function handleMcqSubmit(exercise: Exercise, response: McqResponse) {
     if (!profile || answeredThisStep) return;
     setAnsweredThisStep(true);
@@ -142,6 +150,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
     const attempt = startAttempt(profile.id, exercise, response as unknown as Record<string, unknown>);
     attempt.done.catch(() => undefined);
     setLastCorrect(attempt.isCorrect);
+    markStep(attempt.isCorrect ? "correct" : "wrong");
     if (attempt.isCorrect) playCorrectSound();
     else playIncorrectSound();
     const prompt = (exercise.content as { prompt?: string }).prompt ?? "";
@@ -233,20 +242,15 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
         : null;
     return (
       <div className="mt-8 text-center">
-        <div className="mx-auto w-16 h-16 rounded-full bg-accent/10 text-accent-hover flex items-center justify-center">
-          <Trophy size={28} />
-        </div>
-        <h2 className="mt-3 text-2xl font-bold">המבחן הושלם!</h2>
+        <h2 className="text-2xl font-bold">המבחן הושלם</h2>
+        {mcqCount > 0 && (
+          <p className="mt-2 chyron text-7xl text-primary tabular-nums" aria-label={`${correctCount} מתוך ${mcqCount} נכונות ברב-ברירה`}>
+            {correctCount}/{mcqCount}
+          </p>
+        )}
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-          {mcqCount > 0 && (
-            <span className="px-4 py-2 rounded-lg bg-card border border-card-border text-sm">
-              <EnglishText as="span" className="font-bold">
-                {correctCount}/{mcqCount}
-              </EnglishText>{" "}
-              ברב-ברירה
-            </span>
-          )}
+          {mcqCount > 0 && <span className="text-sm text-muted">נכונות בשאלות הרב-ברירה</span>}
           {avgOpenScore !== null && (
             <span className="px-4 py-2 rounded-lg bg-card border border-card-border text-sm">
               ממוצע{" "}
@@ -309,27 +313,24 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
   return (
     <HeartsGate>
       <div className="mt-8">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted">
-            שלב {stepNumber} מתוך {totalSteps}
-          </span>
-          {timedMode ? (
-            <div
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${
-                lowTime ? "bg-danger-ink text-danger" : "bg-background-2 text-muted"
-              }`}
-            >
-              <Timer size={14} />
-              <EnglishText as="span" className="tabular-nums">
-                {formatTime(timeLeft)}
-              </EnglishText>
-            </div>
-          ) : (
-            <span className="px-3 py-1 rounded-full text-sm font-bold bg-background-2 text-muted">
-              מצב תרגול · ללא הגבלת זמן
-            </span>
-          )}
-        </div>
+        <GameHud
+          title="מבחן הבנה"
+          subtitle={`שאלה ${stepNumber} מתוך ${totalSteps}${timedMode ? "" : " · בלי הגבלת זמן"}`}
+          results={Array.from({ length: totalSteps }, (_, i) => stepResults[i] ?? null)}
+          current={stepIndex}
+          exitHref="/reading"
+          exitLabel="יציאה מהמבחן, חזרה לכל הטקסטים"
+          aside={
+            timedMode ? (
+              <div className="shrink-0 flex items-center gap-1.5" aria-label={`נותר ${formatTime(timeLeft)}`}>
+                <Timer size={16} aria-hidden="true" className={lowTime ? "text-danger" : "text-muted"} />
+                <span aria-hidden="true" className={`chyron text-3xl tabular-nums ${lowTime ? "text-danger" : "text-foreground"}`}>
+                  {formatTime(timeLeft)}
+                </span>
+              </div>
+            ) : undefined
+          }
+        />
 
         <button
           onClick={() => setShowPassage((v) => !v)}
@@ -360,8 +361,9 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mt-4 bg-card border border-card-border rounded-lg p-6 sm:p-8"
+          className="relative overflow-hidden mt-4 bg-card border border-card-border rounded-lg p-5 sm:p-7"
         >
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
           {currentExercise && (
             <>
               <McqQuestion
@@ -411,6 +413,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
                 onGraded={(r) => {
                   setOpenOutcomesById((prev) => ({ ...prev, [currentOpenQuestion.id]: r }));
                   setAnsweredThisStep(true);
+                  markStep("done");
                 }}
               />
               {answeredThisStep && (

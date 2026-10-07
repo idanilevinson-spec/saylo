@@ -64,7 +64,18 @@ export default async function PracticePage({ params }: PageProps) {
 
   if (!exercise) notFound();
 
-  const { siblings, backHref, backLabel } = await resolveParent(supabase, exercise);
+  // The word the exercise is about, when it's tied to one — shown on the
+  // word card after answering (audio, IPA, example sentence).
+  const [{ siblings, backHref, backLabel }, { data: word }] = await Promise.all([
+    resolveParent(supabase, exercise),
+    exercise.vocabulary_item_id
+      ? supabase
+          .from("vocabulary_items")
+          .select("headword, translation_he, example_en, ipa, part_of_speech")
+          .eq("id", exercise.vocabulary_item_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
 
   const currentIndex = siblings.findIndex((s) => s.id === exercise.id);
   const nextHref =
@@ -78,6 +89,17 @@ export default async function PracticePage({ params }: PageProps) {
       backHref={backHref}
       backLabel={backLabel}
       progress={progress}
+      word={
+        word
+          ? {
+              headword: word.headword,
+              translationHe: word.translation_he,
+              exampleEn: word.example_en,
+              ipa: word.ipa,
+              partOfSpeech: word.part_of_speech,
+            }
+          : null
+      }
     />
   );
 }
