@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { AlertTriangle, BookOpen, BookOpenText, Headphones, Lock, PenLine, type LucideIcon } from "lucide-react";
-import ContentCard from "@/components/ContentCard";
-import BagrutTrackPanel from "@/components/BagrutTrackPanel";
+import Link from "next/link";
+import { AlertTriangle, ChevronLeft, GraduationCap } from "lucide-react";
 import {
   BAGRUT_MODULE_FORMATS,
   modulesForUnits,
@@ -9,146 +8,130 @@ import {
   type BagrutStudyUnits,
 } from "@/lib/content/bagrut/moduleFormats";
 import { getPublishableSampleUnits } from "@/lib/content/bagrut/sampleUnits";
+import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/lib/content/bagrut/skills";
+import { getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
 
 export const metadata: Metadata = {
-  title: "תרגול בגרות באנגלית — Saylo",
+  title: "בגרות באנגלית — Saylo",
 };
 
-const MODULE_ORDER: BagrutModuleCode[] = ["A", "B", "C", "D", "E", "F", "G"];
+const TRACKS: BagrutStudyUnits[] = [3, 4, 5];
 
-const TRACK_LABELS: Record<BagrutStudyUnits, string> = {
-  3: "3 יחידות לימוד",
-  4: "4 יחידות לימוד",
-  5: "5 יחידות לימוד",
+const TRACK_NOTE: Record<BagrutStudyUnits, string> = {
+  3: "קריאה, האזנה וכתיבה",
+  4: "קריאה, ספרות, אוצר מילים וכתיבה",
+  5: "קריאה מתקדמת, אוצר מילים וחיבור",
 };
 
-// One icon per module's dominant skill, not a decorative pick — A is the
-// only module with a listening section, E is vocabulary-only (no writing),
-// the rest center on a writing task.
-const MODULE_ICON: Record<BagrutModuleCode, LucideIcon> = {
-  A: Headphones,
-  B: PenLine,
-  C: BookOpenText,
-  D: BookOpenText,
-  E: BookOpen,
-  F: PenLine,
-  G: PenLine,
-};
+const KIND_ORDER: BagrutSkillKind[] = ["reading", "listening", "literature", "vocabulary", "writing"];
 
-function moduleMeta(code: BagrutModuleCode): string {
-  const format = BAGRUT_MODULE_FORMATS[code];
-  return [
-    format.percentOfFinalGrade ? `${format.percentOfFinalGrade}% מהציון` : null,
-    format.timeMinutes ? `${format.timeMinutes} דקות` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-}
-
-function ModuleCard({ code, index }: { code: BagrutModuleCode; index: number }) {
-  const units = getPublishableSampleUnits(code);
-  const Icon = MODULE_ICON[code];
-  const meta = moduleMeta(code);
-
-  if (units.length === 0) {
-    return (
-      <div className="h-full rounded-lg border border-dashed border-card-border p-5 opacity-70">
-        <div className="flex items-center gap-3">
-          <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-background-2 shrink-0">
-            <Lock size={16} className="text-muted" />
-          </span>
-          <div>
-            <p className="font-bold">מודול {code}</p>
-            {meta && <p className="text-xs text-muted mt-0.5">{meta}</p>}
-          </div>
-        </div>
-        <p className="mt-3 text-xs text-muted leading-relaxed">
-          המבנה של המודול הזה עדיין לא אומת מול מקור מספיק — עוד לא זמין לתרגול.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <ContentCard href={`/bagrut/${code}`} index={index}>
-      <div className="flex items-start gap-3">
-        <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 text-primary shrink-0">
-          <Icon size={18} />
-        </span>
-        <div>
-          <p className="font-bold">מודול {code}</p>
-          <p className="text-xs text-muted mt-0.5">
-            {meta ? `${meta} · ` : ""}
-            {units.length} {units.length === 1 ? "ערכת תרגול" : "ערכות תרגול"}
-          </p>
-        </div>
-      </div>
-    </ContentCard>
-  );
-}
-
-function TrackSection({ units }: { units: BagrutStudyUnits }) {
-  const codes = MODULE_ORDER.filter((code) => modulesForUnits(units).includes(code));
-
-  return (
-    <div>
-      <div className="flex items-baseline gap-2">
-        <h2 className="text-lg font-bold">{TRACK_LABELS[units]}</h2>
-        <span className="text-sm text-muted">מודולים {codes.join(" + ")}</span>
-      </div>
-      <div className="mt-4 grid sm:grid-cols-2 gap-4">
-        {codes.map((code, i) => (
-          <ModuleCard key={code} code={code} index={i} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default function BagrutIndexPage() {
-  const unitCounts = Object.fromEntries(MODULE_ORDER.map((code) => [code, getPublishableSampleUnits(code).length])) as Record<
-    BagrutModuleCode,
-    number
-  >;
+export default async function BagrutHubPage() {
+  const { track, progress } = await getBagrutLearnerState();
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 -top-16 h-48 -z-10"
-          style={{
-            background:
-              "radial-gradient(ellipse 55% 100% at 20% 30%, color-mix(in srgb, var(--primary) 11%, transparent) 0%, transparent 65%), radial-gradient(ellipse 45% 100% at 85% 10%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 60%)",
-          }}
-        />
-        <div className="animate-fade-up">
-          <h1 className="text-3xl font-bold">תרגול בגרות באנגלית</h1>
-          <p className="mt-2 text-muted leading-relaxed">
-            תרגול לפי מבנה הבחינה האמיתי, מודול אחר מודול — הבנת הנשמע, הבנת הנקרא, אוצר מילים וכתיבה, בחלוקה
-            שתואמת את יחידות הלימוד שלכם.
-          </p>
-        </div>
-      </div>
+      <h1 className="text-3xl font-bold">בגרות באנגלית</h1>
+      <p className="mt-2 text-muted leading-relaxed max-w-prose">
+        אזור לימוד לפי מספר יחידות הלימוד: מבנה כל שאלון, המיומנויות שכדאי לחזק לקראתו, וערכות תרגול באותו מבנה,
+        גם בזמן אמיתי של בחינה.
+      </p>
 
-      <div
-        role="note"
-        className="mt-6 flex gap-3 rounded-lg border border-accent/40 bg-accent/[0.07] p-4 text-sm leading-relaxed"
-      >
-        <AlertTriangle size={18} className="shrink-0 text-accent-hover mt-0.5" />
+      <div role="note" className="mt-6 flex gap-3 rounded-lg border border-accent/40 bg-accent/[0.07] p-4 text-sm leading-relaxed">
+        <AlertTriangle size={18} aria-hidden="true" className="shrink-0 text-accent-hover mt-0.5" />
         <p>
-          כל התוכן כאן נכתב על ידי AI לפי מבנה בחינה מאומת, ולא נבדק על ידי מורה מוסמך. מתאים כתרגול נוסף — לא
-          כתחליף לחומר לימוד רשמי.
+          מבנה השאלונים אומת מול מקורות ציבוריים. ההסברים, הדוגמאות וערכות התרגול נכתבו על ידי AI ולא נבדקו על ידי מורה
+          מוסמך. מתאים כתרגול נוסף, לא כתחליף לחומר לימוד רשמי או להנחיית מורה.
         </p>
       </div>
 
-      <BagrutTrackPanel unitCounts={unitCounts} />
+      <section aria-labelledby="tracks-title" className="mt-10">
+        <h2 id="tracks-title" className="text-lg font-bold">
+          בחרו מסלול
+        </h2>
+        <ul className="mt-3 grid sm:grid-cols-3 gap-3">
+          {TRACKS.map((units) => {
+            const codes = modulesForUnits(units);
+            const totalSets = codes.reduce((n, c) => n + getPublishableSampleUnits(c).length, 0);
+            const done = progress.filter((p) => codes.includes(p.module_code as BagrutModuleCode)).length;
+            const mine = track === units;
+            return (
+              <li key={units}>
+                <Link
+                  href={`/bagrut/track/${units}`}
+                  className={`game-press group relative flex h-full flex-col overflow-hidden rounded-lg border bg-card p-5 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                    mine ? "border-primary/60" : "border-card-border"
+                  }`}
+                >
+                  {mine && <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />}
+                  <span className="flex items-baseline justify-between gap-2">
+                    <span className="flex items-baseline gap-1.5">
+                      <span className="chyron text-5xl text-primary tabular-nums">{units}</span>
+                      <span className="font-bold">יח״ל</span>
+                    </span>
+                    {mine && <span className="text-xs font-bold text-accent-hover">המסלול שלכם</span>}
+                  </span>
+                  <span className="mt-2 text-sm text-muted">{TRACK_NOTE[units]}</span>
+                  <span dir="ltr" className="mt-3 flex justify-end gap-1.5">
+                    {codes.map((c) => (
+                      <span key={c} className="chyron inline-flex w-8 h-8 items-center justify-center rounded-md bg-background-2 text-lg">
+                        {c}
+                      </span>
+                    ))}
+                  </span>
+                  <span className="mt-4 block h-1.5 rounded-full bg-background-2 overflow-hidden" aria-hidden="true">
+                    <span className="block h-full bg-primary" style={{ width: `${totalSets ? (Math.min(done, totalSets) / totalSets) * 100 : 0}%` }} />
+                  </span>
+                  <span className="mt-1.5 flex items-center justify-between text-xs text-muted tabular-nums">
+                    {Math.min(done, totalSets)} מתוך {totalSets} ערכות
+                    <ChevronLeft size={16} aria-hidden="true" className="transition-transform group-hover:-translate-x-0.5" />
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        {!track && (
+          <p className="mt-3 flex items-center gap-1.5 text-sm text-muted">
+            <GraduationCap size={15} aria-hidden="true" />
+            לא בטוחים באיזה מסלול? כדאי לבדוק עם המורה באיזו רמה אתם ניגשים לבחינה.
+          </p>
+        )}
+      </section>
 
-      <div className="mt-10 space-y-10">
-        <TrackSection units={3} />
-        <TrackSection units={4} />
-        <TrackSection units={5} />
-      </div>
+      <section aria-labelledby="skills-title" className="mt-12">
+        <h2 id="skills-title" className="text-lg font-bold">
+          מיומנויות לבחינה
+        </h2>
+        <p className="mt-1 text-sm text-muted">הסבר קצר, צעדים, מלכודות נפוצות ודוגמה פתורה לכל מיומנות.</p>
+        <div className="mt-4 space-y-5">
+          {KIND_ORDER.map((kind) => {
+            const skills = BAGRUT_SKILLS.filter((s) => s.kind === kind);
+            if (skills.length === 0) return null;
+            return (
+              <div key={kind}>
+                <h3 className="text-sm font-bold text-muted">{BAGRUT_SKILL_KIND_LABEL[kind]}</h3>
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {skills.map((s) => (
+                    <li key={s.slug}>
+                      <Link
+                        href={`/bagrut/skills/${s.slug}`}
+                        className="game-press inline-flex items-center min-h-10 px-3.5 rounded-lg border border-card-border bg-card text-sm font-medium hover:border-primary/50 transition-[border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                      >
+                        {s.titleHe}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <p className="mt-12 text-xs text-muted">
+        מבנה השאלונים: {(Object.values(BAGRUT_MODULE_FORMATS).every((f) => f.verified) ? "כל שבעת המודולים אומתו" : "חלק מהמודולים אומתו")} מול ארכיון
+        משרד החינוך ומדריכי הכנה ציבוריים.
+      </p>
     </div>
   );
 }

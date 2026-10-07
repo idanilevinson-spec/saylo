@@ -603,17 +603,17 @@ function BagrutResultCard({ bagrut }: { bagrut: NonNullable<PlacementResult["bag
       <div className="mt-4 flex flex-wrap gap-2">
         <MotionLink
           whileTap={{ scale: 0.97 }}
-          href={`/bagrut/${startModule}`}
+          href={`/bagrut/track/${bagrut.units}#module-${startModule}`}
           className="px-4 py-2 rounded-lg bg-primary text-primary-ink text-sm font-medium hover:bg-primary-hover transition-colors"
         >
           להתחיל במודול {startModule}
         </MotionLink>
         <MotionLink
           whileTap={{ scale: 0.97 }}
-          href="/bagrut"
+          href={`/bagrut/track/${bagrut.units}`}
           className="px-4 py-2 rounded-lg border border-card-border text-sm font-medium hover:border-primary/40 transition-colors"
         >
-          כל מודולי הבגרות
+          אזור הלימוד של {bagrut.units} יח״ל
         </MotionLink>
       </div>
     </motion.section>
