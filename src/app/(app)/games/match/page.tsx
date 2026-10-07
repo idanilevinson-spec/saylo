@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link2, Trophy, Timer, PartyPopper } from "lucide-react";
+import { Link2, Timer, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { getMatchPairs, type MatchPair, type MatchRoundType } from "@/lib/games/matchContent";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
@@ -11,9 +12,7 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { shuffle } from "@/lib/utils/shuffle";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
-import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
-import { GameCompletionScore } from "@/components/games/GameMoments";
 
 interface LevelConfig {
   type: MatchRoundType;
@@ -48,8 +47,10 @@ type Phase = "loading" | "empty" | "playing" | "levelUp" | "finished";
 // column is always where interaction starts.
 type Endpoint = { side: "source"; id: string } | { side: "target"; id: string };
 
-export default function MatchGamePage() {
+function MatchGamePage({ onReplay }: { onReplay: () => void }) {
   const { profile, loading: authLoading } = useAuth();
+  const [startedAt] = useState(() => Date.now());
+  const [missed, setMissed] = useState<MissedWord[]>([]);
   const [phase, setPhase] = useState<Phase>("loading");
   const [levelIndex, setLevelIndex] = useState(0);
   const [pairs, setPairs] = useState<MatchPair[]>([]);
@@ -171,6 +172,7 @@ export default function MatchGamePage() {
       }
     } else {
       playIncorrectSound();
+      setMissed((m) => [...m, { headword: pair.source, translationHe: pair.target }]);
       setWrongPulse({ sourceId, target: targetValue });
       setSelectedEndpoint(null);
       selectedEndpointRef.current = null;
@@ -321,32 +323,15 @@ export default function MatchGamePage() {
   if (phase === "finished") {
     const accuracy = totalAttemptsRef.current > 0 ? Math.round((correctCountRef.current / totalAttemptsRef.current) * 100) : 0;
     return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">משחק ההתאמה הושלם!</h1>
-        <GameCompletionScore>{accuracy}%</GameCompletionScore>
-        <p className="mt-1 text-muted">
-          {correctCountRef.current} התאמות נכונות מתוך {totalAttemptsRef.current}
-        </p>
-        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games/match"
-            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            עוד סיבוב
-          </MotionLink>
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games"
-            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            חזרה למשחקים
-          </MotionLink>
-        </div>
-      </div>
+      <GameResults
+        title="סוף משחק ההתאמה"
+        percent={accuracy}
+        detail={<>{correctCountRef.current} התאמות נכונות מתוך {totalAttemptsRef.current} ניסיונות</>}
+        gameType="match"
+        startedAt={startedAt}
+        missed={missed}
+        onReplay={onReplay}
+      />
     );
   }
 
@@ -508,3 +493,5 @@ export default function MatchGamePage() {
     </HeartsGate>
   );
 }
+
+export default withReplay(MatchGamePage);

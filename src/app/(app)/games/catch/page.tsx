@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Hand, Trophy, Zap } from "lucide-react";
+import { Hand, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { playCorrectSound, playIncorrectSound, playCompleteSound, playLevelUpSound } from "@/lib/sound/effects";
@@ -12,9 +13,8 @@ import { shuffle } from "@/lib/utils/shuffle";
 import { awardXp } from "@/lib/gamification/xp";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
-import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
-import { GameScorePill, GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
+import { GameScorePill, GameFeedback } from "@/components/games/GameMoments";
 
 const WAVE_SIZE = 5;
 const WAVE_COUNT = 4;
@@ -112,8 +112,10 @@ function FallingWord({
   );
 }
 
-export default function WordCatchPage() {
+function WordCatchPage({ onReplay }: { onReplay: () => void }) {
   const { profile, loading: authLoading } = useAuth();
+  const [startedAt] = useState(() => Date.now());
+  const [missed, setMissed] = useState<MissedWord[]>([]);
   const [phase, setPhase] = useState<Phase>("loading");
   const [items, setItems] = useState<DueReviewItem[]>([]);
   const [round, setRound] = useState(0);
@@ -191,6 +193,7 @@ export default function WordCatchPage() {
       } else {
         playIncorrectSound();
         streakRef.current = 0;
+        setMissed((m) => [...m, { headword: item.headword, translationHe: item.translationHe }]);
       }
       const res = await recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_catch");
       xpAwardedRef.current += res.xpAwarded;
@@ -290,35 +293,24 @@ export default function WordCatchPage() {
   }
 
   if (phase === "finished") {
-    const accuracy = Math.round((caughtRef.current / TOTAL_ROUNDS) * 100);
+    const caught = TOTAL_ROUNDS - missed.length;
+    const accuracy = Math.round((caught / TOTAL_ROUNDS) * 100);
     return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">תפסו את המילה הושלם!</h1>
-        <GameCompletionScore>{score}</GameCompletionScore>
-        <p className="mt-1 text-muted">
-          {caughtRef.current} מתוך {TOTAL_ROUNDS} תפוסות ({accuracy}%)
-          {streakBonus > 0 && <> · +{streakBonus} XP בונוס רצף</>}
-        </p>
-        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games/catch"
-            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            עוד סיבוב
-          </MotionLink>
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games"
-            className="px-6 py-3 rounded-lg border border-card-border font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-          >
-            חזרה למשחקים
-          </MotionLink>
-        </div>
-      </div>
+      <GameResults
+        title="סוף המשחק"
+        score={`${score} נק׳`}
+        percent={accuracy}
+        detail={
+          <>
+            {caught} מתוך {TOTAL_ROUNDS} נתפסו ({accuracy}%)
+            {streakBonus > 0 && <> · +{streakBonus} XP בונוס רצף</>}
+          </>
+        }
+        gameType="word_catch"
+        startedAt={startedAt}
+        missed={missed}
+        onReplay={onReplay}
+      />
     );
   }
 
@@ -420,3 +412,5 @@ export default function WordCatchPage() {
     </HeartsGate>
   );
 }
+
+export default withReplay(WordCatchPage);

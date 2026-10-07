@@ -3,8 +3,9 @@
 import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Trophy, CheckCircle2, XCircle } from "lucide-react";
+import { Sparkles, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { supabase } from "@/lib/supabase/browserClient";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
 import { startAttempt } from "@/lib/exercises/recordAttempt";
@@ -15,9 +16,8 @@ import { awardXp } from "@/lib/gamification/xp";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
-import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
-import { GameScorePill, GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
+import { GameScorePill, GameFeedback } from "@/components/games/GameMoments";
 import type { McqContent } from "@/types/exercises";
 
 const ROUND_SIZE = 10;
@@ -34,8 +34,10 @@ function modeFor(vocabularyItemId: string): Mode {
   return Math.abs(hash) % 2 === 0 ? "mcq" : "spelling";
 }
 
-export default function DailyChallengePage() {
+function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
   const { profile, loading } = useAuth();
+  const [startedAt] = useState(() => Date.now());
+  const [missed, setMissed] = useState<MissedWord[]>([]);
   const [items, setItems] = useState<DueReviewItem[] | null>(null);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -51,18 +53,24 @@ export default function DailyChallengePage() {
   useEffect(() => {
     if (!profile) return;
     (async () => {
-      const [reviewItems, { data: todaySession }] = await Promise.all([
+      // Since local midnight, not UTC midnight (which is 02:00/03:00 in
+      // Israel), and limit(1) rather than maybeSingle(): with two sessions
+      // already today maybeSingle() errors, returns no row, and the
+      // completion bonus would be paid again.
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const [reviewItems, { data: todaySessions }] = await Promise.all([
         getDailyReview(profile.id, ROUND_SIZE),
         supabase
           .from("vocabulary_game_sessions")
           .select("id")
           .eq("profile_id", profile.id)
           .eq("game_type", "daily_challenge")
-          .gte("created_at", new Date().toISOString().slice(0, 10))
-          .maybeSingle(),
+          .gte("created_at", todayStart.toISOString())
+          .limit(1),
       ]);
       setItems(reviewItems);
-      setAlreadyDoneToday(!!todaySession);
+      setAlreadyDoneToday((todaySessions ?? []).length > 0);
     })();
   }, [profile]);
 
@@ -93,6 +101,10 @@ export default function DailyChallengePage() {
 
   async function advance(isCorrect: boolean) {
     correctCountRef.current += isCorrect ? 1 : 0;
+    if (!isCorrect && items) {
+      const missedItem = items[index];
+      setMissed((m) => [...m, { headword: missedItem.headword, translationHe: missedItem.translationHe }]);
+    }
     setCorrectCount(correctCountRef.current);
     setTimeout(() => {
       if (!items) return;
@@ -149,25 +161,21 @@ export default function DailyChallengePage() {
   }
 
   if (finished) {
-    const accuracy = Math.round((correctCount / items.length) * 100);
     return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">האתגר היומי הושלם!</h1>
-        <GameCompletionScore>{accuracy}%</GameCompletionScore>
-        <p className="mt-2 text-muted">
-          {correctCount} מתוך {items.length} נכונות
-          {!alreadyDoneToday && <> · +{COMPLETION_BONUS_XP} XP בונוס על השלמת האתגר היומי</>}
-        </p>
-        <MotionLink
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          href="/games"
-          className="mt-6 inline-block px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-        >
-          חזרה למשחקים
-        </MotionLink>
-      </div>
+      <GameResults
+        title="האתגר היומי הושלם"
+        percent={Math.round((correctCount / items.length) * 100)}
+        detail={
+          <>
+            {correctCount} מתוך {items.length} נכונות
+            {!alreadyDoneToday && <> · +{COMPLETION_BONUS_XP} XP בונוס על האתגר היומי</>}
+          </>
+        }
+        gameType="daily_challenge"
+        startedAt={startedAt}
+        missed={missed}
+        onReplay={onReplay}
+      />
     );
   }
 
@@ -269,3 +277,5 @@ export default function DailyChallengePage() {
     </HeartsGate>
   );
 }
+
+export default withReplay(DailyChallengePage);
