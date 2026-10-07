@@ -60,6 +60,10 @@ export async function generatePaymentPageLink(params: GenerateLinkParams): Promi
       // chars, a UUID) comfortably fits in its own more_info_N field instead.
       more_info_1: params.profileId,
       more_info_2: params.planId,
+      // PayPlus issues the קבלה for this charge (Invoice+, terminal set up
+      // to do so). Sent explicitly so a later change to the terminal's
+      // default can't silently leave payments without receipts.
+      initial_invoice: true,
       refURL_success: params.successUrl,
       refURL_failure: params.failureUrl,
       refURL_callback: params.callbackUrl,
@@ -97,7 +101,9 @@ interface ChargeTokenParams {
 // run its own recurring schedule. Synchronous: the result is known from the
 // response here, no separate IPN callback involved for this charge.
 // See https://docs.payplus.co.il/reference/post_transactions-charge.
-export async function chargeToken(params: ChargeTokenParams): Promise<void> {
+// Returns PayPlus's transaction uid, which is how the receipt PayPlus issues
+// for this charge is found again (lib/billing/receipts.ts).
+export async function chargeToken(params: ChargeTokenParams): Promise<{ transactionUid: string | null }> {
   const res = await fetch(`${BASE_URL}/Transactions/Charge`, {
     method: "POST",
     headers: {
@@ -115,11 +121,13 @@ export async function chargeToken(params: ChargeTokenParams): Promise<void> {
       token: params.token,
       customer_uid: params.customerUid,
       more_info_1: params.profileId,
+      // Same as checkout: PayPlus issues the renewal's קבלה itself.
+      initial_invoice: true,
     }),
   });
 
   const raw = await res.text();
-  let body: { results?: { status?: string }; data?: { transaction?: { status_code?: string } } };
+  let body: { results?: { status?: string }; data?: { transaction?: { status_code?: string; uid?: string } } };
   try {
     body = JSON.parse(raw);
   } catch {
@@ -129,6 +137,7 @@ export async function chargeToken(params: ChargeTokenParams): Promise<void> {
   if (!succeeded) {
     throw new Error(`PayPlus token charge failed (status ${res.status}): ${raw}`);
   }
+  return { transactionUid: body.data?.transaction?.uid ?? null };
 }
 
 // Callback authenticity check — see

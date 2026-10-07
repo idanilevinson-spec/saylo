@@ -2,13 +2,17 @@ import "server-only";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { PRICING_PLANS } from "@/lib/subscriptions/plans";
 import type { BillingDocument } from "@/types/database";
-import { createReceipt, invoicesEnabled } from "./invoicePlusClient";
+import { sendReceiptNeededNotification } from "@/lib/notifications/resend";
+import { createReceipt, getTransactionDocuments, invoicesEnabled } from "./invoicePlusClient";
 
-// Every successful web payment gets exactly one receipt. The flow is always:
-// record the payment as a 'pending' row (idempotent on payment_ref), then ask
-// Invoice+ for the document. The second step can fail — Invoice+ not yet
-// switched on, a timeout — and that's fine: the row stays open, the daily
-// cron retries it, and the admin billing screen shows it until it's issued.
+// Webhooks and crons have no request origin to build the link from.
+const SITE_URL = "https://saylolearn.com";
+
+// Every successful web payment gets exactly one receipt, and this ledger
+// tracks it: the payment is recorded as a 'pending' row (idempotent on
+// payment_ref) the moment the charge succeeds, and the row is marked issued
+// once the receipt exists — found in PayPlus (it issues receipts itself),
+// or recorded by the owner for a payment made outside the site.
 
 // After this many failed attempts the cron stops retrying on its own; the
 // row stays 'failed' on the admin screen for someone to look at.
@@ -89,6 +93,7 @@ export async function issueReceipt(doc: BillingDocument): Promise<BillingDocumen
       .from("billing_documents")
       .update({
         status: "issued",
+        issued_via: "invoice_plus",
         doc_uid: issued.docUid,
         doc_number: issued.number,
         pdf_url: issued.pdfUrl,
@@ -114,33 +119,121 @@ export async function issueReceipt(doc: BillingDocument): Promise<BillingDocumen
   }
 }
 
+// A receipt PayPlus issued for this payment, found by the charge's
+// transaction uid ("payplus:<uid>" refs). Refund documents (קבלה זיכוי) for
+// the same transaction are skipped: they don't stand in for the receipt.
+function isRefundDoc(type: string): boolean {
+  return /refund|credit|זיכוי/i.test(type);
+}
+
+export async function syncReceipt(doc: BillingDocument): Promise<BillingDocument> {
+  if (doc.status === "issued" || !doc.payment_ref.startsWith("payplus:")) return doc;
+  const transactionUid = doc.payment_ref.slice("payplus:".length);
+  const now = new Date().toISOString();
+  try {
+    const found = (await getTransactionDocuments(transactionUid, new Date(doc.paid_at))).find((d) => !isRefundDoc(d.type));
+    if (!found) {
+      const { data } = await supabaseAdmin
+        .from("billing_documents")
+        .update({ attempts: doc.attempts + 1, last_error: "PayPlus עוד לא הפיקה קבלה לעסקה הזו.", updated_at: now })
+        .eq("id", doc.id)
+        .select("*")
+        .single();
+      return (data as BillingDocument) ?? doc;
+    }
+    const { data } = await supabaseAdmin
+      .from("billing_documents")
+      .update({
+        status: "issued",
+        issued_via: "invoice_plus",
+        doc_uid: found.docUid,
+        doc_number: found.number,
+        pdf_url: found.pdfUrl,
+        issued_at: now,
+        attempts: doc.attempts + 1,
+        last_error: null,
+        updated_at: now,
+      })
+      .eq("id", doc.id)
+      .select("*")
+      .single();
+    return (data as BillingDocument) ?? { ...doc, status: "issued" };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("receipt sync failed for", doc.payment_ref, message);
+    const { data } = await supabaseAdmin
+      .from("billing_documents")
+      .update({ attempts: doc.attempts + 1, last_error: message.slice(0, 1000), updated_at: now })
+      .eq("id", doc.id)
+      .select("*")
+      .single();
+    return (data as BillingDocument) ?? doc;
+  }
+}
+
 // The one call payment code makes. Never throws: a receipt problem must not
 // turn a successful payment into a failed webhook or a skipped renewal.
+//
+// Normally PayPlus issues the receipt itself (see invoicePlusClient.ts), so
+// this only records the payment; the receipt's number and PDF are filled in
+// by syncOpenReceipts. PAYPLUS_INVOICES_ENABLED switches to issuing it from
+// here through the API instead — never both, or every payment gets two.
 export async function recordPaymentAndIssueReceipt(payment: PaymentRecord): Promise<BillingDocument | null> {
   try {
-    return await issueReceipt(await recordPayment(payment));
+    const doc = await recordPayment(payment);
+    return invoicesEnabled() ? await issueReceipt(doc) : doc;
   } catch (err) {
     console.error("receipt bookkeeping failed for", payment.paymentRef, err);
     return null;
   }
 }
 
-export async function retryOpenReceipts(limit = 50): Promise<{ issued: number; stillOpen: number }> {
-  if (!invoicesEnabled()) return { issued: 0, stillOpen: 0 };
+// After this long without a receipt, the owner is emailed about the payment:
+// PayPlus normally issues within minutes, so two days means something is
+// wrong (the terminal setting changed, the document failed) and the law
+// wants a receipt promptly.
+const ALERT_AFTER_MS = 48 * 60 * 60 * 1000;
+
+async function alertMissingReceipt(doc: BillingDocument): Promise<void> {
+  const sent = await sendReceiptNeededNotification({
+    customerName: doc.customer_name,
+    customerEmail: doc.customer_email,
+    amountIls: Number(doc.amount_ils),
+    description: doc.description,
+    paidAt: doc.paid_at,
+    source: doc.source,
+    adminUrl: `${SITE_URL}/admin/billing`,
+  });
+  if (sent) {
+    await supabaseAdmin.from("billing_documents").update({ receipt_notified_at: new Date().toISOString() }).eq("id", doc.id);
+  }
+}
+
+// Daily (renewals cron) and on demand (admin "sync" button).
+export async function syncOpenReceipts(limit = 100): Promise<{ issued: number; stillOpen: number; alerted: number }> {
   const { data } = await supabaseAdmin
     .from("billing_documents")
     .select("*")
     .in("status", ["pending", "failed"])
-    .lt("attempts", MAX_AUTO_ATTEMPTS)
     .order("created_at", { ascending: true })
     .limit(limit);
 
   let issued = 0;
   let stillOpen = 0;
-  for (const doc of (data ?? []) as BillingDocument[]) {
-    const result = await issueReceipt(doc);
-    if (result.status === "issued") issued++;
-    else stillOpen++;
+  let alerted = 0;
+  for (const row of (data ?? []) as BillingDocument[]) {
+    const doc = invoicesEnabled() ? (row.attempts < MAX_AUTO_ATTEMPTS ? await issueReceipt(row) : row) : await syncReceipt(row);
+    if (doc.status === "issued") {
+      issued++;
+      continue;
+    }
+    stillOpen++;
+    // Manual rows (a school's bank transfer) are entered by the owner, who
+    // already knows they need a receipt.
+    if (doc.source !== "manual" && !doc.receipt_notified_at && Date.now() - new Date(doc.paid_at).getTime() > ALERT_AFTER_MS) {
+      await alertMissingReceipt(doc);
+      alerted++;
+    }
   }
-  return { issued, stillOpen };
+  return { issued, stillOpen, alerted };
 }

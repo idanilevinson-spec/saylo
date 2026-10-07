@@ -24,7 +24,6 @@ interface ChatTurn {
   proposals?: { proposal: Proposal; state: "open" | "working" | "done" | "dismissed"; result?: string }[];
 }
 
-const STATUS_LABELS: Record<BillingDocument["status"], string> = { pending: "ממתינה", issued: "הופקה", failed: "נכשלה" };
 const SOURCE_LABELS: Record<BillingDocument["source"], string> = { checkout: "רכישה באתר", renewal: "חידוש", manual: "ידנית" };
 const METHOD_LABELS: Record<BillingDocument["payment_method"], string> = {
   "credit-card": "כרטיס אשראי",
@@ -34,7 +33,7 @@ const METHOD_LABELS: Record<BillingDocument["payment_method"], string> = {
   other: "אחר",
 };
 
-const STARTERS = ["אילו תשלומים עדיין בלי קבלה?", "כמה הכנסות היו החודש?", "להפיק קבלה על העברה בנקאית"];
+const STARTERS = ["אילו תשלומים עדיין בלי קבלה?", "כמה הכנסות היו החודש?", "לרשום תשלום שהתקבל בהעברה בנקאית"];
 
 const ils = (n: number) => `₪${Number(n).toLocaleString("he-IL", { maximumFractionDigits: 2 })}`;
 const formatDate = (iso: string) => new Date(iso).toLocaleDateString("he-IL", { dateStyle: "short" });
@@ -45,6 +44,8 @@ export default function AdminBillingPage() {
   const [draft, setDraft] = useState("");
   const [thinking, setThinking] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,6 +55,20 @@ export default function AdminBillingPage() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
   }, [chat, thinking]);
+
+  async function syncNow() {
+    setSyncing(true);
+    setSyncResult(null);
+    const res = await fetch("/api/admin/billing/sync", { method: "POST" });
+    const body = (await res.json().catch(() => ({}))) as { issued?: number; stillOpen?: number; error?: string };
+    setSyncing(false);
+    setSyncResult(
+      res.ok
+        ? `נמצאו ${body.issued ?? 0} קבלות חדשות. ${body.stillOpen ? `${body.stillOpen} תשלומים עדיין בלי קבלה.` : "לכל התשלומים יש קבלה."}`
+        : "הסנכרון נכשל. אפשר לנסות שוב."
+    );
+    void loadDocs();
+  }
 
   async function loadDocs() {
     const { data } = await supabase.from("billing_documents").select("*").order("paid_at", { ascending: false }).limit(100);
@@ -106,9 +121,14 @@ export default function AdminBillingPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(proposal),
     });
-    const body = (await res.json().catch(() => ({}))) as { document?: BillingDocument; error?: string };
-    if (res.ok && body.document) {
-      updateProposal(turn, index, { state: "done", result: `קבלה מס׳ ${body.document.doc_number} הופקה ונשלחה.` });
+    const body = (await res.json().catch(() => ({}))) as { document?: BillingDocument; error?: string; recordedOnly?: boolean };
+    if (res.ok && body.recordedOnly) {
+      updateProposal(turn, index, {
+        state: "done",
+        result: "התשלום נרשם בטבלה. מפיקים עליו קבלה ב-PayPlus (חשבונית+) ומסמנים כאן שהיא הופקה.",
+      });
+    } else if (res.ok && body.document) {
+      updateProposal(turn, index, { state: "done", result: `הקבלה${body.document.doc_number ? ` מס׳ ${body.document.doc_number}` : ""} הופקה ונשלחה.` });
     } else {
       updateProposal(turn, index, { state: "open", result: `לא הופקה: ${body.error ?? "שגיאה"}` });
     }
@@ -124,10 +144,28 @@ export default function AdminBillingPage() {
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
       <section className="min-w-0">
-        <h2 className="font-bold text-lg">קבלות</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-bold text-lg">קבלות</h2>
+          <button
+            type="button"
+            onClick={syncNow}
+            disabled={syncing}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-card-border text-sm font-medium hover:border-primary/40 transition-colors disabled:opacity-60"
+          >
+            <RotateCw size={14} aria-hidden="true" className={syncing ? "animate-spin" : ""} />
+            {syncing ? "מסנכרן…" : "סנכרון עם PayPlus"}
+          </button>
+        </div>
         <p className="mt-1 text-sm text-muted">
-          כל תשלום באתר מקבל קבלה אוטומטית מ-Invoice+ של PayPlus. רכישות דרך ה-App Store מקבלות קבלה מאפל ולא מופיעות כאן.
+          PayPlus מפיקה קבלה על כל חיוב באתר ועל כל חידוש, ושולחת אותה ללקוח במייל. כאן רשום כל תשלום, ומספר הקבלה
+          והקובץ שלה נמשכים מ-PayPlus פעם ביום או בכפתור הסנכרון. אם יומיים אחרי תשלום עדיין אין לו קבלה, נשלח מייל.
+          רכישות דרך ה-App Store מקבלות קבלה מאפל ולא מופיעות כאן.
         </p>
+        {syncResult && (
+          <p role="status" className="mt-2 text-sm">
+            {syncResult}
+          </p>
+        )}
 
         <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
           <div className="bg-card border border-card-border rounded-lg p-3">
@@ -179,16 +217,13 @@ export default function AdminBillingPage() {
                         d.pdf_url ? (
                           <a href={d.pdf_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
                             <FileText size={13} aria-hidden="true" />
-                            <span className="tabular-nums">{d.doc_number}</span>
+                            <span className="tabular-nums">{d.doc_number ?? "קבלה"}</span>
                           </a>
                         ) : (
-                          <span className="tabular-nums">{d.doc_number}</span>
+                          <span className="tabular-nums">{d.doc_number ?? "קבלה"}</span>
                         )
                       ) : (
-                        <span className={d.status === "failed" ? "text-danger" : "text-muted"} title={d.last_error ?? undefined}>
-                          {STATUS_LABELS[d.status]}
-                          {d.attempts > 0 ? ` (${d.attempts} ניסיונות)` : ""}
-                        </span>
+                        <MarkIssued doc={d} onDone={loadDocs} />
                       )}
                     </td>
                   </tr>
@@ -202,7 +237,7 @@ export default function AdminBillingPage() {
       <section aria-labelledby="billing-agent-title" className="lg:sticky lg:top-6 self-start bg-card border border-card-border rounded-lg flex flex-col max-h-[80vh]">
         <header className="px-4 py-3 border-b border-card-border">
           <h2 id="billing-agent-title" className="font-bold">עוזר הנהלת חשבונות</h2>
-          <p className="text-xs text-muted mt-0.5">מחפש, מסכם ומכין קבלות. שום קבלה לא מופקת בלי אישור שלכם.</p>
+          <p className="text-xs text-muted mt-0.5">מחפש, מסכם, ומרכז את הפרטים לכל קבלה שצריך להוציא.</p>
         </header>
 
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 text-sm" aria-live="polite">
@@ -318,5 +353,97 @@ export default function AdminBillingPage() {
         </form>
       </section>
     </div>
+  );
+}
+
+// An open row's receipt cell: when PayPlus didn't issue it (or the payment
+// was made outside the site), issue it by hand in חשבונית+, then record
+// its number here (and the PDF link, if there is one, so the learner can
+// open it from their profile).
+function MarkIssued({ doc, onDone }: { doc: BillingDocument; onDone: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [number, setNumber] = useState("");
+  const [link, setLink] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!open) {
+    return (
+      <span className="flex flex-wrap items-center gap-2">
+        <span className="text-danger">ממתינה לקבלה</span>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="px-2 py-1 rounded-lg border border-card-border text-xs font-medium hover:border-primary/40 transition-colors"
+        >
+          סימון שהופקה
+        </button>
+      </span>
+    );
+  }
+
+  async function save() {
+    setSaving(true);
+    setError(null);
+    const res = await fetch("/api/admin/billing/mark-issued", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ document_id: doc.id, doc_number: number.trim(), pdf_url: link.trim() || null }),
+    });
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    setSaving(false);
+    if (!res.ok) {
+      setError(body.error ?? "השמירה נכשלה.");
+      return;
+    }
+    onDone();
+  }
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (number.trim()) void save();
+      }}
+      className="flex flex-col gap-1.5 min-w-44"
+    >
+      <label className="sr-only" htmlFor={`num-${doc.id}`}>
+        מספר הקבלה
+      </label>
+      <input
+        id={`num-${doc.id}`}
+        value={number}
+        onChange={(e) => setNumber(e.target.value)}
+        inputMode="numeric"
+        placeholder="מספר קבלה"
+        autoFocus
+        className="px-2 py-1 rounded-lg border border-card-border bg-background text-sm placeholder:text-muted"
+      />
+      <label className="sr-only" htmlFor={`link-${doc.id}`}>
+        קישור לקבלה (רשות)
+      </label>
+      <input
+        id={`link-${doc.id}`}
+        value={link}
+        onChange={(e) => setLink(e.target.value)}
+        dir="ltr"
+        type="url"
+        placeholder="קישור ל-PDF (רשות)"
+        className="px-2 py-1 rounded-lg border border-card-border bg-background text-sm placeholder:text-muted"
+      />
+      {error && <span className="text-xs text-danger">{error}</span>}
+      <span className="flex gap-1.5">
+        <button
+          type="submit"
+          disabled={saving || !number.trim()}
+          className="px-2 py-1 rounded-lg bg-primary text-primary-ink text-xs font-medium disabled:opacity-50"
+        >
+          {saving ? "שומר…" : "שמירה"}
+        </button>
+        <button type="button" onClick={() => setOpen(false)} className="px-2 py-1 rounded-lg text-xs text-muted hover:text-foreground">
+          ביטול
+        </button>
+      </span>
+    </form>
   );
 }

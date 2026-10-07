@@ -530,6 +530,8 @@ export interface BillingDocument {
   attempts: number;
   last_error: string | null;
   created_by: string | null;
+  issued_via: "invoice_plus" | "external_manual" | null;
+  receipt_notified_at: string | null;
   created_at: string;
   updated_at: string;
 }

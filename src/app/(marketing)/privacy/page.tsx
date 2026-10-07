@@ -46,7 +46,7 @@ export default function PrivacyPage() {
           <li>
             <strong className="text-foreground">מנוי ותשלום:</strong> סוג המסלול, תאריכי ההתחלה והחידוש והסטטוס.
             פרטי כרטיס האשראי מוזנים אצל חברת הסליקה (PayPlus) בלבד; אצלנו נשמרים מזהים שהיא מחזירה, כולל אסימון
-            לחיוב החידוש, ולא מספר כרטיס. על כל תשלום מופקת קבלה במערכת החשבוניות של PayPlus (Invoice+) על שם
+            לחיוב החידוש, ולא מספר כרטיס. על כל תשלום מופקת קבלה במערכת החשבוניות של PayPlus (חשבונית+) על שם
             הכינוי וכתובת האימייל של החשבון, והיא נשלחת לאימייל הזה.
           </li>
           <li>
@@ -137,7 +137,7 @@ export default function PrivacyPage() {
         <LegalList>
           <li>Supabase: מסד הנתונים וההתחברות.</li>
           <li>Vercel: אחסון האתר.</li>
-          <li>PayPlus: סליקת תשלומים באתר והפקת קבלות (Invoice+).</li>
+          <li>PayPlus: סליקת תשלומים באתר והפקת קבלות (חשבונית+).</li>
           <li>Apple ו-RevenueCat: תשלום וניהול מנויים שנרכשו באפליקציית ה-iOS.</li>
           <li>Anthropic: מורה ה-AI ועוזר התמיכה.</li>
           <li>Microsoft Azure Speech Services: זיהוי דיבור, הערכת הגייה והפקת קול.</li>

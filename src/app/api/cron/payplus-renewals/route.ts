@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { chargeToken } from "@/lib/subscriptions/payplusClient";
-import { planDescription, recordPaymentAndIssueReceipt, retryOpenReceipts } from "@/lib/billing/receipts";
+import { planDescription, recordPaymentAndIssueReceipt, syncOpenReceipts } from "@/lib/billing/receipts";
 import { customerForProfile } from "@/lib/billing/customer";
 
 // Daily job (see vercel.json). The PayPlus account has no permission for
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      await chargeToken({
+      const { transactionUid } = await chargeToken({
         amount: plan.price_ils,
         token: sub.payplus_token,
         customerUid: sub.payplus_customer_uid,
@@ -65,11 +65,14 @@ export async function GET(request: Request) {
         .eq("profile_id", sub.profile_id);
       charged++;
 
-      // Keyed on the period being paid for, so a rerun of this job on the
-      // same day can't record the same renewal twice.
+      // Keyed on PayPlus's transaction uid, which is also how the receipt
+      // PayPlus issued for it is found; the period fallback still keeps a
+      // rerun of this job from recording the same renewal twice.
       const customer = await customerForProfile(sub.profile_id);
       await recordPaymentAndIssueReceipt({
-        paymentRef: `renewal:${sub.profile_id}:${String(sub.current_period_end).slice(0, 10)}`,
+        paymentRef: transactionUid
+          ? `payplus:${transactionUid}`
+          : `renewal:${sub.profile_id}:${String(sub.current_period_end).slice(0, 10)}`,
         source: "renewal",
         profileId: sub.profile_id,
         amountIls: plan.price_ils,
@@ -87,9 +90,9 @@ export async function GET(request: Request) {
     }
   }
 
-  // Receipts that couldn't be issued earlier (Invoice+ down, not yet
-  // switched on) get another try every day.
-  const receipts = await retryOpenReceipts();
+  // Fill in the receipts PayPlus issued since the last run (number + PDF),
+  // and alert the owner about any payment still without one.
+  const receipts = await syncOpenReceipts();
 
   return NextResponse.json({ charged, failed, skipped, receipts });
 }
