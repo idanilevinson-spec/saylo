@@ -2,8 +2,8 @@
 
 import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Timer, Trophy, CheckCircle2, XCircle, Check, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { Timer, Trophy, CheckCircle2, XCircle, Check, X, RotateCcw, CornerDownLeft } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { gradeTestStep, type TestStep } from "@/lib/games/testContent";
@@ -13,10 +13,14 @@ import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
-import { GameFeedback, GameCompletionScore } from "@/components/games/GameMoments";
+import { GameCompletionScore } from "@/components/games/GameMoments";
+import { ChoiceGrid, GameHud, GameStage, type RoundResult } from "@/components/games/GameKit";
 
 interface VocabTestProps {
   steps: TestStep[];
+  // Back to the topic picker for another test. A link to /games/test would
+  // keep this finished screen up (pages are keyed by pathname).
+  onRestart: () => void;
 }
 
 type Phase = "intro" | "exam" | "finished";
@@ -42,7 +46,7 @@ function formatTime(totalSeconds: number): string {
 // between steps and no AI-summary call at the end — just a per-question
 // review, which is the actual point of a Test mode (showing exactly what
 // was missed and why, not just a final percentage).
-export default function VocabTest({ steps }: VocabTestProps) {
+export default function VocabTest({ steps, onRestart }: VocabTestProps) {
   const { profile } = useAuth();
   const [phase, setPhase] = useState<Phase>("intro");
   const [stepIndex, setStepIndex] = useState(0);
@@ -263,14 +267,13 @@ export default function VocabTest({ steps }: VocabTestProps) {
         </div>
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          <MotionLink
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            href="/games/test"
-            className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          <button
+            type="button"
+            onClick={onRestart}
+            className="game-press inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
-            מבחן נוסף
-          </MotionLink>
+            <RotateCcw size={16} aria-hidden="true" /> מבחן נוסף
+          </button>
           <MotionLink
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
@@ -287,153 +290,156 @@ export default function VocabTest({ steps }: VocabTestProps) {
   // phase === "exam"
   const step = steps[stepIndex];
   const lowTime = timedMode && timeLeft <= 20;
+  const results: RoundResult[] = steps.map((_, i) => (i < outcomes.length ? (outcomes[i].isCorrect ? "correct" : "wrong") : null));
+  const last = answeredThisStep ? outcomes[outcomes.length - 1] : null;
 
   return (
     <HeartsGate>
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <h1 className="sr-only">מבחן תרגול</h1>
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-sm text-muted">
-            שאלה {stepIndex + 1} מתוך {steps.length}
-          </span>
-          {timedMode ? (
-            <div
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${
-                lowTime ? "bg-danger-ink text-danger" : "bg-background-2 text-muted"
-              }`}
-            >
-              <Timer size={14} />
-              <EnglishText as="span" className="tabular-nums">
-                {formatTime(timeLeft)}
-              </EnglishText>
-            </div>
-          ) : (
-            <span className="px-3 py-1 rounded-full text-sm font-bold bg-background-2 text-muted">
-              תרגול · ללא הגבלת זמן
-            </span>
-          )}
-        </div>
-
-        <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
-          <motion.div
-            className="h-full bg-accent"
-            animate={{ width: `${(stepIndex / steps.length) * 100}%` }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={stepIndex}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
-          >
-            {step.type === "mcq" && (
-              <div>
-                <p className="text-sm text-muted">איזו מילה מתאימה לתרגום</p>
-                <p className="mt-1 text-2xl font-bold">{step.promptHe}</p>
-                <div className="mt-5 space-y-2">
-                  {step.options.map((option, i) => {
-                    const isCorrectOption = i === step.correctIndex;
-                    const isSelected = selected === i;
-                    let stateClass = "border-card-border hover:border-primary/40";
-                    if (answeredThisStep && isCorrectOption) stateClass = "border-success bg-success/10";
-                    else if (answeredThisStep && isSelected && !isCorrectOption) stateClass = "border-danger bg-danger/10";
-                    else if (isSelected) stateClass = "border-primary bg-primary/5";
-                    return (
-                      <button
-                        key={i}
-                        disabled={answeredThisStep}
-                        onClick={() => submitMcq(i)}
-                        className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${stateClass}`}
-                      >
-                        <EnglishText>{option}</EnglishText>
-                        {answeredThisStep && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
-                        {answeredThisStep && isSelected && !isCorrectOption && <XCircle size={18} className="text-danger shrink-0" />}
-                      </button>
-                    );
-                  })}
-                </div>
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
+        <GameHud
+          title="מבחן תרגול"
+          subtitle={timedMode ? undefined : "תרגול בלי הגבלת זמן"}
+          results={results}
+          current={stepIndex}
+          aside={
+            timedMode ? (
+              <div className="shrink-0 flex items-center gap-1.5" aria-label={`נותר ${formatTime(timeLeft)}`}>
+                <Timer size={16} aria-hidden="true" className={lowTime ? "text-danger" : "text-muted"} />
+                <span aria-hidden="true" className={`chyron text-3xl tabular-nums ${lowTime ? "text-danger" : "text-foreground"}`}>
+                  {formatTime(timeLeft)}
+                </span>
               </div>
-            )}
+            ) : undefined
+          }
+        />
 
-            {step.type === "recall" && (
-              <div className="text-center">
-                <p className="text-sm text-muted">השלימו את המילה באנגלית עבור</p>
-                <p className="mt-1 text-2xl font-bold">{step.translationHe}</p>
-                <input
-                  type="text"
-                  {...ENGLISH_WORD_INPUT}
-                  aria-label={`השלימו את המילה עבור ${step.translationHe}`}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submitRecall()}
-                  disabled={answeredThisStep}
-                  placeholder="Type the word..."
-                  className="mt-6 w-full px-4 py-3 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
+        <GameStage stageKey={stepIndex}>
+          {step.type === "mcq" && (
+            <>
+              <p className="text-sm text-muted">איזו מילה באנגלית מתאימה?</p>
+              <p className="mt-1 text-2xl sm:text-3xl font-bold">{step.promptHe}</p>
+              <div className="mt-5">
+                <ChoiceGrid
+                  options={step.options}
+                  correctIndex={step.correctIndex}
+                  selected={selected}
+                  locked={answeredThisStep}
+                  onChoose={submitMcq}
                 />
-                {!answeredThisStep && (
-                  <button
-                    onClick={submitRecall}
-                    disabled={!input.trim()}
-                    className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-                  >
-                    בדיקה
-                  </button>
-                )}
               </div>
-            )}
+            </>
+          )}
 
-            {step.type === "truefalse" && (
-              <div className="text-center">
-                <p className="text-sm text-muted">האם זה התרגום הנכון?</p>
-                <p className="mt-2 text-2xl font-bold">
-                  <EnglishText as="span">{step.headword}</EnglishText> = {step.shownTranslationHe}
-                </p>
-                <div className="mt-6 grid grid-cols-2 gap-3">
-                  <button
-                    disabled={answeredThisStep}
-                    onClick={() => submitTrueFalse(true)}
-                    className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-lg border border-success/40 bg-success/5 hover:bg-success/10 font-medium text-success transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-50"
-                  >
-                    <Check size={16} /> נכון
-                  </button>
-                  <button
-                    disabled={answeredThisStep}
-                    onClick={() => submitTrueFalse(false)}
-                    className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-lg border border-danger/40 bg-danger/5 hover:bg-danger/10 font-medium text-danger transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-50"
-                  >
-                    <X size={16} /> לא נכון
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {answeredThisStep && lastCorrect !== null && (
-              <>
-                <GameFeedback correct={lastCorrect} centered>
-                  {lastCorrect ? "תשובה נכונה!" : "לא בדיוק"}
-                </GameFeedback>
-                {!lastCorrect && outcomes.length > 0 && (
-                  <p className="mt-1 text-center text-sm text-danger">
-                    התשובה הנכונה:{" "}
-                    <span className="font-medium">{outcomes[outcomes.length - 1].correctLabel}</span>
-                  </p>
-                )}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={nextStep}
-                  className="mt-4 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          {step.type === "recall" && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                submitRecall();
+              }}
+              className="text-center"
+            >
+              <p className="text-sm text-muted">איך כותבים באנגלית</p>
+              <p className="mt-1 text-2xl sm:text-3xl font-bold">{step.translationHe}</p>
+              <input
+                type="text"
+                {...ENGLISH_WORD_INPUT}
+                autoFocus
+                aria-label={`איך כותבים באנגלית ${step.translationHe}`}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                disabled={answeredThisStep}
+                placeholder="Type the word"
+                className={`mt-6 w-full min-h-12 px-4 rounded-lg border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-90 placeholder:text-muted ${
+                  last ? (last.isCorrect ? "border-success text-success" : "game-shake border-danger text-danger") : "border-card-border"
+                }`}
+              />
+              {!answeredThisStep && (
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="game-press mt-3 w-full min-h-12 px-4 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[background-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
-                  {stepIndex + 1 < steps.length ? "השאלה הבאה →" : "סיום המבחן"}
-                </motion.button>
-              </>
-            )}
-          </motion.div>
-        </AnimatePresence>
+                  בדיקה
+                </button>
+              )}
+            </form>
+          )}
+
+          {step.type === "truefalse" && (
+            <div className="text-center">
+              <p className="text-sm text-muted">האם זה התרגום הנכון?</p>
+              <p className="mt-3 flex flex-wrap items-baseline justify-center gap-x-3 text-2xl sm:text-3xl font-bold">
+                <EnglishText>{step.headword}</EnglishText>
+                <span className="text-muted font-normal">=</span>
+                <span>{step.shownTranslationHe}</span>
+              </p>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                {[true, false].map((answer) => {
+                  const chosen = last && last.responseLabel === (answer ? "נכון" : "לא נכון");
+                  const isRight = answer === step.isActuallyCorrect;
+                  return (
+                    <button
+                      key={String(answer)}
+                      type="button"
+                      disabled={answeredThisStep}
+                      onClick={() => submitTrueFalse(answer)}
+                      className={`game-press flex items-center justify-center gap-2 min-h-14 px-4 rounded-lg border-2 font-bold text-lg transition-[background-color,border-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                        answeredThisStep
+                          ? isRight
+                            ? "border-success bg-success/10 text-success"
+                            : chosen
+                              ? "game-shake border-danger bg-danger/10 text-danger"
+                              : "border-card-border opacity-50"
+                          : answer
+                            ? "border-success/40 text-success hover:bg-success/10"
+                            : "border-danger/40 text-danger hover:bg-danger/10"
+                      }`}
+                    >
+                      {answer ? <Check size={18} aria-hidden="true" /> : <X size={18} aria-hidden="true" />}
+                      {answer ? "נכון" : "לא נכון"}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {last && (
+            <motion.div
+              role="status"
+              initial={{ opacity: 0, transform: "translateY(6px)" }}
+              animate={{ opacity: 1, transform: "translateY(0px)" }}
+              transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+              className={`mt-5 rounded-lg border p-4 ${last.isCorrect ? "border-success/35 bg-success/[0.06]" : "border-danger/35 bg-danger/[0.05]"}`}
+            >
+              <p className={`flex items-center gap-1.5 font-bold ${last.isCorrect ? "text-success" : "text-danger"}`}>
+                {last.isCorrect ? <CheckCircle2 size={17} aria-hidden="true" /> : <XCircle size={17} aria-hidden="true" />}
+                {last.isCorrect ? "תשובה נכונה" : "לא בדיוק"}
+              </p>
+              {!last.isCorrect && (
+                <p className="mt-1.5 text-sm">
+                  <span className="text-muted">התשובה הנכונה: </span>
+                  {step.type === "truefalse" ? (
+                    <span className="font-bold">{last.correctLabel}</span>
+                  ) : (
+                    <EnglishText className="font-bold">{last.correctLabel}</EnglishText>
+                  )}
+                </p>
+              )}
+              {!last.isCorrect && (
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={nextStep}
+                  className="game-press mt-4 w-full inline-flex items-center justify-center gap-2 min-h-12 px-4 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                >
+                  {stepIndex + 1 < steps.length ? "לשאלה הבאה" : "סיום המבחן"}
+                  <CornerDownLeft size={15} aria-hidden="true" className="opacity-70 hidden sm:inline" />
+                </button>
+              )}
+            </motion.div>
+          )}
+        </GameStage>
       </div>
     </HeartsGate>
   );

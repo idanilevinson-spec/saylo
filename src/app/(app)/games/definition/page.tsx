@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { BookOpenCheck, CheckCircle2, XCircle } from "lucide-react";
+import { BookOpenCheck, Star } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -12,7 +11,7 @@ import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/s
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
-import { GameFeedback } from "@/components/games/GameMoments";
+import { ChoiceGrid, GameHud, GameStage, WordReveal, type RoundResult } from "@/components/games/GameKit";
 
 const ROUND_SIZE = 10;
 
@@ -27,21 +26,26 @@ function DefinitionGamePage({ onReplay }: { onReplay: () => void }) {
   const [wasCorrect, setWasCorrect] = useState<boolean | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [results, setResults] = useState<RoundResult[]>([]);
   const correctCountRef = useRef(0);
   const xpAwardedRef = useRef(0);
 
   useEffect(() => {
     if (!profile) return;
-    getDefinitionGameWords(profile.id, ROUND_SIZE).then(setItems);
+    getDefinitionGameWords(profile.id, ROUND_SIZE).then((fetched) => {
+      setResults(fetched.map(() => null));
+      setItems(fetched);
+    });
   }, [profile]);
 
-  async function submitAnswer(selectedIndex: number) {
+  function submitAnswer(selectedIndex: number) {
     if (!profile || !items || locked) return;
     setLocked(true);
     setSelected(selectedIndex);
     const item = items[index];
     const isCorrect = selectedIndex === item.correctIndex;
     setWasCorrect(isCorrect);
+    setResults((r) => r.map((v, i) => (i === index ? (isCorrect ? "correct" : "wrong") : v)));
     if (isCorrect) {
       playCorrectSound();
       correctCountRef.current += 1;
@@ -50,27 +54,35 @@ function DefinitionGamePage({ onReplay }: { onReplay: () => void }) {
       playIncorrectSound();
       setMissed((m) => [...m, { headword: item.headword, translationHe: item.translationHe }]);
     }
-    const res = await recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_definition");
-    xpAwardedRef.current += res.xpAwarded;
+    // Saved in the background; the verdict and the next word never wait on it.
+    recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_definition")
+      .then((res) => {
+        xpAwardedRef.current += res.xpAwarded;
+      })
+      .catch(() => undefined);
 
-    setTimeout(async () => {
-      if (index + 1 >= items.length) {
-        await supabase.from("vocabulary_game_sessions").insert({
-          profile_id: profile.id,
-          game_type: "definition",
-          total_questions: items.length,
-          correct_count: correctCountRef.current,
-          xp_awarded: xpAwardedRef.current,
-        });
-        playCompleteSound();
-        setFinished(true);
-      } else {
-        setIndex((i) => i + 1);
-        setSelected(null);
-        setLocked(false);
-        setWasCorrect(null);
-      }
-    }, 1100);
+    // A right answer moves on by itself; a wrong one waits on the word card.
+    if (isCorrect) setTimeout(() => void advance(), 900);
+  }
+
+  async function advance() {
+    if (!profile || !items) return;
+    if (index + 1 >= items.length) {
+      await supabase.from("vocabulary_game_sessions").insert({
+        profile_id: profile.id,
+        game_type: "definition",
+        total_questions: items.length,
+        correct_count: correctCountRef.current,
+        xp_awarded: xpAwardedRef.current,
+      });
+      playCompleteSound();
+      setFinished(true);
+    } else {
+      setIndex((i) => i + 1);
+      setSelected(null);
+      setLocked(false);
+      setWasCorrect(null);
+    }
   }
 
   if (loading || items === null) {
@@ -96,6 +108,7 @@ function DefinitionGamePage({ onReplay }: { onReplay: () => void }) {
         gameType="definition"
         startedAt={startedAt}
         missed={missed}
+        results={results}
         onReplay={onReplay}
       />
     );
@@ -105,56 +118,29 @@ function DefinitionGamePage({ onReplay }: { onReplay: () => void }) {
 
   return (
     <HeartsGate>
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="sr-only">זיהוי לפי הגדרה</h1>
-        <p className="text-sm text-muted mb-4">
-          שאלה {index + 1} מתוך {items.length}
-        </p>
-        <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
-          <div className="h-full bg-primary transition-all" style={{ width: `${((index + 1) / items.length) * 100}%` }} />
-        </div>
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
+        <GameHud title="זיהוי לפי הגדרה" results={results} current={index} score={correctCount} scoreLabel="תשובות נכונות" scoreIcon={Star} />
 
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
-        >
-          <p className="text-sm text-muted">איזו מילה מתאימה להגדרה הבאה?</p>
-          <EnglishText as="p" className="mt-2 font-medium text-lg leading-relaxed">
+        <GameStage stageKey={index}>
+          <p className="text-sm text-muted">איזו מילה מתאימה להגדרה?</p>
+          <EnglishText as="blockquote" className="mt-2 text-xl sm:text-[1.4rem] font-semibold leading-relaxed">
             {item.definitionEn}
           </EnglishText>
 
-          <div className="mt-5 space-y-2">
-            {item.options.map((option, i) => {
-              const isCorrectOption = i === item.correctIndex;
-              const isSelected = selected === i;
-              let stateClass = "border-card-border hover:border-primary/40";
-              if (locked && isCorrectOption) stateClass = "border-success bg-success/10";
-              else if (locked && isSelected && !isCorrectOption) stateClass = "border-danger bg-danger/10";
-              else if (isSelected) stateClass = "border-primary bg-primary/5";
-              return (
-                <button
-                  key={i}
-                  disabled={locked}
-                  onClick={() => submitAnswer(i)}
-                  className={`w-full flex items-center justify-between gap-2 text-right px-4 py-3 rounded-lg border transition-[color,background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default active:scale-[0.98] ${stateClass}`}
-                >
-                  <EnglishText>{option}</EnglishText>
-                  {locked && isCorrectOption && <CheckCircle2 size={18} className="text-success shrink-0" />}
-                  {locked && isSelected && !isCorrectOption && <XCircle size={18} className="text-danger shrink-0" />}
-                </button>
-              );
-            })}
+          <div className="mt-5">
+            <ChoiceGrid options={item.options} correctIndex={item.correctIndex} selected={selected} locked={locked} onChoose={submitAnswer} />
           </div>
 
           {wasCorrect !== null && (
-            <GameFeedback correct={wasCorrect}>
-              {wasCorrect ? "כל הכבוד!" : `לא בדיוק — המילה היא "${item.headword}" (${item.translationHe})`}
-            </GameFeedback>
+            <WordReveal
+              word={item}
+              verdict={wasCorrect ? "correct" : "wrong"}
+              compact={wasCorrect}
+              onNext={wasCorrect ? undefined : () => void advance()}
+              nextLabel={index + 1 >= items.length ? "לתוצאות" : "למילה הבאה"}
+            />
           )}
-        </motion.div>
+        </GameStage>
       </div>
     </HeartsGate>
   );

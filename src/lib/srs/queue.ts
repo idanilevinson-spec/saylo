@@ -56,6 +56,11 @@ export interface DueReviewItem {
   vocabularyItemId: string;
   headword: string;
   translationHe: string;
+  // Shown after an answer so every round teaches the word, not just grades
+  // it: how it sounds (ipa), what kind of word it is, and a real sentence.
+  exampleEn: string | null;
+  ipa: string | null;
+  partOfSpeech: string | null;
   exercise: Exercise;
 }
 
@@ -94,7 +99,10 @@ export async function getDailyReview(profileId: string, limit = 20): Promise<Due
   if (allIds.length === 0) return [];
 
   const [{ data: items }, { data: exercises }] = await Promise.all([
-    supabase.from("vocabulary_items").select("id, headword, translation_he").in("id", allIds),
+    supabase
+      .from("vocabulary_items")
+      .select("id, headword, translation_he, example_en, ipa, part_of_speech")
+      .in("id", allIds),
     supabase
       .from("exercises")
       .select("*")
@@ -113,6 +121,9 @@ export async function getDailyReview(profileId: string, limit = 20): Promise<Due
         vocabularyItemId: item.id,
         headword: item.headword,
         translationHe: item.translation_he,
+        exampleEn: item.example_en ?? null,
+        ipa: item.ipa ?? null,
+        partOfSpeech: item.part_of_speech ?? null,
         exercise,
       };
     })

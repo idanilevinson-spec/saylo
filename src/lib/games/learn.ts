@@ -26,6 +26,9 @@ export interface LearnItem {
   vocabularyItemId: string;
   headword: string;
   translationHe: string;
+  exampleEn: string | null;
+  ipa: string | null;
+  partOfSpeech: string | null;
   repetitions: number;
 }
 
@@ -61,7 +64,8 @@ export function buildLearnQuestion(item: LearnItem, pool: LearnItem[]): LearnQue
 // backing MCQ exercises row, since Learn Mode generates its own
 // questions client-side and every published word is eligible.
 export async function getLearnPool(profileId: string, topicId?: string, limit = 12): Promise<LearnItem[]> {
-  let itemsQuery = supabase.from("vocabulary_items").select("id, headword, translation_he").eq("status", "published");
+  let itemsQuery = supabase.from("vocabulary_items").select("id, headword, translation_he, example_en, ipa, part_of_speech")
+    .eq("status", "published");
   if (topicId) itemsQuery = itemsQuery.eq("topic_id", topicId);
   const { data: candidates } = await itemsQuery.order("sort_order").limit(500);
   const pool = candidates ?? [];
@@ -92,6 +96,9 @@ export async function getLearnPool(profileId: string, topicId?: string, limit = 
       vocabularyItemId: item.id,
       headword: item.headword,
       translationHe: item.translation_he,
+      exampleEn: item.example_en ?? null,
+      ipa: item.ipa ?? null,
+      partOfSpeech: item.part_of_speech ?? null,
       repetitions: srsByItem.get(item.id)?.repetitions ?? 0,
     }))
   );

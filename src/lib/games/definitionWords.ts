@@ -6,6 +6,9 @@ export interface DefinitionGameItem {
   headword: string;
   translationHe: string;
   definitionEn: string;
+  exampleEn: string | null;
+  ipa: string | null;
+  partOfSpeech: string | null;
   options: string[];
   correctIndex: number;
 }
@@ -18,7 +21,7 @@ export interface DefinitionGameItem {
 export async function getDefinitionGameWords(profileId: string, limit = 10): Promise<DefinitionGameItem[]> {
   const { data: defined } = await supabase
     .from("vocabulary_items")
-    .select("id, headword, translation_he, definition_en")
+    .select("id, headword, translation_he, definition_en, example_en, ipa, part_of_speech")
     .not("definition_en", "is", null)
     .eq("status", "published");
 
@@ -73,6 +76,9 @@ export async function getDefinitionGameWords(profileId: string, limit = 10): Pro
         headword: item.headword,
         translationHe: item.translation_he,
         definitionEn: item.definition_en as string,
+        exampleEn: item.example_en ?? null,
+        ipa: item.ipa ?? null,
+        partOfSpeech: item.part_of_speech ?? null,
         options,
         correctIndex,
       };

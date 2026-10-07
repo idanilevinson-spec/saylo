@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Trophy, Crown } from "lucide-react";
+import Link from "next/link";
+import { Trophy, Crown, ChevronRight } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import type { LeaderboardEntry } from "@/app/api/leaderboard/route";
 
@@ -32,79 +33,82 @@ export default function LeaderboardPage() {
   const rest = entries.slice(3);
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-12">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <h1 className="text-3xl font-bold">לוח המובילים</h1>
-        <p className="mt-2 text-muted">
-          מי צבר הכי הרבה XP ב-{data.windowDays} הימים האחרונים, מכל התרגול והמשחקים ביחד
-        </p>
-      </motion.div>
+    <div className="max-w-xl mx-auto px-4 pt-6 pb-12">
+      <Link href="/games" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+        <ChevronRight size={15} aria-hidden="true" /> למשחקים
+      </Link>
+      <h1 className="mt-3 text-3xl font-bold">לוח המובילים</h1>
+      <p className="mt-2 text-muted">מי צבר הכי הרבה XP ב-{data.windowDays} הימים האחרונים, מכל התרגול והמשחקים ביחד.</p>
 
       {entries.length === 0 ? (
-        <div className="mt-10 text-center">
-          <Trophy size={40} className="mx-auto text-muted" />
-          <p className="mt-3 text-muted">אף אחד עדיין לא צבר XP השבוע — תהיו הראשונים!</p>
+        <div className="mt-10 rounded-lg border border-dashed border-card-border p-8 text-center">
+          <Trophy size={36} aria-hidden="true" className="mx-auto text-muted" />
+          <p className="mt-3 text-muted">עוד אף אחד לא צבר XP השבוע. כל תרגול או משחק יכניס אתכם ללוח.</p>
         </div>
       ) : (
         <>
           {podium.length > 0 && (
-            <div className="mt-8 flex items-end justify-center gap-3">
+            <ol className="mt-8 flex items-end justify-center gap-2.5 sm:gap-3" aria-label="שלושת הראשונים">
               {[podium[1], podium[0], podium[2]].map((entry, i) =>
                 entry ? (
-                  <motion.div
+                  <motion.li
                     key={entry.rank}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: i * 0.08 }}
-                    className={`flex flex-col items-center justify-end rounded-lg border p-4 ${
-                      entry.rank === 1
-                        ? "w-28 h-36 bg-card border-primary/40 shadow-lg"
-                        : "w-24 h-28 bg-card border-card-border"
+                    initial={{ opacity: 0, transform: "translateY(12px)" }}
+                    animate={{ opacity: 1, transform: "translateY(0px)" }}
+                    transition={{ duration: 0.3, delay: i * 0.06, ease: [0.23, 1, 0.32, 1] }}
+                    className={`relative overflow-hidden flex flex-1 max-w-32 flex-col items-center justify-end rounded-lg border bg-card px-2 pb-3 ${
+                      entry.rank === 1 ? "h-44 border-primary/45 shadow-[0_10px_30px_-12px_rgb(0_0_0/0.35)]" : entry.rank === 2 ? "h-36 border-card-border" : "h-32 border-card-border"
                     } ${entry.isMe ? "ring-2 ring-primary" : ""}`}
                   >
-                    <Crown size={entry.rank === 1 ? 22 : 16} className={MEDAL_COLOR[entry.rank - 1]} />
-                    <p className="mt-1 text-sm font-bold truncate max-w-full">{entry.displayName}</p>
-                    <EnglishText as="p" className="text-xs text-muted">
+                    {entry.rank === 1 && <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />}
+                    <Crown size={entry.rank === 1 ? 22 : 16} aria-hidden="true" className={MEDAL_COLOR[entry.rank - 1]} />
+                    <span className="chyron text-4xl leading-none mt-1 tabular-nums" aria-label={`מקום ${entry.rank}`}>
+                      {entry.rank}
+                    </span>
+                    <p className="mt-1.5 text-sm font-bold truncate max-w-full">
+                      {entry.displayName}
+                      {entry.isMe && <span className="text-primary"> (אתם)</span>}
+                    </p>
+                    <EnglishText as="p" className="text-xs text-muted tabular-nums">
                       {entry.xp} XP
                     </EnglishText>
-                  </motion.div>
+                  </motion.li>
                 ) : (
-                  <div key={`empty-${i}`} className="w-24" />
+                  <li key={`empty-${i}`} aria-hidden="true" className="flex-1 max-w-32" />
                 )
               )}
-            </div>
+            </ol>
           )}
 
           {rest.length > 0 && (
-            <div className="mt-6 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
+            <ol className="mt-6 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden" start={4}>
               {rest.map((entry) => (
-                <div
+                <li
                   key={entry.rank}
-                  className={`flex items-center justify-between gap-3 px-4 py-3 ${entry.isMe ? "bg-primary/5" : ""}`}
+                  className={`flex items-center justify-between gap-3 px-4 py-3 ${entry.isMe ? "bg-primary/[0.07]" : ""}`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <EnglishText as="span" className="w-6 text-sm font-bold text-muted shrink-0">
-                      {entry.rank}
-                    </EnglishText>
-                    <span className="text-sm font-medium truncate">{entry.displayName}</span>
+                    <span className="chyron w-8 text-2xl text-muted shrink-0 tabular-nums">{entry.rank}</span>
+                    <span className="font-medium truncate">
+                      {entry.displayName}
+                      {entry.isMe && <span className="text-primary"> (אתם)</span>}
+                    </span>
                   </div>
-                  <EnglishText as="span" className="text-sm font-bold text-primary shrink-0">
+                  <EnglishText as="span" className="text-sm font-bold text-primary shrink-0 tabular-nums">
                     {entry.xp} XP
                   </EnglishText>
-                </div>
+                </li>
               ))}
-            </div>
+            </ol>
           )}
 
           {me && (
-            <div className="mt-4 flex items-center justify-between gap-3 px-4 py-3 rounded-lg border-2 border-dashed border-primary/40 bg-primary/5">
+            <div className="mt-4 flex items-center justify-between gap-3 px-4 py-3 rounded-lg border border-primary/50 bg-primary/[0.07]">
               <div className="flex items-center gap-3 min-w-0">
-                <EnglishText as="span" className="w-6 text-sm font-bold text-primary shrink-0">
-                  {me.rank}
-                </EnglishText>
-                <span className="text-sm font-medium truncate">{me.displayName} (אתם)</span>
+                <span className="chyron w-8 text-2xl text-primary shrink-0 tabular-nums">{me.rank}</span>
+                <span className="font-medium truncate">{me.displayName} (אתם)</span>
               </div>
-              <EnglishText as="span" className="text-sm font-bold text-primary shrink-0">
+              <EnglishText as="span" className="text-sm font-bold text-primary shrink-0 tabular-nums">
                 {me.xp} XP
               </EnglishText>
             </div>

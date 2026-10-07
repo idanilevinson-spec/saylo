@@ -2,8 +2,7 @@
 
 import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { PenTool } from "lucide-react";
+import { PenTool, Star } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -13,7 +12,7 @@ import { maskWord, checkSpelling } from "@/lib/games/spelling";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
-import { GameFeedback } from "@/components/games/GameMoments";
+import { GameHud, GameStage, LetterTiles, SpeakButton, WordReveal, type RoundResult } from "@/components/games/GameKit";
 
 const ROUND_SIZE = 10;
 
@@ -28,13 +27,17 @@ function SpellingChallengePage({ onReplay }: { onReplay: () => void }) {
   const [wasCorrect, setWasCorrect] = useState<boolean | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [results, setResults] = useState<RoundResult[]>([]);
   const correctCountRef = useRef(0);
   const xpAwardedRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!profile) return;
-    getDailyReview(profile.id, ROUND_SIZE).then(setItems);
+    getDailyReview(profile.id, ROUND_SIZE).then((fetched) => {
+      setResults(fetched.map(() => null));
+      setItems(fetched);
+    });
   }, [profile]);
 
   // Auto-focus the input for every new word so the learner can keep
@@ -43,12 +46,13 @@ function SpellingChallengePage({ onReplay }: { onReplay: () => void }) {
     if (!locked) inputRef.current?.focus();
   }, [index, locked]);
 
-  async function handleSubmit() {
+  function handleSubmit() {
     if (!profile || !items || locked || !input.trim()) return;
     setLocked(true);
     const item = items[index];
     const isCorrect = checkSpelling(input, item.headword);
     setWasCorrect(isCorrect);
+    setResults((r) => r.map((v, i) => (i === index ? (isCorrect ? "correct" : "wrong") : v)));
     if (isCorrect) {
       playCorrectSound();
       correctCountRef.current += 1;
@@ -57,27 +61,33 @@ function SpellingChallengePage({ onReplay }: { onReplay: () => void }) {
       playIncorrectSound();
       setMissed((m) => [...m, { headword: item.headword, translationHe: item.translationHe }]);
     }
-    const res = await recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_spelling");
-    xpAwardedRef.current += res.xpAwarded;
+    recordGameAnswer(profile.id, item.vocabularyItemId, isCorrect, "vocab_game_spelling")
+      .then((res) => {
+        xpAwardedRef.current += res.xpAwarded;
+      })
+      .catch(() => undefined);
 
-    setTimeout(async () => {
-      if (index + 1 >= items.length) {
-        await supabase.from("vocabulary_game_sessions").insert({
-          profile_id: profile.id,
-          game_type: "spelling",
-          total_questions: items.length,
-          correct_count: correctCountRef.current,
-          xp_awarded: xpAwardedRef.current,
-        });
-        playCompleteSound();
-        setFinished(true);
-      } else {
-        setIndex((i) => i + 1);
-        setInput("");
-        setLocked(false);
-        setWasCorrect(null);
-      }
-    }, 1400);
+    if (isCorrect) setTimeout(() => void advance(), 1000);
+  }
+
+  async function advance() {
+    if (!profile || !items) return;
+    if (index + 1 >= items.length) {
+      await supabase.from("vocabulary_game_sessions").insert({
+        profile_id: profile.id,
+        game_type: "spelling",
+        total_questions: items.length,
+        correct_count: correctCountRef.current,
+        xp_awarded: xpAwardedRef.current,
+      });
+      playCompleteSound();
+      setFinished(true);
+    } else {
+      setIndex((i) => i + 1);
+      setInput("");
+      setLocked(false);
+      setWasCorrect(null);
+    }
   }
 
   if (loading || items === null) {
@@ -103,6 +113,7 @@ function SpellingChallengePage({ onReplay }: { onReplay: () => void }) {
         gameType="spelling"
         startedAt={startedAt}
         missed={missed}
+        results={results}
         onReplay={onReplay}
       />
     );
@@ -113,61 +124,63 @@ function SpellingChallengePage({ onReplay }: { onReplay: () => void }) {
 
   return (
     <HeartsGate>
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="sr-only">אתגר האיות</h1>
-        <p className="text-sm text-muted mb-4">
-          מילה {index + 1} מתוך {items.length}
-        </p>
-        <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
-          <div
-            className="h-full bg-accent transition-all"
-            style={{ width: `${((index + 1) / items.length) * 100}%` }}
-          />
-        </div>
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
+        <GameHud title="אתגר איות" results={results} current={index} score={correctCount} scoreLabel="מילים נכונות" scoreIcon={Star} />
 
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="bg-card border border-card-border rounded-lg p-6 sm:p-8 text-center"
-        >
-          <p className="text-sm text-muted">השלימו את המילה באנגלית עבור</p>
-          <p className="mt-1 text-2xl font-bold">{item.translationHe}</p>
+        <GameStage stageKey={index} className="text-center">
+          <p className="text-sm text-muted">איך כותבים באנגלית</p>
+          <p className="mt-1 text-2xl sm:text-3xl font-bold">{item.translationHe}</p>
 
-          <p dir="ltr" className="mt-6 font-content text-3xl tracking-widest text-muted select-none">
-            {hint}
-          </p>
+          <div className="mt-6">
+            <LetterTiles hint={hint} typed={input} word={item.headword} verdict={wasCorrect === null ? null : wasCorrect ? "correct" : "wrong"} />
+          </div>
 
-          <input
-            ref={inputRef}
-            type="text"
-            {...ENGLISH_WORD_INPUT}
-            aria-label={`השלימו את המילה עבור ${item.translationHe}`}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-            disabled={locked}
-            placeholder="Type the word..."
-            className="mt-6 w-full px-4 py-3 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
-          />
-
-          {wasCorrect !== null && (
-            <GameFeedback correct={wasCorrect} centered>
-              {wasCorrect ? "כל הכבוד!" : `לא בדיוק — המילה היא "${item.headword}"`}
-            </GameFeedback>
-          )}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+            className="mt-6 flex gap-2"
+          >
+            <input
+              ref={inputRef}
+              type="text"
+              {...ENGLISH_WORD_INPUT}
+              enterKeyHint="done"
+              aria-label={`איך כותבים באנגלית ${item.translationHe}`}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={locked}
+              maxLength={item.headword.length + 4}
+              placeholder="Type the whole word"
+              className="flex-1 min-w-0 min-h-12 px-4 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70 placeholder:text-muted"
+            />
+            <SpeakButton text={item.headword} label="רמז קולי: השמעת המילה" />
+          </form>
 
           {!locked && (
             <button
+              type="button"
               onClick={handleSubmit}
               disabled={!input.trim()}
-              className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[color,background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
+              className="game-press mt-3 w-full min-h-12 px-4 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-[background-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
               בדיקה
             </button>
           )}
-        </motion.div>
+
+          {wasCorrect !== null && (
+            <div className="text-start">
+              <WordReveal
+                word={item}
+                verdict={wasCorrect ? "correct" : "wrong"}
+                compact={wasCorrect}
+                onNext={wasCorrect ? undefined : () => void advance()}
+                nextLabel={index + 1 >= items.length ? "לתוצאות" : "למילה הבאה"}
+              />
+            </div>
+          )}
+        </GameStage>
       </div>
     </HeartsGate>
   );

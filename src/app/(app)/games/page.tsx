@@ -160,15 +160,18 @@ export default function GamesHubPage() {
           <p className="mt-2 text-muted">אותן מילים שאתם לומדים, בכמה דרכים. מילה שטעיתם בה תחזור אליכם שוב.</p>
         </div>
         {sessions && sessions.length > 0 && (
-          <p className="text-sm text-muted tabular-nums">
-            <span className="font-bold text-foreground">{sessions.length}</span> סיבובים
+          <dl className="flex gap-5">
+            <div>
+              <dt className="text-xs text-muted">סיבובים</dt>
+              <dd className="chyron text-3xl tabular-nums">{sessions.length}</dd>
+            </div>
             {accuracy !== null && (
-              <>
-                {" · "}
-                <span className="font-bold text-foreground">{accuracy}%</span> הצלחה
-              </>
+              <div>
+                <dt className="text-xs text-muted">הצלחה</dt>
+                <dd className="chyron text-3xl tabular-nums">{accuracy}%</dd>
+              </div>
             )}
-          </p>
+          </dl>
         )}
       </div>
 
@@ -227,7 +230,7 @@ export default function GamesHubPage() {
                 <li key={game.type}>
                   <Link
                     href={game.href}
-                    className="group flex items-center gap-4 p-4 hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
+                    className="game-press group flex items-center gap-4 p-4 hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
                   >
                     <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                       <game.icon size={20} aria-hidden="true" />

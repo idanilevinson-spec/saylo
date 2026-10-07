@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Brain } from "lucide-react";
+import { Brain, MessageCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import { GameHud, type RoundResult } from "@/components/games/GameKit";
 import GameResults, { withReplay } from "@/components/games/GameResults";
 import { getDailyReview } from "@/lib/srs/queue";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
@@ -155,23 +156,32 @@ function MemoryGamePage({ onReplay }: { onReplay: () => void }) {
     );
   }
 
+  // One segment per pair, filled as pairs are found.
+  const pairIds = [...new Set(cards.map((c) => c.vocabularyItemId))];
+  const results: RoundResult[] = pairIds.map((id) => (matchedVocabIds.has(id) ? "correct" : null));
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="sr-only">משחק הזיכרון</h1>
+    <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
       <p role="status" className="sr-only">
         {announcement}
       </p>
-      <p className="text-sm text-muted mb-4 text-center">
-        {matchedVocabIds.size} מתוך {pairTotal} זוגות · {comparisons} ניסיונות
-      </p>
+      <GameHud
+        title="זיכרון"
+        subtitle={`${matchedVocabIds.size} מתוך ${pairTotal} זוגות`}
+        results={results}
+        current={matchedVocabIds.size}
+        score={comparisons}
+        scoreLabel="ניסיונות"
+      />
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 sm:gap-3">
         {cards.map((card) => {
           const isMatched = matchedVocabIds.has(card.vocabularyItemId);
           const isFlipped = isMatched || flipped.includes(card.id);
           return (
-            <motion.button
+            <button
               key={card.id}
+              type="button"
               onClick={() => handleFlip(card)}
               disabled={isMatched || locked}
               // backface-visibility only hides the back face visually — the
@@ -179,33 +189,39 @@ function MemoryGamePage({ onReplay }: { onReplay: () => void }) {
               // screen reader can read every card's word before it's ever
               // flipped, which gives away the whole game.
               aria-label={isFlipped ? card.label : "כרטיס מוסתר, לחצו לחשיפה"}
-              className="relative h-28 [perspective:600px]"
-              whileTap={!isFlipped ? { scale: 0.96 } : undefined}
+              className="game-press relative h-24 sm:h-28 [perspective:700px] rounded-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
               <motion.div
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
-                transition={{ duration: 0.35 }}
+                transition={{ duration: 0.32, ease: [0.77, 0, 0.175, 1] }}
                 className="relative w-full h-full [transform-style:preserve-3d]"
               >
+                {/* Back: a plate in the brand blue with the speech mark. */}
                 <div
-                  className="absolute inset-0 rounded-lg bg-primary flex items-center justify-center [backface-visibility:hidden]"
+                  className="absolute inset-0 rounded-lg bg-primary flex items-center justify-center [backface-visibility:hidden] shadow-[inset_0_-3px_0_rgb(0_0_0/0.15)]"
                   aria-hidden="true"
                 >
-                  <span className="w-2.5 h-2.5 rounded-full bg-white/70" />
+                  <MessageCircle size={26} strokeWidth={2.25} className="text-primary-ink/45" />
                 </div>
                 <div
                   aria-hidden="true"
-                  className={`absolute inset-0 rounded-lg border flex items-center justify-center px-2 text-center text-sm font-bold [backface-visibility:hidden] [transform:rotateY(180deg)] ${
-                    isMatched ? "border-success/40 bg-success/10" : "border-card-border bg-card"
+                  className={`absolute inset-0 rounded-lg border flex flex-col items-center justify-center gap-1 px-2 text-center font-bold leading-tight [backface-visibility:hidden] [transform:rotateY(180deg)] transition-colors duration-300 ${
+                    isMatched ? "border-success/50 bg-success/10" : "border-card-border bg-card"
                   }`}
                 >
-                  {card.isEnglish ? <EnglishText>{card.label}</EnglishText> : card.label}
+                  {card.isEnglish ? (
+                    <EnglishText className="text-base sm:text-lg">{card.label}</EnglishText>
+                  ) : (
+                    <span className="text-sm sm:text-base">{card.label}</span>
+                  )}
+                  <span className="text-[10px] font-medium text-muted">{card.isEnglish ? "English" : "עברית"}</span>
                 </div>
               </motion.div>
-            </motion.button>
+            </button>
           );
         })}
       </div>
+      <p className="mt-4 text-center text-xs text-muted">הופכים שני קלפים בכל פעם ומחפשים מילה והתרגום שלה</p>
     </div>
   );
 }

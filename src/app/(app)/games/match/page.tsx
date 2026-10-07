@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link2, Timer, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import { GameHud, type RoundResult } from "@/components/games/GameKit";
 import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
 import { getMatchPairs, type MatchPair, type MatchRoundType } from "@/lib/games/matchContent";
@@ -337,33 +338,24 @@ function MatchGamePage({ onReplay }: { onReplay: () => void }) {
 
   return (
     <HeartsGate>
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <h1 className="sr-only">משחק ההתאמה</h1>
+      <div className="max-w-3xl mx-auto px-4 pt-6 pb-10">
         <p role="status" className="sr-only">
           {announcement}
         </p>
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <span className="font-bold text-accent-hover">
-              שלב {levelIndex + 1} מתוך {LEVELS.length} · {level.label}
-            </span>
-            <p className="mt-1 text-sm text-muted">{level.instruction}</p>
-          </div>
-          <div className="relative w-12 h-12 shrink-0 flex items-center justify-center rounded-full border-2 border-dashed border-card-border">
-            <Timer size={14} className="absolute -top-1.5 -right-1.5 bg-background rounded-full text-muted" />
-            <EnglishText as="span" className="text-sm font-bold tabular-nums">
-              {timeLeft}
-            </EnglishText>
-          </div>
-        </div>
-
-        <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
-          <motion.div
-            className="h-full bg-accent"
-            animate={{ width: `${(matchedIds.size / Math.max(pairs.length, 1)) * 100}%` }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
+        <GameHud
+          title={`משחק התאמה · שלב ${levelIndex + 1} מתוך ${LEVELS.length}: ${level.label}`}
+          subtitle={level.instruction}
+          results={pairs.map((p): RoundResult => (matchedIds.has(p.id) ? "correct" : null))}
+          current={matchedIds.size}
+          aside={
+            <div className="shrink-0 flex items-center gap-1.5" aria-label={`נותרו ${timeLeft} שניות`}>
+              <Timer size={16} aria-hidden="true" className={timeLeft <= 10 ? "text-danger" : "text-muted"} />
+              <span aria-hidden="true" className={`chyron text-3xl tabular-nums ${timeLeft <= 10 ? "text-danger" : "text-foreground"}`}>
+                {timeLeft}
+              </span>
+            </div>
+          }
+        />
 
         <div ref={containerRef} className="relative">
           <AnimatePresence>
