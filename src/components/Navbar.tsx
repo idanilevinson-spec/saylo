@@ -16,6 +16,7 @@ import {
   BookOpenText,
   MessageCircle,
   Gamepad2,
+  GraduationCap,
   User,
   LogOut,
   ShieldCheck,
@@ -46,10 +47,16 @@ function getServerMountedSnapshot() {
 // BookOpen for vocabulary, etc.) — the mobile nav reuses the vocabulary
 // the rest of the app already taught the learner, rather than inventing
 // its own.
-const AUTHED_LINKS: { href: string; label: string; icon: LucideIcon }[] = [
+// mobileOnly: kept in the phone menu but left out of the desktop bar, which
+// has room for only so many items — the placement test is a one-off that
+// the dashboard already points to.
+const AUTHED_LINKS: { href: string; label: string; icon: LucideIcon; mobileOnly?: boolean }[] = [
   { href: "/dashboard", label: "לוח בקרה", icon: LayoutDashboard },
-  { href: "/placement", label: "מבחן רמה", icon: Target },
+  { href: "/placement", label: "מבחן רמה", icon: Target, mobileOnly: true },
   { href: "/learn", label: "מסלול לימוד", icon: Map },
+  // Its own area (sub-navigation in bagrut/layout.tsx): for the many
+  // learners whose real goal is the matriculation exam, not general English.
+  { href: "/bagrut", label: "בגרות", icon: GraduationCap },
   { href: "/vocabulary", label: "אוצר מילים", icon: BookOpen },
   { href: "/grammar", label: "דקדוק", icon: PenLine },
   { href: "/reading", label: "קריאה", icon: BookOpenText },
@@ -169,8 +176,8 @@ export default function Navbar() {
 
         <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
           {session && (
-            <nav className="hidden md:flex items-center gap-1 bg-card/60 border border-card-border rounded-xl p-1 min-w-0 overflow-x-auto">
-              {links.map((link) => (
+            <nav className="hidden md:flex items-center gap-1 bg-card/60 border border-card-border rounded-xl p-1 min-w-0 overflow-x-auto [scrollbar-width:none]">
+              {links.filter((link) => !("mobileOnly" in link && link.mobileOnly)).map((link) => (
                 <Link key={link.href} href={link.href} className={linkClass(link.href)}>
                   {link.label}
                 </Link>
