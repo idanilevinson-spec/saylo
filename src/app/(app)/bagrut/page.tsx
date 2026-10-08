@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, ChevronLeft, GraduationCap } from "lucide-react";
+import { AlertTriangle, ChevronLeft, GraduationCap, History } from "lucide-react";
 import {
   BAGRUT_MODULE_FORMATS,
   modulesForUnits,
   type BagrutModuleCode,
   type BagrutStudyUnits,
 } from "@/lib/content/bagrut/moduleFormats";
-import { getPublishableSampleUnits } from "@/lib/content/bagrut/sampleUnits";
+import { getPublishableSampleUnits, getSampleUnit } from "@/lib/content/bagrut/sampleUnits";
 import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/lib/content/bagrut/skills";
 import { getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
 
@@ -27,6 +27,9 @@ const KIND_ORDER: BagrutSkillKind[] = ["reading", "listening", "literature", "vo
 
 export default async function BagrutHubPage() {
   const { track, progress } = await getBagrutLearnerState();
+  // The practice set worked on most recently, to pick up from.
+  const last = [...progress].sort((a, b) => b.completed_at.localeCompare(a.completed_at))[0];
+  const lastUnit = last ? getSampleUnit(last.module_code as BagrutModuleCode, last.unit_slug) : undefined;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
@@ -43,6 +46,23 @@ export default async function BagrutHubPage() {
           מוסמך. מתאים כתרגול נוסף, לא כתחליף לחומר לימוד רשמי או להנחיית מורה.
         </p>
       </div>
+
+      {last && lastUnit && (
+        <Link
+          href={`/bagrut/${last.module_code}/${last.unit_slug}`}
+          className="game-press group mt-6 flex items-center gap-4 rounded-lg border border-primary/40 bg-primary/[0.06] p-4 transition-[border-color,transform] duration-150 hover:border-primary/70"
+        >
+          <History size={20} aria-hidden="true" className="shrink-0 text-primary" />
+          <span className="flex-1 min-w-0">
+            <span className="block text-sm text-muted">המשיכו מאיפה שעצרתם</span>
+            <span className="block font-bold truncate">
+              שאלון {last.module_code} · {lastUnit.titleHe}
+            </span>
+          </span>
+          <span className="chyron shrink-0 text-2xl tabular-nums">{last.best_percent}%</span>
+          <ChevronLeft size={18} aria-hidden="true" className="shrink-0 text-muted transition-transform group-hover:-translate-x-0.5" />
+        </Link>
+      )}
 
       <section aria-labelledby="tracks-title" className="mt-10">
         <h2 id="tracks-title" className="text-lg font-bold">
