@@ -15,6 +15,7 @@ import {
   GraduationCap,
   ClipboardCheck,
   CheckCircle2,
+  Ear,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
@@ -38,10 +39,20 @@ interface GameEntry {
 // Grouped by what each game trains, not listed flat: speed games build
 // recall under pressure, meaning games build recognition, spelling builds
 // production — a learner who knows what they want to work on can find it.
-const GROUPS: { title: string; note: string; games: GameEntry[] }[] = [
+// Each group has its own tile colour, so the hub reads as four kinds of
+// play rather than one long list.
+const TONES = {
+  speed: "bg-accent/15 text-accent-hover",
+  meaning: "bg-primary/10 text-primary",
+  listening: "bg-primary text-primary-ink",
+  spelling: "bg-success/12 text-success",
+} as const;
+
+const GROUPS: { title: string; note: string; tone: keyof typeof TONES; games: GameEntry[] }[] = [
   {
     title: "מהירות ותגובה",
     note: "שליפה מהירה של מילים שכבר פגשתם",
+    tone: "speed",
     games: [
       {
         type: "speed_round",
@@ -64,6 +75,7 @@ const GROUPS: { title: string; note: string; games: GameEntry[] }[] = [
   {
     title: "משמעות וזיהוי",
     note: "לזהות מילה לפי תרגום, הגדרה או הקשר",
+    tone: "meaning",
     games: [
       {
         type: "definition",
@@ -93,8 +105,24 @@ const GROUPS: { title: string; note: string; games: GameEntry[] }[] = [
     ],
   },
   {
+    title: "האזנה",
+    note: "לזהות מילה לפי הצליל בלבד",
+    tone: "listening",
+    games: [
+      {
+        type: "listening",
+        icon: Ear,
+        title: "שמעו ובחרו",
+        body: "שומעים מילה בלי לראות אותה, ובוחרים מה היא אומרת או איך כותבים אותה. אפשר לשמוע שוב, וגם לאט.",
+        length: "10 מילים",
+        href: "/games/listen",
+      },
+    ],
+  },
+  {
     title: "כתיב",
     note: "לכתוב את המילה בעצמכם, לא רק לזהות אותה",
+    tone: "spelling",
     games: [
       {
         type: "spelling",
@@ -232,7 +260,7 @@ export default function GamesHubPage() {
                     href={game.href}
                     className="game-press group flex items-center gap-4 p-4 hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
                   >
-                    <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <span className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${TONES[group.tone]}`}>
                       <game.icon size={20} aria-hidden="true" />
                     </span>
                     <span className="flex-1 min-w-0">

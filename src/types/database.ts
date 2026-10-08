@@ -192,7 +192,8 @@ export type VocabularyGameType =
   | "memory"
   | "learn"
   | "test"
-  | "idioms";
+  | "idioms"
+  | "listening";
 
 export interface VocabularyGameSession {
   id: string;
