@@ -106,7 +106,7 @@ export default function LandingHero() {
                   </Link>
                 </motion.div>
               </div>
-              <AppStoreButton className="mt-3" />
+              <AppStoreButton className="mt-4" />
             </motion.div>
 
             {/* The signature moment: not a screenshot of the product but
