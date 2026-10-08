@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/serverClient";
-import type { Topic, VocabularyItem } from "@/types/database";
+import type { Topic, VocabularyItem, CefrLevel } from "@/types/database";
 
 export async function listVocabularyTopics(): Promise<Topic[]> {
   const supabase = await createClient();
@@ -36,6 +36,7 @@ export async function listVocabularyItems(topicId: string): Promise<VocabularyIt
 export interface VocabularyLookupEntry {
   translation_he: string;
   ipa: string | null;
+  cefr_level: CefrLevel;
 }
 
 // headword -> translation/IPA, for the reading page's click-a-word lookup.
@@ -45,12 +46,12 @@ export async function getVocabularyLookupMap(): Promise<Record<string, Vocabular
   const supabase = await createClient();
   const { data } = await supabase
     .from("vocabulary_items")
-    .select("headword, translation_he, ipa")
+    .select("headword, translation_he, ipa, cefr_level")
     .eq("status", "published");
 
   const map: Record<string, VocabularyLookupEntry> = {};
   for (const item of data ?? []) {
-    map[item.headword.toLowerCase()] = { translation_he: item.translation_he, ipa: item.ipa };
+    map[item.headword.toLowerCase()] = { translation_he: item.translation_he, ipa: item.ipa, cefr_level: item.cefr_level };
   }
   return map;
 }
