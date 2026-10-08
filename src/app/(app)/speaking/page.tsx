@@ -33,6 +33,7 @@ import CefrBadge from "@/components/CefrBadge";
 import ConsentRequestForm from "@/components/ConsentRequestForm";
 import PremiumGate from "@/components/PremiumGate";
 import AiConsentGate from "@/components/AiConsentGate";
+import TeacherNotebook from "@/components/speaking/TeacherNotebook";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { requiresParentalConsent } from "@/lib/auth/consentGate";
@@ -328,6 +329,13 @@ export default function SpeakingPage() {
               </div>
             </div>
           </motion.section>
+
+          <TeacherNotebook
+            profileId={profile.id}
+            isAdult={profile.age_band === "adult"}
+            disabled={starting}
+            onPractice={(starter) => startConversation(null, { starter })}
+          />
 
           {/* Conversation starters */}
           <section aria-labelledby="starters-title" className="mt-12">
