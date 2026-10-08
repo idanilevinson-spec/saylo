@@ -2,14 +2,19 @@
 
 import { useSyncExternalStore } from "react";
 import { Capacitor } from "@capacitor/core";
-import { Smartphone } from "lucide-react";
+import { ChevronLeft, Smartphone } from "lucide-react";
 
 // Saylo's page on the Israeli App Store — the app is only listed there.
 export const APP_STORE_URL = "https://apps.apple.com/il/app/id6809848231";
 
 // iPhones, and iPads (which report themselves as a Mac but have touch).
+// In development, ?iphone-preview shows it on any device, so the layout can
+// be checked without an iPhone.
 export function isAppleMobileWeb(): boolean {
   if (Capacitor.isNativePlatform()) return false; // already in the app
+  if (process.env.NODE_ENV === "development" && new URLSearchParams(window.location.search).has("iphone-preview")) {
+    return true;
+  }
   const ua = navigator.userAgent;
   if (/iPhone|iPod|iPad/.test(ua)) return true;
   return /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
@@ -22,19 +27,26 @@ const subscribe = () => () => {};
 // signing up right here and installing the app. Everyone else (Android,
 // desktop, the app itself) sees nothing. Server render and first paint
 // show nothing too, so there's no hydration mismatch.
+//
+// A quiet secondary line, not a third full-size button: signing up on the
+// site stays the one primary action, and the app is the alternative.
 export default function AppStoreButton({ className = "" }: { className?: string }) {
   const show = useSyncExternalStore(subscribe, isAppleMobileWeb, () => false);
   if (!show) return null;
 
   return (
-    <a
-      href={APP_STORE_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-card-border text-foreground font-medium text-lg hover:bg-background-2 transition-colors ${className}`}
-    >
-      <Smartphone size={18} aria-hidden="true" />
-      הורידו את האפליקציה ל-iPhone
-    </a>
+    <p className={`flex items-center justify-center sm:justify-start gap-1.5 text-sm text-muted ${className}`}>
+      <Smartphone size={16} aria-hidden="true" className="shrink-0" />
+      <span>יש לכם iPhone?</span>
+      <a
+        href={APP_STORE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-0.5 font-bold text-primary-hover underline-offset-4 hover:underline focus-visible:underline"
+      >
+        הורידו את האפליקציה
+        <ChevronLeft size={16} aria-hidden="true" />
+      </a>
+    </p>
   );
 }
