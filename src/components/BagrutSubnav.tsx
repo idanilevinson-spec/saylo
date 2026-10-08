@@ -20,11 +20,11 @@ export default function BagrutSubnav() {
   return (
     <div className="border-b border-card-border bg-background-2/60">
       <div className="max-w-4xl mx-auto px-4 flex items-center gap-3">
-        <Link href="/bagrut" className="hidden sm:inline-flex shrink-0 items-center gap-1.5 py-3 text-sm font-black tracking-tight">
+        <Link href="/bagrut" className="hidden sm:inline-flex shrink-0 items-center gap-1.5 pe-3 me-1 border-e border-card-border text-sm font-black tracking-tight">
           <GraduationCap size={17} aria-hidden="true" className="text-primary" />
           אזור הבגרות
         </Link>
-        <nav aria-label="אזור הבגרות" className="-mx-4 sm:mx-0 flex flex-1 gap-1 overflow-x-auto px-4 sm:px-0 py-2 [scrollbar-width:none]">
+        <nav aria-label="אזור הבגרות" className="-mx-4 sm:mx-0 flex flex-1 gap-1 overflow-x-auto px-4 sm:px-0 [scrollbar-width:none]">
           {TABS.map((tab) => {
             const active = tab.match(pathname);
             return (
@@ -32,11 +32,16 @@ export default function BagrutSubnav() {
                 key={tab.href}
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
-                className={`game-press shrink-0 inline-flex items-center min-h-9 px-3 rounded-lg text-sm font-medium transition-[background-color,color,transform] duration-150 ${
-                  active ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground hover:bg-card"
+                className={`relative shrink-0 inline-flex items-center min-h-12 px-3 text-sm transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2 ${
+                  active ? "font-bold text-foreground" : "font-medium text-muted hover:text-foreground"
                 }`}
               >
                 {tab.label}
+                {/* The active tab sits on the area's edge, like a folder tab. */}
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-x-2 bottom-0 h-0.5 rounded-full transition-colors duration-150 ${active ? "bg-primary" : "bg-transparent"}`}
+                />
               </Link>
             );
           })}
