@@ -422,6 +422,24 @@ textarea::placeholder {
   word-spacing: 0.04em;
 }
 
+/* The AI teacher's studio monitor (speaking page): a voice level that
+   breathes. Transform only, staggered per bar by inline animation-delay. */
+@keyframes studio-level {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+.studio-bar {
+  transform-origin: center;
+  animation: studio-level 1.1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-bar { animation: none; transform: scaleY(0.7); }
+}
+:root[data-a11y-motion="reduced"] .studio-bar {
+  animation: none;
+  transform: scaleY(0.7);
+}
+
 /* ---- Games (src/components/games/GameKit.tsx) ----
    Press feedback lands on pointer-down (:active), not on release, so a tap
    feels answered the instant the finger lands — including in the iOS app's

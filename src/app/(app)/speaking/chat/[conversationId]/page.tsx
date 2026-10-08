@@ -35,7 +35,9 @@ function SpeakingChatInner() {
   const startInVoiceMode = searchParams.get("mode") === "voice";
   const { profile } = useAuth();
   const [messages, setMessages] = useState<ConversationMessage[] | null>(null);
-  const [input, setInput] = useState("");
+  // A conversation starter picked on /speaking arrives pre-filled; the
+  // learner sends (or edits) it themselves.
+  const [input, setInput] = useState(() => searchParams.get("starter") ?? "");
   const [sending, setSending] = useState(false);
   const [ending, setEnding] = useState(false);
   const [voiceMode, setVoiceMode] = useState(startInVoiceMode);
