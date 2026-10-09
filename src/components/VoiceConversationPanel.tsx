@@ -424,7 +424,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
         <p className="text-xl sm:text-2xl font-semibold text-center px-4">מוכנים לשיחה?</p>
         <p className="text-sm text-muted text-center px-4 max-w-xs">
-          לחצו כדי להתחיל — יש לאשר גישה למיקרופון כשיתבקש.
+          לחצו כדי להתחיל. הדפדפן יבקש גישה למיקרופון.
         </p>
 
         <motion.button

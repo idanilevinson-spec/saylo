@@ -63,7 +63,7 @@ export default async function BagrutModulePage({ params }: PageProps) {
 
       <p className="mt-4 text-muted leading-relaxed">
         {units.length > 1
-          ? `${units.length} ערכות תרגול לבחירה, כולן באותו מבנה בדיוק — תרגלו כמה שתרצו.`
+          ? `${units.length} ערכות תרגול לבחירה, כולן באותו מבנה בדיוק. אפשר לתרגל כמה שרוצים.`
           : "ערכת תרגול אחת זמינה כרגע למודול הזה."}
       </p>
 

@@ -10,7 +10,7 @@ import {
   BookOpenText,
   Brain,
   Gamepad2,
-  Target,
+  GraduationCap,
   Phone,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
@@ -38,12 +38,12 @@ const NOW_PLAYING = [
 
 const SCENES = [
   { icon: BookOpen, title: "אוצר מילים לפי נושא", body: "ממספרים ובגדים ועד Business ו-Technology.", href: "/vocabulary" },
-  { icon: PenLine, title: "דקדוק מלא", body: "מסלול שלם מ-A1 ועד C2, בלי לדלג.", href: "/grammar" },
-  { icon: Headphones, title: "האזנה", body: "שיחות וקטעי האזנה לפי רמה.", href: "/listening" },
-  { icon: BookOpenText, title: "קריאה חכמה", body: "סיפורים לפי רמה, מבחן הבנה ושאלה פתוחה עם משוב AI.", href: "/reading" },
+  { icon: PenLine, title: "דקדוק", body: "הסבר קצר בעברית ותרגול לכל נושא, מ-present simple ועד nominalisation.", href: "/grammar" },
+  { icon: Headphones, title: "האזנה", body: "שיחות לפי רמה, עם האטה ותמלול, וגם דיבור טבעי עם קיצורים והססות.", href: "/listening" },
+  { icon: BookOpenText, title: "קריאה", body: "טקסטים מקוריים לפי רמה, תרגום בלחיצה על מילה, ושאלה פתוחה עם משוב.", href: "/reading" },
   { icon: Brain, title: "חזרה חכמה", body: "המערכת מחזירה לכם מילים במרווחי זמן מתוכננים, כדי שיישארו בזיכרון.", href: "/review" },
-  { icon: Gamepad2, title: "לומדים דרך משחק", body: "XP, רצף ימים ותגי הישג.", href: "/games" },
-  { icon: Target, title: "מסלולים לפי מטרה", body: "עבודה, טיולים, ראיונות או לימודים.", href: "/learn" },
+  { icon: Gamepad2, title: "משחקים", body: "שמונה משחקים על המילים שלכם: מהירות, האזנה, איות, זיכרון ועוד.", href: "/games" },
+  { icon: GraduationCap, title: "הכנה לבגרות", body: "3, 4 ו-5 יח״ל: מבנה השאלונים, מיומנויות וערכות תרגול באותו מבנה.", href: "/bagrut" },
 ];
 
 // A small ballistic level meter, not a spinner or a static icon — the one
@@ -86,13 +86,13 @@ export default function LandingFeatures() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.5, ease: EASE_OUT }}
-        className="max-w-3xl mx-auto"
+        className="max-w-4xl mx-auto"
       >
-        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center mb-4">
+        <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
           הכל בערוץ אחד
         </h2>
-        <p className="text-center text-muted mb-14 max-w-lg mx-auto">
-          לא עוד אתר לימוד רגיל. מערכת שלמה שמכירה אתכם ומתאימה את עצמה אליכם.
+        <p className="mt-3 mb-10 max-w-xl text-lg text-muted leading-relaxed">
+          שש מיומנויות, מורה אחד שזוכר את הטעויות שלכם, ותרגול ברמה שלכם בכל אחת מהן.
         </p>
 
         <div className="space-y-3 mb-3">

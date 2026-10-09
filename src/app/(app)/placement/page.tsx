@@ -106,7 +106,7 @@ export default function PlacementPage() {
   if (questions.length === 0) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">
-        מבחן הרמה עוד לא זמין — חזרו בקרוב.
+        מבחן הרמה עוד לא זמין.
       </div>
     );
   }
@@ -145,7 +145,7 @@ export default function PlacementPage() {
           </div>
           <h1 className="mt-5 text-2xl sm:text-3xl font-bold">מבחן רמה</h1>
           <p className="mt-3 text-muted leading-relaxed">
-            {questions.length} שאלות קצרות שבודקות אוצר מילים, דקדוק, קריאה והאזנה — ובסוף אפשרות לדגימת כתיבה
+            {questions.length} שאלות קצרות שבודקות אוצר מילים, דקדוק, קריאה והאזנה, ובסוף גם קטע כתיבה קצר (לא חובה)
             קצרה. בסיום תקבלו הערכת רמה לפי סולם CEFR, לפי תחום. זו הערכה פנימית של Saylo ולא מבחן רשמי.
           </p>
           <fieldset className="mt-8 text-start">

@@ -6,11 +6,12 @@ import EnglishText from "@/components/EnglishText";
 // list, not fetched data — motion.div wrapping isn't needed since the
 // CSS animation runs on mount regardless.
 const ITEMS = [
-  "3 ימים ראשונים חינם",
-  "בלי כרטיס אשראי",
+  "3 ימים חינם, בלי כרטיס אשראי",
+  "מבחן רמה של כ-10 דקות",
+  "שש רמות, מ-A1 עד C2",
+  "תרגול לבגרות: 3, 4 ו-5 יח״ל",
+  "זיהוי דיבור אמיתי בתרגול הגייה",
   "ביטול בכל עת",
-  "שיחה עם מורה AI במנוי בתשלום",
-  "תרגול דיבור עם זיהוי קול אמיתי",
 ];
 
 // One "group" repeats the item set enough times to safely exceed any real

@@ -106,7 +106,7 @@ export default function PricingCards() {
       {!session && (
         <p className="max-w-2xl mx-auto mb-8 text-center text-sm text-muted leading-relaxed">
           כל המסלולים למטה מותאמים אישית: מסלול לימוד שמתעדכן לפי הביצועים שלכם, ומורה AI שזוכר את הטעויות החוזרות
-          שלכם. לכן ההרשמה היא הצעד הראשון — היא גם מה שמאפשר לגשת למנוי מכל אחד מהמכשירים שלכם.
+          שלכם. לכן ההרשמה היא הצעד הראשון. היא גם מה שמאפשר לגשת למנוי מכל אחד מהמכשירים שלכם.
         </p>
       )}
 
@@ -233,7 +233,7 @@ export default function PricingCards() {
           subscription quietly lapses. */}
       {!isNative && (
         <p className="max-w-3xl mx-auto mt-2 text-center text-[11px] text-muted/70 leading-relaxed">
-          בתשלום דרך Apple Pay החידוש האוטומטי אינו נתמך כרגע — בתום התקופה יהיה צורך לבצע תשלום חדש כדי להמשיך.
+          בתשלום דרך Apple Pay החידוש האוטומטי אינו נתמך כרגע. בתום התקופה יהיה צורך לבצע תשלום חדש כדי להמשיך.
         </p>
       )}
 

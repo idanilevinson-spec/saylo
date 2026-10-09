@@ -22,9 +22,9 @@ export default function LandingFinalCta() {
         transition={{ duration: 0.5, ease: EASE_OUT }}
         className="relative max-w-lg mx-auto text-center"
       >
-        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-primary-ink">מוכנים להתחיל?</h2>
+        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-primary-ink">בעוד כעשר דקות תדעו את הרמה שלכם.</h2>
         <p className="mt-4 text-primary-ink text-lg leading-relaxed">
-          מבחן הרמה בודק אוצר מילים, דקדוק, קריאה והאזנה. בסופו תקבלו הערכת רמה ומסלול לימוד.
+          ומיד אחריהן תחכה לכם תוכנית יומית שבנויה עליה. שלושה ימים חינם, בלי כרטיס אשראי.
         </p>
         {/* Unlike the hero's CTA (which sits on its own white/dark card,
             not the field), this button sits directly on the field with

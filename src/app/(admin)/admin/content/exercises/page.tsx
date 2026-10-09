@@ -162,10 +162,10 @@ export default function AdminExercisesPage() {
             className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"
           />
           <textarea
-            aria-label="אפשרויות תשובה — כל שורה אפשרות אחת"
+            aria-label="אפשרויות תשובה, אחת בכל שורה"
             value={form.optionsText}
             onChange={(e) => setForm({ ...form, optionsText: e.target.value })}
-            placeholder={"אפשרויות תשובה — כל שורה אפשרות אחת"}
+            placeholder={"אפשרויות תשובה, אחת בכל שורה"}
             dir="ltr"
             rows={4}
             className="w-full px-2 py-1.5 rounded-lg border border-card-border bg-card text-sm"

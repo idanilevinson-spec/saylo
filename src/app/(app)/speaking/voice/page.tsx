@@ -110,13 +110,13 @@ export default function VoiceConversationHubPage() {
           <div className="animate-fade-up">
             <h1 className="text-3xl font-bold">שיחה עם נציג AI</h1>
             <p className="mt-2 text-muted">
-              שיחה קולית חופשית עם ה-AI — כמו שיחת טלפון. בחרו נושא, או פתחו שיחה חופשית על מה שבא לכם.
+              שיחה קולית עם המורה, כמו בטלפון. בחרו נושא, או פתחו שיחה חופשית על מה שבא לכם.
             </p>
           </div>
 
           {limitReached && (
             <div className="mt-6 p-4 rounded-lg bg-danger-ink text-danger text-sm">
-              הגעתם למגבלת 5 שיחות ליום. אפשר להתחיל שיחה חדשה בעוד עד 24 שעות — השיחות הישנות שלכם עדיין זמינות לצפייה.
+              הגעתם למגבלת 5 שיחות ליום. אפשר להתחיל שיחה חדשה בעוד עד 24 שעות, והשיחות הקודמות עדיין זמינות לצפייה.
             </div>
           )}
 
@@ -134,7 +134,7 @@ export default function VoiceConversationHubPage() {
               <Phone size={20} />
             </span>
             <h2 className="mt-2 font-bold">שיחת חולין חופשית</h2>
-            <p className="text-sm text-muted mt-1">בלי נושא קבוע — דברו על מה שבא לכם עם ה-AI</p>
+            <p className="text-sm text-muted mt-1">בלי נושא קבוע. מדברים על מה שבא לכם</p>
           </motion.button>
 
           {scenarios === null && <p className="mt-10 text-center text-muted">טוען נושאים...</p>}

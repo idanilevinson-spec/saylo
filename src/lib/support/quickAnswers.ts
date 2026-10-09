@@ -78,7 +78,7 @@ function subscriptionAnswer(account: AccountStatus): string {
   }
 
   // canceled / expired, or a trial / period whose date has passed.
-  return `אין כרגע מנוי פעיל בחשבון${sub.status === "trialing" ? " — תקופת הניסיון הסתיימה" : ""}. אפשר לחדש ב[מסלולים ומחירים](/pricing).`;
+  return `אין כרגע מנוי פעיל בחשבון${sub.status === "trialing" ? " (תקופת הניסיון הסתיימה)" : ""}. אפשר לחדש ב[מסלולים ומחירים](/pricing).`;
 }
 
 function heartsAnswer(account: AccountStatus): string {
@@ -87,7 +87,7 @@ function heartsAnswer(account: AccountStatus): string {
   }
   const hearts = typeof account.hearts === "object" && account.hearts ? account.hearts : null;
   const now = hearts ? ` כרגע יש לכם ${hearts.current} מתוך ${hearts.max}.` : "";
-  return `בלי מנוי פעיל, כל טעות בתרגיל עולה לב, ולב אחד חוזר כל ${HEART_REGEN_HOURS} שעות.${now} במנוי אין הגבלת לבבות — המסלולים ב[מסלולים ומחירים](/pricing).`;
+  return `בלי מנוי פעיל, כל טעות בתרגיל עולה לב, ולב אחד חוזר כל ${HEART_REGEN_HOURS} שעות.${now} במנוי אין הגבלת לבבות. המסלולים ב[מסלולים ומחירים](/pricing).`;
 }
 
 function teacherAnswer(account: AccountStatus): string {

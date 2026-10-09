@@ -200,7 +200,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
         <IconBadge icon={Mic} tone="danger" className="mx-auto" />
         <h1 className="text-2xl font-bold">מוכנים למבחן הדיבור?</h1>
         <p className="mt-2 text-muted">
-          {steps.length} שאלות · עונים בקול על כל שאלה — מילים באנגלית ושאלות פתוחות
+          {steps.length} שאלות · עונים בקול: מילים באנגלית ושאלות פתוחות
         </p>
         <p className="mt-2 text-sm text-muted">יש לאשר גישה למיקרופון כשיתבקש.</p>
         <motion.button

@@ -10,12 +10,14 @@ import LandingPricingTeaser from "@/components/LandingPricingTeaser";
 import LandingFinalCta from "@/components/LandingFinalCta";
 import SiteFooter from "@/components/SiteFooter";
 import AccountDeletedNotice from "@/components/AccountDeletedNotice";
+import { getLevelCatalog } from "@/lib/content/levelCatalog";
 
 export const metadata: Metadata = {
   title: "Saylo — לומדים אנגלית בקצב שלכם",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const catalog = await getLevelCatalog();
   return (
     <>
       <Suspense fallback={null}>
@@ -26,7 +28,7 @@ export default function HomePage() {
       <LandingProductTour />
       <LandingSteps />
       <LandingFeatures />
-      <LandingLevels />
+      <LandingLevels catalog={catalog} />
       <LandingPricingTeaser />
       <LandingFinalCta />
       <SiteFooter />

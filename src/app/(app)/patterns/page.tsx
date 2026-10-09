@@ -54,7 +54,7 @@ export default function MyPatternsPage() {
         הדפוסים שלי
       </motion.h1>
       <p className="mt-2 text-muted">
-        טעויות שקשורות ספציפית לעברית וחוזרות אצלכם בכתיבה ובשיחות — לא כל טעות, רק מה שבאמת חוזר.
+        טעויות שבאות מהעברית וחוזרות אצלכם בכתיבה ובשיחות. רק מה שחוזר שוב ושוב נכנס לכאן.
       </p>
 
       {displayStats.length === 0 ? (
@@ -103,7 +103,7 @@ export default function MyPatternsPage() {
                   </Link>
                 ) : (
                   <span className="mt-4 inline-block px-4 py-2 rounded-lg bg-background-2 text-muted text-sm">
-                    תרגול קצר — בקרוב
+                    תרגול קצר בקרוב
                   </span>
                 )}
               </motion.div>

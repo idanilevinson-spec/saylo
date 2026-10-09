@@ -41,7 +41,7 @@ export default function DailyLessonPage() {
   if (topic === null) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">
-        עוד אין מספיק תוכן לשיעור יומי — חזרו בקרוב.
+        עוד אין מספיק תוכן לשיעור יומי.
       </div>
     );
   }
@@ -50,7 +50,7 @@ export default function DailyLessonPage() {
   const kindLabel = topic.kind === "vocabulary" ? "אוצר מילים" : "דקדוק";
   const reason =
     topic.status === "in_progress"
-      ? `כבר התחלתם את הנושא הזה (${topic.accuracy}% הצלחה) — בואו נשלים אותו`
+      ? `כבר התחלתם את הנושא הזה (${topic.accuracy}% הצלחה). הזמן להשלים אותו.`
       : "נבחר בשבילכם לפי מבחן הרמה שלכם";
 
   return (

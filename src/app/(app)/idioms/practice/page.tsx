@@ -86,7 +86,7 @@ export default function IdiomsPracticePage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={MessagesSquare} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">התרגיל הזה עוד לא זמין</h1>
-        <p className="mt-2 text-muted">מוסיפים בהדרגה ניבים ופעלים דו-מיליים — חזרו לבדוק בקרוב.</p>
+        <p className="mt-2 text-muted">ניבים ופעלים דו-מיליים מתווספים בהדרגה. כדאי לחזור לבדוק בקרוב.</p>
       </div>
     );
   }
@@ -179,7 +179,7 @@ export default function IdiomsPracticePage() {
                 className={`mt-4 flex items-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
               >
                 {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
-                {wasCorrect ? "כל הכבוד!" : `לא בדיוק — הביטוי הנכון הוא "${item.options[item.correctIndex]}"`}
+                {wasCorrect ? "כל הכבוד!" : `לא בדיוק. הביטוי הנכון: "${item.options[item.correctIndex]}"`}
               </motion.p>
               <EnglishText as="p" className="mt-1 text-sm text-muted">
                 {item.exampleEn}

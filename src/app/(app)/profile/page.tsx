@@ -298,7 +298,7 @@ export default function ProfilePage() {
                 <div className="bg-danger-ink border border-danger/30 rounded-lg p-4 space-y-3">
                   <p className="text-sm">
                     בטוחים שברצונכם לבטל? תמשיכו ליהנות מהמנוי עד{" "}
-                    <strong>{formatDate(subscription.current_period_end)}</strong> — התשלום שכבר בוצע לא מוחזר, ואחרי
+                    <strong>{formatDate(subscription.current_period_end)}</strong>. התשלום שכבר בוצע לא מוחזר, ואחרי
                     התאריך הזה פשוט לא תחויבו שוב.
                   </p>
                   <div className="flex gap-2">
@@ -325,7 +325,7 @@ export default function ProfilePage() {
           {subscription.status === "active" && subscription.billing_provider !== "apple" && subscription.cancel_at_period_end && (
             <>
               <p className="text-sm">
-                המנוי שלכם יבוטל ב-<strong>{formatDate(subscription.current_period_end)}</strong> — עד אז יש לכם
+                המנוי שלכם יבוטל ב-<strong>{formatDate(subscription.current_period_end)}</strong>. עד אז יש לכם
                 גישה מלאה, ולא תחויבו שוב אחרי זה.
               </p>
               <button
@@ -354,7 +354,7 @@ export default function ProfilePage() {
 
           {subscription.status === "past_due" && (
             <p role="alert" className="text-sm text-danger">
-              יש בעיה בחיוב האחרון שלכם — בדקו את אמצעי התשלום מול חברת האשראי.
+              החיוב האחרון לא עבר. כדאי לבדוק את אמצעי התשלום מול חברת האשראי.
             </p>
           )}
 

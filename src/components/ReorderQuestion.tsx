@@ -36,7 +36,7 @@ export default function ReorderQuestion({ content, disabled, onSubmit }: Reorder
 
   return (
     <div>
-      <p className="font-medium text-lg mb-4">סדרו את המשפט בסדר הנכון — בנק המילים למטה</p>
+      <p className="font-medium text-lg mb-4">סדרו את המילים למשפט</p>
 
       <div
         dir="ltr"

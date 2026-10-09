@@ -209,7 +209,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
             </span>
           </div>
           <p className="mt-2 text-sm text-muted">
-            הטקסט יישאר נגיש לחזרה בלחיצת כפתור לאורך כל המבחן — אין צורך לשנן אותו מראש.
+            הטקסט יישאר נגיש לחזרה בלחיצת כפתור לאורך כל המבחן, אז אין צורך לשנן אותו.
           </p>
           <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center">
             <motion.button
@@ -278,7 +278,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
           </div>
         )}
         {openCount > openOutcomes.length && (
-          <p className="mt-4 text-sm text-muted">הזמן נגמר לפני שהספקתם לענות על כל השאלות הפתוחות — זה בסדר גמור, נסו שוב בפעם הבאה.</p>
+          <p className="mt-4 text-sm text-muted">הזמן נגמר לפני שהספקתם לענות על כל השאלות הפתוחות. זה קורה, ובפעם הבאה כבר תדעו כמה זמן לתת לכל שאלה.</p>
         )}
 
         <div className="mt-6 bg-accent/5 border border-accent/25 rounded-lg p-6 text-right">
