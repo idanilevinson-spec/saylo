@@ -6,10 +6,14 @@ import { speak } from "@/lib/speech/browserTts";
 import { useNeuralSpeech, NEURAL_SPEECH_RATES } from "@/lib/speech/useNeuralSpeech";
 import EnglishText from "@/components/EnglishText";
 import type { VocabularyLookupEntry } from "@/lib/content/vocabulary";
+import { CEFR_ORDER } from "@/lib/assessment/cefrScoring";
+import type { CefrLevel } from "@/types/database";
 
 interface ReadingTextViewerProps {
   bodyEn: string;
   vocabByWord: Record<string, VocabularyLookupEntry>;
+  // The text's level: the glossary leaves out words well below it.
+  textLevel?: CefrLevel;
 }
 
 function normalizeWord(word: string): string {
@@ -46,7 +50,7 @@ function tokenizeWords(text: string, vocabByWord: Record<string, VocabularyLooku
 // pause/resume at the exact point playback was at, and adjusting speed
 // without losing your place — none of which are achievable once several
 // paragraphs are baked into a single audio clip.
-export default function ReadingTextViewer({ bodyEn, vocabByWord }: ReadingTextViewerProps) {
+export default function ReadingTextViewer({ bodyEn, vocabByWord, textLevel }: ReadingTextViewerProps) {
   // Blank lines between paragraphs come through as \r\n\r\n when the
   // source SQL was saved/pasted with Windows line endings, not just \n\n
   // — matching (\r\n|\n) as one unit before requiring 2+ of them handles
@@ -54,6 +58,21 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord }: ReadingTextVi
   const paragraphs = bodyEn.split(/(?:\r\n|\n){2,}/).filter((p) => p.trim().length > 0);
 
   const [popover, setPopover] = useState<{ word: string; entry: VocabularyLookupEntry } | null>(null);
+  // The words from the vocabulary bank that appear in this text, in the
+  // order they first appear — a glossary to skim before or after reading.
+  // Words two or more levels below the text ("one", "today" in a C1 text)
+  // stay tappable in the text but don't crowd the list.
+  const minLevel = textLevel ? Math.max(0, CEFR_ORDER.indexOf(textLevel) - 1) : 0;
+  const glossary: { word: string; entry: VocabularyLookupEntry }[] = [];
+  const seen = new Set<string>();
+  for (const token of bodyEn.split(/\s+/)) {
+    const clean = normalizeWord(token);
+    const entry = vocabByWord[clean];
+    if (entry && !seen.has(clean) && CEFR_ORDER.indexOf(entry.cefr_level) >= minLevel) {
+      seen.add(clean);
+      glossary.push({ word: clean, entry });
+    }
+  }
   const { state: playback, activeIndex: activeParagraph, rate, play, togglePlayPause, setRate: handleRateChange } =
     useNeuralSpeech(paragraphs);
 
@@ -115,6 +134,34 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord }: ReadingTextVi
           </p>
         ))}
       </div>
+
+      {glossary.length > 0 && (
+        <section aria-labelledby="glossary-title" className="mt-8">
+          <h2 id="glossary-title" className="text-sm font-bold text-muted">
+            מילים מהטקסט · {glossary.length}
+          </h2>
+          <ul className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+            {glossary.map(({ word, entry }) => (
+              <li key={word}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPopover({ word, entry });
+                    speak(word);
+                  }}
+                  className="game-press flex w-full items-center justify-between gap-3 rounded-lg border border-card-border bg-card px-3 py-2 text-start transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                >
+                  <span className="text-sm">{entry.translation_he}</span>
+                  <span dir="ltr" lang="en" className="inline-flex items-center gap-1.5 font-bold text-primary">
+                    <Volume2 size={13} aria-hidden="true" className="text-muted" />
+                    {word}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {popover && (
         <div className="mt-6 p-4 rounded-lg bg-primary/5 border border-primary/20 flex items-start justify-between gap-4">

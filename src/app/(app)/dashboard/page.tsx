@@ -284,82 +284,65 @@ export default function DashboardPage() {
 
       <TeacherSuggestionCard />
 
-      {/* Today's goal + the two differentiated AI-conversation modes sit
-          together up top — the rest of the catalog is grouped below by
-          what the learner is trying to do, not spread into one grid of
-          identical cards. */}
-      <div className="mt-10 grid lg:grid-cols-[1.1fr_1fr] gap-4">
+      {/* Today's XP goal beside the two ways to talk with the AI teacher. */}
+      <div className="mt-10 grid lg:grid-cols-[1.1fr_1fr] gap-3">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="relative overflow-hidden rounded-lg border border-card-border p-6 flex flex-col justify-between"
+          className="rounded-lg border border-card-border bg-card p-5 flex flex-col justify-between"
         >
-          <motion.div
-            aria-hidden="true"
-            className="absolute inset-0"
-            initial={{ opacity: 0.55 }}
-            animate={{ opacity: [0.55, 0.75, 0.55] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            style={{
-              background:
-                "radial-gradient(ellipse 70% 60% at 100% 0%, color-mix(in srgb, var(--primary) 18%, transparent) 0%, transparent 60%), radial-gradient(ellipse 60% 55% at 0% 100%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 55%)",
-            }}
-          />
-          <div className="relative flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm text-muted">היעד היומי שלכם</p>
-              <p className="mt-1 text-3xl font-extrabold">
-                {todayXp}
-                <span className="text-base font-medium text-muted"> / {DAILY_XP_GOAL} XP</span>
+              <p className="text-sm font-bold text-muted">היעד היומי</p>
+              <p className="mt-1 flex items-baseline gap-1.5">
+                <span className="chyron text-4xl tabular-nums">{todayXp}</span>
+                <span className="text-sm font-medium text-muted">/ {DAILY_XP_GOAL} XP</span>
               </p>
             </div>
-            <span className="shrink-0 mt-1 text-sm font-bold text-primary">{goalPct}%</span>
+            <span className={`shrink-0 mt-1 text-sm font-bold tabular-nums ${goalPct >= 100 ? "text-success" : "text-primary"}`}>
+              {goalPct}%
+            </span>
           </div>
-          <div className="relative mt-5">
+          <div className="mt-4">
             <div className="h-2 rounded-full bg-background-2 overflow-hidden">
               <motion.div
-                className="h-full rounded-full bg-primary"
+                className={`h-full rounded-full ${goalPct >= 100 ? "bg-success" : "bg-primary"}`}
                 initial={{ width: 0 }}
                 animate={{ width: `${goalPct}%` }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.2 }}
               />
             </div>
             <p className="mt-2 text-xs text-muted">
-              {goalPct >= 100 ? "היעד הושלם היום — כל הכבוד!" : "נסו לשמור על הרצף שלכם"}
+              {goalPct >= 100 ? "היעד של היום הושלם" : "כל תרגיל, משחק ושיחה נספרים ביעד"}
             </p>
           </div>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-3">
           {FEATURED_MODULES.map((m, i) => (
             <motion.div
               key={m.title}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.15 + i * 0.05 }}
-              whileHover={{ y: -3 }}
-              whileTap={{ scale: 0.98 }}
             >
               <Link
                 href={m.href}
-                className={`h-full flex items-center gap-4 rounded-lg border p-5 transition-all hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
-                  m.tone === "accent"
-                    ? "bg-accent/10 border-accent/30 hover:border-accent/50"
-                    : "bg-primary/10 border-primary/30 hover:border-primary/50"
-                }`}
+                className="game-press group h-full flex items-center gap-4 rounded-lg border border-card-border bg-card p-4 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 <span
-                  className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl ${
-                    m.tone === "accent" ? "bg-accent/20 text-accent-hover" : "bg-primary/20 text-primary"
+                  className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
+                    m.tone === "accent" ? "bg-accent/15 text-accent-hover" : "bg-primary/10 text-primary"
                   }`}
                 >
-                  <m.icon size={22} strokeWidth={2} />
+                  <m.icon size={21} strokeWidth={2} aria-hidden="true" />
                 </span>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <h3 className="font-bold">{m.title}</h3>
                   <p className="mt-0.5 text-xs text-muted truncate">{m.body}</p>
                 </div>
+                <ChevronLeft size={17} aria-hidden="true" className="shrink-0 text-muted transition-transform group-hover:-translate-x-0.5" />
               </Link>
             </motion.div>
           ))}
