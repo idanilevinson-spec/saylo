@@ -48,7 +48,7 @@ const FEATURED_MODULES: (ModuleItem & { tone: "accent" | "primary" })[] = [
   {
     icon: Phone,
     title: "שיחה קולית עם מורה AI",
-    body: "שיחה חופשית בקול — כמו שיחת טלפון",
+    body: "מדברים בקול, כמו בשיחת טלפון",
     href: "/speaking/voice",
     tone: "accent",
   },
@@ -231,7 +231,7 @@ export default function DashboardPage() {
                 stats.freezeCount > 0 ? (
                   <span
                     className="flex items-center gap-0.5 text-[10px] text-primary"
-                    title={`${stats.freezeCount} ${stats.freezeCount === 1 ? "הקפאת רצף זמינה" : "הקפאות רצף זמינות"} — שומרת על הרצף אם מפספסים יום אחד`}
+                    title={`${stats.freezeCount} ${stats.freezeCount === 1 ? "הקפאת רצף זמינה" : "הקפאות רצף זמינות"}. שומרת על הרצף אם מפספסים יום אחד`}
                   >
                     <Snowflake size={10} />
                     {stats.freezeCount}
@@ -269,7 +269,7 @@ export default function DashboardPage() {
               <div className="min-w-0">
                 <h2 className="text-2xl font-black tracking-tight">מתחילים במבחן רמה</h2>
                 <p className="mt-1 max-w-lg text-primary-ink/80 leading-relaxed">
-                  פחות מ-10 דקות. בסופו תקבלו את הרמה שלכם בכל מיומנות, ותוכנית יומית שבנויה בדיוק לרמה הזו.
+                  בערך 10 דקות. בסופו תקבלו את הרמה שלכם בכל מיומנות, ותוכנית יומית שבנויה בדיוק לרמה הזו.
                 </p>
               </div>
               <span className="sm:ms-auto shrink-0 inline-flex items-center gap-2 min-h-12 px-5 rounded-lg bg-background text-foreground font-bold">

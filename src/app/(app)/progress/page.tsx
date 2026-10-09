@@ -251,7 +251,7 @@ export default function ProgressPage() {
               data.freezeCount > 0 ? (
                 <span
                   className="flex items-center gap-0.5 text-xs text-primary"
-                  title={`${data.freezeCount} ${data.freezeCount === 1 ? "הקפאת רצף זמינה" : "הקפאות רצף זמינות"} — שומרת על הרצף אם מפספסים יום אחד`}
+                  title={`${data.freezeCount} ${data.freezeCount === 1 ? "הקפאת רצף זמינה" : "הקפאות רצף זמינות"}. שומרת על הרצף אם מפספסים יום אחד`}
                 >
                   <Snowflake size={12} />
                   {data.freezeCount}
@@ -270,7 +270,7 @@ export default function ProgressPage() {
         >
           <span>
             <span className="block font-bold">הדפוסים שלי</span>
-            <span className="block text-sm text-muted">טעויות שקשורות לעברית וחוזרות אצלכם — ומה לתרגל בעקבותיהן</span>
+            <span className="block text-sm text-muted">טעויות שבאות מהעברית וחוזרות אצלכם, ומה לתרגל בעקבותיהן</span>
           </span>
           <span className="text-primary text-sm shrink-0">לצפייה ←</span>
         </Link>
@@ -382,7 +382,7 @@ export default function ProgressPage() {
         {data.badges.length === 0 ? (
           <div className="mt-4 text-center py-6">
             <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-            <p className="text-sm text-muted">עדיין אין תגים — המשיכו ללמוד כדי להרוויח את הראשון!</p>
+            <p className="text-sm text-muted">עוד אין תגים. התג הראשון מגיע אחרי כמה ימי תרגול.</p>
           </div>
         ) : (
           <div className="mt-4 grid sm:grid-cols-2 gap-3">

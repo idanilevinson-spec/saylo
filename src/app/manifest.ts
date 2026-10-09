@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Saylo — לומדים אנגלית בקצב שלכם",
     short_name: "Saylo",
-    description: "לומדים אנגלית בקצב שלכם — מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם",
+    description: "לומדים אנגלית בקצב שלכם: מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם",
     start_url: "/dashboard",
     display: "standalone",
     background_color: "#0b0c0f",

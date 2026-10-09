@@ -44,7 +44,7 @@ export default function PremiumGate({ children, featureName, requirePaid = false
         </h1>
         <p className="mt-2 text-muted">
           {requirePaid
-            ? "התכונה הזו אינה כלולה בתקופת הניסיון החינמי — זמינה רק למנויים עם מנוי פעיל בתשלום."
+            ? "התכונה הזו אינה כלולה בתקופת הניסיון. היא זמינה במנוי בתשלום."
             : "תקופת הניסיון שלכם הסתיימה. שדרגו כדי להמשיך וליהנות מכל התכונות."}
         </p>
         <Link

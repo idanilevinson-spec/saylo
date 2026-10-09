@@ -161,7 +161,7 @@ export default function AdminModerationPage() {
       <div>
         <h2 className="font-bold text-lg">שיחות AI אחרונות</h2>
         <p className="mt-1 text-sm text-muted">
-          במיוחד רלוונטי לשיחות של קטינים — ניתן לסמן שיחה לבדיקה, מה שיוצר דיווח ברשימה למעלה.
+          במיוחד בשיחות של קטינים. ניתן לסמן שיחה לבדיקה, מה שיוצר דיווח ברשימה למעלה.
         </p>
         {!conversations ? (
           <p className="mt-3 text-muted">טוען...</p>

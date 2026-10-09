@@ -107,7 +107,7 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
           <BookOpenText size={18} className="shrink-0 mt-0.5" />
           <p>
             בבחינה האמיתית של מודול D לומדים מראש יצירה ספציפית (סיפור ושיר) שנקבעת על ידי משרד החינוך. הטקסט כאן{" "}
-            <strong className="text-foreground">מקורי</strong> ונועד לתרגל את סוג הניתוח הספרותי הנדרש — הוא אינו
+            <strong className="text-foreground">מקורי</strong> ונועד לתרגל את סוג הניתוח הספרותי הנדרש, והוא אינו
             תחליף ללימוד היצירות הרשמיות שנבחרו לבית הספר שלכם.
           </p>
         </div>
@@ -138,7 +138,7 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
           <h2 className="flex items-center gap-2 font-bold text-sm text-muted">
             <BookOpenText size={16} />
-            הבנת הנקרא{unit.readingPassages.length > 1 ? ` — קטע ${passageIndex + 1}` : ""}
+            הבנת הנקרא{unit.readingPassages.length > 1 ? ` · קטע ${passageIndex + 1}` : ""}
           </h2>
           <EnglishText as="div" className="mt-3 leading-relaxed whitespace-pre-line">
             {passage}
@@ -357,7 +357,7 @@ function WritingTaskCard({ promptEn, wordCountRange }: { promptEn: string; wordC
         {wordCount} מילים (טווח מבוקש: {min}–{max})
       </p>
       <p className="mt-2 text-xs text-muted">
-        הכתיבה כאן לתרגול עצמי בלבד ואינה נשלחת לבדיקה — משוב אוטומטי על כתיבה עשוי להתווסף בהמשך.
+        הכתיבה כאן לתרגול עצמי בלבד ואינה נשלחת לבדיקה.
       </p>
     </section>
   );

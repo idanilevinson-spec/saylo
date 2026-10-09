@@ -26,7 +26,7 @@ export default async function VocabularyPage() {
       />
       <div className="mt-10">
         {topics.length === 0 ? (
-          <p className="text-muted">אין עדיין נושאים זמינים — יתווספו בקרוב.</p>
+          <p className="text-muted">עוד אין כאן נושאים.</p>
         ) : (
           <LevelShelves
             items={topics}

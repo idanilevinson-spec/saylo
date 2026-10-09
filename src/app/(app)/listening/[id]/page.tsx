@@ -59,7 +59,7 @@ export default async function ListeningClipPage({ params }: PageProps) {
 
       {clip.style === "natural_speech" && (
         <p className="mt-4 text-sm text-muted">
-          קטע דיבור טבעי — כולל קיצורים והססות כמו בשיחה אמיתית. מתחילים לאט; אפשר להאיץ בבקרת המהירות.
+          קטע דיבור טבעי, עם קיצורים והססות כמו בשיחה אמיתית. מתחילים לאט; אפשר להאיץ בבקרת המהירות.
         </p>
       )}
 

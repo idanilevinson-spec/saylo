@@ -10,24 +10,24 @@ const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 // 01/02/03 the old direction refused.
 const STEPS = [
   {
-    en: "Take the level test.",
-    he: "שאלות באוצר מילים, דקדוק, קריאה והאזנה שמעריכות את הרמה שלכם, מתוך 6 רמות ה-CEFR.",
-    title: "מבחן רמה חכם",
+    en: "About ten minutes, four skills.",
+    he: "שאלות באוצר מילים, דקדוק, קריאה והאזנה. בסוף מקבלים רמה לכל מיומנות בנפרד, כי קריאה ודיבור לא תמיד באותה רמה.",
+    title: "מבחן רמה",
   },
   {
-    en: "Get your own track.",
-    he: "המערכת בונה לכם תוכנית לימוד שמתמקדת במה שאתם באמת צריכים, לא שיעור אחיד לכולם.",
-    title: "מסלול אישי",
+    en: "A plan for today.",
+    he: "שישה תרגילים קצרים: דקדוק, מילים, קריאה, האזנה, כתיבה ושיחה. כל אחד ברמה שלכם במיומנות שלו.",
+    title: "התוכנית היומית",
   },
   {
-    en: "Practice, daily.",
-    he: "אוצר מילים, דקדוק, האזנה, קריאה, כתיבה ודיבור, במינון קטן וקבוע.",
-    title: "תרגול יומי",
+    en: "Talk, and get corrected.",
+    he: "בכתב או בקול. המורה ממשיך את השיחה ומתקן את הטעות שחשובה, לא כל פסיק.",
+    title: "שיחה עם המורה",
   },
   {
-    en: "Corrected in real time.",
-    he: "רואה את הטעויות האחרונות שלכם ומציע מה לתרגל הלאה.",
-    title: "מורה AI אישי",
+    en: "Mistakes come back.",
+    he: "מילה שטעיתם בה חוזרת אליכם למחרת, ואחר כך במרווחים הולכים וגדלים, עד שהיא נשארת.",
+    title: "חזרה חכמה",
   },
 ];
 
@@ -39,9 +39,10 @@ export default function LandingSteps() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.5, ease: EASE_OUT }}
-        className="max-w-3xl mx-auto"
+        className="max-w-4xl mx-auto"
       >
-        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center mb-14">סדר היום</h2>
+        <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">סדר היום</h2>
+        <p className="mt-3 mb-10 max-w-xl text-lg text-muted leading-relaxed">מה קורה מהרגע שנרשמים: ארבעה שלבים, ורק הראשון הוא חד-פעמי.</p>
 
         <div className="divide-y divide-card-border border-y border-card-border">
           {STEPS.map((step, i) => (

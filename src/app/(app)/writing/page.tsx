@@ -32,7 +32,7 @@ export default async function WritingPage() {
       />
       <div className="mt-10">
         {prompts.length === 0 ? (
-          <p className="text-muted">אין עדיין נושאי כתיבה זמינים — יתווספו בקרוב.</p>
+          <p className="text-muted">עוד אין כאן נושאי כתיבה.</p>
         ) : (
           <LevelShelves
             items={prompts}

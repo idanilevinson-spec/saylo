@@ -70,7 +70,7 @@ export async function sendStreakReminderEmail(to: string, displayName: string): 
     html: `
       <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
         <h1 style="color: #0066d6;">היי ${escapeHtml(displayName)},</h1>
-        <p>עוד לא תרגלתם אנגלית היום — 5 דקות מספיקות כדי לשמור על הרצף שלכם ב-Saylo.</p>
+        <p>עוד לא תרגלתם היום. 5 דקות ב-Saylo, והרצף נשמר.</p>
         <a href="https://saylolearn.com/dashboard" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: #0066d6; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
           לתרגול עכשיו
         </a>
@@ -98,7 +98,7 @@ function reportEmailHtml(displayName: string, summary: ScoreSummary, periodLabel
     )
     .join("");
 
-  const emptyState = `<p style="color: #6b7280;">אין עדיין פעילות ${periodLabel} — עוד לא מאוחר להתחיל.</p>`;
+  const emptyState = `<p style="color: #6b7280;">אין עדיין פעילות ${periodLabel}. אפשר להתחיל בכל יום.</p>`;
 
   return `
     <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
@@ -235,7 +235,7 @@ export async function sendGuardianActivityReportEmail(
             <div style="font-size: 12px; color: #6b7280;">רמה כללית</div>
           </div>
         </div>
-        <p style="font-size: 13px; color: #6b7280;">הדוח הזה מכיל רק סיכום כללי — לא תוכן שיחות, לא טעויות ספציפיות ולא שום פרט אישי מעבר למה שמוצג כאן.</p>
+        <p style="font-size: 13px; color: #6b7280;">הדוח הזה מכיל רק סיכום כללי: לא תוכן שיחות, לא טעויות ספציפיות ולא שום פרט אישי מעבר למה שמוצג כאן.</p>
         <p style="margin-top: 24px; font-size: 12px; color: #6b7280;">קיבלתם מייל זה כי אישרתם לקבל דוח פעילות תקופתי. אפשר להפסיק בכל עת: <a href="${escapeHtml(unsubscribeUrl)}" style="color: #0066d6;">הסרה מרשימת התפוצה</a>. שאלות: <a href="mailto:${CONTACT_EMAIL}" style="color: #0066d6;">${CONTACT_EMAIL}</a>.</p>
       </div>
     `,

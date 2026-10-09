@@ -47,7 +47,7 @@ export default async function ListeningPage() {
       />
       <div className="mt-10">
         {clips.length === 0 ? (
-          <p className="text-muted">אין עדיין קטעים זמינים — יתווספו בקרוב.</p>
+          <p className="text-muted">עוד אין כאן קטעים.</p>
         ) : (
           <LevelShelves
             items={clips}

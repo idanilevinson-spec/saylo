@@ -72,11 +72,11 @@ export default function LandingHero() {
                 always wanted<span className="text-primary">.</span>
               </EnglishText>
               <h2 className="mt-3 text-xl sm:text-2xl font-extrabold leading-snug text-primary-hover">
-                סוף סוף, ברור.
+                מתחילים מהרמה שלכם.
               </h2>
               <p className="mt-5 max-w-xl text-muted leading-relaxed">
-                מבחן רמה אישי, מסלול לימוד שמתאים לחוזקות ולחולשות שלכם, ומורה AI שמציע מה לתרגל לפי הטעויות
-                האחרונות שלכם.
+                מבחן רמה קצר, תוכנית יומית שבנויה בדיוק לרמה שלכם, ומורה שמדבר איתכם באנגלית ומתקן תוך כדי
+                שיחה.
               </p>
 
               <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">

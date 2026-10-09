@@ -42,7 +42,7 @@ export default function MatchQuestion({ content, disabled, onSubmit }: MatchQues
       <p className="font-medium text-lg mb-4">התאימו בין המילה לתרגום</p>
       <p role="status" className="sr-only">
         {selectedLeft
-          ? `נבחר: ${selectedLeft} — עכשיו בחרו את התרגום שלה`
+          ? `נבחר: ${selectedLeft}. עכשיו בוחרים את התרגום שלה`
           : allMatched
             ? "כל הזוגות הותאמו"
             : "בחרו מילה כדי להתחיל להתאים"}

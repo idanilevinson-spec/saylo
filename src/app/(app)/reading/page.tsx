@@ -18,11 +18,11 @@ export const metadata: Metadata = {
 // guidance (SAT/TOEFL-style prep sources) into our own words — general,
 // well-established technique, not any one source's specific phrasing.
 const TIPS = [
-  { icon: ListChecks, text: "עברו על השאלות לפני שאתם קוראים את הטקסט — זה ממקד את הקריאה שלכם." },
+  { icon: ListChecks, text: "קודם השאלות, אחר כך הטקסט. כך יודעים מה מחפשים." },
   { icon: AlignLeft, text: "קראו למבנה: מה הרעיון המרכזי של כל פסקה, לא כל מילה בעצימות שווה." },
-  { icon: Search, text: "לפני שעונים, חפשו בטקסט הוכחה ישירה לתשובה — אל תסתמכו על הזיכרון." },
+  { icon: Search, text: "לפני שעונים, מוצאים בטקסט את המשפט שמוכיח את התשובה. לא סומכים על הזיכרון." },
   { icon: ListX, text: "פסלו קודם תשובות שברור שהן שגויות, ורק אז בחרו מבין מה שנשאר." },
-  { icon: Timer, text: "שמרו על קצב — אם נתקעתם על שאלה, המשיכו הלאה וחזרו אליה אם יישאר זמן." },
+  { icon: Timer, text: "נתקעתם בשאלה? ממשיכים הלאה, וחוזרים אליה אם נשאר זמן." },
   { icon: PenLine, text: "בשאלה הפתוחה: תכננו רגע לפני שאתם כותבים, והביאו פרטים קונקרטיים מהטקסט." },
 ];
 
@@ -157,7 +157,7 @@ export default async function ReadingPage() {
 
       <div className="mt-10">
         {texts.length === 0 ? (
-          <p className="text-muted">אין עדיין טקסטים זמינים — יתווספו בקרוב.</p>
+          <p className="text-muted">עוד אין כאן טקסטים.</p>
         ) : (
           <LevelShelves
             items={texts}

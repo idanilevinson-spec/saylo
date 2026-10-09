@@ -123,7 +123,7 @@ function SpeakingTestPageInner() {
     <div className="max-w-2xl mx-auto px-4 py-12">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h1 className="text-3xl font-bold">בחרו נושא למבחן</h1>
-        <p className="mt-2 text-muted">10 שאלות — עונים בקול על מילים באנגלית ועל שאלות פתוחות.</p>
+        <p className="mt-2 text-muted">10 שאלות. עונים בקול על מילים באנגלית ועל שאלות פתוחות.</p>
       </motion.div>
 
       <button

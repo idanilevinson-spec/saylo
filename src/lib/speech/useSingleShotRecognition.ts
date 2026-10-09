@@ -101,7 +101,7 @@ export function useSingleShotRecognition() {
             if (noMatchDetails?.reason === sdk.NoMatchReason.InitialSilenceTimeout) {
               resolve({
                 kind: "fatal",
-                message: "לא נקלט שום קול — ודאו שהמיקרופון הנכון נבחר בדפדפן ושהוא לא מושתק, ונסו לדבר מיד אחרי הלחיצה.",
+                message: "לא נקלט קול. כדאי לוודא שהמיקרופון הנכון נבחר בדפדפן ושהוא לא מושתק, ונסו לדבר מיד אחרי הלחיצה.",
                 permissionDenied: false,
               });
             } else {
@@ -163,7 +163,7 @@ export function useSingleShotRecognition() {
 
       if (outcome.kind === "retryable-no-match") {
         setStatus("error");
-        setErrorMessage("לא הצלחנו לזהות דיבור — נסו שוב, קרוב יותר למיקרופון ובקול ברור.");
+        setErrorMessage("לא זיהינו דיבור. כדאי לנסות שוב, קרוב יותר למיקרופון.");
         return;
       }
       if (outcome.kind === "fatal") {

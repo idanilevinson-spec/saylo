@@ -150,8 +150,8 @@ export default function PushSubscribeButton() {
     return (
       <p className="text-sm text-muted">
         {isNative
-          ? "התראות חסומות — ניתן לאפשר בהגדרות המכשיר עבור Saylo."
-          : "התראות חסומות בדפדפן — ניתן לאפשר בהגדרות האתר."}
+          ? "ההתראות חסומות. אפשר לפתוח אותן בהגדרות המכשיר, תחת Saylo."
+          : "ההתראות חסומות בדפדפן. אפשר לפתוח אותן בהגדרות האתר."}
       </p>
     );
   }
@@ -165,7 +165,7 @@ export default function PushSubscribeButton() {
     >
       {status === "on" ? (
         <>
-          <Bell size={18} /> התראות פעילות — לביטול
+          <Bell size={18} /> התראות פעילות · לביטול
         </>
       ) : (
         <>

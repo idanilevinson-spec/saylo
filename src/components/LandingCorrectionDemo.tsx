@@ -21,16 +21,19 @@ interface CorrectionExample {
   correct: string;
   suffix: string;
   he: string;
+  // What lands in the mistakes notebook — the short name of the rule.
+  rule: string;
 }
 
 const EXAMPLES: CorrectionExample[] = [
   {
     level: "B1",
-    prefix: "I ",
-    wrong: "have went",
-    correct: "have gone",
-    suffix: " to the store yesterday.",
-    he: '"went" לא מתחבר ל-have. הצורה הנכונה: gone.',
+    prefix: "She has ",
+    wrong: "went",
+    correct: "gone",
+    suffix: " to bed already.",
+    he: 'אחרי has באה הצורה השלישית: gone, לא went.',
+    rule: "has + gone",
   },
   {
     level: "A2",
@@ -39,6 +42,7 @@ const EXAMPLES: CorrectionExample[] = [
     correct: "doesn't",
     suffix: " like coffee in the morning.",
     he: "אחרי he, she, it משתמשים ב-doesn't, לא don't.",
+    rule: "she doesn't",
   },
   {
     level: "B1",
@@ -47,6 +51,7 @@ const EXAMPLES: CorrectionExample[] = [
     correct: "agree",
     suffix: " with your plan.",
     he: '"agree" הוא כבר פועל. אין צורך ב-am לפניו.',
+    rule: "agree בלי am",
   },
   {
     level: "A2",
@@ -55,6 +60,7 @@ const EXAMPLES: CorrectionExample[] = [
     correct: "taller",
     suffix: " than his brother.",
     he: "כש-taller כבר משווה, לא מוסיפים לפניו more.",
+    rule: "taller בלי more",
   },
 ];
 
@@ -101,6 +107,11 @@ export default function LandingCorrectionDemo() {
   const showCorrection = shownPhase === "correcting" || shownPhase === "translating" || shownPhase === "reading";
   const showStrike = shownPhase !== "typing" && shownPhase !== "holding";
   const showHebrew = shownPhase === "translating" || shownPhase === "reading";
+  // The two lines before this one, already corrected, fading upward — the
+  // demo reads as a conversation in progress, not a single flashcard.
+  const history = reduceMotion ? [] : [2, 1].map((back) => EXAMPLES[(index - back + EXAMPLES.length) % EXAMPLES.length]);
+  // What the teacher has noted so far in this loop.
+  const noted = EXAMPLES.slice(0, showHebrew ? index + 1 : index);
 
   return (
     <div
@@ -126,6 +137,18 @@ export default function LandingCorrectionDemo() {
           {example.level}
         </motion.span>
       </div>
+
+      <ul aria-hidden="true" className="mb-3 space-y-1.5">
+        {history.map((h, i) => (
+          <li key={`${index}-${i}`} className={i === 0 ? "opacity-30" : "opacity-55"}>
+            <EnglishText as="p" className="text-sm leading-relaxed text-foreground">
+              {h.prefix}
+              <span className="text-muted line-through decoration-danger/70">{h.wrong}</span> <span className="font-semibold text-primary">{h.correct}</span>
+              {h.suffix}
+            </EnglishText>
+          </li>
+        ))}
+      </ul>
 
       <div className="caption-stack min-h-[4.5rem] sm:min-h-[3.5rem]">
         <motion.div
@@ -173,6 +196,24 @@ export default function LandingCorrectionDemo() {
             {example.he}
           </motion.p>
         )}
+            </div>
+
+      <div className="mt-4 border-t border-card-border pt-3">
+        <p className="text-xs font-bold text-muted">נשמר במחברת הטעויות</p>
+        <ul className="mt-2 flex min-h-7 flex-wrap gap-1.5">
+          {noted.map((e) => (
+            <motion.li
+              key={e.rule}
+              initial={reduceMotion ? false : { opacity: 0, transform: "scale(0.9)" }}
+              animate={{ opacity: 1, transform: "scale(1)" }}
+              transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+              dir="auto"
+              className="rounded-md bg-primary/12 px-2 py-1 text-xs font-bold text-primary"
+            >
+              {e.rule}
+            </motion.li>
+          ))}
+        </ul>
       </div>
     </div>
   );

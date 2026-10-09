@@ -47,7 +47,7 @@ export default function LearnPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h1 className="text-3xl font-bold">מסלול הלימוד שלי</h1>
         <p className="mt-2 text-muted">
-          כל הנושאים, מהבסיס ועד המתקדם — {masteredCount} מתוך {entries.length} כבר בשליטה מלאה.
+          כל הנושאים, מהבסיס ועד המתקדם. {masteredCount} מתוך {entries.length} כבר בשליטה מלאה.
         </p>
       </motion.div>
 
@@ -69,7 +69,7 @@ export default function LearnPage() {
       </motion.div>
 
       {entries.length === 0 ? (
-        <p className="mt-10 text-muted">התוכן בדרך — חזרו לבדוק בקרוב.</p>
+        <p className="mt-10 text-muted">התוכן בדרך. כדאי לחזור לבדוק בקרוב.</p>
       ) : (
         <ol className="mt-6 space-y-3">
           {entries.map((entry, i) => {

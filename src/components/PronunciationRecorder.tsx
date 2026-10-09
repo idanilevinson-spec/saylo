@@ -141,7 +141,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
             if (noMatchDetails?.reason === sdk.NoMatchReason.InitialSilenceTimeout) {
               resolve({
                 kind: "fatal",
-                message: "לא נקלט שום קול — ודאו שהמיקרופון הנכון נבחר בדפדפן ושהוא לא מושתק, ונסו לדבר מיד אחרי הלחיצה.",
+                message: "לא נקלט קול. כדאי לוודא שהמיקרופון הנכון נבחר בדפדפן ושהוא לא מושתק, ונסו לדבר מיד אחרי הלחיצה.",
                 permissionDenied: false,
               });
             } else {
@@ -163,7 +163,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
               targetPhrase,
               score,
             });
-            resolve({ kind: "fatal", message: "לא הצלחנו לנתח את ההגייה הפעם — נסו שוב.", permissionDenied: false });
+            resolve({ kind: "fatal", message: "לא הצלחנו לנתח את ההגייה הפעם. אפשר לנסות שוב.", permissionDenied: false });
             return;
           }
           // A recognized-but-unrelated utterance (e.g. only the headword
@@ -178,7 +178,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
             });
             resolve({
               kind: "fatal",
-              message: `לא זיהינו את המשפט המלא — נסו לומר בדיוק: "${targetPhrase}"`,
+              message: `לא זיהינו את המשפט המלא. נסו לומר בדיוק: "${targetPhrase}"`,
               permissionDenied: false,
             });
             return;
@@ -267,7 +267,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
 
       if (outcome.kind === "retryable-no-match") {
         setStatus("error");
-        setErrorMessage("לא הצלחנו לזהות דיבור — נסו שוב, קרוב יותר למיקרופון ובקול ברור.");
+        setErrorMessage("לא זיהינו דיבור. כדאי לנסות שוב, קרוב יותר למיקרופון.");
         return;
       }
       if (outcome.kind === "fatal") {

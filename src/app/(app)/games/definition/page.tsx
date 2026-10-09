@@ -94,7 +94,7 @@ function DefinitionGamePage({ onReplay }: { onReplay: () => void }) {
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={BookOpenCheck} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">המשחק הזה עוד לא זמין</h1>
-        <p className="mt-2 text-muted">מוסיפים בהדרגה הגדרות באנגלית למילים — חזרו לבדוק בקרוב.</p>
+        <p className="mt-2 text-muted">הגדרות באנגלית מתווספות למילים בהדרגה. כדאי לחזור לבדוק בקרוב.</p>
       </div>
     );
   }
