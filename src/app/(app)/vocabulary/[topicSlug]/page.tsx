@@ -2,12 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import EnglishText from "@/components/EnglishText";
-import CefrBadge from "@/components/CefrBadge";
-import { Target, GraduationCap, ClipboardCheck } from "lucide-react";
-import SpeakButton from "@/components/SpeakButton";
-import PronunciationRecorder from "@/components/PronunciationRecorder";
-import MotionLink from "@/components/MotionLink";
-import ContentCard from "@/components/ContentCard";
+import { Target, GraduationCap, ClipboardCheck, ChevronRight } from "lucide-react";
+import WordCard from "@/components/content/WordCard";
 import TeacherExplanationCard from "@/components/TeacherExplanationCard";
 import { getVocabularyTopicBySlug, listVocabularyItems } from "@/lib/content/vocabulary";
 import { createClient } from "@/lib/supabase/serverClient";
@@ -48,51 +44,42 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
 
   const intro = await getVocabularyTopicIntro(supabase, topic, items.slice(0, 6));
 
+  const action =
+    "game-press inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-lg font-bold transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2";
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <Link href="/vocabulary" className="text-sm text-primary">
-        ← כל הנושאים
+    <div className="max-w-5xl mx-auto px-4 pt-8 pb-16">
+      <Link href="/vocabulary" className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+        <ChevronRight size={15} aria-hidden="true" /> כל הנושאים
       </Link>
 
-      <div className="animate-fade-up">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold">{topic.name_he}</h1>
-            <CefrBadge level={topic.cefr_level} />
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {firstExercise && (
-              <MotionLink
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                href={`/practice/${firstExercise.id}`}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
-              >
-                תרגלו את הנושא <Target size={16} />
-              </MotionLink>
-            )}
-            <MotionLink
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              href={`/games/learn?topic=${topic.slug}`}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg border border-success/30 bg-success/5 text-success font-medium hover:bg-success/10 transition-colors"
-            >
-              למדו את הנושא <GraduationCap size={16} />
-            </MotionLink>
-            <MotionLink
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              href={`/games/test?topic=${topic.slug}`}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg border border-accent/30 bg-accent/5 text-accent-hover font-medium hover:bg-accent/10 transition-colors"
-            >
-              מבחן נושא <ClipboardCheck size={16} />
-            </MotionLink>
-          </div>
+      <header className="mt-4 flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 text-sm text-muted">
+            <span className="chyron rounded-md bg-background-2 px-1.5 py-0.5 text-sm text-primary" dir="ltr">
+              {topic.cefr_level}
+            </span>
+            <span className="tabular-nums">{items.length} מילים</span>
+          </p>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-black tracking-tight">{topic.name_he}</h1>
+          <EnglishText as="p" className="mt-0.5 text-right text-lg text-muted">
+            {topic.name_en}
+          </EnglishText>
         </div>
-        <EnglishText as="p" className="mt-1 text-muted">
-          {topic.name_en}
-        </EnglishText>
-      </div>
+        <div className="flex flex-wrap gap-2">
+          {firstExercise && (
+            <Link href={`/practice/${firstExercise.id}`} className={`${action} bg-primary text-primary-ink hover:bg-primary-hover`}>
+              <Target size={17} aria-hidden="true" /> לתרגל
+            </Link>
+          )}
+          <Link href={`/games/learn?topic=${topic.slug}`} className={`${action} border border-card-border bg-card hover:border-primary/50`}>
+            <GraduationCap size={17} aria-hidden="true" /> ללמוד בכרטיסיות
+          </Link>
+          <Link href={`/games/test?topic=${topic.slug}`} className={`${action} border border-card-border bg-card hover:border-primary/50`}>
+            <ClipboardCheck size={17} aria-hidden="true" /> מבחן על הנושא
+          </Link>
+        </div>
+      </header>
 
       {intro && (
         <div className="mt-6">
@@ -100,33 +87,13 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
         </div>
       )}
 
-      <div className="mt-8 space-y-3">
-        {items.map((item, i) => (
-          <ContentCard
-            key={item.id}
-            index={i}
-            className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6"
-          >
-            <div className="md:w-40 shrink-0">
-              <div className="flex items-center gap-2">
-                <EnglishText as="p" className="text-xl font-bold text-primary">
-                  {item.headword}
-                </EnglishText>
-                <SpeakButton text={item.headword} />
-              </div>
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">{item.translation_he}</p>
-              <EnglishText as="p" className="mt-1 text-sm text-muted">
-                {item.example_en}
-              </EnglishText>
-              <div className="mt-2">
-                <PronunciationRecorder targetPhrase={item.example_en} />
-              </div>
-            </div>
-          </ContentCard>
+      <ul className="mt-8 grid gap-3 md:grid-cols-2">
+        {items.map((item) => (
+          <li key={item.id}>
+            <WordCard item={item} />
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

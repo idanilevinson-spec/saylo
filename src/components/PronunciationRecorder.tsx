@@ -52,7 +52,8 @@ type AttemptOutcome =
 // The SDK is imported dynamically inside the click handler — it touches
 // browser-only APIs (mic, AudioContext), so it must never load during SSR
 // of this "use client" component's initial server pass.
-function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) {
+// hidePhrase: for callers that already show the sentence right above.
+function PronunciationRecorderInner({ targetPhrase, hidePhrase = false }: { targetPhrase: string; hidePhrase?: boolean }) {
   const { profile } = useAuth();
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<ScoreResult | null>(null);
@@ -299,7 +300,7 @@ function PronunciationRecorderInner({ targetPhrase }: { targetPhrase: string }) 
 
   if (profile && requiresParentalConsent(profile)) return <ParentalConsentNotice />;
 
-  const showTargetPhrase = status === "idle" || status === "connecting" || status === "listening";
+  const showTargetPhrase = !hidePhrase && (status === "idle" || status === "connecting" || status === "listening");
 
   return (
     <div>
