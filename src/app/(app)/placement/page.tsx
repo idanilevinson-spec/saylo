@@ -3,14 +3,16 @@
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Volume2, Turtle, Target, GraduationCap, AlertTriangle, BookOpenText } from "lucide-react";
+import Link from "next/link";
+import { Volume2, Turtle, Target, GraduationCap, AlertTriangle, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, ChevronLeft, type LucideIcon } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
-import CefrBadge from "@/components/CefrBadge";
 import AiConsentGate from "@/components/AiConsentGate";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { speak } from "@/lib/speech/browserTts";
+import { getCanDoStatement } from "@/lib/content/canDoStatements";
+import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import type { CefrLevel, PlacementQuestion, SkillArea } from "@/types/database";
 import { modulesForUnits, type BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_AI_CONTENT_DISCLAIMER } from "@/lib/content/bagrut/sampleUnits";
@@ -23,6 +25,15 @@ const SKILL_LABELS_HE: Record<SkillArea, string> = {
   reading: "קריאה",
   writing: "כתיבה",
   speaking: "דיבור",
+};
+
+const SKILL_ICONS: Record<SkillArea, LucideIcon> = {
+  vocabulary: BookOpen,
+  grammar: PenLine,
+  reading: BookOpenText,
+  listening: Headphones,
+  writing: NotebookPen,
+  speaking: Mic,
 };
 
 const SKILL_ORDER: SkillArea[] = ["vocabulary", "grammar", "reading", "listening", "writing", "speaking"];
@@ -132,28 +143,42 @@ export default function PlacementPage() {
   }
 
   if (!started) {
+    // The test as it actually is: how many questions in each skill.
+    const perSkill = SKILL_ORDER.filter((s) => s !== "speaking" && s !== "writing")
+      .map((skill) => ({ skill, count: questions.filter((q) => q.skill_area === skill).length }))
+      .filter((s) => s.count > 0);
     return (
-      <div className="max-w-xl mx-auto px-4 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="bg-card border border-card-border rounded-lg p-6 sm:p-10 text-center"
-        >
-          <div className="mx-auto w-20 h-20 rounded-full border-2 border-dashed border-primary bg-primary/[0.07] flex items-center justify-center">
-            <Target size={30} className="text-primary" strokeWidth={2} />
-          </div>
-          <h1 className="mt-5 text-2xl sm:text-3xl font-bold">מבחן רמה</h1>
-          <p className="mt-3 text-muted leading-relaxed">
-            {questions.length} שאלות קצרות שבודקות אוצר מילים, דקדוק, קריאה והאזנה, ובסוף גם קטע כתיבה קצר (לא חובה)
-            קצרה. בסיום תקבלו הערכת רמה לפי סולם CEFR, לפי תחום. זו הערכה פנימית של Saylo ולא מבחן רשמי.
+      <div className="max-w-3xl mx-auto px-4 pt-10 pb-16">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}>
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">מבחן רמה</h1>
+          <p className="mt-3 max-w-xl text-lg text-muted leading-relaxed">
+            כ-10 דקות, {questions.length} שאלות קצרות. בסוף תקבלו רמה לכל מיומנות בנפרד, ותוכנית יומית שבנויה עליה.
           </p>
-          <fieldset className="mt-8 text-start">
-            <legend className="font-bold">בשביל מה תשתמשו ב-Saylo?</legend>
+
+          <ul className="mt-8 grid grid-cols-2 sm:grid-cols-5 gap-px overflow-hidden rounded-lg border border-card-border bg-card-border">
+            {perSkill.map(({ skill, count }) => {
+              const Icon = SKILL_ICONS[skill];
+              return (
+                <li key={skill} className="flex flex-col gap-1 bg-card px-4 py-4">
+                  <Icon size={17} aria-hidden="true" className="text-primary" />
+                  <span className="chyron text-3xl leading-none tabular-nums">{count}</span>
+                  <span className="text-sm text-muted">{SKILL_LABELS_HE[skill]}</span>
+                </li>
+              );
+            })}
+            <li className="flex flex-col gap-1 bg-card px-4 py-4">
+              <NotebookPen size={17} aria-hidden="true" className="text-muted" />
+              <span className="chyron text-3xl leading-none text-muted" dir="ltr">+1</span>
+              <span className="text-sm text-muted">כתיבה, לא חובה</span>
+            </li>
+          </ul>
+
+          <fieldset className="mt-10">
+            <legend className="text-xl font-black tracking-tight">מה המטרה שלכם?</legend>
             <p className="mt-1 text-sm text-muted leading-relaxed">
               מי שמתכוננים לבגרות יקבלו בסוף המבחן גם קטע קריאה קצר בפורמט הבגרות, לפי מספר היחידות.
             </p>
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
               {GOAL_OPTIONS.map((option) => {
                 const active = chosenGoal === option.value;
                 return (
@@ -162,119 +187,129 @@ export default function PlacementPage() {
                     type="button"
                     aria-pressed={active}
                     onClick={() => setGoal(option.value)}
-                    className={`flex flex-col items-start gap-0.5 px-3 py-2.5 rounded-lg border text-start transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
-                      active ? "border-primary bg-primary/[0.07]" : "border-card-border hover:border-primary/40"
+                    className={`game-press flex items-center gap-3 rounded-lg border px-4 py-3.5 text-start transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                      active ? "border-primary bg-primary/[0.07]" : "border-card-border bg-card hover:border-primary/40"
                     }`}
                   >
-                    <span className="flex items-center gap-1.5 font-medium">
-                      {option.value !== "general" && <GraduationCap size={15} aria-hidden="true" className="text-primary" />}
-                      {option.label}
+                    <span
+                      aria-hidden="true"
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${active ? "border-primary" : "border-card-border"}`}
+                    >
+                      {active && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
                     </span>
-                    <span className="text-xs text-muted">{option.hint}</span>
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-1.5 font-bold">
+                        {option.value !== "general" && <GraduationCap size={15} aria-hidden="true" className="text-primary" />}
+                        {option.label}
+                      </span>
+                      <span className="block text-xs text-muted">{option.hint}</span>
+                    </span>
                   </button>
                 );
               })}
             </div>
           </fieldset>
 
-          <motion.button
-            whileHover={chosenGoal !== null ? { scale: 1.02 } : undefined}
-            whileTap={chosenGoal !== null ? { scale: 0.97 } : undefined}
-            onClick={handleStart}
-            disabled={starting || chosenGoal === null}
-            className="mt-8 w-full sm:w-auto px-10 py-3.5 rounded-lg bg-primary text-primary-ink font-medium text-lg disabled:opacity-60 hover:bg-primary-hover transition-colors"
-          >
-            {starting ? "מתחילים..." : chosenGoal === null ? "בחרו מטרה כדי להתחיל" : "התחילו את המבחן"}
-          </motion.button>
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3">
+            <button
+              type="button"
+              onClick={handleStart}
+              disabled={starting || chosenGoal === null}
+              className="game-press inline-flex items-center justify-center gap-2 min-h-13 px-8 rounded-lg bg-primary text-primary-ink text-lg font-bold hover:bg-primary-hover transition-[background-color,opacity,transform] duration-150 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            >
+              <Target size={19} aria-hidden="true" />
+              {starting ? "מתחילים..." : chosenGoal === null ? "בחרו מטרה כדי להתחיל" : "להתחיל את המבחן"}
+            </button>
+            <p className="text-xs text-muted">הערכה פנימית של Saylo לפי סולם CEFR, לא מבחן רשמי.</p>
+          </div>
         </motion.div>
       </div>
     );
   }
 
   if (result) {
+    const canDo = getCanDoStatement("speaking", result.overallCefr as CefrLevel);
     return (
-      <div className="max-w-xl mx-auto px-4 py-12">
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="text-3xl font-bold text-center"
+      <div className="max-w-3xl mx-auto px-4 pt-10 pb-16">
+        <motion.section
+          initial={{ opacity: 0, transform: "translateY(12px) scale(0.985)" }}
+          animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
+          transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+          className="relative overflow-hidden rounded-lg bg-primary text-primary-ink p-6 sm:p-8"
         >
-          התוצאות שלכם
-        </motion.h1>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: 0.1, type: "spring", bounce: 0.4 }}
-          className="mt-8 flex flex-col items-center"
-        >
-          {/* The big payoff moment: your CEFR level filled in solid, not
-              stamped — the moment the scrubber's dashed marker resolves
-              into a completed chapter. */}
-          <motion.div
-            initial={{ rotate: 0 }}
-            animate={{ rotate: -6 }}
-            transition={{ delay: 0.35, duration: 0.4, ease: "easeOut" }}
-            className="w-36 h-36 sm:w-40 sm:h-40 rounded-full bg-accent flex flex-col items-center justify-center shadow-lg shadow-accent/20"
-          >
-            <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-accent-ink/80">רמתכם</span>
-            <EnglishText as="span" className="text-4xl sm:text-5xl font-extrabold text-accent-ink leading-none mt-1">
+          <p className="text-sm font-bold text-primary-ink/75">התוצאה שלכם</p>
+          <div className="mt-2 flex items-end gap-5">
+            <EnglishText as="span" className="chyron text-8xl sm:text-9xl leading-[0.8]">
               {result.overallCefr}
             </EnglishText>
-          </motion.div>
-        </motion.div>
+            <div className="pb-1">
+              <p className="text-2xl font-black">{CEFR_NAME_HE[result.overallCefr as CefrLevel]}</p>
+              {canDo && <p className="mt-1 max-w-sm text-sm text-primary-ink/80 leading-relaxed">{canDo}</p>}
+            </div>
+          </div>
+          <Link
+            href="/dashboard"
+            className="game-press mt-6 inline-flex items-center gap-2 min-h-12 px-5 rounded-lg bg-background text-foreground font-bold transition-transform duration-150"
+          >
+            לתוכנית של היום <ChevronLeft size={17} aria-hidden="true" />
+          </Link>
+        </motion.section>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="mt-6 bg-card border border-card-border rounded-lg p-6"
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="mt-4 rounded-lg border border-card-border bg-card p-5 sm:p-6"
+          aria-labelledby="by-skill"
         >
-          <p className="leading-relaxed">{result.summary}</p>
-        </motion.div>
+          <h2 id="by-skill" className="font-black">לפי מיומנות</h2>
+          <ul className="mt-4 space-y-3.5">
+            {SKILL_ORDER.map((skill) => {
+              const s = result.scores.find((sc) => sc.skill === skill);
+              return (
+                <li key={skill} className="grid grid-cols-[6.5rem_1fr_auto] items-center gap-3 text-sm">
+                  <span className="font-bold">{SKILL_LABELS_HE[skill]}</span>
+                  {s ? (
+                    <>
+                      <span className="h-2 overflow-hidden rounded-full bg-background-2" aria-hidden="true">
+                        <motion.span
+                          className="block h-full rounded-full bg-primary"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${s.percentCorrect}%` }}
+                          transition={{ duration: 0.7, delay: 0.25, ease: [0.23, 1, 0.32, 1] }}
+                        />
+                      </span>
+                      <span className="flex items-center gap-2 tabular-nums">
+                        <span className="text-muted">{s.percentCorrect}%</span>
+                        <span className="chyron text-lg text-primary" dir="ltr">
+                          {s.cefrLevel}
+                        </span>
+                      </span>
+                    </>
+                  ) : (
+                    <span className="col-span-2 text-muted">
+                      {skill === "speaking" ? "נבדק בשיחה הראשונה עם המורה" : "לא נבדק הפעם"}
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </motion.section>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          className="mt-6 bg-card border border-card-border rounded-lg overflow-hidden"
-        >
-          <table className="w-full text-sm">
-            <tbody>
-              {SKILL_ORDER.map((skill) => {
-                const s = result.scores.find((sc) => sc.skill === skill);
-                return (
-                  <tr key={skill} className="border-b border-card-border last:border-0">
-                    <td className="p-3 font-medium">{SKILL_LABELS_HE[skill]}</td>
-                    {s ? (
-                      <>
-                        <td className="p-3 text-muted">{s.percentCorrect}%</td>
-                        <td className="p-3">
-                          <CefrBadge level={s.cefrLevel as CefrLevel} />
-                        </td>
-                      </>
-                    ) : (
-                      <td className="p-3 text-muted italic" colSpan={2}>
-                        {skill === "speaking" ? "יבדק בשיחה הראשונה שלכם עם ה-AI" : "טרם נבדק"}
-                      </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </motion.div>
+        {result.summary && (
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.25 }}
+            className="mt-4 rounded-lg border border-card-border bg-card p-5 sm:p-6"
+          >
+            <h2 className="font-black">מה המורה ראה במבחן</h2>
+            <p className="mt-2 leading-relaxed text-foreground/90">{result.summary}</p>
+          </motion.section>
+        )}
 
         {result.bagrut && <BagrutResultCard bagrut={result.bagrut} />}
-
-        <MotionLink
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          href="/learn"
-          className="mt-6 block text-center px-5 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
-        >
-          למסלול הלימוד שלי
-        </MotionLink>
       </div>
     );
   }
