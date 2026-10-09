@@ -1,76 +1,63 @@
 import type { Metadata } from "next";
-import { Waves } from "lucide-react";
-import EnglishText from "@/components/EnglishText";
-import CefrBadge from "@/components/CefrBadge";
-import ContentCard from "@/components/ContentCard";
+import { Headphones, Waves } from "lucide-react";
+import AreaHeader from "@/components/content/AreaHeader";
+import LevelShelves from "@/components/content/LevelShelves";
+import TopicTile from "@/components/content/TopicTile";
 import { groupListeningClipsByStyle, listListeningClips } from "@/lib/content/listening";
+import { getLearnerLevels, levelFor } from "@/lib/content/learnerLevel";
 import type { ListeningClip } from "@/types/database";
 
 export const metadata: Metadata = {
   title: "האזנה — Saylo",
 };
 
-function ClipGrid({ clips }: { clips: ListeningClip[] }) {
+function clipTile(clip: ListeningClip, natural: boolean) {
   return (
-    <div className="grid sm:grid-cols-2 gap-4">
-      {clips.map((clip, i) => (
-        <ContentCard key={clip.id} href={`/listening/${clip.id}`} index={i}>
-          <div className="flex flex-col items-start gap-1.5">
-            <EnglishText as="h2" className="text-lg font-bold">
-              {clip.title_en}
-            </EnglishText>
-            <p className="text-sm font-medium text-foreground/70">{clip.title_he}</p>
-            <CefrBadge level={clip.cefr_level} />
-          </div>
-        </ContentCard>
-      ))}
-    </div>
+    <TopicTile
+      href={`/listening/${clip.id}`}
+      titleEn={clip.title_en}
+      titleHe={clip.title_he}
+      level={clip.cefr_level}
+      meta={
+        natural ? (
+          <span className="inline-flex items-center gap-1">
+            <Waves size={12} aria-hidden="true" /> דיבור טבעי
+          </span>
+        ) : undefined
+      }
+    />
   );
 }
 
 export default async function ListeningPage() {
-  const clips = await listListeningClips();
-  const { standard, naturalSpeech } = groupListeningClipsByStyle(clips);
+  const [clips, levels] = await Promise.all([listListeningClips(), getLearnerLevels()]);
+  const { naturalSpeech } = groupListeningClipsByStyle(clips);
+  const natural = new Set(naturalSpeech.map((c) => c.id));
+  const level = levelFor(levels, "listening");
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 -top-16 h-48 -z-10"
-          style={{
-            background:
-              "radial-gradient(ellipse 55% 100% at 20% 30%, color-mix(in srgb, var(--primary) 11%, transparent) 0%, transparent 65%), radial-gradient(ellipse 45% 100% at 85% 10%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 60%)",
-          }}
-        />
-        <div className="animate-fade-up">
-          <h1 className="text-3xl font-bold">האזנה</h1>
-          <p className="mt-2 text-muted">הקשיבו לקטע, נסו להבין בלי תמלול, ואז בדקו את עצמכם</p>
-        </div>
+    <div className="max-w-4xl mx-auto px-4 pt-10 pb-16">
+      <AreaHeader
+        icon={Headphones}
+        title="האזנה"
+        description="מקשיבים לקטע, מנסים להבין בלי תמלול, ואז בודקים את עצמכם. קטעי 'דיבור טבעי' כוללים קיצורים והססות, כמו שאנשים באמת מדברים."
+        level={level}
+        levelLabel="הרמה שלכם בהאזנה"
+        signedIn={levels.signedIn}
+      />
+      <div className="mt-10">
+        {clips.length === 0 ? (
+          <p className="text-muted">אין עדיין קטעים זמינים — יתווספו בקרוב.</p>
+        ) : (
+          <LevelShelves
+            items={clips}
+            level={level}
+            levelOf={(c) => c.cefr_level}
+            keyOf={(c) => c.id}
+            renderItem={(c) => clipTile(c, natural.has(c.id))}
+          />
+        )}
       </div>
-
-      {clips.length === 0 ? (
-        <p className="mt-10 text-muted">אין עדיין קטעים זמינים — יתווספו בקרוב.</p>
-      ) : (
-        <div className="mt-8 space-y-10">
-          {standard.length > 0 && <ClipGrid clips={standard} />}
-
-          {naturalSpeech.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2">
-                <Waves size={18} className="text-primary" />
-                <h2 className="text-lg font-bold">דיבור טבעי</h2>
-              </div>
-              <p className="mt-1 text-sm text-muted">
-                שיחות אמיתיות, עם קיצורים, הססות ומשפטים לא גמורים — כמו שאנשים באמת מדברים, לא כמו טקסט כתוב.
-              </p>
-              <div className="mt-4">
-                <ClipGrid clips={naturalSpeech} />
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

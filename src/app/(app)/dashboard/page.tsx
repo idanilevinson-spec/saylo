@@ -30,6 +30,8 @@ import {
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import TeacherSuggestionCard from "@/components/TeacherSuggestionCard";
+import TodayAtLevel, { MoreAtLevel } from "@/components/dashboard/TodayAtLevel";
+import { getLevelPlan, type LevelPlan } from "@/lib/content/levelPlan";
 import SubscriptionBanner from "@/components/SubscriptionBanner";
 import { isPremiumActive } from "@/lib/subscriptions/entitlements";
 import { getCurrentHearts } from "@/lib/subscriptions/heartsService";
@@ -117,6 +119,7 @@ export default function DashboardPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [hearts, setHearts] = useState<{ current: number; max: number } | null>(null);
   const [placementDone, setPlacementDone] = useState<boolean | null>(null);
+  const [plan, setPlan] = useState<LevelPlan | null>(null);
 
   // Same session guard as profile/page.tsx: without it, this effect also
   // fires right after sign-out (session and profile clear together) and
@@ -157,6 +160,11 @@ export default function DashboardPage() {
       setSubscription(subRes.data ?? null);
       setPlacementDone((placementRes.data?.length ?? 0) > 0);
     });
+  }, [profile]);
+
+  useEffect(() => {
+    if (!profile) return;
+    getLevelPlan(profile.id).then(setPlan);
   }, [profile]);
 
   useEffect(() => {
@@ -239,31 +247,37 @@ export default function DashboardPage() {
         )}
       </motion.div>
 
-      {placementDone === false && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.05 }}
-          className="mt-6"
-        >
-          <Link
-            href="/placement"
-            className="group relative flex items-center gap-5 overflow-hidden rounded-lg border border-accent/40 bg-accent/[0.07] p-6 transition-colors hover:bg-accent/[0.11] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+      {/* The lead: the learner's level and today's plan at it — or, before
+          the placement test, the one thing to do first. */}
+      {plan?.overall ? (
+        <TodayAtLevel plan={plan} level={plan.overall} />
+      ) : (
+        placementDone === false && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.05 }}
+            className="mt-6"
           >
-            <span className="inline-flex w-14 h-14 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent-hover">
-              <Target size={26} strokeWidth={2} />
-            </span>
-            <div className="min-w-0">
-              <h2 className="font-bold text-lg">התחילו כאן: מבחן הרמה שלכם</h2>
-              <p className="mt-1 text-sm text-muted">
-                פחות מ־10 דקות, ובסיומן נדע בדיוק איפה להתחיל ולבנות לכם מסלול שמתאים לרמה שלכם.
-              </p>
-            </div>
-            <span className="ms-auto shrink-0 text-accent-hover font-medium hidden sm:block group-hover:translate-x-[-4px] transition-transform">
-              בואו נתחיל ←
-            </span>
-          </Link>
-        </motion.div>
+            <Link
+              href="/placement"
+              className="game-press group relative flex flex-col sm:flex-row sm:items-center gap-5 overflow-hidden rounded-lg bg-primary text-primary-ink p-6 sm:p-8 transition-transform duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            >
+              <span className="inline-flex w-14 h-14 shrink-0 items-center justify-center rounded-lg bg-primary-ink/15">
+                <Target size={28} strokeWidth={2} aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="text-2xl font-black tracking-tight">מתחילים במבחן רמה</h2>
+                <p className="mt-1 max-w-lg text-primary-ink/80 leading-relaxed">
+                  פחות מ-10 דקות. בסופו תקבלו את הרמה שלכם בכל מיומנות, ותוכנית יומית שבנויה בדיוק לרמה הזו.
+                </p>
+              </div>
+              <span className="sm:ms-auto shrink-0 inline-flex items-center gap-2 min-h-12 px-5 rounded-lg bg-background text-foreground font-bold">
+                להתחיל את המבחן <ChevronLeft size={17} aria-hidden="true" />
+              </span>
+            </Link>
+          </motion.div>
+        )
       )}
 
       {stats !== null && <SubscriptionBanner subscription={subscription} />}
@@ -352,7 +366,10 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      {plan?.overall && <MoreAtLevel plan={plan} />}
+
+      <h2 className="mt-12 text-xl font-black tracking-tight">כל האזורים</h2>
+      <div className="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
         {MODULE_GROUPS.map((group, gi) => (
           <motion.div
             key={group.title}

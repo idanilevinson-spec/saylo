@@ -1,74 +1,68 @@
 import type { Metadata } from "next";
-import { Gamepad2 } from "lucide-react";
+import Link from "next/link";
+import { Gamepad2, Quote } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
-import ContentCard from "@/components/ContentCard";
-import MotionLink from "@/components/MotionLink";
+import AreaHeader from "@/components/content/AreaHeader";
+import LevelShelves from "@/components/content/LevelShelves";
 import { listIdiomsAndPhrasalVerbs } from "@/lib/content/idioms";
+import { getLearnerLevels, levelFor } from "@/lib/content/learnerLevel";
+import type { IdiomPhrasalVerb } from "@/types/database";
 
 export const metadata: Metadata = {
   title: "ניבים ופעלים דו-מיליים — Saylo",
 };
 
+function PhraseCard({ item }: { item: IdiomPhrasalVerb }) {
+  return (
+    <div className="flex h-full flex-col rounded-lg border border-card-border bg-card p-4">
+      <span className="flex items-start justify-between gap-3">
+        <EnglishText as="span" className="block text-right text-lg font-bold text-primary leading-snug">
+          {item.phrase}
+        </EnglishText>
+        <span className="shrink-0 rounded-md bg-background-2 px-1.5 py-0.5 text-[0.7rem] font-bold text-muted">
+          {item.type === "phrasal_verb" ? "פועל דו-מילי" : "ניב"}
+        </span>
+      </span>
+      <span className="mt-1 font-bold">{item.meaning_he}</span>
+      <EnglishText as="span" className="mt-2 block text-right text-sm text-muted leading-relaxed">
+        {item.example_en}
+      </EnglishText>
+    </div>
+  );
+}
+
 export default async function IdiomsPage() {
-  const all = await listIdiomsAndPhrasalVerbs();
-  const phrasalVerbs = all.filter((i) => i.type === "phrasal_verb");
-  const idioms = all.filter((i) => i.type === "idiom");
+  const [all, levels] = await Promise.all([listIdiomsAndPhrasalVerbs(), getLearnerLevels()]);
+  // Idioms live between vocabulary and speaking; the vocabulary level is
+  // the closer measure of whether a phrase will be within reach.
+  const level = levelFor(levels, "vocabulary");
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 -top-16 h-48 -z-10"
-          style={{
-            background:
-              "radial-gradient(ellipse 55% 100% at 20% 30%, color-mix(in srgb, var(--primary) 11%, transparent) 0%, transparent 65%), radial-gradient(ellipse 45% 100% at 85% 10%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 60%)",
-          }}
-        />
-        <div className="animate-fade-up flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-3xl font-bold">ניבים ופעלים דו-מיליים</h1>
-            <p className="mt-2 text-muted">אנגלית שאנשים באמת מדברים, לא רק מה שכתוב בספר הדקדוק</p>
-          </div>
-          <MotionLink
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+    <div className="max-w-4xl mx-auto px-4 pt-10 pb-16">
+      <AreaHeader
+        icon={Quote}
+        title="ניבים ופעלים דו-מיליים"
+        description="אנגלית שאנשים באמת מדברים, לא רק מה שכתוב בספר הדקדוק: המשמעות בעברית ומשפט לדוגמה."
+        level={level}
+        levelLabel="הרמה שלכם באוצר מילים"
+        signedIn={levels.signedIn}
+        actions={
+          <Link
             href="/idioms/practice"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+            className="game-press inline-flex items-center gap-2 min-h-11 px-5 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-[background-color,transform] duration-150"
           >
-            תרגלו את הניבים <Gamepad2 size={16} />
-          </MotionLink>
-        </div>
-      </div>
-
-      <h2 className="mt-10 text-lg font-bold text-muted">Phrasal Verbs</h2>
-      <div className="mt-4 grid sm:grid-cols-2 gap-4">
-        {phrasalVerbs.map((item, i) => (
-          <ContentCard key={item.id} index={i}>
-            <EnglishText as="p" className="text-lg font-bold text-primary">
-              {item.phrase}
-            </EnglishText>
-            <p className="mt-1 font-pen text-lg text-accent-hover">{item.meaning_he}</p>
-            <EnglishText as="p" className="mt-2 text-sm text-muted">
-              {item.example_en}
-            </EnglishText>
-          </ContentCard>
-        ))}
-      </div>
-
-      <h2 className="mt-10 text-lg font-bold text-muted">Idioms</h2>
-      <div className="mt-4 grid sm:grid-cols-2 gap-4">
-        {idioms.map((item, i) => (
-          <ContentCard key={item.id} index={i}>
-            <EnglishText as="p" className="text-lg font-bold text-primary">
-              {item.phrase}
-            </EnglishText>
-            <p className="mt-1 font-pen text-lg text-accent-hover">{item.meaning_he}</p>
-            <EnglishText as="p" className="mt-2 text-sm text-muted">
-              {item.example_en}
-            </EnglishText>
-          </ContentCard>
-        ))}
+            <Gamepad2 size={17} aria-hidden="true" /> לתרגל את הניבים
+          </Link>
+        }
+      />
+      <div className="mt-10">
+        <LevelShelves
+          items={all}
+          level={level}
+          levelOf={(i) => i.cefr_level}
+          keyOf={(i) => i.id}
+          renderItem={(i) => <PhraseCard item={i} />}
+        />
       </div>
     </div>
   );

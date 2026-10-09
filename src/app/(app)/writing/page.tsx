@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import EnglishText from "@/components/EnglishText";
-import CefrBadge from "@/components/CefrBadge";
-import ContentCard from "@/components/ContentCard";
+import { NotebookPen } from "lucide-react";
+import AreaHeader from "@/components/content/AreaHeader";
+import LevelShelves from "@/components/content/LevelShelves";
+import TopicTile from "@/components/content/TopicTile";
 import { createClient } from "@/lib/supabase/serverClient";
+import { getLearnerLevels, levelFor } from "@/lib/content/learnerLevel";
 import type { WritingPrompt } from "@/types/database";
 
 export const metadata: Metadata = {
@@ -11,47 +13,36 @@ export const metadata: Metadata = {
 
 export default async function WritingPage() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("writing_prompts")
-    .select("*")
-    .eq("status", "published")
-    .order("sort_order");
+  const [{ data }, levels] = await Promise.all([
+    supabase.from("writing_prompts").select("*").eq("status", "published").order("sort_order"),
+    getLearnerLevels(),
+  ]);
   const prompts: WritingPrompt[] = data ?? [];
+  const level = levelFor(levels, "writing");
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 -top-16 h-48 -z-10"
-          style={{
-            background:
-              "radial-gradient(ellipse 55% 100% at 20% 30%, color-mix(in srgb, var(--primary) 11%, transparent) 0%, transparent 65%), radial-gradient(ellipse 45% 100% at 85% 10%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 60%)",
-          }}
-        />
-        <div className="animate-fade-up">
-          <h1 className="text-3xl font-bold">כתיבה</h1>
-          <p className="mt-2 text-muted">כתבו טקסט קצר באנגלית, וקבלו משוב אישי ממורה ה-AI</p>
-        </div>
+    <div className="max-w-4xl mx-auto px-4 pt-10 pb-16">
+      <AreaHeader
+        icon={NotebookPen}
+        title="כתיבה"
+        description="כותבים טקסט קצר באנגלית ומקבלים משוב אישי: מה עבד, מה לתקן, ואיך לנסח טוב יותר."
+        level={level}
+        levelLabel="הרמה שלכם בכתיבה"
+        signedIn={levels.signedIn}
+      />
+      <div className="mt-10">
+        {prompts.length === 0 ? (
+          <p className="text-muted">אין עדיין נושאי כתיבה זמינים — יתווספו בקרוב.</p>
+        ) : (
+          <LevelShelves
+            items={prompts}
+            level={level}
+            levelOf={(p) => p.cefr_level}
+            keyOf={(p) => p.id}
+            renderItem={(p) => <TopicTile href={`/writing/${p.id}`} titleEn={p.prompt_en} titleHe={p.title_he} level={p.cefr_level} />}
+          />
+        )}
       </div>
-
-      {prompts.length === 0 ? (
-        <p className="mt-10 text-muted">אין עדיין נושאי כתיבה זמינים — יתווספו בקרוב.</p>
-      ) : (
-        <div className="mt-8 grid sm:grid-cols-2 gap-4">
-          {prompts.map((p, i) => (
-            <ContentCard key={p.id} href={`/writing/${p.id}`} index={i}>
-              <div className="flex flex-col items-start gap-1.5">
-                <EnglishText as="h2" className="text-lg font-bold">
-                  {p.prompt_en}
-                </EnglishText>
-                <p className="text-sm font-medium text-foreground/70">{p.title_he}</p>
-                <CefrBadge level={p.cefr_level} />
-              </div>
-            </ContentCard>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

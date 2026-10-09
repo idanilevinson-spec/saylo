@@ -1,50 +1,43 @@
 import type { Metadata } from "next";
-import EnglishText from "@/components/EnglishText";
-import CefrBadge from "@/components/CefrBadge";
-import ContentCard from "@/components/ContentCard";
+import { BookOpen } from "lucide-react";
+import AreaHeader from "@/components/content/AreaHeader";
+import LevelShelves from "@/components/content/LevelShelves";
+import TopicTile from "@/components/content/TopicTile";
 import { listVocabularyTopics } from "@/lib/content/vocabulary";
+import { getLearnerLevels, levelFor } from "@/lib/content/learnerLevel";
 
 export const metadata: Metadata = {
   title: "אוצר מילים — Saylo",
 };
 
 export default async function VocabularyPage() {
-  const topics = await listVocabularyTopics();
+  const [topics, levels] = await Promise.all([listVocabularyTopics(), getLearnerLevels()]);
+  const level = levelFor(levels, "vocabulary");
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <div className="relative -mx-4 px-4 pb-2 overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 -top-16 h-48 -z-10"
-          style={{
-            background:
-              "radial-gradient(ellipse 55% 100% at 20% 30%, color-mix(in srgb, var(--primary) 11%, transparent) 0%, transparent 65%), radial-gradient(ellipse 45% 100% at 85% 10%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 60%)",
-          }}
-        />
-        <div className="animate-fade-up">
-          <h1 className="text-3xl font-bold">אוצר מילים</h1>
-          <p className="mt-2 text-muted">בחרו נושא כדי להתחיל ללמוד מילים חדשות</p>
-        </div>
+    <div className="max-w-4xl mx-auto px-4 pt-10 pb-16">
+      <AreaHeader
+        icon={BookOpen}
+        title="אוצר מילים"
+        description="מילים לפי נושא, עם הגייה ומשפט לדוגמה. מילה שטעיתם בה חוזרת אליכם בחזרה החכמה."
+        level={level}
+        levelLabel="הרמה שלכם באוצר מילים"
+        signedIn={levels.signedIn}
+      />
+      <div className="mt-10">
+        {topics.length === 0 ? (
+          <p className="text-muted">אין עדיין נושאים זמינים — יתווספו בקרוב.</p>
+        ) : (
+          <LevelShelves
+            items={topics}
+            level={level}
+            levelOf={(t) => t.cefr_level}
+            keyOf={(t) => t.id}
+            gridClassName="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
+            renderItem={(t) => <TopicTile href={`/vocabulary/${t.slug}`} titleEn={t.name_en} titleHe={t.name_he} level={t.cefr_level} />}
+          />
+        )}
       </div>
-
-      {topics.length === 0 ? (
-        <p className="mt-10 text-muted">אין עדיין נושאים זמינים — יתווספו בקרוב.</p>
-      ) : (
-        <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {topics.map((topic, i) => (
-            <ContentCard key={topic.id} href={`/vocabulary/${topic.slug}`} index={i}>
-              <div className="flex flex-col items-start gap-1.5">
-                <EnglishText as="h2" className="text-lg font-bold">
-                  {topic.name_en}
-                </EnglishText>
-                <p className="text-sm font-medium text-foreground/70">{topic.name_he}</p>
-                <CefrBadge level={topic.cefr_level} />
-              </div>
-            </ContentCard>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
