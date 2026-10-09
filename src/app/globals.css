@@ -343,6 +343,45 @@ textarea::placeholder {
   --tw-prose-td-borders: var(--card-border);
 }
 
+/* Grammar lessons: the rules read like a well-set textbook page, not raw
+   markdown. Emphasis carries the brand blue (it marks the forms to learn:
+   -ed, will, Having + V3), tables sit in their own bordered plate, and
+   list markers pick up the same blue. */
+.lesson {
+  --tw-prose-bold: var(--primary);
+  font-size: 1.05rem;
+  line-height: 1.85;
+}
+.lesson :where(p, li) > strong { font-weight: 700; }
+.lesson :where(li)::marker { color: var(--primary); }
+.lesson :where(table) {
+  display: table;
+  width: 100%;
+  border: 1px solid var(--card-border);
+  border-radius: 0.5rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  font-size: 0.95rem;
+}
+.lesson :where(thead th) {
+  background: var(--background-2);
+  padding: 0.6rem 0.9rem;
+  font-weight: 700;
+}
+.lesson :where(tbody td) {
+  padding: 0.55rem 0.9rem;
+  border-top: 1px solid var(--card-border);
+}
+.lesson :where(h2, h3) { margin-top: 1.6em; }
+/* Each line picks its own direction: an English example inside a Hebrew
+   list keeps its period at the end, not before "If". unicode-bidi on the
+   container alone doesn't reach list items and table cells. */
+.lesson :where(p, li, td, th, h2, h3, h4) {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
 /* Accessibility toolbar (AccessibilityWidget) — a manual, in-page override
    layer on top of the OS-level prefers-color-scheme/prefers-reduced-motion
    support the rest of the app already has. Required for real people whose

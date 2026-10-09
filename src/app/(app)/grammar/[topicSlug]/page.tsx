@@ -2,11 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import EnglishText from "@/components/EnglishText";
-import CefrBadge from "@/components/CefrBadge";
 import GrammarLessonContent from "@/components/GrammarLessonContent";
-import MotionLink from "@/components/MotionLink";
 import ReportContentError from "@/components/ReportContentError";
-import { Target } from "lucide-react";
+import { Target, ChevronRight } from "lucide-react";
 import { getGrammarTopicBySlug, listGrammarLessons } from "@/lib/content/grammar";
 import { createClient } from "@/lib/supabase/serverClient";
 import { seededShuffle, dailySeed } from "@/lib/utils/shuffle";
@@ -31,7 +29,7 @@ export default async function GrammarTopicPage({ params }: PageProps) {
   const supabase = await createClient();
   const { data: exerciseIds } = await supabase
     .from("exercises")
-    .select("id")
+    .select("id, type")
     .eq("grammar_topic_id", topic.id)
     .eq("status", "published")
     .order("sort_order");
@@ -43,60 +41,68 @@ export default async function GrammarTopicPage({ params }: PageProps) {
     ? seededShuffle(exerciseIds, dailySeed(topic.id))[0]
     : null;
 
+  const fills = (exerciseIds ?? []).filter((e) => e.type === "fill_blank").length;
+  const reorders = (exerciseIds ?? []).filter((e) => e.type === "reorder").length;
+  const practiceSummary = [fills ? `${fills} השלמות` : null, reorders ? `${reorders} סידורי משפט` : null].filter(Boolean).join(" ו-");
+
+  const action =
+    "game-press inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-lg font-bold transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2";
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <Link href="/grammar" className="text-sm text-primary">
-        ← כל נושאי הדקדוק
+    <div className="max-w-3xl mx-auto px-4 pt-8 pb-16">
+      <Link href="/grammar" className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+        <ChevronRight size={15} aria-hidden="true" /> כל נושאי הדקדוק
       </Link>
 
-      <div className="animate-fade-up">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold">{topic.name_he}</h1>
-            <CefrBadge level={topic.cefr_level} />
-          </div>
-          {firstExercise && (
-            <MotionLink
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              href={`/practice/${firstExercise.id}`}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
-            >
-              תרגלו את הנושא <Target size={16} />
-            </MotionLink>
-          )}
+      <header className="mt-4 flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 text-sm text-muted">
+            <span className="chyron rounded-md bg-background-2 px-1.5 py-0.5 text-sm text-primary" dir="ltr">
+              {topic.cefr_level}
+            </span>
+            {practiceSummary && <span>{practiceSummary}</span>}
+          </p>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-black tracking-tight">{topic.name_he}</h1>
+          <EnglishText as="p" className="mt-0.5 text-right text-lg text-muted">
+            {topic.name_en}
+          </EnglishText>
         </div>
-        <EnglishText as="p" className="mt-1 text-muted">
-          {topic.name_en}
-        </EnglishText>
-      </div>
+        {firstExercise && (
+          <Link href={`/practice/${firstExercise.id}`} className={`${action} bg-primary text-primary-ink hover:bg-primary-hover`}>
+            <Target size={17} aria-hidden="true" /> לתרגל
+          </Link>
+        )}
+      </header>
 
       {lessons.length > 0 && (
         <>
-          <div className="mt-8 flex items-center justify-between gap-3">
-            <h2 className="text-lg font-bold text-muted">הסבר מהמורה</h2>
-            <ReportContentError targetType="grammar_topic" targetId={topic.id} />
-          </div>
-          <div className="mt-3 space-y-10">
+          <div className="mt-8 space-y-6">
             {lessons.map((lesson) => (
-              <article key={lesson.id} className="bg-card border border-card-border rounded-lg p-6 sm:p-8">
-                <h2 className="text-xl font-bold mb-4">{lesson.title_he}</h2>
-                <GrammarLessonContent bodyMd={lesson.body_md} />
+              <article key={lesson.id} className="relative overflow-hidden rounded-lg border border-card-border bg-card px-5 py-6 sm:px-9 sm:py-8">
+                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
+                <h2 className="text-xl sm:text-2xl font-black tracking-tight">{lesson.title_he}</h2>
+                <div className="mt-4">
+                  <GrammarLessonContent bodyMd={lesson.body_md} />
+                </div>
               </article>
             ))}
           </div>
+          <div className="mt-2 flex justify-end">
+            <ReportContentError targetType="grammar_topic" targetId={topic.id} />
+          </div>
 
           {firstExercise && (
-            <div className="mt-8 text-center">
-              <MotionLink
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                href={`/practice/${firstExercise.id}`}
-                className="inline-flex items-center gap-1.5 px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
-              >
-                מוכנים? בואו נתרגל <Target size={16} />
-              </MotionLink>
-            </div>
+            <section className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg bg-primary px-6 py-5 text-primary-ink">
+              <div>
+                <h2 className="text-lg font-black">עכשיו לתרגול</h2>
+                <p className="text-sm text-primary-ink/80">
+                  {practiceSummary ? `${practiceSummary}, ` : ""}עם בדיקה מיידית והסבר על כל טעות.
+                </p>
+              </div>
+              <Link href={`/practice/${firstExercise.id}`} className={`${action} bg-background text-foreground`}>
+                <Target size={17} aria-hidden="true" /> להתחיל
+              </Link>
+            </section>
           )}
         </>
       )}

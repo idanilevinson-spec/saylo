@@ -18,7 +18,7 @@ export default function TeacherExplanationCard({ text }: TeacherExplanationCardP
         <Presentation size={18} />
       </span>
       <div>
-        <p className="text-sm font-bold text-primary">המורה AI מסביר</p>
+        <p className="text-sm font-bold text-primary">המורה מסביר</p>
         <p className="mt-1 leading-relaxed" style={{ unicodeBidi: "plaintext" }}>
           {text}
         </p>

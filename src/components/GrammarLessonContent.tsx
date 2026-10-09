@@ -1,19 +1,48 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import type { ReactNode } from "react";
 
 interface GrammarLessonContentProps {
   bodyMd: string;
 }
 
-// Lesson prose mixes Hebrew explanation with inline English examples.
-// unicode-bidi: plaintext lets each paragraph pick its own direction per the
-// Unicode Bidi Algorithm instead of forcing everything into the page's RTL
-// flow, which is the right default for this kind of mixed-language prose —
-// unlike vocabulary/UI chrome, which always goes through EnglishText instead.
+interface HastNode {
+  type: string;
+  value?: string;
+  children?: HastNode[];
+}
+
+function textOf(node: HastNode | undefined): string {
+  if (!node) return "";
+  if (node.type === "text") return node.value ?? "";
+  return (node.children ?? []).map(textOf).join("");
+}
+
+// Lesson prose mixes Hebrew explanation with English examples. Each line
+// picks its own direction (see .lesson in globals.css); list items that are
+// English examples are also marked ltr, so their bullet sits next to the
+// sentence instead of across the line on the Hebrew side.
 export default function GrammarLessonContent({ bodyMd }: GrammarLessonContentProps) {
   return (
-    <div className="prose prose-neutral max-w-none" style={{ unicodeBidi: "plaintext" }}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{bodyMd}</ReactMarkdown>
+    <div className="lesson prose prose-neutral max-w-none" style={{ unicodeBidi: "plaintext" }}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          li: ({ node, children }: { node?: unknown; children?: ReactNode }) => {
+            const text = textOf(node as HastNode).trim();
+            const english = /^[A-Za-z"'(]/.test(text);
+            return english ? (
+              <li dir="ltr" lang="en">
+                {children}
+              </li>
+            ) : (
+              <li>{children}</li>
+            );
+          },
+        }}
+      >
+        {bodyMd}
+      </ReactMarkdown>
     </div>
   );
 }
