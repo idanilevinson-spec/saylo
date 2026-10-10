@@ -366,8 +366,8 @@ join (values
 **מבנה:**
 
 - חיוב: I / you / she / we / they **will go** (בקיצור I'll, she'll)
-- שלילה: **will not** = **won't** — I won't tell anyone.
-- שאלה: **Will** + נושא + בסיס — Will you come with us?
+- שלילה: **will not** = **won't**: I won't tell anyone.
+- שאלה: **Will** + נושא + בסיס: Will you come with us?
 
 **will או going to?**
 
@@ -428,21 +428,21 @@ join (values
 **בדיבור:** כשהקול יורד בזנב, מבקשים הסכמה. כשהוא עולה, באמת שואלים.$$),
   ('participle-clauses', 'פסוקיות בינוני — כתיבה תמציתית', $$פסוקית בינוני מקצרת משפט בעזרת צורת **-ing** או צורת **V3** (past participle), במקום פסוקית מלאה עם נושא ופועל. זה נפוץ בכתיבה רשמית, אקדמית ועיתונאית.
 
-**פעולה בו-זמנית או סיבה — -ing:**
+**פעולה בו-זמנית או סיבה: -ing:**
 
 - **Feeling** tired, she went to bed early. (= Because she felt tired...)
 - **Walking** home, I met an old friend. (= While I was walking home...)
 
-**פעולה שקדמה — Having + V3:**
+**פעולה שקדמה: Having + V3:**
 
 - **Having finished** the report, he sent it to his manager. (= After he had finished...)
 
-**משמעות סבילה — V3:**
+**משמעות סבילה: V3:**
 
 - **Built** in 1920, the house needs major repairs. (= Because it was built in 1920...)
 - **Asked** about the delay, the minister refused to comment.
 
-**כלל חשוב — אותו נושא:** הנושא של הפסוקית חייב להיות הנושא של המשפט הראשי.
+**כלל חשוב: אותו נושא:** הנושא של הפסוקית חייב להיות הנושא של המשפט הראשי.
 
 - ✗ Walking down the street, the rain started. (הגשם לא הלך ברחוב)
 - ✓ Walking down the street, I felt the rain start.
