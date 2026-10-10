@@ -8,10 +8,13 @@ import LandingSteps from "@/components/LandingSteps";
 import LandingFeatures from "@/components/LandingFeatures";
 import LandingLevels from "@/components/LandingLevels";
 import LandingPricingTeaser from "@/components/LandingPricingTeaser";
+import LandingFreeResources from "@/components/LandingFreeResources";
 import LandingFinalCta from "@/components/LandingFinalCta";
 import SiteFooter from "@/components/SiteFooter";
 import AccountDeletedNotice from "@/components/AccountDeletedNotice";
 import { getLevelCatalog } from "@/lib/content/levelCatalog";
+import { listPublicGrammar } from "@/lib/content/publicGrammar";
+import { listPublicVocabulary } from "@/lib/content/publicVocabulary";
 import { APP_STORE_URL, INSTAGRAM_URL } from "@/lib/site/links";
 import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
@@ -56,7 +59,7 @@ const JSON_LD = {
 };
 
 export default async function HomePage() {
-  const catalog = await getLevelCatalog();
+  const [catalog, grammar, vocabulary] = await Promise.all([getLevelCatalog(), listPublicGrammar(), listPublicVocabulary()]);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(JSON_LD) }} />
@@ -69,6 +72,7 @@ export default async function HomePage() {
       <LandingSteps />
       <LandingFeatures />
       <LandingLevels catalog={catalog} />
+      <LandingFreeResources grammarTopics={grammar.length} words={vocabulary.reduce((n, t) => n + t.wordCount, 0)} />
       <LandingPricingTeaser />
       <LandingFinalCta />
       <SiteFooter />
