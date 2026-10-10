@@ -36,8 +36,9 @@ function highlight(example: string, headword: string): ReactNode {
 
 // One word in a vocabulary topic: how it's said, what kind of word it is,
 // what it means in Hebrew and in English, and the word in a sentence —
-// each shown once, with listening and speaking right there.
-export default function WordCard({ item }: { item: VocabularyItem }) {
+// each shown once, with listening and speaking right there. Public pages
+// pass withRecorder={false}: pronunciation scoring needs a signed-in user.
+export default function WordCard({ item, withRecorder = true }: { item: VocabularyItem; withRecorder?: boolean }) {
   const pos = item.part_of_speech ? (POS_HE[item.part_of_speech] ?? item.part_of_speech) : null;
   return (
     <article className="flex h-full flex-col rounded-lg border border-card-border bg-card p-4 sm:p-5">
@@ -66,9 +67,11 @@ export default function WordCard({ item }: { item: VocabularyItem }) {
           <span className="flex-1">{highlight(item.example_en, item.headword)}</span>
           <SpeakButton text={item.example_en} className="mt-1 p-1 -m-1 rounded-md" />
         </p>
-        <div className="mt-3">
-          <PronunciationRecorder targetPhrase={item.example_en} hidePhrase />
-        </div>
+        {withRecorder && (
+          <div className="mt-3">
+            <PronunciationRecorder targetPhrase={item.example_en} hidePhrase />
+          </div>
+        )}
       </div>
     </article>
   );
