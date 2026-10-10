@@ -37,9 +37,21 @@ for (const [table, statusCol] of TABLES) {
   rows.push([table, ...LEVELS.map((l) => String(counts[l]))]);
 }
 // Exercises by skill area too.
-const { data: ex } = await supabase.from("exercises").select("skill_area, type, cefr_level").eq("status", "published");
+// Paged: the API returns at most 1000 rows per request, and there are more.
+const ex = [];
+for (let from = 0; ; from += 1000) {
+  const { data, error } = await supabase
+    .from("exercises")
+    .select("skill_area, type, cefr_level")
+    .eq("status", "published")
+    .order("id")
+    .range(from, from + 999);
+  if (error) throw error;
+  ex.push(...data);
+  if (data.length < 1000) break;
+}
 const bySkill = {};
-for (const e of ex ?? []) {
+for (const e of ex) {
   const k = `${e.skill_area}/${e.type}`;
   bySkill[k] ??= Object.fromEntries(LEVELS.map((l) => [l, 0]));
   bySkill[k][e.cefr_level]++;

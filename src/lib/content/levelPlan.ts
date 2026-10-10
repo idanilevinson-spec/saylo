@@ -3,6 +3,7 @@ import { nearestLevelWith, overallLevel } from "./levelOrder";
 
 export { overallLevel };
 import type { CefrLevel, SkillArea } from "@/types/database";
+import { fetchAll } from "@/lib/supabase/fetchAll";
 
 // "Today, at your level": one item from each kind of practice, picked at
 // the learner's level in that skill (or the overall placement result), so
@@ -88,13 +89,18 @@ export async function getLevelPlan(profileId: string): Promise<LevelPlan> {
       supabase.from("listening_clips").select("id, title_he, title_en, transcript_en, cefr_level").eq("status", "published").order("sort_order"),
       supabase.from("writing_prompts").select("id, title_he, prompt_en, cefr_level").eq("status", "published").order("sort_order"),
       supabase.from("conversation_scenarios").select("id, title_he, title_en, cefr_level").eq("status", "published").order("sort_order"),
-      supabase
-        .from("exercise_attempts")
-        .select("created_at, exercises(topic_id, grammar_topic_id, reading_text_id, listening_clip_id)")
-        .eq("profile_id", profileId)
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(3000),
+      fetchAll(
+        (from, to) =>
+          supabase
+            .from("exercise_attempts")
+            .select("created_at, exercises(topic_id, grammar_topic_id, reading_text_id, listening_clip_id)")
+            .eq("profile_id", profileId)
+            .gte("created_at", since)
+            .order("created_at", { ascending: false })
+            .order("id")
+            .range(from, to),
+        3000,
+      ),
       supabase.from("writing_submissions").select("writing_prompt_id, created_at").eq("profile_id", profileId),
       supabase.from("conversations").select("scenario_id, created_at").eq("profile_id", profileId).not("scenario_id", "is", null),
     ]);
