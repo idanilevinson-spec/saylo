@@ -8,6 +8,7 @@ import SiteFooter from "@/components/SiteFooter";
 import { getCanDoStatement } from "@/lib/content/canDoStatements";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { getLevelCatalog, getLevelSamples } from "@/lib/content/levelCatalog";
+import { listPublicVocabulary } from "@/lib/content/publicVocabulary";
 import type { CefrLevel, SkillArea } from "@/types/database";
 
 // One public page per CEFR level: what a learner at that level can do (the
@@ -48,7 +49,8 @@ export async function generateMetadata({ params }: { params: Promise<{ level: st
 export default async function EnglishLevelPage({ params }: { params: Promise<{ level: string }> }) {
   const level = levelFrom((await params).level);
   if (!level) notFound();
-  const [catalog, samples] = await Promise.all([getLevelCatalog(), getLevelSamples(level)]);
+  const [catalog, samples, vocabTopics] = await Promise.all([getLevelCatalog(), getLevelSamples(level), listPublicVocabulary()]);
+  const levelTopics = vocabTopics.filter((t) => t.cefr_level === level);
   const c = catalog[level];
   const i = LEVELS.indexOf(level);
 
@@ -90,6 +92,20 @@ export default async function EnglishLevelPage({ params }: { params: Promise<{ l
               מילים שלומדים ברמה {level}
             </h2>
             <p className="mt-1 text-sm text-muted">מתוך {c.words} המילים ברמה הזו באתר.</p>
+            {levelTopics.length > 0 && (
+              <ul className="mt-3 flex flex-wrap gap-2" aria-label="נושאי אוצר מילים ברמה">
+                {levelTopics.map((t) => (
+                  <li key={t.slug}>
+                    <Link
+                      href={`/english-vocabulary/${t.slug}`}
+                      className="inline-flex rounded-lg border border-card-border bg-card px-3 py-1.5 text-sm font-bold hover:border-primary/50"
+                    >
+                      {t.name_he}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
             <ul className="mt-4 grid gap-2 sm:grid-cols-2">
               {samples.words.map((w) => (
                 <li key={w.headword} className="rounded-lg bg-background-2 px-4 py-3">
@@ -116,11 +132,13 @@ export default async function EnglishLevelPage({ params }: { params: Promise<{ l
               </h2>
               <ul className="mt-3 space-y-1.5 text-sm">
                 {samples.grammar.map((g) => (
-                  <li key={g.name_en} className="flex justify-between gap-3 border-b border-card-border pb-1.5">
-                    <span>{g.name_he}</span>
-                    <span dir="ltr" lang="en" className="text-muted font-content">
-                      {g.name_en}
-                    </span>
+                  <li key={g.slug} className="border-b border-card-border pb-1.5">
+                    <Link href={`/english-grammar/${g.slug}`} className="flex justify-between gap-3 hover:text-primary">
+                      <span className="font-bold">{g.name_he}</span>
+                      <span dir="ltr" lang="en" className="text-muted font-content">
+                        {g.name_en}
+                      </span>
+                    </Link>
                   </li>
                 ))}
               </ul>
