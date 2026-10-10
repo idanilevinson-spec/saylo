@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { breadcrumbJsonLd } from "@/lib/site/breadcrumbs";
+import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
 import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -56,7 +56,7 @@ export default async function BagrutModulePage({ params }: { params: Promise<{ m
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([{ name: "Saylo", path: "/" }, { name: "בגרות באנגלית", path: "/english-bagrut" }, { name: `שאלון ${code}`, path: `/english-bagrut/${code.toLowerCase()}` }])) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbJsonLd([{ name: "Saylo", path: "/" }, { name: "בגרות באנגלית", path: "/english-bagrut" }, { name: `שאלון ${code}`, path: `/english-bagrut/${code.toLowerCase()}` }])) }}
       />
       <div className="max-w-4xl mx-auto px-4 pt-10 pb-16">
         <Link href="/english-bagrut" className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline">

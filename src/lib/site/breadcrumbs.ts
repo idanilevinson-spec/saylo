@@ -12,3 +12,9 @@ export function breadcrumbJsonLd(trail: { name: string; path: string }[]) {
     })),
   };
 }
+
+// JSON for a <script type="application/ld+json">, with "<" escaped so no
+// string in the data can close the script tag (as the Next.js guide does).
+export function jsonLdHtml(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\u003c");
+}
