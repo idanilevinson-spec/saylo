@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
+import PracticeLink from "@/components/PracticeLink";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { listPublicIdioms, type PublicIdiom } from "@/lib/content/publicIdioms";
@@ -122,12 +122,11 @@ export default async function EnglishIdiomsPage() {
           <p className="mt-1 text-primary-ink/80">
             באפליקציה יש תרגול לכל הביטויים, לפי הרמה שלכם.
           </p>
-          <Link
-            href="/signup"
+          <PracticeLink signedInHref="/idioms/practice" signedInLabel="לתרגול הביטויים"
             className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold"
           >
             להתחיל בחינם
-          </Link>
+          </PracticeLink>
         </section>
       </div>
       <SiteFooter />

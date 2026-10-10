@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, Target } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
+import PracticeLink from "@/components/PracticeLink";
 import GrammarLessonContent from "@/components/GrammarLessonContent";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
@@ -128,12 +129,11 @@ export default async function EnglishGrammarTopic({ params }: { params: Promise<
               {topic.practiceCount} תרגילים על הנושא הזה באפליקציה, עם בדיקה מיידית והסבר על כל טעות.
             </p>
           </div>
-          <Link
-            href="/signup"
+          <PracticeLink signedInHref={`/grammar/${topic.slug}`} signedInLabel={<><Target size={17} aria-hidden="true" /> לתרגל באפליקציה</>}
             className="game-press inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-lg bg-background text-foreground font-bold"
           >
             <Target size={17} aria-hidden="true" /> להתחיל בחינם
-          </Link>
+          </PracticeLink>
         </section>
 
         {sameLevel.length > 0 && (

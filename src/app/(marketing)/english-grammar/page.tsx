@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
+import PracticeLink from "@/components/PracticeLink";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { listPublicGrammar } from "@/lib/content/publicGrammar";
@@ -73,9 +74,9 @@ export default async function EnglishGrammarIndex() {
         <section className="mt-14 rounded-lg bg-primary px-6 py-7 text-primary-ink">
           <h2 className="text-2xl font-black">לא בטוחים מאיפה להתחיל?</h2>
           <p className="mt-1 text-primary-ink/80">מבחן רמה של כ-10 דקות, ואחריו תוכנית יומית עם הנושאים שמתאימים לרמה שלכם.</p>
-          <Link href="/signup" className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold">
+          <PracticeLink signedInHref="/grammar" signedInLabel="לנושאי הדקדוק באפליקציה" className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold">
             למבחן הרמה, חינם
-          </Link>
+          </PracticeLink>
         </section>
       </div>
       <SiteFooter />

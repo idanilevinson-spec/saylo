@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, Target } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
+import PracticeLink from "@/components/PracticeLink";
 import WordCard from "@/components/content/WordCard";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
@@ -95,12 +96,11 @@ export default async function EnglishVocabularyTopic({ params }: { params: Promi
               באפליקציה: תרגיל לכל מילה, חזרה במרווחים כדי שהמילים יישארו, ובדיקת הגייה של המשפטים.
             </p>
           </div>
-          <Link
-            href="/signup"
+          <PracticeLink signedInHref={`/vocabulary/${topic.slug}`} signedInLabel={<><Target size={17} aria-hidden="true" /> לתרגל באפליקציה</>}
             className="game-press inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-lg bg-background text-foreground font-bold"
           >
             <Target size={17} aria-hidden="true" /> להתחיל בחינם
-          </Link>
+          </PracticeLink>
         </section>
 
         {sameLevel.length > 0 && (
