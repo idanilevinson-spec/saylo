@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/browserClient";
 import type { CefrLevel } from "@/types/database";
+import { fetchAll } from "@/lib/supabase/fetchAll";
 
 export type TopicMasteryStatus = "not_started" | "in_progress" | "mastered";
 
@@ -35,10 +36,14 @@ export async function listTopicsWithMastery(profileId: string): Promise<TopicWit
   const [{ data: vocabTopics }, { data: grammarTopics }, { data: attempts }] = await Promise.all([
     supabase.from("topics").select("*").eq("status", "published").order("cefr_level").order("sort_order"),
     supabase.from("grammar_topics").select("*").eq("status", "published").order("cefr_level").order("sort_order"),
-    supabase
-      .from("exercise_attempts")
-      .select("is_correct, exercises(topic_id, grammar_topic_id)")
-      .eq("profile_id", profileId),
+    fetchAll((from, to) =>
+      supabase
+        .from("exercise_attempts")
+        .select("is_correct, exercises(topic_id, grammar_topic_id)")
+        .eq("profile_id", profileId)
+        .order("id")
+        .range(from, to),
+    ),
   ]);
 
   const vocabStats = new Map<string, { correct: number; total: number }>();

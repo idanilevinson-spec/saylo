@@ -24,6 +24,7 @@ import CefrBadge from "@/components/CefrBadge";
 import { getCanDoStatement } from "@/lib/content/canDoStatements";
 import { buildScoreSummary, type ScoreRange, type ScoreSummary } from "@/lib/reports/buildScoreSummary";
 import type { CefrLevel, SkillArea } from "@/types/database";
+import { fetchAll } from "@/lib/supabase/fetchAll";
 
 const CEFR_ORDER: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
@@ -98,10 +99,14 @@ export default function ProgressPage() {
         .select("current_streak, longest_streak, freeze_count")
         .eq("profile_id", profile.id)
         .maybeSingle(),
-      supabase
-        .from("exercise_attempts")
-        .select("is_correct, exercises(skill_area)")
-        .eq("profile_id", profile.id),
+      fetchAll((from, to) =>
+        supabase
+          .from("exercise_attempts")
+          .select("is_correct, exercises(skill_area)")
+          .eq("profile_id", profile.id)
+          .order("id")
+          .range(from, to),
+      ),
       supabase.from("skill_levels").select("skill, cefr_level").eq("profile_id", profile.id),
       supabase
         .from("conversations")
@@ -172,11 +177,15 @@ export default function ProgressPage() {
         .select("amount, created_at")
         .eq("profile_id", profile.id)
         .gte("created_at", since.toISOString()),
-      supabase
-        .from("exercise_attempts")
-        .select("is_correct, created_at, exercises(skill_area)")
-        .eq("profile_id", profile.id)
-        .gte("created_at", since.toISOString()),
+      fetchAll((from, to) =>
+        supabase
+          .from("exercise_attempts")
+          .select("is_correct, created_at, exercises(skill_area)")
+          .eq("profile_id", profile.id)
+          .gte("created_at", since.toISOString())
+          .order("id")
+          .range(from, to),
+      ),
     ]).then(([xpEventsRes, attemptsRes]) => {
       const dailyXp = buckets.map((b) =>
         (xpEventsRes.data ?? [])

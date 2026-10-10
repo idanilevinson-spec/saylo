@@ -9,6 +9,7 @@ import { getLearnerLevels } from "@/lib/content/learnerLevel";
 import { listReadingTexts } from "@/lib/content/reading";
 import { createClient } from "@/lib/supabase/serverClient";
 import type { CefrLevel, ReadingText } from "@/types/database";
+import { fetchAll } from "@/lib/supabase/fetchAll";
 
 export const metadata: Metadata = {
   title: "קריאה — Saylo",
@@ -52,7 +53,15 @@ async function readingProgress(): Promise<{ byText: Map<string, TextProgress>; l
   if (!user) return { byText, level: null };
 
   const [{ data: exercises }, { data: levelRow }] = await Promise.all([
-    supabase.from("exercises").select("id, reading_text_id").not("reading_text_id", "is", null).eq("status", "published"),
+    fetchAll((from, to) =>
+      supabase
+        .from("exercises")
+        .select("id, reading_text_id")
+        .not("reading_text_id", "is", null)
+        .eq("status", "published")
+        .order("id")
+        .range(from, to),
+    ),
     supabase.from("skill_levels").select("cefr_level").eq("profile_id", user.id).eq("skill", "reading").maybeSingle(),
   ]);
   const textOf = new Map((exercises ?? []).map((e) => [e.id as string, e.reading_text_id as string]));

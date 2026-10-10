@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/browserClient";
+import { fetchAll } from "@/lib/supabase/fetchAll";
 
 interface PlanBreakdown {
   code: string;
@@ -88,14 +89,25 @@ export default function AdminAnalyticsPage() {
         { count: aiUsageCallsLast7Days },
       ] = await Promise.all([
         supabase.from("subscriptions").select("status, subscription_plans(code, price_ils, months)").eq("status", "active"),
-        supabase.from("profiles").select("id, created_at"),
-        supabase.from("streaks").select("profile_id, last_active_date"),
+        fetchAll((from, to) => supabase.from("profiles").select("id, created_at").order("id").range(from, to)),
+        fetchAll((from, to) =>
+          supabase.from("streaks").select("profile_id, last_active_date").order("profile_id").range(from, to),
+        ),
         supabase.from("exercise_attempts").select("*", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
-        supabase.from("exercise_attempts").select("profile_id").gte("created_at", sevenDaysAgo),
+        fetchAll((from, to) =>
+          supabase.from("exercise_attempts").select("profile_id").gte("created_at", sevenDaysAgo).order("id").range(from, to),
+        ),
         supabase.from("placement_tests").select("*", { count: "exact", head: true }).eq("status", "completed"),
-        supabase.from("exercise_attempts").select("profile_id").limit(5000),
-        supabase.from("conversations").select("profile_id").limit(5000),
-        supabase.from("ai_usage_log").select("feature, input_tokens, output_tokens").gte("created_at", thirtyDaysAgo).limit(20000),
+        fetchAll((from, to) => supabase.from("exercise_attempts").select("profile_id").order("id").range(from, to)),
+        fetchAll((from, to) => supabase.from("conversations").select("profile_id").order("id").range(from, to)),
+        fetchAll((from, to) =>
+          supabase
+            .from("ai_usage_log")
+            .select("feature, input_tokens, output_tokens")
+            .gte("created_at", thirtyDaysAgo)
+            .order("id")
+            .range(from, to),
+        ),
         supabase.from("ai_usage_log").select("*", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
       ]);
 
