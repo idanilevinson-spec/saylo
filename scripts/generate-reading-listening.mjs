@@ -2,7 +2,11 @@
 // scripts/content/readingListening.mjs. Validates every question before
 // writing anything. Run: node scripts/generate-reading-listening.mjs
 import { writeFileSync } from "node:fs";
-import { READING, LISTENING } from "./content/readingListening.mjs";
+// Optional args: content module (default readingListening.mjs) and seed
+// file name, so the same validation serves every reading/listening batch.
+const contentPath = process.argv[2] ?? "./content/readingListening.mjs";
+const seedName = process.argv[3] ?? "027_reading_listening_b1_c2.sql";
+const { READING, LISTENING, IDIOMS = [] } = await import(new URL(contentPath, import.meta.url).href);
 
 const q = (s) => `'${String(s).replace(/'/g, "''")}'`;
 const json = (o) => q(JSON.stringify(o));
@@ -15,7 +19,7 @@ function checkMcq(where, [prompt, options, correct]) {
   if (!(correct >= 0 && correct < options.length)) errors.push(`${where}: bad correctIndex`);
 }
 for (const r of READING) {
-  if (r.body.split(/\s+/).length < 250) errors.push(`${r.title_en}: body under 250 words`);
+  if (r.body.split(/\s+/).length < (r.level.startsWith("A") ? 150 : 250)) errors.push(`${r.title_en}: body too short`);
   r.mcq.forEach((m, i) => checkMcq(`${r.title_en} q${i + 1}`, m));
 }
 for (const l of LISTENING) {
@@ -91,6 +95,7 @@ ${LISTENING.map((l) => `  (${q(l.title_en)}, ${json({ audioText: l.dictation, co
 ) as gen(title_en, content)
   on lc.title_en = gen.title_en;
 `);
+if (seedName.startsWith("027")) {
 // Tidy existing content: lesson titles lose the long dash, and three
 // listening questions drop "/ה" forms for neutral Hebrew (the site-wide
 // rule). Profession translations such as "נהג/ת" stay: that is the normal
@@ -108,6 +113,17 @@ update public.exercises set content = jsonb_set(content, '{options,3}', ${q(JSON
 where skill_area = 'listening' and content->>'prompt' = ${q('מה המשמעות של "I kinda forgot about that"?')};
 `);
 
-const path = new URL("../supabase/seed/027_reading_listening_b1_c2.sql", import.meta.url);
+}
+
+if (IDIOMS.length) {
+  const phrases = IDIOMS.map((i) => q(i[0])).join(", ");
+  out.push(`-- ============ Idioms and phrasal verbs ============
+delete from public.idioms_phrasal_verbs where phrase in (${phrases});
+insert into public.idioms_phrasal_verbs (phrase, type, meaning_he, example_en, cefr_level, sort_order) values
+${IDIOMS.map(([phrase, type, he, ex, lvl], i) => `  (${q(phrase)}, ${q(type)}, ${q(he)}, ${q(ex)}, ${q(lvl)}, ${200 + i})`).join(",\n")};
+`);
+}
+
+const path = new URL(`../supabase/seed/${seedName}`, import.meta.url);
 writeFileSync(path, out.join("\n"));
-console.log(`wrote seed 027: ${READING.length} texts, ${LISTENING.length} clips`);
+console.log(`wrote ${seedName}: ${READING.length} texts, ${LISTENING.length} clips, ${IDIOMS.length} idioms`);
