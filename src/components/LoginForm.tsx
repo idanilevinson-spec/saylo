@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import AppleLogo from "@/components/icons/AppleLogo";
+import GoogleLogo from "@/components/icons/GoogleLogo";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/lib/supabase/browserClient";
 import { signInWithOAuthNative } from "@/lib/auth/nativeOAuth";
@@ -69,6 +70,9 @@ export default function LoginForm() {
     });
   }
 
+  const socialClass =
+    "game-press flex items-center justify-center gap-2 w-full min-h-12 px-4 rounded-lg border border-card-border bg-background font-bold hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2";
+
   return (
     <div className="max-w-md mx-auto px-4 py-16">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
@@ -85,6 +89,21 @@ export default function LoginForm() {
         className="relative mt-8 bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7"
       >
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
+
+        <div className="space-y-2.5">
+          <button type="button" onClick={handleGoogleLogin} className={socialClass}>
+            <GoogleLogo /> המשך עם Google
+          </button>
+          <button type="button" onClick={handleAppleLogin} className={socialClass}>
+            <AppleLogo size={22} /> המשך עם Apple
+          </button>
+        </div>
+
+        <div className="my-5 flex items-center gap-3">
+          <div className="flex-1 h-px bg-card-border" />
+          <span className="text-xs text-muted">או עם אימייל</span>
+          <div className="flex-1 h-px bg-card-border" />
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -124,33 +143,9 @@ export default function LoginForm() {
             disabled={loading}
             className="w-full px-4 py-3 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors disabled:opacity-60"
           >
-            {loading ? "מתחבר..." : "התחברות"}
+            {loading ? "מתחברים..." : "התחברות"}
           </motion.button>
         </form>
-
-        <div className="mt-4 flex items-center gap-3">
-          <div className="flex-1 h-px bg-card-border" />
-          <span className="text-xs text-muted">או</span>
-          <div className="flex-1 h-px bg-card-border" />
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={handleGoogleLogin}
-          className="mt-4 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
-        >
-          המשך עם Google
-        </motion.button>
-
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={handleAppleLogin}
-          className="mt-2.5 flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
-        >
-          <AppleLogo size={24} /> המשך עם Apple
-        </motion.button>
 
         <p className="mt-4 text-xs text-muted leading-relaxed">
           התחברות עם Google או Apple בפעם הראשונה פותחת חשבון חדש. בהמשך תתבקשו לאשר את{" "}
