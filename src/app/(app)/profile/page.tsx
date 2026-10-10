@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Star, Trophy, Flame, CreditCard, FileText } from "lucide-react";
+import { CreditCard, FileText } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { AGE_BAND_LABELS } from "@/lib/auth/ageBand";
 import { supabase } from "@/lib/supabase/browserClient";
 import type { BillingDocument, Subscription } from "@/types/database";
-import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import GuardianReportRequestForm from "@/components/GuardianReportRequestForm";
@@ -174,58 +173,42 @@ export default function ProfilePage() {
   const initial = profile.display_name?.trim().charAt(0).toUpperCase() || "?";
 
   return (
-    <div className="max-w-md mx-auto px-4 py-16">
-      <motion.div
+    <div className="max-w-xl mx-auto px-4 pt-10 pb-16">
+      {/* Who you are and where you stand, in one row — not a centered
+          avatar badge with a separate stats strip under it. */}
+      <motion.header
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col items-center text-center"
+        className="relative overflow-hidden rounded-lg border border-card-border bg-card p-5"
       >
-        <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-2xl font-bold text-primary-ink shadow-lg shadow-primary/20">
-          {initial}
+        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+        <div className="flex items-center gap-4">
+          <div className="chyron flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary text-3xl text-primary-ink">
+            {initial}
+          </div>
+          <div className="min-w-0">
+            <h1 className="truncate text-2xl font-black tracking-tight">{profile.display_name}</h1>
+            <p className="text-sm text-muted">{AGE_BAND_LABELS[profile.age_band]}</p>
+          </div>
         </div>
-        <h1 className="mt-4 text-2xl font-bold">{profile.display_name}</h1>
-        <p className="text-sm text-muted">{AGE_BAND_LABELS[profile.age_band]}</p>
-      </motion.div>
-
-      {stats && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.05 }}
-          className="mt-6 flex items-center justify-around bg-card border border-card-border rounded-lg p-5"
-        >
-          <div className="flex flex-col items-center gap-1">
-            <span className="flex items-center gap-1 text-primary">
-              <Star size={16} className="fill-current" />
-              <EnglishText as="span" className="font-bold">
-                {stats.totalXp}
-              </EnglishText>
-            </span>
-            <p className="text-xs text-muted">XP</p>
-          </div>
-          <div className="h-8 border-e border-card-border" />
-          <div className="flex flex-col items-center gap-1">
-            <span className="flex items-center gap-1 text-accent-hover">
-              <Trophy size={16} />
-              <EnglishText as="span" className="font-bold">
-                {stats.level}
-              </EnglishText>
-            </span>
-            <p className="text-xs text-muted">רמה</p>
-          </div>
-          <div className="h-8 border-e border-card-border" />
-          <div className="flex flex-col items-center gap-1">
-            <span className="flex items-center gap-1 text-accent-hover">
-              <Flame size={16} />
-              <EnglishText as="span" className="font-bold">
-                {stats.currentStreak}
-              </EnglishText>
-            </span>
-            <p className="text-xs text-muted">ימים ברצף</p>
-          </div>
-        </motion.div>
-      )}
+        {stats && (
+          <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-card-border pt-4 text-sm">
+            <div className="flex items-baseline gap-1.5">
+              <dd className="chyron text-2xl leading-none tabular-nums text-primary">{stats.totalXp}</dd>
+              <dt className="text-muted">XP</dt>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <dd className="chyron text-2xl leading-none tabular-nums">{stats.level}</dd>
+              <dt className="text-muted">רמת XP</dt>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <dd className="chyron text-2xl leading-none tabular-nums">{stats.currentStreak}</dd>
+              <dt className="text-muted">ימים ברצף</dt>
+            </div>
+          </dl>
+        )}
+      </motion.header>
 
       <MotionLink
         whileHover={{ scale: 1.01 }}

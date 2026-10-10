@@ -56,7 +56,7 @@ export async function GET() {
   const nameById = new Map(
     (profiles ?? []).map((p) => [
       p.id,
-      p.age_band === "adult" || p.id === user.id ? p.display_name : "לומד/ת אנונימי/ת",
+      p.age_band === "adult" || p.id === user.id ? p.display_name : "שם מוסתר",
     ])
   );
 

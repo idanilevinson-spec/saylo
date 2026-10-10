@@ -7,7 +7,7 @@ export function deriveAgeBand(age: number): AgeBand {
 }
 
 export const AGE_BAND_LABELS: Record<AgeBand, string> = {
-  child: "ילד/ה (עד גיל 13)",
-  teen: "בני נוער (13-17)",
-  adult: "מבוגר/ת (18 ומעלה)",
+  child: "עד גיל 13",
+  teen: "גיל 13–17",
+  adult: "גיל 18 ומעלה",
 };
