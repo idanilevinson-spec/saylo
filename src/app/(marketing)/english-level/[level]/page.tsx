@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
@@ -32,10 +33,14 @@ function levelFrom(param: string): CefrLevel | null {
 export async function generateMetadata({ params }: { params: Promise<{ level: string }> }): Promise<Metadata> {
   const level = levelFrom((await params).level);
   if (!level) return {};
+  const title = `אנגלית ברמה ${level} (${CEFR_NAME_HE[level]}): מה יודעים ומה לומדים`;
+  const description = `מה אפשר לעשות באנגלית ברמה ${level} לפי סולם CEFR, ודוגמאות אמיתיות למילים, לנושאי הדקדוק ולטקסטים שלומדים ברמה הזו.`;
+  const path = `/english-level/${level.toLowerCase()}`;
   return {
-    title: `אנגלית ברמה ${level} (${CEFR_NAME_HE[level]}): מה יודעים ומה לומדים — Saylo`,
-    description: `מה אפשר לעשות באנגלית ברמה ${level} לפי סולם CEFR, ודוגמאות אמיתיות למילים, לנושאי הדקדוק ולטקסטים שלומדים ברמה הזו.`,
-    alternates: { canonical: `/english-level/${level.toLowerCase()}` },
+    title: `${title} — Saylo`,
+    description,
+    alternates: { canonical: path },
+    openGraph: pageOpenGraph(title, description, path),
   };
 }
 

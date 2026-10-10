@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
 import { Timer, ChevronLeft } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
@@ -12,11 +13,14 @@ import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/
 // uses: the verified questionnaire structure, the skill lessons and the
 // practice sets. Nothing here is a promise the product doesn't keep.
 
+const DESCRIPTION =
+  "מבנה כל שאלון בבגרות באנגלית (A עד G), מיומנויות עם דוגמה פתורה, וערכות תרגול באותו מבנה, עם שעון באורך הבחינה. לפי 3, 4 ו-5 יחידות לימוד.";
+
 export const metadata: Metadata = {
   title: "הכנה לבגרות באנגלית: 3, 4 ו-5 יח״ל — Saylo",
-  description:
-    "מבנה כל שאלון בבגרות באנגלית (A עד G), מיומנויות עם דוגמה פתורה, וערכות תרגול באותו מבנה, עם שעון באורך הבחינה. לפי 3, 4 ו-5 יחידות לימוד.",
+  description: DESCRIPTION,
   alternates: { canonical: "/english-bagrut" },
+  openGraph: pageOpenGraph("הכנה לבגרות באנגלית: 3, 4 ו-5 יח״ל", DESCRIPTION, "/english-bagrut"),
 };
 
 const TRACKS: BagrutStudyUnits[] = [3, 4, 5];

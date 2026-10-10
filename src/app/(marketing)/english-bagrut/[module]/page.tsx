@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Timer, ChevronRight, CheckCircle2 } from "lucide-react";
@@ -29,10 +30,14 @@ export async function generateMetadata({ params }: { params: Promise<{ module: s
   if (!code) return {};
   const f = BAGRUT_MODULE_FORMATS[code];
   const tracks = f.studyUnitTracks.map((u) => `${u} יח״ל`).join(" ו-");
+  const title = `שאלון ${code} בבגרות באנגלית (${tracks}): מבנה, מיומנויות ותרגול`;
+  const description = `איך בנוי שאלון ${code} בבגרות באנגלית: ${f.sections.map((s) => `${s.nameHe} (${s.points} נק׳)`).join(", ")}${f.timeMinutes ? `, ${f.timeMinutes} דקות` : ""}. מיומנויות עם דוגמה פתורה וערכות תרגול באותו מבנה.`;
+  const path = `/english-bagrut/${code.toLowerCase()}`;
   return {
-    title: `שאלון ${code} בבגרות באנגלית (${tracks}): מבנה, מיומנויות ותרגול — Saylo`,
-    description: `איך בנוי שאלון ${code} בבגרות באנגלית: ${f.sections.map((s) => `${s.nameHe} (${s.points} נק׳)`).join(", ")}${f.timeMinutes ? `, ${f.timeMinutes} דקות` : ""}. מיומנויות עם דוגמה פתורה וערכות תרגול באותו מבנה.`,
-    alternates: { canonical: `/english-bagrut/${code.toLowerCase()}` },
+    title: `${title} — Saylo`,
+    description,
+    alternates: { canonical: path },
+    openGraph: pageOpenGraph(title, description, path),
   };
 }
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
 import { BookOpen, PenLine, BookOpenText, Headphones, NotebookPen, ChevronLeft, type LucideIcon } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
@@ -12,11 +13,14 @@ import type { CefrLevel } from "@/types/database";
 // counts come from the database (cached), the can-do lines from the same
 // statements the app shows learners.
 
+const DESCRIPTION =
+  "מבחן רמה באנגלית של כ-10 דקות: אוצר מילים, דקדוק, קריאה והאזנה. בסופו רמה מ-A1 עד C2 לכל מיומנות בנפרד, ותוכנית תרגול יומית שבנויה עליה.";
+
 export const metadata: Metadata = {
   title: "מבחן רמה באנגלית לפי CEFR — Saylo",
-  description:
-    "מבחן רמה באנגלית של כ-10 דקות: אוצר מילים, דקדוק, קריאה והאזנה. בסופו רמה מ-A1 עד C2 לכל מיומנות בנפרד, ותוכנית תרגול יומית שבנויה עליה.",
+  description: DESCRIPTION,
   alternates: { canonical: "/english-level-test" },
+  openGraph: pageOpenGraph("מבחן רמה באנגלית לפי CEFR", DESCRIPTION, "/english-level-test"),
 };
 
 const LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
