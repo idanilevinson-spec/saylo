@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
 import { Suspense } from "react";
 import LandingHero from "@/components/LandingHero";
 import LandingTrustStrip from "@/components/LandingTrustStrip";
@@ -58,7 +59,7 @@ export default async function HomePage() {
   const catalog = await getLevelCatalog();
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(JSON_LD) }} />
       <Suspense fallback={null}>
         <AccountDeletedNotice />
       </Suspense>

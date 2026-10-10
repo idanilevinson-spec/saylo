@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
 import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
 import { Timer, ChevronLeft } from "lucide-react";
@@ -57,7 +58,7 @@ export default function EnglishBagrutPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
       <div className="max-w-4xl mx-auto px-4 pt-12 pb-16">
         <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">הכנה לבגרות באנגלית</h1>
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
