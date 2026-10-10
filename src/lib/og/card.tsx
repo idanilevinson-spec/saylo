@@ -16,38 +16,80 @@ const FG = "#f3efe4";
 const MUTED = "#a39c8c";
 
 // Satori (behind next/og) has no bidi support: it draws every string left
-// to right, so Hebrew comes out mirrored. We do the bidi by hand: each word
-// is reversed for display, except runs of Latin letters and digits, which
-// keep their own order; the words are then laid out right to left.
-const LTR_RUN = /[A-Za-z0-9.:/]+/g;
+// to right, so Hebrew comes out mirrored. We do a small version of the
+// bidi algorithm by hand:
+// - an English run (Latin letters and digits, with the spaces and
+//   punctuation between them) stays one unit in its own order, so
+//   "Wish and If only" doesn't come out as "only If and Wish";
+// - Hebrew is reversed character by character;
+// - pieces with no space between them ("ו-" + "if", "only" + ":") stay
+//   glued, in right-to-left order;
+// - the resulting items are laid out right to left and wrap like words.
+const HEBREW = /[֐-׿]/;
+// Spaces, and " / " or " & " between English words, stay inside the run.
+const LTR_RUN = /[A-Za-z0-9](?:[A-Za-z0-9'’./&–-]|\s*[/&+]\s*(?=[A-Za-z0-9])|\s+(?=[A-Za-z0-9]))*/g;
 
-export function visualWord(word: string): string {
-  if (!/[֐-׿]/.test(word)) return word;
-  const parts: string[] = [];
+// One item per space-separated chunk of the visual line, in logical order.
+export function bidiItems(text: string): string[] {
+  const s = text.trim();
+  if (!HEBREW.test(s)) return s.split(/\s+/);
+  // Split into logical runs: English runs, and everything else.
+  const runs: { ltr: boolean; text: string }[] = [];
   let last = 0;
-  for (const m of word.matchAll(LTR_RUN)) {
-    if (m.index > last) parts.push([...word.slice(last, m.index)].reverse().join(""));
-    parts.push(m[0]);
+  for (const m of s.matchAll(LTR_RUN)) {
+    if (m.index > last) runs.push({ ltr: false, text: s.slice(last, m.index) });
+    runs.push({ ltr: true, text: m[0] });
     last = m.index + m[0].length;
   }
-  if (last < word.length) parts.push([...word.slice(last)].reverse().join(""));
-  return parts.reverse().join("");
+  if (last < s.length) runs.push({ ltr: false, text: s.slice(last) });
+
+  // Cut the non-English runs at spaces; whatever touches without a space
+  // forms one item.
+  const items: { ltr: boolean; text: string }[][] = [[]];
+  for (const run of runs) {
+    if (run.ltr) {
+      items[items.length - 1].push(run);
+      continue;
+    }
+    run.text.split(/(\s+)/).forEach((piece) => {
+      if (/^\s+$/.test(piece)) items.push([]);
+      else if (piece) items[items.length - 1].push({ ltr: false, text: piece });
+    });
+  }
+  return items
+    .filter((parts) => parts.length > 0)
+    .map((parts) => {
+      // A chunk that is all English reads as typed. Anything else, even
+      // English with punctuation after it ("only:"), goes right to left in
+      // this right-to-left line, with Hebrew parts mirrored.
+      if (parts.every((p) => p.ltr)) return parts.map((p) => p.text).join("");
+      return parts
+        .map((p) => (p.ltr ? p.text : [...p.text].reverse().join("")))
+        .reverse()
+        .join("");
+    });
 }
 
 function RtlText({ text, style }: { text: string; style: Record<string, unknown> }) {
   const fontSize = style.fontSize as number;
+  // Text with no Hebrew at all ("there is / there are") is a plain
+  // left-to-right line, aligned to the right like the rest of the card.
+  const english = !HEBREW.test(text);
   return (
     <div
       style={{
         display: "flex",
-        flexDirection: "row-reverse",
+        flexDirection: english ? "row" : "row-reverse",
+        justifyContent: english ? "flex-end" : "flex-start",
         flexWrap: "wrap",
         columnGap: Math.round(fontSize * 0.28),
         ...style,
       }}
     >
-      {text.split(/\s+/).map((w, i) => (
-        <span key={i}>{visualWord(w)}</span>
+      {bidiItems(text).map((w, i) => (
+        <span key={i} style={{ whiteSpace: "pre" }}>
+          {w}
+        </span>
       ))}
     </div>
   );
