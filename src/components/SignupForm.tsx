@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Play } from "lucide-react";
 import AppleLogo from "@/components/icons/AppleLogo";
 import GoogleLogo from "@/components/icons/GoogleLogo";
@@ -182,12 +181,7 @@ export default function SignupForm() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:items-start">
       {/* What happens after this form — the next ten minutes, not a pitch. */}
-      <motion.aside
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="lg:order-2 lg:pt-4"
-      >
+      <aside className="rise-in lg:order-2 lg:pt-4">
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight">יוצרים חשבון</h1>
         <p className="mt-2 text-muted text-lg">3 ימים ראשונים חינם, בלי כרטיס אשראי.</p>
         <ol className="mt-8 hidden lg:block space-y-5">
@@ -213,14 +207,9 @@ export default function SignupForm() {
         <p className="mt-6 text-xs text-muted leading-relaxed max-w-sm">
           החשבון הוא מה שמאפשר מסלול לימוד אישי, מורה AI שזוכר אתכם, ושמירת ההתקדמות בכל המכשירים שלכם.
         </p>
-      </motion.aside>
+      </aside>
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="lg:order-1"
-      >
+      <div className="rise-in lg:order-1" style={{ animationDelay: "0.1s" }}>
         <div className="relative bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7">
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
 
@@ -315,7 +304,7 @@ export default function SignupForm() {
             התחברות
           </Link>
         </p>
-      </motion.div>
+      </div>
     </div>
   );
 }

@@ -75,19 +75,14 @@ export default function LoginForm() {
 
   return (
     <div className="max-w-md mx-auto px-4 py-16">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+      <div className="rise-in">
         <h1 className="text-3xl font-black tracking-tight text-center">ברוכים השבים</h1>
         <p className="mt-2 text-center text-muted">התחברו כדי להמשיך ללמוד</p>
-      </motion.div>
+      </div>
 
       {/* The same plate language as the rest of the site: a card with a
           primary-colored edge, not bare inputs floating on the page. */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="relative mt-8 bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7"
-      >
+      <div className="rise-in relative mt-8 bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7" style={{ animationDelay: "0.1s" }}>
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
 
         <div className="space-y-2.5">
@@ -149,16 +144,16 @@ export default function LoginForm() {
 
         <p className="mt-4 text-xs text-muted leading-relaxed">
           התחברות עם Google או Apple בפעם הראשונה פותחת חשבון חדש. בהמשך תתבקשו לאשר את{" "}
-          <Link href="/terms" className="text-primary hover:underline">
+          <Link href="/terms" className="text-primary underline underline-offset-2">
             תנאי השימוש
           </Link>{" "}
           ואת{" "}
-          <Link href="/privacy" className="text-primary hover:underline">
+          <Link href="/privacy" className="text-primary underline underline-offset-2">
             מדיניות הפרטיות
           </Link>
           .
         </p>
-      </motion.div>
+      </div>
 
       <p className="mt-6 text-center text-sm text-muted">
         עדיין אין לכם חשבון?{" "}

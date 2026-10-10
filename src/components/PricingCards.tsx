@@ -256,7 +256,7 @@ export default function PricingCards() {
         <p className="max-w-3xl mx-auto mt-8 text-center text-sm text-muted leading-relaxed">
           המחירים בשקלים והם סופיים: העסק רשום כעוסק פטור ואינו גובה מע״מ. כל מסלול משולם מראש, בתשלום אחד, ומתחדש
           אוטומטית לאותה תקופה עד שתבטלו. אפשר לבטל את החידוש בכל עת בעמוד הפרופיל. פרטים ב
-          <Link href="/terms" className="text-primary hover:underline">
+          <Link href="/terms" className="text-primary underline underline-offset-2">
             תנאי השימוש
           </Link>{" "}
           וב
@@ -272,7 +272,7 @@ export default function PricingCards() {
           disclosed here rather than left to surprise someone when their
           subscription quietly lapses. */}
       {!isNative && (
-        <p className="max-w-3xl mx-auto mt-2 text-center text-[11px] text-muted/70 leading-relaxed">
+        <p className="max-w-3xl mx-auto mt-2 text-center text-[11px] text-muted leading-relaxed">
           בתשלום דרך Apple Pay החידוש האוטומטי אינו נתמך כרגע. בתום התקופה יהיה צורך לבצע תשלום חדש כדי להמשיך.
         </p>
       )}
@@ -298,11 +298,11 @@ export default function PricingCards() {
             נעשה דרך חשבון ה-Apple שלכם, ואפשר לנהל או לבטל את המנוי בכל עת בהגדרות ה-Apple ID.
           </p>
           <p className="text-xs">
-            <a href="/terms" className="text-primary hover:underline">
+            <a href="/terms" className="text-primary underline underline-offset-2">
               תנאי שימוש
             </a>
             {" · "}
-            <a href="/privacy" className="text-primary hover:underline">
+            <a href="/privacy" className="text-primary underline underline-offset-2">
               מדיניות פרטיות
             </a>
             {" · "}
@@ -319,7 +319,7 @@ export default function PricingCards() {
           page, muted, and the last thing before the footer rather than
           sitting right under the price cards. */}
       {!isNative && (
-        <p className="max-w-3xl mx-auto mt-6 text-center text-[11px] text-muted/70 leading-relaxed">
+        <p className="max-w-3xl mx-auto mt-6 text-center text-[11px] text-muted leading-relaxed">
           המוכר: {BUSINESS_NAME}
           {BUSINESS_REGISTRATION ? `, ${BUSINESS_REGISTRATION}` : ""}
           {BUSINESS_ADDRESS ? `, ${BUSINESS_ADDRESS}` : ""}.

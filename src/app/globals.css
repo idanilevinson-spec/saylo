@@ -296,12 +296,13 @@ textarea::placeholder {
   }
 }
 
-/* The landing hero's entrance. Pure CSS so it starts at first paint, not
+/* Entrance for content above the fold on pages people land on directly
+   (landing hero, sign-up, log-in). Pure CSS so it starts at first paint, not
    after hydration (a framer-motion `initial={{ opacity: 0 }}` kept the hero
    invisible until the JS bundle ran: about four seconds of blank card on a
    mid-range phone). Transform only, no fade, so the headline counts as
    painted on the very first frame. */
-@keyframes hero-rise {
+@keyframes rise-in {
   from {
     transform: translateY(20px);
   }
@@ -309,13 +310,17 @@ textarea::placeholder {
     transform: translateY(0);
   }
 }
-.hero-rise {
-  animation: hero-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+.rise-in {
+  animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-rise {
+  .rise-in {
     animation: none;
   }
+}
+
+:root[data-cookie-ack] .cookie-notice {
+  display: none;
 }
 
 /* All English learning content renders through the EnglishText component,
@@ -579,7 +584,7 @@ textarea::placeholder {
   transition: none;
 }
 :root[data-a11y-motion="reduced"] .animate-fade-up,
-:root[data-a11y-motion="reduced"] .hero-rise {
+:root[data-a11y-motion="reduced"] .rise-in {
   animation: none;
 }
 :root[data-a11y-motion="reduced"] *,

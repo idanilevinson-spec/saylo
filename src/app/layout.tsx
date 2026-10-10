@@ -71,6 +71,12 @@ const noFlashThemeScript = `(function(){try{var t=localStorage.getItem("theme");
 // accessibility preferences straight to <html> before first paint, so a
 // returning visitor who turned on high contrast or a larger text size
 // never sees a flash of the unadjusted page.
+// The cookie notice is server-rendered so a first visit sees it on first
+// paint (rendering it only after hydration made it the page's LCP, at about
+// five seconds on a phone). Anyone who already dismissed it, or whose
+// storage is blocked, gets it hidden here before paint.
+const noFlashCookieScript = `(function(){var h=document.documentElement;try{if(localStorage.getItem("saylo-cookie-notice-ack")==="1")h.setAttribute("data-cookie-ack","")}catch(e){h.setAttribute("data-cookie-ack","")}})();`;
+
 const noFlashA11yScript = `(function(){try{var raw=localStorage.getItem("saylo-a11y-prefs");if(!raw)return;var p=JSON.parse(raw);var html=document.documentElement;if(p.fontScale&&p.fontScale!==100)html.setAttribute("data-a11y-font-scale",String(p.fontScale));if(p.highContrast)html.setAttribute("data-a11y-contrast","high");if(p.grayscale)html.setAttribute("data-a11y-grayscale","true");if(p.underlineLinks)html.setAttribute("data-a11y-underline-links","true");if(p.readingSpacing)html.setAttribute("data-a11y-reading-spacing","true");if(p.stopAnimations)html.setAttribute("data-a11y-motion","reduced")}catch(e){}})();`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -87,6 +93,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </Script>
         <Script id="no-flash-a11y" strategy="beforeInteractive">
           {noFlashA11yScript}
+        </Script>
+        <Script id="no-flash-cookie" strategy="beforeInteractive">
+          {noFlashCookieScript}
         </Script>
       </head>
       <body className="min-h-full flex flex-col">
