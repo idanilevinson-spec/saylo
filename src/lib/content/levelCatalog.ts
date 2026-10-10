@@ -50,7 +50,7 @@ export const getLevelCatalog = unstable_cache(
 
 export interface LevelSamples {
   words: { headword: string; translation_he: string; example_en: string }[];
-  grammar: { name_en: string; name_he: string }[];
+  grammar: { slug: string; name_en: string; name_he: string }[];
   readings: { title_en: string; title_he: string }[];
 }
 
@@ -66,11 +66,11 @@ export const getLevelSamples = unstable_cache(
         .eq("cefr_level", level)
         .order("sort_order")
         .limit(12),
-      supabaseAdmin.from("grammar_topics").select("name_en, name_he").eq("status", "published").eq("cefr_level", level).order("sort_order"),
+      supabaseAdmin.from("grammar_topics").select("slug, name_en, name_he").eq("status", "published").eq("cefr_level", level).order("sort_order"),
       supabaseAdmin.from("reading_texts").select("title_en, title_he").eq("status", "published").eq("cefr_level", level).order("sort_order"),
     ]);
     return { words: words.data ?? [], grammar: grammar.data ?? [], readings: readings.data ?? [] };
   },
-  ["level-samples"],
+  ["level-samples-v2"],
   { revalidate: 3600 },
 );
