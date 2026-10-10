@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/english-level-test", label: "מבחן רמה" },
   { href: "/english-grammar", label: "דקדוק באנגלית" },
   { href: "/english-vocabulary", label: "אוצר מילים" },
+  { href: "/english-idioms", label: "ביטויים" },
   { href: "/privacy", label: "פרטיות" },
   { href: "/privacy#cookies", label: "עוגיות" },
   { href: "/terms", label: "תנאי שימוש" },
