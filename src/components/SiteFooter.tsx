@@ -4,6 +4,8 @@ import EnglishText from "@/components/EnglishText";
 
 const LINKS = [
   { href: "/pricing", label: "מסלולים" },
+  { href: "/english-bagrut", label: "בגרות באנגלית" },
+  { href: "/english-level-test", label: "מבחן רמה" },
   { href: "/privacy", label: "פרטיות" },
   { href: "/privacy#cookies", label: "עוגיות" },
   { href: "/terms", label: "תנאי שימוש" },
