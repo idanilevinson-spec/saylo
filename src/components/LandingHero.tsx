@@ -57,12 +57,7 @@ export default function LandingHero() {
           </div>
 
           <div className="grid lg:grid-cols-[1.3fr_1fr] gap-8 lg:gap-10 items-start">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="relative bg-card rounded-lg shadow-2xl p-6 sm:p-9"
-            >
+            <div className="hero-rise relative bg-card rounded-lg shadow-2xl p-6 sm:p-9">
               {/* The card's edge, a broadcast-graphic detail. */}
               <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-primary" />
 
@@ -107,19 +102,15 @@ export default function LandingHero() {
                 </motion.div>
               </div>
               <AppStoreButton className="mt-4" />
-            </motion.div>
+            </div>
 
             {/* The signature moment: not a screenshot of the product but
                 the product's real mechanism, playing live and looping
                 through a handful of real mistakes — inside the first
                 viewport on desktop, not scrolled past. */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <div className="hero-rise" style={{ animationDelay: "0.15s" }}>
               <LandingCorrectionDemo />
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
