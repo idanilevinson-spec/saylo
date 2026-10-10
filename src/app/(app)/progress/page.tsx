@@ -418,38 +418,37 @@ function ScoreHistoryPanel({ summary }: { summary: ScoreSummary | null }) {
       transition={{ duration: 0.4, delay: 0.18 }}
       className="mt-4 bg-card border border-card-border rounded-lg p-6"
     >
-      <h2 className="font-bold">היסטוריית מבחנים</h2>
-      <p className="text-xs text-muted mt-0.5">כל התרגולים, המבחנים והשיחות עם ה-AI בטווח שנבחר למעלה</p>
+      <h2 className="font-bold">מה עשיתם</h2>
+      <p className="text-xs text-muted mt-0.5">תרגולים, מבחנים ושיחות עם המורה בטווח שבחרתם למעלה</p>
 
       {!summary ? (
         <div className="mt-5 h-24 rounded-lg bg-background-2 animate-pulse" />
       ) : (
         <>
-          <div className="mt-5 grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-lg bg-background-2 p-3">
-              <EnglishText as="p" className="text-2xl font-bold">
-                {summary.testsCount}
-              </EnglishText>
-              <p className="text-xs text-muted mt-0.5">פעילויות</p>
+          {/* One line of numbers, read as a sentence, not three identical tiles. */}
+          <dl className="mt-5 flex flex-wrap items-baseline gap-x-8 gap-y-3 border-y border-card-border py-4">
+            <div className="flex items-baseline gap-2">
+              <dd className="chyron text-4xl leading-none tabular-nums">{summary.testsCount}</dd>
+              <dt className="text-sm text-muted">פעילויות</dt>
             </div>
-            <div className="rounded-lg bg-background-2 p-3">
-              <p className="text-2xl font-bold">{summary.averageScore !== null ? `${summary.averageScore}%` : "—"}</p>
-              <p className="text-xs text-muted mt-0.5">ציון ממוצע</p>
+            <div className="flex items-baseline gap-2">
+              <dd className="chyron text-4xl leading-none tabular-nums" dir="ltr">
+                {summary.averageScore !== null ? `${summary.averageScore}%` : "–"}
+              </dd>
+              <dt className="text-sm text-muted">ציון ממוצע</dt>
             </div>
-            <div className="rounded-lg bg-background-2 p-3">
-              <EnglishText as="p" className="text-2xl font-bold">
-                {summary.xpEarned}
-              </EnglishText>
-              <p className="text-xs text-muted mt-0.5">XP נצבר</p>
+            <div className="flex items-baseline gap-2">
+              <dd className="chyron text-4xl leading-none tabular-nums">{summary.xpEarned}</dd>
+              <dt className="text-sm text-muted">XP</dt>
             </div>
-          </div>
+          </dl>
 
           {summary.items.length === 0 ? (
             <p className="mt-5 py-4 text-center text-sm text-muted">אין עדיין פעילות בטווח הזה</p>
           ) : (
-            <div className="mt-5 space-y-2">
+            <div className="mt-2">
               {summary.items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between gap-3 p-3 rounded-lg bg-background-2">
+                <div key={item.id} className="flex items-center justify-between gap-3 border-b border-card-border py-3 last:border-0">
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{item.typeLabel}</p>
                     <p className="text-xs text-muted mt-0.5">
@@ -462,7 +461,7 @@ function ScoreHistoryPanel({ summary }: { summary: ScoreSummary | null }) {
                   </div>
                   <span
                     className={`shrink-0 text-sm font-medium ${
-                      item.scorePct === null ? "text-muted" : item.scorePct >= 60 ? "text-success" : "text-danger"
+                      item.scorePct === null ? "text-muted" : item.scorePct >= 60 ? "text-success" : item.scorePct >= 40 ? "text-foreground" : "text-danger"
                     }`}
                   >
                     {item.detail}
