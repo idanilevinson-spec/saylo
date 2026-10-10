@@ -1,106 +1,120 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { CheckCircle2, Circle, CircleDot, Sparkles } from "lucide-react";
-import EnglishText from "@/components/EnglishText";
-import CefrBadge from "@/components/CefrBadge";
-import ContentCard from "@/components/ContentCard";
-import MotionLink from "@/components/MotionLink";
+import Link from "next/link";
+import { Map as MapIcon, Sparkles, ChevronLeft, CheckCircle2, CircleDot } from "lucide-react";
+import AreaHeader from "@/components/content/AreaHeader";
+import LevelShelves from "@/components/content/LevelShelves";
+import TopicTile from "@/components/content/TopicTile";
 import { useAuth } from "@/context/AuthProvider";
+import { supabase } from "@/lib/supabase/browserClient";
 import { listTopicsWithMastery, type TopicWithMastery } from "@/lib/content/topicMastery";
-import { getTopicIcon } from "@/lib/content/topicIcons";
+import { overallLevel } from "@/lib/content/levelOrder";
+import type { CefrLevel, SkillArea } from "@/types/database";
 
-const STATUS_META = {
-  not_started: { icon: Circle, className: "text-muted" },
-  in_progress: { icon: CircleDot, className: "text-accent-hover" },
-  mastered: { icon: CheckCircle2, className: "text-success" },
-} as const;
-
+// Every vocabulary and grammar topic, arranged around the learner's level
+// like the other areas — not one long A1-to-C2 list to scroll through.
 export default function LearnPage() {
   const { profile, loading } = useAuth();
   const [entries, setEntries] = useState<TopicWithMastery[] | null>(null);
+  const [level, setLevel] = useState<CefrLevel | null>(null);
 
   useEffect(() => {
     if (!profile) return;
     listTopicsWithMastery(profile.id).then(setEntries);
+    Promise.all([
+      supabase
+        .from("placement_tests")
+        .select("result_cefr_overall")
+        .eq("profile_id", profile.id)
+        .eq("status", "completed")
+        .order("completed_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase.from("skill_levels").select("skill, cefr_level").eq("profile_id", profile.id),
+    ]).then(([placement, skills]) => {
+      const bySkill: Partial<Record<SkillArea, CefrLevel>> = {};
+      for (const s of skills.data ?? []) bySkill[s.skill as SkillArea] = s.cefr_level as CefrLevel;
+      setLevel(overallLevel((placement.data?.result_cefr_overall as CefrLevel | null) ?? null, bySkill));
+    });
   }, [profile]);
 
   if (loading || entries === null) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="h-9 w-56 rounded-lg bg-background-2 animate-pulse" />
-        <div className="mt-6 h-24 rounded-lg bg-background-2 animate-pulse" />
-        <div className="mt-6 space-y-3">
+      <div className="max-w-4xl mx-auto px-4 pt-10 pb-16">
+        <div className="h-24 rounded-lg bg-background-2 animate-pulse" />
+        <div className="mt-8 grid sm:grid-cols-2 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-16 rounded-lg bg-background-2 animate-pulse" />
+            <div key={i} className="h-24 rounded-lg bg-background-2 animate-pulse" />
           ))}
         </div>
       </div>
     );
   }
 
-  const masteredCount = entries.filter((e) => e.status === "mastered").length;
+  const mastered = entries.filter((e) => e.status === "mastered").length;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <h1 className="text-3xl font-bold">מסלול הלימוד שלי</h1>
-        <p className="mt-2 text-muted">
-          כל הנושאים, מהבסיס ועד המתקדם. {masteredCount} מתוך {entries.length} כבר בשליטה מלאה.
-        </p>
-      </motion.div>
+    <div className="max-w-4xl mx-auto px-4 pt-10 pb-16">
+      <AreaHeader
+        icon={MapIcon}
+        title="מסלול הלימוד"
+        description={`כל נושאי אוצר המילים והדקדוק. ${mastered} מתוך ${entries.length} כבר בשליטה מלאה.`}
+        level={level}
+        levelLabel="הרמה שלכם"
+      />
 
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}>
-        <MotionLink
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          href="/learn/today"
-          className="mt-6 flex items-center gap-4 p-5 rounded-lg border border-accent/30 bg-accent/5 hover:border-accent/50 transition-colors"
-        >
-          <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent-hover">
-            <Sparkles size={20} />
-          </span>
-          <div>
-            <p className="font-bold">השיעור היומי שלכם</p>
-            <p className="text-sm text-muted mt-0.5">נושא אחד, נבחר במיוחד בשבילכם לפי מבחן הרמה וההתקדמות שלכם</p>
-          </div>
-        </MotionLink>
-      </motion.div>
+      <Link
+        href="/learn/today"
+        className="game-press group mt-8 flex items-center gap-4 rounded-lg border border-card-border bg-card p-4 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+      >
+        <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-ink">
+          <Sparkles size={20} aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-bold">השיעור היומי</span>
+          <span className="block text-sm text-muted">נושא אחד שנבחר לפי הרמה וההתקדמות שלכם</span>
+        </span>
+        <ChevronLeft size={18} aria-hidden="true" className="shrink-0 text-muted transition-transform group-hover:-translate-x-0.5" />
+      </Link>
 
-      {entries.length === 0 ? (
-        <p className="mt-10 text-muted">התוכן בדרך. כדאי לחזור לבדוק בקרוב.</p>
-      ) : (
-        <ol className="mt-6 space-y-3">
-          {entries.map((entry, i) => {
-            const Icon = getTopicIcon(entry.kind, entry.slug);
-            const status = STATUS_META[entry.status];
-            const StatusIcon = status.icon;
-            return (
-              <li key={entry.id}>
-                <ContentCard href={entry.href} index={i} className="p-4">
-                  <div className="flex items-center gap-4">
-                    <span className="w-9 h-9 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                      <Icon size={18} />
-                    </span>
-                    <span className="flex-1 min-w-0 flex flex-col items-start gap-1">
-                      <EnglishText as="span" className="max-w-full truncate font-bold">
-                        {entry.name_en}
-                      </EnglishText>
-                      <span className="max-w-full truncate text-xs font-medium text-foreground/60">
-                        {entry.name_he}
-                        {entry.accuracy !== null && ` · ${entry.accuracy}%`}
+      <div className="mt-10">
+        {entries.length === 0 ? (
+          <p className="text-muted">התוכן בדרך. כדאי לחזור לבדוק בקרוב.</p>
+        ) : (
+          <LevelShelves
+            items={entries}
+            level={level}
+            levelOf={(e) => e.cefr_level}
+            keyOf={(e) => `${e.kind}-${e.id}`}
+            renderItem={(e) => (
+              <TopicTile
+                href={e.href}
+                titleEn={e.name_en}
+                titleHe={e.name_he}
+                level={e.cefr_level}
+                done={e.status === "mastered"}
+                meta={
+                  <>
+                    <span>{e.kind === "grammar" ? "דקדוק" : "אוצר מילים"}</span>
+                    {e.status === "mastered" ? (
+                      <span className="inline-flex items-center gap-1 font-medium text-success">
+                        <CheckCircle2 size={12} aria-hidden="true" /> בשליטה · {e.accuracy}%
                       </span>
-                      <CefrBadge level={entry.cefr_level} />
-                    </span>
-                    <StatusIcon size={20} className={`shrink-0 ${status.className}`} aria-label={entry.status} />
-                  </div>
-                </ContentCard>
-              </li>
-            );
-          })}
-        </ol>
-      )}
+                    ) : e.status === "in_progress" ? (
+                      <span className="inline-flex items-center gap-1 font-medium text-accent-hover">
+                        <CircleDot size={12} aria-hidden="true" /> בתהליך · {e.accuracy}%
+                      </span>
+                    ) : (
+                      <span>עוד לא התחלתם</span>
+                    )}
+                  </>
+                }
+              />
+            )}
+          />
+        )}
+      </div>
     </div>
   );
 }

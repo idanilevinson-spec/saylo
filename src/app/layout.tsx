@@ -102,7 +102,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AccessibilityProvider>
           <AuthProvider>
             <Navbar />
-            <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+            <main id="main-content" tabIndex={-1} className="flex-1 pb-16 sm:pb-0 focus:outline-none">
               <PageTransition>{children}</PageTransition>
             </main>
             <SupportChat />

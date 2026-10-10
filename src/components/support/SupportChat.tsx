@@ -347,10 +347,10 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
         aria-controls="support-panel"
         aria-label={open ? "סגירת חלון העזרה" : "עזרה ותמיכה"}
         title={open ? "סגירה" : "עזרה ותמיכה"}
-        // Stacked directly above the accessibility button (bottom-4 end-4,
-        // also a 48px circle), so the two read as one column of tools in
-        // the corner instead of a wide bar across the bottom of a phone.
-        className={`fixed bottom-20 end-4 z-[58] w-12 h-12 rounded-full bg-card text-primary border border-card-border shadow-lg flex items-center justify-center hover:border-primary/60 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+        // Desktop: stacked above the accessibility button. Phones: beside
+        // it in one low row, because a two-high column covered answers,
+        // list items and the end of every page on a small screen.
+        className={`fixed bottom-3 end-[4.25rem] sm:bottom-20 sm:end-4 z-[58] w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-card text-primary border border-card-border shadow-lg flex items-center justify-center hover:border-primary/60 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
           open ? "max-sm:hidden" : ""
         }`}
         style={{ marginBottom: "env(safe-area-inset-bottom)" }}
