@@ -73,9 +73,9 @@ export default async function EnglishLevelTestPage() {
               return (
                 <li key={l} className="grid gap-3 rounded-lg border border-card-border bg-card p-4 sm:grid-cols-[7rem_1fr_auto] sm:items-center">
                   <p className="flex items-baseline gap-2">
-                    <span className="chyron text-4xl leading-none text-primary" dir="ltr">
+                    <Link href={`/english-level/${l.toLowerCase()}`} className="chyron text-4xl leading-none text-primary hover:underline" dir="ltr">
                       {l}
-                    </span>
+                    </Link>
                     <span className="font-bold">{CEFR_NAME_HE[l]}</span>
                   </p>
                   <p className="text-sm text-muted leading-relaxed">{getCanDoStatement("speaking", l)}</p>

@@ -93,7 +93,9 @@ export default function EnglishBagrutPage() {
                     return (
                       <li key={code} className="rounded-lg bg-background-2 p-3.5">
                         <p className="flex items-baseline justify-between gap-2">
-                          <span className="chyron text-2xl">שאלון {code}</span>
+                          <Link href={`/english-bagrut/${code.toLowerCase()}`} className="chyron text-2xl hover:text-primary hover:underline">
+                            שאלון {code}
+                          </Link>
                           {f.timeMinutes && (
                             <span className="inline-flex items-center gap-1 text-xs text-muted">
                               <Timer size={12} aria-hidden="true" /> {f.timeMinutes} דק׳
