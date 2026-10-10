@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AlertTriangle, BookOpenText, CheckCircle2, ChevronLeft, Clock, Headphones, PenLine, Timer, Layers, BookOpen } from "lucide-react";
+import { BookOpenText, CheckCircle2, ChevronLeft, Clock, Headphones, PenLine, Timer, Layers, BookOpen } from "lucide-react";
 import {
   BAGRUT_MODULE_FORMATS,
   modulesForUnits,
@@ -12,6 +12,7 @@ import { getPublishableSampleUnits } from "@/lib/content/bagrut/sampleUnits";
 import { skillsForModule } from "@/lib/content/bagrut/skills";
 import { bestScore, getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
 import SetBagrutTrackButton from "@/components/SetBagrutTrackButton";
+import BagrutCredit from "@/components/BagrutCredit";
 
 interface PageProps {
   params: Promise<{ units: string }>;
@@ -59,10 +60,6 @@ export default async function BagrutTrackPage({ params }: PageProps) {
         לחזק לקראתו, וערכות תרגול באותו מבנה. בכל ערכה אפשר להפעיל שעון באורך הבחינה האמיתית.
       </p>
 
-      <div role="note" className="mt-5 flex gap-3 rounded-lg border border-accent/40 bg-accent/[0.07] p-4 text-sm leading-relaxed">
-        <AlertTriangle size={18} aria-hidden="true" className="shrink-0 text-accent-hover mt-0.5" />
-        <p>ההסברים וערכות התרגול נכתבו על ידי AI לפי מבנה שאלון מאומת, ולא נבדקו על ידי מורה מוסמך.</p>
-      </div>
 
       {/* In-page index: jump straight to a questionnaire. */}
       <nav aria-label="שאלונים במסלול" className="mt-6 flex gap-2">
@@ -82,6 +79,7 @@ export default async function BagrutTrackPage({ params }: PageProps) {
           <ModuleBlock key={code} code={code} progress={progress} />
         ))}
       </div>
+      <BagrutCredit className="mt-12" />
     </div>
   );
 }

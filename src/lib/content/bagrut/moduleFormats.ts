@@ -46,7 +46,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
       {
         nameHe: "הבנת הנשמע",
         points: 30,
-        notesHe: "קטע שמע קצר (כ-3 דקות) — שיחה, ראיון, תיאור או דוח.",
+        notesHe: "קטע שמע קצר, כ-3 דקות: שיחה, ראיון, תיאור או דוח.",
       },
       {
         nameHe: "הבנת הנקרא",
@@ -90,7 +90,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
       {
         nameHe: "הבנת הנקרא",
         points: 70,
-        notesHe: "קטעי ספרות (סיפור קצר ושיר, מתוך רשימה שמתעדכנת מדי מחזור) שנלמדים מראש — לא טקסט לא מוכר.",
+        notesHe: "קטעי ספרות (סיפור קצר ושיר, מתוך רשימה שמתעדכנת מדי מחזור) שנלמדים מראש, ולא טקסט שרואים לראשונה בבחינה.",
       },
       { nameHe: "כתיבה", points: 30, wordCountRange: [100, 120] },
     ],
@@ -116,7 +116,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
         points: 30,
         questionCount: 5,
         questionFormatsHe: ["השלמת משפטים", "רב-ברירה", "התאמה"],
-        notesHe: "מתוך רשימות המילים הרשמיות (Core). אין במודול הזה כתיבה או האזנה — טעות נפוצה לחשוב שיש.",
+        notesHe: "מתוך רשימות המילים הרשמיות (Core). אין במודול הזה כתיבה או האזנה, למרות שרבים חושבים שיש.",
       },
     ],
     verified: true,

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  AlertTriangle,
   ChevronLeft,
   History,
   BookOpenText,
@@ -23,6 +22,7 @@ import { getPublishableSampleUnits, getSampleUnit } from "@/lib/content/bagrut/s
 import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/lib/content/bagrut/skills";
 import { getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
 import type { BagrutUnitProgress } from "@/types/database";
+import BagrutCredit from "@/components/BagrutCredit";
 
 export const metadata: Metadata = {
   title: "בגרות באנגלית — Saylo",
@@ -151,13 +151,6 @@ export default async function BagrutHubPage() {
         </div>
       </section>
 
-      <div role="note" className="mt-4 flex gap-2.5 rounded-lg bg-background-2 px-4 py-3 text-xs leading-relaxed text-muted">
-        <AlertTriangle size={15} aria-hidden="true" className="shrink-0 text-accent-hover mt-px" />
-        <p>
-          מבנה השאלונים אומת מול מקורות ציבוריים. ההסברים, הדוגמאות וערכות התרגול נכתבו על ידי AI ולא נבדקו על ידי מורה מוסמך.
-          מתאים כתרגול נוסף, לא כתחליף לחומר לימוד רשמי או להנחיית מורה.
-        </p>
-      </div>
 
       <section aria-labelledby="tracks-title" className="mt-12">
         <h2 id="tracks-title" className="text-xl font-black tracking-tight">
@@ -265,6 +258,7 @@ export default async function BagrutHubPage() {
         מבנה השאלונים: {(Object.values(BAGRUT_MODULE_FORMATS).every((f) => f.verified) ? "כל שבעת המודולים אומתו" : "חלק מהמודולים אומתו")} מול ארכיון
         משרד החינוך ומדריכי הכנה ציבוריים.
       </p>
+      <BagrutCredit className="mt-1" />
     </div>
   );
 }

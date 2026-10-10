@@ -39,9 +39,10 @@
 // strictly need it, but showing it anyway is never wrong).
 
 import { BAGRUT_MODULE_FORMATS, type BagrutModuleCode } from "./moduleFormats";
+import { BAGRUT_SAMPLE_UNITS_SET3 } from "./sampleUnitsSet3";
 
 export const BAGRUT_AI_CONTENT_DISCLAIMER =
-  "החומר הזה נוצר על ידי AI, בהתבסס על מבנה הבחינה הרשמי — הוא לא נבדק על ידי מורה מוסמך ואינו רשמי או מטעם משרד החינוך. מומלץ להשתמש בו כתרגול נוסף, ולא כתחליף לחומר לימוד רשמי או להנחיית מורה.";
+  "התוכן באזור הבגרות נבנה בשיתוף אדם בעל ידע רב באנגלית ובינה מלאכותית, לפי מבנה השאלונים שמפורסם לציבור. הוא מקורי, ואינו רשמי או מטעם משרד החינוך.";
 
 export interface BagrutReadingQuestion {
   formatHe: string;
@@ -300,7 +301,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "A",
     unitSlug: "1",
-    titleHe: "דוגמה למודול A — הדרכה בקמפוס",
+    titleHe: "הדרכה בקמפוס",
     teacherReviewed: false,
     aiContentDisclosed: true,
     listeningTask: {
@@ -391,7 +392,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "B",
     unitSlug: "1",
-    titleHe: "דוגמה למודול B — הפינה הירוקה",
+    titleHe: "הפינה הירוקה",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [GREEN_CORNER_PASSAGE],
@@ -445,7 +446,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "C",
     unitSlug: "1",
-    titleHe: "דוגמה למודול C — קפה התיקונים",
+    titleHe: "קפה התיקונים",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [REPAIR_CAFE_PASSAGE],
@@ -501,7 +502,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "D",
     unitSlug: "1",
-    titleHe: "דוגמה לתרגול ניתוח ספרותי בסגנון מודול D — \"השיעור האחרון\"",
+    titleHe: "השיעור האחרון (סיפור)",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [LAST_LESSON_STORY],
@@ -547,7 +548,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "E",
     unitSlug: "1",
-    titleHe: "דוגמה למודול E — אופניים שיתופיים",
+    titleHe: "אופניים שיתופיים",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [BIKE_SHARE_PASSAGE],
@@ -655,7 +656,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "F",
     unitSlug: "1",
-    titleHe: "דוגמה למודול F — הספרייה שלא נסגרת",
+    titleHe: "הספרייה שלא נסגרת",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [LIBRARY_PASSAGE],
@@ -712,7 +713,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "G",
     unitSlug: "1",
-    titleHe: "דוגמה למודול G — המחיר של זמינות מתמדת",
+    titleHe: "המחיר של זמינות מתמדת",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [ALWAYS_REACHABLE_PASSAGE],
@@ -769,7 +770,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "A",
     unitSlug: "2",
-    titleHe: "דוגמה שנייה למודול A — מסיבה שקטה",
+    titleHe: "מסיבה שקטה",
     teacherReviewed: false,
     aiContentDisclosed: true,
     listeningTask: {
@@ -859,7 +860,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "B",
     unitSlug: "2",
-    titleHe: "דוגמה שנייה למודול B — מועדון הרובוטיקה",
+    titleHe: "מועדון הרובוטיקה",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [ROBOTICS_CLUB_PASSAGE],
@@ -913,7 +914,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "C",
     unitSlug: "2",
-    titleHe: "דוגמה שנייה למודול C — קפה שמחכה למישהו",
+    titleHe: "קפה שמחכה למישהו",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [SUSPENDED_COFFEE_PASSAGE],
@@ -971,7 +972,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "D",
     unitSlug: "2",
-    titleHe: "דוגמה שנייה לתרגול ניתוח ספרותי בסגנון מודול D — \"מה שהבית זוכר\" (שיר)",
+    titleHe: "מה שהבית זוכר (שיר)",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [HOUSE_REMEMBERS_POEM],
@@ -1017,7 +1018,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "E",
     unitSlug: "2",
-    titleHe: "דוגמה שנייה למודול E — ספריית הכלים",
+    titleHe: "ספריית הכלים",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [TOOL_LIBRARY_PASSAGE],
@@ -1130,7 +1131,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "F",
     unitSlug: "2",
-    titleHe: "דוגמה שנייה למודול F — דבורים על הגג",
+    titleHe: "דבורים על הגג",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [ROOFTOP_BEES_PASSAGE],
@@ -1186,7 +1187,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
   {
     moduleCode: "G",
     unitSlug: "2",
-    titleHe: "דוגמה שנייה למודול G — הזכות להישכח",
+    titleHe: "הזכות להישכח",
     teacherReviewed: false,
     aiContentDisclosed: true,
     readingPassages: [RIGHT_TO_BE_FORGOTTEN_PASSAGE],
@@ -1239,6 +1240,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
       wordCountRange: [120, 140],
     },
   },
+  ...BAGRUT_SAMPLE_UNITS_SET3,
 ] as const;
 
 export function getSampleUnit(moduleCode: BagrutModuleCode, unitSlug: string): BagrutSampleUnit | undefined {

@@ -4,7 +4,7 @@ import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Volume2, Turtle, Target, GraduationCap, AlertTriangle, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, ChevronLeft, type LucideIcon } from "lucide-react";
+import { Volume2, Turtle, Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, ChevronLeft, type LucideIcon } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import AiConsentGate from "@/components/AiConsentGate";
@@ -15,8 +15,8 @@ import { getCanDoStatement } from "@/lib/content/canDoStatements";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import type { CefrLevel, PlacementQuestion, SkillArea } from "@/types/database";
 import { modulesForUnits, type BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
-import { BAGRUT_AI_CONTENT_DISCLAIMER } from "@/lib/content/bagrut/sampleUnits";
 import { BAGRUT_PLACEMENT_SECTIONS, BAGRUT_READINESS_COPY, bagrutReadiness } from "@/lib/content/bagrut/placementItems";
+import BagrutCredit from "@/components/BagrutCredit";
 
 const SKILL_LABELS_HE: Record<SkillArea, string> = {
   vocabulary: "אוצר מילים",
@@ -412,10 +412,7 @@ export default function PlacementPage() {
             הקטע קצר יותר מזה שבבחינה, אבל השאלות הן מאותם סוגים: רעיון מרכזי, פרטים מהטקסט, מילות הפניה והסקת
             מסקנות. אפשר לחזור לקטע תוך כדי.
           </p>
-          <div role="note" className="mt-4 flex gap-2.5 rounded-lg border border-accent/40 bg-accent/[0.07] p-3 text-xs leading-relaxed">
-            <AlertTriangle size={15} aria-hidden="true" className="shrink-0 text-accent-hover mt-0.5" />
-            <p>{BAGRUT_AI_CONTENT_DISCLAIMER}</p>
-          </div>
+          <BagrutCredit className="mt-3" />
 
           <h2 className="mt-6 flex items-center gap-2 font-bold text-sm text-muted">
             <BookOpenText size={16} aria-hidden="true" /> הבנת הנקרא

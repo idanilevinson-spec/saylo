@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AlertTriangle, ChevronLeft, ListOrdered, TriangleAlert } from "lucide-react";
+import { ChevronLeft, ListOrdered, TriangleAlert } from "lucide-react";
 import { BAGRUT_SKILL_KIND_LABEL, getBagrutSkill } from "@/lib/content/bagrut/skills";
 import { BAGRUT_MODULE_FORMATS, type BagrutModuleCode } from "@/lib/content/bagrut/moduleFormats";
 import BagrutSkillExample from "@/components/BagrutSkillExample";
+import BagrutCredit from "@/components/BagrutCredit";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -88,10 +89,7 @@ export default async function BagrutSkillPage({ params, searchParams }: PageProp
         <BagrutSkillExample skill={skill} />
       </section>
 
-      <div role="note" className="mt-6 flex gap-3 rounded-lg border border-accent/40 bg-accent/[0.07] p-4 text-sm leading-relaxed">
-        <AlertTriangle size={18} aria-hidden="true" className="shrink-0 text-accent-hover mt-0.5" />
-        <p>ההסבר והדוגמה נכתבו על ידי AI, הם מקוריים ולא נלקחו מבחינה אמיתית, ולא נבדקו על ידי מורה מוסמך.</p>
-      </div>
+      <BagrutCredit className="mt-12" />
     </div>
   );
 }
