@@ -11,15 +11,54 @@ import LandingFinalCta from "@/components/LandingFinalCta";
 import SiteFooter from "@/components/SiteFooter";
 import AccountDeletedNotice from "@/components/AccountDeletedNotice";
 import { getLevelCatalog } from "@/lib/content/levelCatalog";
+import { APP_STORE_URL, INSTAGRAM_URL } from "@/lib/site/links";
+import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 export const metadata: Metadata = {
   title: "Saylo — לומדים אנגלית בקצב שלכם",
+};
+
+// Who we are, for search engines: the organization, the site, and the
+// iPhone app. Facts only (no ratings or review counts we don't have).
+const SITE = "https://www.saylolearn.com";
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE}/#org`,
+      name: "Saylo",
+      url: SITE,
+      logo: `${SITE}/logo-mark.png`,
+      email: CONTACT_EMAIL,
+      sameAs: [APP_STORE_URL, INSTAGRAM_URL],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE}/#website`,
+      name: "Saylo",
+      url: SITE,
+      inLanguage: "he",
+      publisher: { "@id": `${SITE}/#org` },
+    },
+    {
+      "@type": "MobileApplication",
+      name: "Saylo",
+      operatingSystem: "iOS",
+      applicationCategory: "EducationalApplication",
+      inLanguage: ["he", "en"],
+      installUrl: APP_STORE_URL,
+      publisher: { "@id": `${SITE}/#org` },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "ILS" },
+    },
+  ],
 };
 
 export default async function HomePage() {
   const catalog = await getLevelCatalog();
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <Suspense fallback={null}>
         <AccountDeletedNotice />
       </Suspense>

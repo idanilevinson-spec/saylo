@@ -4,8 +4,9 @@ import { useSyncExternalStore } from "react";
 import { Capacitor } from "@capacitor/core";
 import { ChevronLeft, Smartphone } from "lucide-react";
 
-// Saylo's page on the Israeli App Store — the app is only listed there.
-export const APP_STORE_URL = "https://apps.apple.com/il/app/id6809848231";
+import { APP_STORE_URL } from "@/lib/site/links";
+
+export { APP_STORE_URL };
 
 // iPhones, and iPads (which report themselves as a Mac but have touch).
 // In development, ?iphone-preview shows it on any device, so the layout can
