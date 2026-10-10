@@ -126,6 +126,16 @@ ${rows.join(",\n")}
 `);
 }
 
+if (READING.length)
+  out.push(`-- Check: texts from this seed, and their questions.
+select
+  (select count(*) from public.reading_texts where title_en in (${readingTitles})) as texts,
+  (select count(*) from public.exercises e join public.reading_texts rt on rt.id = e.reading_text_id
+     where rt.title_en in (${readingTitles})) as questions,
+  (select count(*) from public.reading_open_questions oq join public.reading_texts rt on rt.id = oq.reading_text_id
+     where rt.title_en in (${readingTitles})) as open_questions;
+`);
+
 const allClips = [...LISTENING.map((l) => l.title_en), ...existingTitles];
 if (allClips.length)
   out.push(`-- Check: clips from this seed, and their questions.

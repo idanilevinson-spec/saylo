@@ -220,3 +220,11 @@ join (values
   ('Does Language Shape Thought?', 'Evaluate the difference between the strong and weak versions of the hypothesis described in the text.', 2)
 ) as gen(title_en, question_en, sort_order)
   on rt.title_en = gen.title_en;
+
+-- Check: texts from this seed, and their questions.
+select
+  (select count(*) from public.reading_texts where title_en in ('My Grandmother''s Garden', 'A Day at the Beach', 'Lost at the Airport', 'Our Class Trip to the Desert', 'Saving Money as a Student', 'Why I Started Running', 'The Hidden Cost of Fast Fashion', 'How Bees Keep Food on Our Tables', 'The Architecture of Habit', 'Why We Trust Strangers Online', 'In Defense of Boredom', 'Does Language Shape Thought?')) as texts,
+  (select count(*) from public.exercises e join public.reading_texts rt on rt.id = e.reading_text_id
+     where rt.title_en in ('My Grandmother''s Garden', 'A Day at the Beach', 'Lost at the Airport', 'Our Class Trip to the Desert', 'Saving Money as a Student', 'Why I Started Running', 'The Hidden Cost of Fast Fashion', 'How Bees Keep Food on Our Tables', 'The Architecture of Habit', 'Why We Trust Strangers Online', 'In Defense of Boredom', 'Does Language Shape Thought?')) as questions,
+  (select count(*) from public.reading_open_questions oq join public.reading_texts rt on rt.id = oq.reading_text_id
+     where rt.title_en in ('My Grandmother''s Garden', 'A Day at the Beach', 'Lost at the Airport', 'Our Class Trip to the Desert', 'Saving Money as a Student', 'Why I Started Running', 'The Hidden Cost of Fast Fashion', 'How Bees Keep Food on Our Tables', 'The Architecture of Habit', 'Why We Trust Strangers Online', 'In Defense of Boredom', 'Does Language Shape Thought?')) as open_questions;
