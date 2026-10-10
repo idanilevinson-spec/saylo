@@ -7,9 +7,8 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import EnglishText from "@/components/EnglishText";
-import MotionLink from "@/components/MotionLink";
 import { useAuth } from "@/context/AuthProvider";
-import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
+import { PRICING_PLANS, TRIAL_DAYS, monthlyEquivalent, type PricingPlan } from "@/lib/subscriptions/plans";
 import {
   BUSINESS_ADDRESS,
   BUSINESS_NAME,
@@ -35,6 +34,16 @@ const isNative = Capacitor.isNativePlatform();
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
+const INCLUDED = [
+  "מבחן רמה ותוכנית יומית לפי הרמה שלכם",
+  "שיחות עם המורה, בכתב ובקול",
+  "תרגול הגייה עם זיהוי דיבור",
+  "משוב אישי על כתיבה",
+  "תרגול בלי מגבלת לבבות",
+  "חזרה חכמה על מה שטעיתם בו",
+  "כל התוכן, מ-A1 עד C2, וגם הכנה לבגרות",
+];
+
 export default function PricingCards() {
   const router = useRouter();
   const { session, profile } = useAuth();
@@ -43,6 +52,35 @@ export default function PricingCards() {
   const [nativePackages, setNativePackages] = useState<NativePlanPackage[]>([]);
   const [restoring, setRestoring] = useState(false);
   const [restoreMessage, setRestoreMessage] = useState<string | null>(null);
+  const [selectedCode, setSelectedCode] = useState<string>(
+    (PRICING_PLANS.find((p) => p.badge) ?? PRICING_PLANS[PRICING_PLANS.length - 1]).code,
+  );
+  const selected = PRICING_PLANS.find((p) => p.code === selectedCode) ?? PRICING_PLANS[0];
+
+  // On the native app every price shown must be exactly what Apple charges,
+  // so it comes from StoreKit rather than plans.ts.
+  const nativeFor = (plan: PricingPlan) => (isNative ? nativePackages.find((p) => p.planCode === plan.code) : undefined);
+  function priceOf(plan: PricingPlan): { total: string; perMonth: string } {
+    const native = nativeFor(plan);
+    if (native) {
+      const fmt = new Intl.NumberFormat("en", { style: "currency", currency: native.currencyCode, maximumFractionDigits: 0 });
+      return { total: native.priceString, perMonth: fmt.format(native.price / plan.months) };
+    }
+    return { total: `₪${plan.totalPrice}`, perMonth: `₪${monthlyEquivalent(plan)}` };
+  }
+  // Percent saved per month against the monthly plan, from real prices.
+  function savingOf(plan: PricingPlan): number | null {
+    if (plan.months === 1) return null;
+    const monthly = PRICING_PLANS.find((p) => p.months === 1);
+    if (!monthly) return null;
+    const nm = nativeFor(monthly);
+    const np = nativeFor(plan);
+    const base = nm ? nm.price : monthly.totalPrice;
+    const per = np ? np.price / plan.months : plan.totalPrice / plan.months;
+    if (isNative && (!nm || !np)) return null;
+    const pct = Math.round((1 - per / base) * 100);
+    return pct >= 1 ? pct : null;
+  }
 
   async function handleRestore() {
     setRestoring(true);
@@ -110,106 +148,108 @@ export default function PricingCards() {
         </p>
       )}
 
-      {/* Below lg this collapses from a 5-up grid to a single stack — at
-          that width, 5 full-size, near-identical cards read as pure
-          repetition and bury the recommended plan at the bottom of a long
-          scroll. The badge plan floats to the top of the stack (order-first,
-          canceled again at lg so the desktop grid position is untouched),
-          and the other four collapse into a compact comparison row (label +
-          price left, a small button right) instead of repeating the same
-          tall block four times. pb-24 keeps the last row clear of the fixed
-          accessibility-widget button that otherwise overlaps it. */}
-      <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-5 pb-24 lg:pb-0">
-        {PRICING_PLANS.map((plan, i) => {
-          // On the native app the price shown must be exactly what Apple
-          // charges, so it comes from StoreKit rather than plans.ts.
-          const native = isNative ? nativePackages.find((p) => p.planCode === plan.code) : undefined;
-          const priceNode = (
-            <>
-              <EnglishText as="span" className={plan.badge ? "text-3xl font-bold" : "text-xl lg:text-3xl font-bold"}>
-                {native ? native.priceString : `₪${plan.totalPrice}`}
-              </EnglishText>
-              <span className="text-muted text-sm">
-                {" "}
-                / {plan.months === 1 ? "חודש" : plan.months === 12 ? "שנה" : `${plan.months} חודשים`}
-              </span>
-            </>
-          );
-          const equivalentNode = plan.months > 1 && (
-            <p className={`mt-1 text-xs text-muted ${plan.badge ? "" : "hidden lg:block"}`}>
-              שווה ערך ל־
-              <EnglishText as="span">
-                {native
-                  ? new Intl.NumberFormat("en", {
-                      style: "currency",
-                      currency: native.currencyCode,
-                      maximumFractionDigits: 0,
-                    }).format(native.price / plan.months)
-                  : `₪${monthlyEquivalent(plan)}`}
-              </EnglishText>{" "}
-              לחודש
-            </p>
-          );
-          const buttonLabel = loadingCode === plan.code ? "פותח תשלום..." : "התחילו עכשיו";
-          const buttonClassName = plan.badge
-            ? "mt-auto px-4 py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-            : "shrink-0 px-3 py-2 text-sm lg:mt-auto lg:block lg:w-full lg:px-4 lg:py-2.5 rounded-lg font-bold transition-colors bg-primary text-primary-ink hover:bg-primary-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2";
-          return (
-          <motion.div
-            key={plan.code}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.4, delay: i * 0.06, ease: EASE_OUT }}
-            whileHover={{ y: -3 }}
-            className={`relative overflow-visible rounded-lg border transition-shadow hover:shadow-lg hover:shadow-primary/5 ${
-              plan.badge
-                ? "order-first lg:order-none p-6 flex flex-col border-primary bg-card shadow-xl shadow-primary/10"
-                : "p-4 lg:p-6 flex flex-row lg:flex-col items-center lg:items-stretch gap-4 lg:gap-0 border-card-border bg-card"
-            }`}
-          >
-            {plan.badge && (
-              <>
-                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
-                {/* Floats above the card's own border instead of pushing the
-                    title down with extra padding — that padding (plus a
-                    translate-up on the card itself) used to be what made
-                    this card alone sit taller and higher than its siblings. */}
-                <span className="absolute -top-3 inset-x-0 mx-auto w-fit px-2.5 py-1 rounded-md bg-primary text-primary-ink text-xs font-bold">
-                  {plan.badge}
+      {/* One decision at a time: pick a duration on one side, see exactly
+          what it costs and includes on the other. Five identical cards
+          with five identical buttons made the choice harder, not clearer.
+          Savings are computed from the real prices (StoreKit's on the
+          native app), never stated by hand. */}
+      <div className="max-w-5xl mx-auto grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start pb-24 lg:pb-0">
+        <div role="radiogroup" aria-label="משך המנוי" className="space-y-2">
+          {PRICING_PLANS.map((plan) => {
+            const p = priceOf(plan);
+            const active = plan.code === selected.code;
+            const saving = savingOf(plan);
+            return (
+              <button
+                key={plan.code}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => setSelectedCode(plan.code)}
+                className={`game-press flex w-full items-center gap-4 rounded-lg border px-4 py-3.5 text-start transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                  active ? "border-primary bg-primary/[0.07]" : "border-card-border bg-card hover:border-primary/40"
+                }`}
+              >
+                <span
+                  aria-hidden="true"
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${active ? "border-primary" : "border-card-border"}`}
+                >
+                  {active && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
                 </span>
-              </>
-            )}
+                <span className="min-w-0 flex-1">
+                  <span className="flex flex-wrap items-center gap-2 font-bold">
+                    {plan.label}
+                    {plan.badge && (
+                      <span className="rounded-md bg-primary px-1.5 py-0.5 text-[0.7rem] font-bold text-primary-ink">{plan.badge}</span>
+                    )}
+                  </span>
+                  <span className="block text-xs text-muted">
+                    {plan.months === 1 ? "מתחדש כל חודש" : `תשלום אחד של ${p.total}`}
+                  </span>
+                </span>
+                <span className="shrink-0 text-end">
+                  <span className="block font-bold tabular-nums" dir="ltr">
+                    {p.perMonth}
+                  </span>
+                  <span className="block text-xs text-muted">{saving ? `לחודש · חיסכון ${saving}%` : "לחודש"}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-            <div className={plan.badge ? "" : "flex-1 lg:flex-none min-w-0"}>
-              <h2 className={plan.badge ? "font-bold text-lg" : "font-bold text-base lg:text-lg"}>{plan.label}</h2>
-              <div className={plan.badge ? "mt-4" : "mt-1 lg:mt-4"}>{priceNode}</div>
-              {equivalentNode}
-            </div>
+        <motion.div
+          key={selected.code}
+          initial={{ opacity: 0.6, transform: "translateY(4px)" }}
+          animate={{ opacity: 1, transform: "translateY(0px)" }}
+          transition={{ duration: 0.2, ease: EASE_OUT }}
+          className="relative overflow-hidden rounded-lg border border-primary bg-card p-6 sm:p-7 lg:sticky lg:top-24"
+        >
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+          <h2 className="text-lg font-black">{selected.label}</h2>
+          <p className="mt-3 flex items-baseline gap-2">
+            <EnglishText as="span" className="chyron text-6xl leading-none">
+              {priceOf(selected).perMonth}
+            </EnglishText>
+            <span className="text-muted">לחודש</span>
+          </p>
+          <p className="mt-2 text-sm text-muted">
+            {selected.months === 1
+              ? "חיוב חודשי, מתחדש אוטומטית עד שמבטלים."
+              : `${priceOf(selected).total} בתשלום אחד ל${selected.months === 12 ? "שנה" : `-${selected.months} חודשים`}, מתחדש לאותה תקופה עד שמבטלים.`}
+          </p>
 
-            {session ? (
-              <motion.button
-                whileHover={loadingCode === null ? { scale: 1.02 } : undefined}
-                whileTap={loadingCode === null ? { scale: 0.97 } : undefined}
-                onClick={() => handleCheckout(plan.code)}
-                disabled={loadingCode !== null}
-                className={buttonClassName}
-              >
-                {buttonLabel}
-              </motion.button>
-            ) : (
-              <MotionLink
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                href="/signup"
-                className={`text-center ${buttonClassName}`}
-              >
-                התחילו עכשיו
-              </MotionLink>
-            )}
-          </motion.div>
-          );
-        })}
+          <ul className="mt-5 space-y-2 border-t border-card-border pt-5 text-sm">
+            {INCLUDED.map((item) => (
+              <li key={item} className="flex items-center gap-2">
+                <Check size={16} className="shrink-0 text-success" aria-hidden="true" />
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          {session ? (
+            <button
+              type="button"
+              onClick={() => handleCheckout(selected.code)}
+              disabled={loadingCode !== null}
+              className="game-press mt-6 w-full min-h-12 rounded-lg bg-primary text-primary-ink text-lg font-bold hover:bg-primary-hover transition-[background-color,opacity,transform] duration-150 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            >
+              {loadingCode === selected.code ? "פותח תשלום..." : "להמשיך לתשלום"}
+            </button>
+          ) : (
+            <Link
+              href="/signup"
+              className="game-press mt-6 flex w-full min-h-12 items-center justify-center rounded-lg bg-primary text-primary-ink text-lg font-bold hover:bg-primary-hover transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            >
+              להתחיל {TRIAL_DAYS} ימים חינם
+            </Link>
+          )}
+          <p className="mt-3 text-xs text-muted leading-relaxed">
+            שימוש הוגן: עד {DAILY_CONVERSATION_LIMIT} שיחות חדשות עם המורה ועד {DAILY_WRITING_LIMIT} הגשות כתיבה בכל 24 שעות.
+            שיחה עם המורה זמינה במנוי בתשלום בלבד, ולא בניסיון החינם.
+          </p>
+        </motion.div>
       </div>
 
       {!isNative && (
@@ -272,36 +312,6 @@ export default function PricingCards() {
           </p>
         </div>
       )}
-
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.4 }}
-        className="max-w-3xl mx-auto mt-8 bg-background-2 border border-card-border rounded-lg p-6"
-      >
-        <h2 className="font-bold mb-3">מה כלול בכל המסלולים בתשלום?</h2>
-        <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted">
-          {[
-            "מבחן רמה ומסלול לימוד אישי",
-            "שיחות עם מורה AI, בטקסט ובקול",
-            "תרגול דיבור עם AI",
-            "משוב AI על כתיבה",
-            "תרגול בלי מגבלת לבבות",
-            "חזרה חכמה יומית",
-            "כל 6 רמות ה־CEFR",
-          ].map((item) => (
-            <li key={item} className="flex items-center gap-2">
-              <Check size={16} className="shrink-0 text-success" aria-hidden="true" />
-              {item}
-            </li>
-          ))}
-        </ul>
-        <p className="mt-4 text-xs text-muted leading-relaxed">
-          שימוש הוגן: עד {DAILY_CONVERSATION_LIMIT} שיחות חדשות עם המורה ועד {DAILY_WRITING_LIMIT} הגשות כתיבה בכל 24
-          שעות. שיחה עם המורה זמינה במנוי בתשלום בלבד, ולא בניסיון החינם.
-        </p>
-      </motion.div>
 
       {/* Seller identification (name, business number, address) is required
           on a page a sale happens from — Consumer Protection Law s.14C —
