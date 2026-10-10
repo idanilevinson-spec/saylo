@@ -6,6 +6,7 @@ const LINKS = [
   { href: "/pricing", label: "מסלולים" },
   { href: "/english-bagrut", label: "בגרות באנגלית" },
   { href: "/english-level-test", label: "מבחן רמה" },
+  { href: "/english-grammar", label: "דקדוק באנגלית" },
   { href: "/privacy", label: "פרטיות" },
   { href: "/privacy#cookies", label: "עוגיות" },
   { href: "/terms", label: "תנאי שימוש" },

@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
+import { listPublicGrammar } from "@/lib/content/publicGrammar";
 
 // Only the real, public, indexable pages — everything under (app) sits
 // behind auth and has no business in a sitemap, and (auth) pages are
 // transactional, not content search engines should send people to.
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://www.saylolearn.com";
   const now = new Date();
+  const grammar = await listPublicGrammar();
 
   return [
     { url: base, lastModified: now, changeFrequency: "weekly", priority: 1 },
@@ -22,6 +24,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${base}/english-level/${l}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+    { url: `${base}/english-grammar`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    ...grammar.map((t) => ({
+      url: `${base}/english-grammar/${t.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
     { url: `${base}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
