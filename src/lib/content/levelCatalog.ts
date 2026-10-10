@@ -51,7 +51,7 @@ export const getLevelCatalog = unstable_cache(
 export interface LevelSamples {
   words: { headword: string; translation_he: string; example_en: string }[];
   grammar: { slug: string; name_en: string; name_he: string }[];
-  readings: { title_en: string; title_he: string }[];
+  readings: { title_en: string; title_he: string }[]; // linked by readingSlug(title_en)
 }
 
 // A real taste of a level for the public level pages: some of its words,

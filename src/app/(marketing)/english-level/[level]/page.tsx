@@ -9,6 +9,7 @@ import { getCanDoStatement } from "@/lib/content/canDoStatements";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { getLevelCatalog, getLevelSamples } from "@/lib/content/levelCatalog";
 import { listPublicVocabulary } from "@/lib/content/publicVocabulary";
+import { readingSlug } from "@/lib/content/publicReading";
 import type { CefrLevel, SkillArea } from "@/types/database";
 
 // One public page per CEFR level: what a learner at that level can do (the
@@ -151,11 +152,13 @@ export default async function EnglishLevelPage({ params }: { params: Promise<{ l
               </h2>
               <ul className="mt-3 space-y-1.5 text-sm">
                 {samples.readings.map((r) => (
-                  <li key={r.title_en} className="flex justify-between gap-3 border-b border-card-border pb-1.5">
-                    <span>{r.title_he}</span>
-                    <span dir="ltr" lang="en" className="text-muted font-content">
-                      {r.title_en}
-                    </span>
+                  <li key={r.title_en} className="border-b border-card-border pb-1.5">
+                    <Link href={`/english-reading/${readingSlug(r.title_en)}`} className="flex justify-between gap-3 hover:text-primary">
+                      <span className="font-bold">{r.title_he}</span>
+                      <span dir="ltr" lang="en" className="text-muted font-content">
+                        {r.title_en}
+                      </span>
+                    </Link>
                   </li>
                 ))}
               </ul>
