@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { listPublicGrammar } from "@/lib/content/publicGrammar";
+import { listPublicVocabulary } from "@/lib/content/publicVocabulary";
 
 // Only the real, public, indexable pages — everything under (app) sits
 // behind auth and has no business in a sitemap, and (auth) pages are
@@ -7,7 +8,7 @@ import { listPublicGrammar } from "@/lib/content/publicGrammar";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = "https://www.saylolearn.com";
   const now = new Date();
-  const grammar = await listPublicGrammar();
+  const [grammar, vocabulary] = await Promise.all([listPublicGrammar(), listPublicVocabulary()]);
 
   return [
     { url: base, lastModified: now, changeFrequency: "weekly", priority: 1 },
@@ -29,6 +30,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/english-grammar`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     ...grammar.map((t) => ({
       url: `${base}/english-grammar/${t.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    { url: `${base}/english-vocabulary`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    ...vocabulary.map((t) => ({
+      url: `${base}/english-vocabulary/${t.slug}`,
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.7,
