@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, Clock, ListChecks, Map as MapIcon, Layers, Timer, NotebookPen, CheckCircle2 } from "lucide-react";
+import { Clock, ListChecks, Map as MapIcon, Layers, Timer, NotebookPen, CheckCircle2 } from "lucide-react";
 import { BAGRUT_MODULE_FORMATS, modulesForUnits, type BagrutModuleCode, type BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
+import BagrutCredit from "@/components/BagrutCredit";
 
 export const metadata: Metadata = {
   title: "לקראת בחינת הבגרות — Saylo",
@@ -183,13 +184,7 @@ export default function BagrutExamGuidePage() {
         </ul>
       </section>
 
-      <div role="note" className="mt-10 flex gap-3 rounded-lg border border-accent/40 bg-accent/[0.07] p-4 text-sm leading-relaxed">
-        <AlertTriangle size={18} aria-hidden="true" className="shrink-0 text-accent-hover mt-0.5" />
-        <p>
-          זמני השאלונים והניקוד אומתו מול מקורות ציבוריים. חלוקת הזמן והטיפים הם המלצה כללית שנכתבה על ידי AI, ולא תחליף
-          להנחיות המורה או של משרד החינוך.
-        </p>
-      </div>
+      <BagrutCredit className="mt-12" />
     </div>
   );
 }

@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, XCircle, Eye, Headphones, BookOpenText, PenLine, Timer, Trophy } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, Headphones, BookOpenText, PenLine, Timer, Trophy } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import EnglishText from "@/components/EnglishText";
 import ListeningPlayer from "@/components/ListeningPlayer";
 import type { BagrutSampleUnit, BagrutReadingQuestion, BagrutVocabularyQuestion } from "@/lib/content/bagrut/sampleUnits";
-import { BAGRUT_AI_CONTENT_DISCLAIMER } from "@/lib/content/bagrut/sampleUnits";
+import BagrutCredit from "@/components/BagrutCredit";
 import type { BagrutModuleFormat } from "@/lib/content/bagrut/moduleFormats";
 
 interface BagrutPracticeUnitProps {
@@ -88,15 +88,7 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
 
       {format.timeMinutes && <ExamTimer minutes={format.timeMinutes} />}
 
-      {!unit.teacherReviewed && unit.aiContentDisclosed && (
-        <div
-          role="alert"
-          className="mt-4 flex gap-3 rounded-lg border border-accent/40 bg-accent/[0.07] p-4 text-sm leading-relaxed"
-        >
-          <AlertTriangle size={18} className="shrink-0 text-accent-hover mt-0.5" />
-          <p>{BAGRUT_AI_CONTENT_DISCLAIMER}</p>
-        </div>
-      )}
+      {!unit.teacherReviewed && <BagrutCredit className="mt-3" />}
 
       {/* Module D's real exam tests a specific story/poem chosen by the
           Ministry and studied in advance — this practice text is original,
