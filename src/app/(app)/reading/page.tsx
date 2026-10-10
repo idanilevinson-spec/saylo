@@ -72,12 +72,19 @@ async function readingProgress(): Promise<{ byText: Map<string, TextProgress>; l
   }
 
   if (textOf.size > 0) {
-    const { data: attempts } = await supabase
-      .from("exercise_attempts")
-      .select("exercise_id, is_correct, created_at")
-      .eq("profile_id", user.id)
-      .in("exercise_id", [...textOf.keys()])
-      .order("created_at", { ascending: false });
+    // Filtered by a join, not by .in() with every reading exercise id: that
+    // list goes into the URL, and past about 400 ids the request fails
+    // (there were 294 when this was written).
+    const { data: attempts } = await fetchAll((from, to) =>
+      supabase
+        .from("exercise_attempts")
+        .select("exercise_id, is_correct, created_at, exercises!inner(reading_text_id)")
+        .eq("profile_id", user.id)
+        .not("exercises.reading_text_id", "is", null)
+        .order("created_at", { ascending: false })
+        .order("id")
+        .range(from, to),
+    );
     const seen = new Set<string>();
     for (const a of attempts ?? []) {
       if (seen.has(a.exercise_id)) continue;
