@@ -47,3 +47,30 @@ export const getLevelCatalog = unstable_cache(
   ["level-catalog"],
   { revalidate: 3600 },
 );
+
+export interface LevelSamples {
+  words: { headword: string; translation_he: string; example_en: string }[];
+  grammar: { name_en: string; name_he: string }[];
+  readings: { title_en: string; title_he: string }[];
+}
+
+// A real taste of a level for the public level pages: some of its words,
+// its grammar topics and reading titles. Same hourly cache as above.
+export const getLevelSamples = unstable_cache(
+  async (level: CefrLevel): Promise<LevelSamples> => {
+    const [words, grammar, readings] = await Promise.all([
+      supabaseAdmin
+        .from("vocabulary_items")
+        .select("headword, translation_he, example_en")
+        .eq("status", "published")
+        .eq("cefr_level", level)
+        .order("sort_order")
+        .limit(12),
+      supabaseAdmin.from("grammar_topics").select("name_en, name_he").eq("status", "published").eq("cefr_level", level).order("sort_order"),
+      supabaseAdmin.from("reading_texts").select("title_en, title_he").eq("status", "published").eq("cefr_level", level).order("sort_order"),
+    ]);
+    return { words: words.data ?? [], grammar: grammar.data ?? [], readings: readings.data ?? [] };
+  },
+  ["level-samples"],
+  { revalidate: 3600 },
+);
