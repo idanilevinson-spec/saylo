@@ -42,7 +42,7 @@ import { BAGRUT_MODULE_FORMATS, type BagrutModuleCode } from "./moduleFormats";
 import { BAGRUT_SAMPLE_UNITS_SET3 } from "./sampleUnitsSet3";
 
 export const BAGRUT_AI_CONTENT_DISCLAIMER =
-  "התוכן באזור הבגרות נבנה בשיתוף אדם בעל ידע רב באנגלית ובינה מלאכותית, לפי מבנה השאלונים שמפורסם לציבור. הוא מקורי, ואינו רשמי או מטעם משרד החינוך.";
+  "התכנים באזור הבגרות נכתבו בהובלת אדם בעל השכלה אקדמית באנגלית ובעזרת כלי בינה מלאכותית, לפי מבנה השאלונים שמשרד החינוך מפרסם לציבור. הם מקוריים, ואינם רשמיים או מטעם משרד החינוך.";
 
 export interface BagrutReadingQuestion {
   formatHe: string;
