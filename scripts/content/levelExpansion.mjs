@@ -302,7 +302,7 @@ export const SCENARIOS = [
 export const GRAMMAR_TOPICS = [
   {
     slug: "future-will",
-    name_he: "עתיד — will",
+    name_he: "עתיד: will",
     name_en: "Future: will",
     level: "B1",
     sort: 30,
@@ -347,7 +347,7 @@ export const GRAMMAR_TOPICS = [
     name_en: "Zero Conditional",
     level: "B1",
     sort: 31,
-    title_he: "תנאי אפס — עובדות ותוצאות קבועות",
+    title_he: "תנאי אפס: עובדות ותוצאות קבועות",
     body_md: `משתמשים בתנאי אפס לדברים ש**תמיד** קורים כשמשהו מסוים קורה: עובדות, חוקי טבע, הרגלים.
 
 **מבנה:** If + הווה פשוט, הווה פשוט
@@ -388,7 +388,7 @@ export const GRAMMAR_TOPICS = [
     name_en: "Question Tags",
     level: "B1",
     sort: 32,
-    title_he: "שאלות זנב — ..., isn't it?",
+    title_he: "שאלות זנב: ..., isn't it?",
     body_md: `שאלת זנב היא שאלה קצרה בסוף משפט, שמבקשת אישור: "נכון?", "לא?".
 
 **הכלל:** משפט חיובי → זנב שלילי. משפט שלילי → זנב חיובי.
@@ -432,7 +432,7 @@ export const GRAMMAR_TOPICS = [
     name_en: "Participle Clauses",
     level: "C1",
     sort: 33,
-    title_he: "פסוקיות בינוני — כתיבה תמציתית",
+    title_he: "פסוקיות בינוני: כתיבה תמציתית",
     body_md: `פסוקית בינוני מקצרת משפט בעזרת צורת **-ing** או צורת **V3** (past participle), במקום פסוקית מלאה עם נושא ופועל. זה נפוץ בכתיבה רשמית, אקדמית ועיתונאית.
 
 **פעולה בו-זמנית או סיבה: -ing:**
@@ -472,11 +472,11 @@ export const GRAMMAR_TOPICS = [
   },
   {
     slug: "nominalisation",
-    name_he: "נומינליזציה — שמות במקום פעלים",
+    name_he: "נומינליזציה: שמות במקום פעלים",
     name_en: "Nominalisation",
     level: "C2",
     sort: 34,
-    title_he: "נומינליזציה — סגנון אקדמי ורשמי",
+    title_he: "נומינליזציה: סגנון אקדמי ורשמי",
     body_md: `נומינליזציה היא הפיכת פועל או תואר ל**שם עצם**, כדי לכתוב בצורה רשמית, אובייקטיבית ודחוסה יותר. זה אחד הסימנים הבולטים של כתיבה אקדמית ברמה גבוהה.
 
 **לפני ואחרי:**

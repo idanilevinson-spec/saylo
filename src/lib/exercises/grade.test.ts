@@ -101,3 +101,35 @@ describe("gradeExercise — dictation", () => {
     expect(gradeExercise("dictation", content, { text: "I am sad" })).toBe(false);
   });
 });
+
+describe("gradeExercise: how answers are typed", () => {
+  const fill = (correctAnswer: string, text: string) =>
+    gradeExercise("fill_blank", { sentence: "x ___ y", correctAnswer } as FillBlankContent, { text });
+
+  it("accepts the iPhone keyboard's curly apostrophe", () => {
+    expect(fill("isn't", "isn’t")).toBe(true);
+    expect(fill("can't", "can’t")).toBe(true);
+  });
+
+  it("treats short and long forms as the same answer", () => {
+    expect(fill("isn't", "is not")).toBe(true);
+    expect(fill("won't", "will not")).toBe(true);
+    expect(fill("can't", "cannot")).toBe(true);
+    expect(fill("There is", "There's")).toBe(true);
+    expect(fill("I'm", "I am")).toBe(true);
+    expect(fill("have lost", "'ve lost")).toBe(true);
+  });
+
+  it("still tells different answers apart", () => {
+    expect(fill("isn't", "is")).toBe(false);
+    expect(fill("won't", "want")).toBe(false);
+    expect(fill("Noa's", "Noa")).toBe(false);
+    expect(fill("parents'", "parent's")).toBe(false);
+  });
+
+  it("ignores punctuation in a dictation, but not the words", () => {
+    const content: DictationContent = { audioText: "Can I have a coffee, please?", correctAnswer: "Can I have a coffee, please?" };
+    expect(gradeExercise("dictation", content, { text: "can i have a coffee please" })).toBe(true);
+    expect(gradeExercise("dictation", content, { text: "Can I have a tea, please?" })).toBe(false);
+  });
+});
