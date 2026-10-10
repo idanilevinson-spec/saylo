@@ -27,8 +27,11 @@ function getSnapshot() {
   }
 }
 
+// Rendered on the server for everyone; the no-flash-cookie script in the
+// root layout hides it before paint for visitors who already dismissed it,
+// and hydration then removes it for them.
 function getServerSnapshot() {
-  return true;
+  return false;
 }
 
 function acknowledge() {
@@ -53,12 +56,12 @@ export default function CookieNotice() {
     <div
       role="region"
       aria-label="הודעה על עוגיות"
-      className="fixed inset-x-3 z-[55] bg-card border border-card-border rounded-lg shadow-2xl p-4 bottom-[calc(9rem+env(safe-area-inset-bottom))] sm:inset-x-auto sm:start-4 sm:bottom-4 sm:max-w-md"
+      className="cookie-notice fixed inset-x-3 z-[55] bg-card border border-card-border rounded-lg shadow-2xl p-4 bottom-[calc(9rem+env(safe-area-inset-bottom))] sm:inset-x-auto sm:start-4 sm:bottom-4 sm:max-w-md"
     >
       <p className="text-sm leading-relaxed">
         האתר משתמש רק בעוגיות ובאחסון מקומי הכרחיים: כדי לשמור אתכם מחוברים ולזכור את ההעדפות שבחרתם. אין אצלנו
         עוגיות פרסום או מעקב.{" "}
-        <Link href="/privacy#cookies" className="text-primary hover:underline">
+        <Link href="/privacy#cookies" className="text-primary underline underline-offset-2">
           פרטים נוספים
         </Link>
       </p>

@@ -109,16 +109,11 @@ export default function ResetPasswordConfirmForm() {
 
   return (
     <div className="max-w-md mx-auto px-4 py-16">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+      <div className="rise-in">
         <h1 className="text-3xl font-black tracking-tight text-center">בחרו סיסמה חדשה</h1>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="relative mt-8 bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7"
-      >
+      <div className="rise-in relative mt-8 bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7" style={{ animationDelay: "0.1s" }}>
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -145,7 +140,7 @@ export default function ResetPasswordConfirmForm() {
             {submitting ? "מעדכן..." : "עדכון סיסמה"}
           </motion.button>
         </form>
-      </motion.div>
+      </div>
     </div>
   );
 }

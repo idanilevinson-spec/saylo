@@ -57,7 +57,7 @@ export default function LandingHero() {
           </div>
 
           <div className="grid lg:grid-cols-[1.3fr_1fr] gap-8 lg:gap-10 items-start">
-            <div className="hero-rise relative bg-card rounded-lg shadow-2xl p-6 sm:p-9">
+            <div className="rise-in relative bg-card rounded-lg shadow-2xl p-6 sm:p-9">
               {/* The card's edge, a broadcast-graphic detail. */}
               <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-primary" />
 
@@ -108,7 +108,7 @@ export default function LandingHero() {
                 the product's real mechanism, playing live and looping
                 through a handful of real mistakes — inside the first
                 viewport on desktop, not scrolled past. */}
-            <div className="hero-rise" style={{ animationDelay: "0.15s" }}>
+            <div className="rise-in" style={{ animationDelay: "0.15s" }}>
               <LandingCorrectionDemo />
             </div>
           </div>

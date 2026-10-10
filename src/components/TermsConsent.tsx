@@ -24,11 +24,11 @@ export default function TermsConsent({ checked, onChange }: TermsConsentProps) {
         />
         <span>
           קראתי את{" "}
-          <Link href="/terms" target="_blank" rel="noopener" className="text-primary hover:underline">
+          <Link href="/terms" target="_blank" rel="noopener" className="text-primary underline underline-offset-2">
             תנאי השימוש
           </Link>{" "}
           ואת{" "}
-          <Link href="/privacy" target="_blank" rel="noopener" className="text-primary hover:underline">
+          <Link href="/privacy" target="_blank" rel="noopener" className="text-primary underline underline-offset-2">
             מדיניות הפרטיות
           </Link>
           , והם מקובלים עליי
