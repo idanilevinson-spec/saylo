@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import AppleLogo from "@/components/icons/AppleLogo";
@@ -11,10 +11,10 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { signInWithOAuthNative } from "@/lib/auth/nativeOAuth";
 import PasswordField from "@/components/PasswordField";
 import { EMAIL_INPUT } from "@/lib/utils/inputProps";
+import { safeNext } from "@/lib/auth/safeNext";
 
 export default function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +33,9 @@ export default function LoginForm() {
       return;
     }
 
-    router.push(searchParams.get("next") ?? "/dashboard");
+    // Read at submit time rather than through useSearchParams, which would
+    // keep the whole form out of the server render (blank until hydration).
+    router.push(safeNext(new URLSearchParams(window.location.search).get("next")));
   }
 
   // Native runs the whole round trip through a dismissible modal browser and
