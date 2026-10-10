@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { safeNext } from "@/lib/auth/safeNext";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/serverClient";
 
@@ -12,11 +13,6 @@ import { createClient } from "@/lib/supabase/serverClient";
 const ALLOWED_TYPES: EmailOtpType[] = ["recovery", "signup", "email"];
 
 // Only ever send the learner to a page on this site.
-function safeNext(value: string | null, fallback: string): string {
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return fallback;
-  return value;
-}
-
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const tokenHash = searchParams.get("token_hash");
