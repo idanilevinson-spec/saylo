@@ -114,7 +114,7 @@ export default function AccessibilityWidget({ prefs, setPrefs }: AccessibilityWi
         aria-haspopup="dialog"
         aria-controls="a11y-panel"
         aria-label="תפריט נגישות"
-        className="fixed bottom-4 end-4 z-[60] w-12 h-12 rounded-full bg-primary text-primary-ink shadow-lg flex items-center justify-center hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+        className="fixed bottom-3 end-3 sm:bottom-4 sm:end-4 z-[60] w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-primary text-primary-ink shadow-lg flex items-center justify-center hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
         style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       >
         <Accessibility size={24} aria-hidden="true" />
@@ -127,7 +127,7 @@ export default function AccessibilityWidget({ prefs, setPrefs }: AccessibilityWi
           role="dialog"
           aria-modal="false"
           aria-label="אפשרויות נגישות"
-          className="fixed bottom-36 end-4 z-[60] w-72 max-w-[calc(100vw-2rem)] bg-card border border-card-border rounded-lg shadow-2xl p-4"
+          className="fixed bottom-16 sm:bottom-36 end-4 z-[60] w-72 max-w-[calc(100vw-2rem)] bg-card border border-card-border rounded-lg shadow-2xl p-4"
           style={{ marginBottom: "env(safe-area-inset-bottom)" }}
         >
           <div className="flex items-center justify-between mb-3">

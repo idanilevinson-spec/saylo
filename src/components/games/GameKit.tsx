@@ -434,9 +434,12 @@ export function LetterTiles({ hint, typed, word, verdict }: { hint: string; type
 // to the wrong end, so the direction follows the text itself.
 export function PromptText({ text, className = "" }: { text: string; className?: string }) {
   if (/[֐-׿]/.test(text)) {
+    // A hyphen between Hebrew letters ("דו-משמעי") becomes a non-breaking
+    // one: a line break there throws the hyphen to the wrong end of the
+    // line in right-to-left text.
     return (
       <p dir="rtl" className={className}>
-        {text}
+        {text.replace(/([֐-׿])-([֐-׿])/g, "$1‑$2")}
       </p>
     );
   }
