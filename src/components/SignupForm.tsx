@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Play } from "lucide-react";
 import AppleLogo from "@/components/icons/AppleLogo";
+import GoogleLogo from "@/components/icons/GoogleLogo";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/lib/supabase/browserClient";
 import { deriveAgeBand } from "@/lib/auth/ageBand";
@@ -173,137 +174,148 @@ export default function SignupForm() {
     );
   }
 
+  const inputClass =
+    "w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40";
+  const socialClass =
+    "game-press flex items-center justify-center gap-2 w-full min-h-12 px-4 rounded-lg border border-card-border bg-background font-bold hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2";
+
   return (
-    <div className="max-w-md mx-auto px-4 py-16">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <h1 className="text-3xl font-black tracking-tight text-center">יוצרים חשבון</h1>
-        <p className="mt-2 text-center text-muted">3 ימים ראשונים חינם, בלי כרטיס אשראי</p>
+    <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:items-start">
+      {/* What happens after this form — the next ten minutes, not a pitch. */}
+      <motion.aside
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="lg:order-2 lg:pt-4"
+      >
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight">יוצרים חשבון</h1>
+        <p className="mt-2 text-muted text-lg">3 ימים ראשונים חינם, בלי כרטיס אשראי.</p>
+        <ol className="mt-8 hidden lg:block space-y-5">
+          {[
+            ["חשבון", "דקה אחת. כינוי מספיק, אין צורך בשם מלא."],
+            ["מבחן רמה", "כ-10 דקות: אוצר מילים, דקדוק, קריאה והאזנה."],
+            ["תוכנית יומית", "תרגילים ברמה שלכם בכל מיומנות, ושיחה עם המורה."],
+          ].map(([title, body], i) => (
+            <li key={title} className="flex gap-4">
+              <span className="chyron flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-ink text-xl">
+                {i + 1}
+              </span>
+              <span>
+                <span className="block font-bold">{title}</span>
+                <span className="block text-sm text-muted">{body}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
         {/* App Store Review Guideline 5.1.1: says explicitly, at the exact
             point registration is required, why it's required — every
             feature past this point is tied to the account itself. */}
-        <p className="mt-1 text-center text-xs text-muted">
+        <p className="mt-6 text-xs text-muted leading-relaxed max-w-sm">
           החשבון הוא מה שמאפשר מסלול לימוד אישי, מורה AI שזוכר אתכם, ושמירת ההתקדמות בכל המכשירים שלכם.
         </p>
-      </motion.div>
+      </motion.aside>
 
-      {/* The same plate language as the rest of the site: a card with a
-          primary-colored edge, not bare inputs floating on the page. */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="relative mt-8 bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7"
+        className="lg:order-1"
       >
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
+        <div className="relative bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="signup-name" className="block text-sm font-medium mb-1.5">כינוי</label>
-            <input
-              id="signup-name"
-              type="text"
-              autoComplete="given-name"
-              aria-describedby="signup-name-hint"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              required
-              className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
-            <p id="signup-name-hint" className="mt-1.5 text-xs text-muted">
-              כינוי מספיק, אין צורך בשם מלא. הוא מוצג בלוח התוצאות למשתמשים בוגרים.
-            </p>
-          </div>
-          <div>
-            <label htmlFor="signup-age" className="block text-sm font-medium mb-1.5">גיל</label>
-            <input
-              id="signup-age"
-              type="number"
-              inputMode="numeric"
-              autoComplete="off"
-              min={4}
-              max={119}
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              required
-              className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
-          </div>
-          <div>
-            <label htmlFor="signup-email" className="block text-sm font-medium mb-1.5">אימייל</label>
-            <input
-              id="signup-email"
-              {...EMAIL_INPUT}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
-          </div>
-          <div>
-            <label htmlFor="signup-password" className="block text-sm font-medium mb-1.5">סיסמה</label>
-            <PasswordField
-              id="signup-password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              aria-describedby="signup-password-hint"
-            />
-            <p id="signup-password-hint" className="mt-1.5 text-xs text-muted">
-              לפחות 6 תווים
-            </p>
-          </div>
-
+          {/* Consent first: it applies to every way of signing up below. */}
           <TermsConsent checked={accepted} onChange={setAccepted} />
 
-          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+          <div className="mt-5 space-y-2.5">
+            <button type="button" onClick={handleGoogleSignup} className={socialClass}>
+              <GoogleLogo /> המשך עם Google
+            </button>
+            <button type="button" onClick={handleAppleSignup} className={socialClass}>
+              <AppleLogo size={22} /> המשך עם Apple
+            </button>
+          </div>
 
-          {/* The one CTA on the page that's genuinely "start" gets the
-              same press-play language as the hero's own primary CTA. */}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            type="submit"
-            disabled={loading}
-            className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors disabled:opacity-60"
-          >
-            {!loading && <Play size={16} fill="currentColor" strokeWidth={0} />}
-            {loading ? "יוצר חשבון..." : "יצירת חשבון"}
-          </motion.button>
-        </form>
+          <div className="my-5 flex items-center gap-3">
+            <div className="flex-1 h-px bg-card-border" />
+            <span className="text-xs text-muted">או עם אימייל</span>
+            <div className="flex-1 h-px bg-card-border" />
+          </div>
 
-        <div className="mt-4 flex items-center gap-3">
-          <div className="flex-1 h-px bg-card-border" />
-          <span className="text-xs text-muted">או</span>
-          <div className="flex-1 h-px bg-card-border" />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_6rem] gap-3">
+              <div>
+                <label htmlFor="signup-name" className="block text-sm font-medium mb-1.5">כינוי</label>
+                <input
+                  id="signup-name"
+                  type="text"
+                  autoComplete="given-name"
+                  aria-describedby="signup-name-hint"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="signup-age" className="block text-sm font-medium mb-1.5">גיל</label>
+                <input
+                  id="signup-age"
+                  type="number"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  min={4}
+                  max={119}
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  required
+                  className={inputClass}
+                />
+              </div>
+            </div>
+            <p id="signup-name-hint" className="-mt-2 text-xs text-muted">
+              הכינוי מוצג בלוח התוצאות למשתמשים בוגרים.
+            </p>
+            <div>
+              <label htmlFor="signup-email" className="block text-sm font-medium mb-1.5">אימייל</label>
+              <input id="signup-email" {...EMAIL_INPUT} value={email} onChange={(e) => setEmail(e.target.value)} required className={inputClass} />
+            </div>
+            <div>
+              <label htmlFor="signup-password" className="block text-sm font-medium mb-1.5">סיסמה</label>
+              <PasswordField
+                id="signup-password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                aria-describedby="signup-password-hint"
+              />
+              <p id="signup-password-hint" className="mt-1.5 text-xs text-muted">
+                לפחות 6 תווים
+              </p>
+            </div>
+
+            {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="game-press flex items-center justify-center gap-2 w-full min-h-12 px-4 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-[background-color,opacity,transform] duration-150 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            >
+              {!loading && <Play size={16} fill="currentColor" strokeWidth={0} />}
+              {loading ? "יוצרים חשבון..." : "יצירת חשבון"}
+            </button>
+          </form>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={handleGoogleSignup}
-          className="mt-4 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
-        >
-          המשך עם Google
-        </motion.button>
-
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={handleAppleSignup}
-          className="mt-2.5 flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-card-border bg-background font-medium hover:bg-background-2 transition-colors"
-        >
-          <AppleLogo size={24} /> המשך עם Apple
-        </motion.button>
+        <p className="mt-6 text-center text-sm text-muted">
+          כבר יש לכם חשבון?{" "}
+          <Link href="/login" className="text-primary font-bold">
+            התחברות
+          </Link>
+        </p>
       </motion.div>
-
-      <p className="mt-6 text-center text-sm text-muted">
-        כבר יש לכם חשבון?{" "}
-        <Link href="/login" className="text-primary font-medium">
-          התחברות
-        </Link>
-      </p>
     </div>
   );
 }

@@ -23,14 +23,15 @@ export default function TermsConsent({ checked, onChange }: TermsConsentProps) {
           className="mt-0.5 w-5 h-5 shrink-0 accent-primary"
         />
         <span>
-          קראתי ואני מסכים/ה ל
+          קראתי את{" "}
           <Link href="/terms" target="_blank" rel="noopener" className="text-primary hover:underline">
             תנאי השימוש
           </Link>{" "}
-          ול
+          ואת{" "}
           <Link href="/privacy" target="_blank" rel="noopener" className="text-primary hover:underline">
             מדיניות הפרטיות
           </Link>
+          , והם מקובלים עליי
           <span className="sr-only"> (נפתחים בלשונית חדשה)</span>
         </span>
       </label>
