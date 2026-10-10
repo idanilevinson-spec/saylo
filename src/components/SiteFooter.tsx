@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/english-vocabulary", label: "אוצר מילים" },
   { href: "/english-idioms", label: "ביטויים" },
   { href: "/english-reading", label: "קטעי קריאה" },
+  { href: "/english-writing", label: "נושאים לחיבור" },
   { href: "/privacy", label: "פרטיות" },
   { href: "/privacy#cookies", label: "עוגיות" },
   { href: "/terms", label: "תנאי שימוש" },

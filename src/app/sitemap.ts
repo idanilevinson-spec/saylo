@@ -42,6 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.6,
     })),
+    { url: `${base}/english-writing`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/english-idioms`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/english-vocabulary`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     ...vocabulary.map((t) => ({
