@@ -104,3 +104,9 @@ Rules carried by all three: content is fully visible before any script runs (the
 Navigation screens in the app (dashboard, today's plan, `ContentCard` grids, profile, the speaking hub, progress, the review/mistakes empty and done screens, the daily lesson) no longer fade and rise in on every visit. Some staggered up to ~0.9s before the last block settled, on the screen a learner opens most. Content is simply there; this is the Operate rule ("don't make users wait through page-load choreography") and the owner's latency rule. Motion that stays: feedback inside a flow (answer panels, chat messages, game moments), hover/press, and data drawing on the progress charts.
 
 The one authored moment that replaced it is `DailyGoal` (dashboard): the day's XP rolls from what this learner last saw on the dashboard (sessionStorage, per day and per tab) to the new total, with the bar (a transform, not width) and a "+N" for what was added. A first look or nothing new shows the number as is.
+
+## Placement result (2026-10-11)
+
+The end of the placement test is the first time a learner sees where they stand, so it gets the one authored sequence in the app (`src/components/placement/PlacementResult.tsx`, GSAP timeline, about 2s, once): the overall level rises in like a chyron cut-in, each skill bar fills in order (a transform from the reading start) while its percentage counts up, its CEFR level appears as the bar arrives, then the summary and Bagrut cards settle. Everything renders at its final state; with reduced motion the sequence does not run.
+
+The wait before it (two AI calls, up to 30s) was a single grey line. It is now a plate that says what is happening and how long it can take, with a `.working-sweep` line: a segment crossing the track, never a fake percentage.
