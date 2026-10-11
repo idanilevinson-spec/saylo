@@ -59,7 +59,7 @@ export default async function BagrutModulePage({ params }: { params: Promise<{ m
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbJsonLd([{ name: "Saylo", path: "/" }, { name: "בגרות באנגלית", path: "/english-bagrut" }, { name: `שאלון ${code}`, path: `/english-bagrut/${code.toLowerCase()}` }])) }}
       />
       <div className="max-w-4xl mx-auto px-4 pt-10 pb-16">
-        <Link href="/english-bagrut" className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+        <Link href="/english-bagrut" className="-my-2.5 inline-flex items-center gap-1 py-2.5 text-sm font-bold text-primary hover:underline">
           <ChevronRight size={15} aria-hidden="true" /> כל השאלונים
         </Link>
         <h1 className="mt-4 text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">שאלון {code} בבגרות באנגלית</h1>

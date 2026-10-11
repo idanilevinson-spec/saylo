@@ -49,7 +49,7 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 pt-8 pb-16">
-      <Link href="/vocabulary" className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+      <Link href="/vocabulary" className="-my-2.5 inline-flex items-center gap-1 py-2.5 text-sm font-bold text-primary hover:underline">
         <ChevronRight size={15} aria-hidden="true" /> כל הנושאים
       </Link>
 

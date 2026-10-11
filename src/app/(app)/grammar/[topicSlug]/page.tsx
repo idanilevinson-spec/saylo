@@ -50,7 +50,7 @@ export default async function GrammarTopicPage({ params }: PageProps) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 pt-8 pb-16">
-      <Link href="/grammar" className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+      <Link href="/grammar" className="-my-2.5 inline-flex items-center gap-1 py-2.5 text-sm font-bold text-primary hover:underline">
         <ChevronRight size={15} aria-hidden="true" /> כל נושאי הדקדוק
       </Link>
 

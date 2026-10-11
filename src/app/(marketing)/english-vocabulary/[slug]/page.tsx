@@ -58,7 +58,7 @@ export default async function EnglishVocabularyTopic({ params }: { params: Promi
         }}
       />
       <div className="max-w-5xl mx-auto px-4 pt-10 pb-16">
-        <Link href="/english-vocabulary" className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+        <Link href="/english-vocabulary" className="-my-2.5 inline-flex items-center gap-1 py-2.5 text-sm font-bold text-primary hover:underline">
           <ChevronRight size={15} aria-hidden="true" /> כל הנושאים
         </Link>
 
@@ -66,7 +66,7 @@ export default async function EnglishVocabularyTopic({ params }: { params: Promi
           <p className="flex items-center gap-2 text-sm text-muted">
             <Link
               href={`/english-level/${topic.cefr_level.toLowerCase()}`}
-              className="chyron rounded-md bg-background-2 px-1.5 py-0.5 text-sm text-primary hover:underline"
+              className="chyron inline-flex min-h-7 items-center rounded-md bg-background-2 px-2 text-sm text-primary hover:underline"
               dir="ltr"
             >
               {topic.cefr_level}
