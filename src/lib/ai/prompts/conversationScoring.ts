@@ -27,7 +27,7 @@ Respond with ONLY valid JSON, no markdown code fences, in exactly this shape:
   "grammarMistakes": ["<short description of a real mistake found, in Hebrew>", ...],
   "overusedWords": ["<word or phrase the student repeated too much>", ...],
   "suggestedVocabulary": ["<English word/phrase the student could have used instead>", ...],
-  "generalSuggestionsHe": "<2-3 sentences in Hebrew with encouraging, specific advice for next time>",
+  "generalSuggestionsHe": "<2-3 sentences in Hebrew with specific, practical advice for next time>",
   "patterns": [...]
 }
 
