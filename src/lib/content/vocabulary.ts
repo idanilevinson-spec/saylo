@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/serverClient";
+import { fetchAll } from "@/lib/supabase/fetchAll";
 import type { Topic, VocabularyItem, CefrLevel } from "@/types/database";
 
 export async function listVocabularyTopics(): Promise<Topic[]> {
@@ -40,14 +41,18 @@ export interface VocabularyLookupEntry {
 }
 
 // headword -> translation/IPA, for the reading page's click-a-word lookup.
-// Only ~60 words today, so fetching the whole published set is simpler and
-// cheaper than a query per click.
+// The whole published set in one go is still small (about 600 words), but
+// it's paged with fetchAll so it keeps working past the API's 1000-row cap.
 export async function getVocabularyLookupMap(): Promise<Record<string, VocabularyLookupEntry>> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("vocabulary_items")
-    .select("headword, translation_he, ipa, cefr_level")
-    .eq("status", "published");
+  const { data } = await fetchAll((from, to) =>
+    supabase
+      .from("vocabulary_items")
+      .select("headword, translation_he, ipa, cefr_level")
+      .eq("status", "published")
+      .order("id")
+      .range(from, to),
+  );
 
   const map: Record<string, VocabularyLookupEntry> = {};
   for (const item of data ?? []) {

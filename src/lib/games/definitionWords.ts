@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/browserClient";
+import { fetchAll } from "@/lib/supabase/fetchAll";
 import { shuffle } from "@/lib/utils/shuffle";
 
 export interface DefinitionGameItem {
@@ -33,19 +34,23 @@ export async function getDefinitionGameWords(profileId: string, limit = 10): Pro
   // Both queries only depend on profileId, not on each other, so they
   // run together instead of one-after-the-other — this fetch reruns on
   // every "play again" click.
-  const [{ data: dueSrs }, { data: allSrs }] = await Promise.all([
+  // One read of this learner's review rows, filtered here. The due list
+  // used to pass every pool id to .in(): that goes into the request URL and
+  // fails past about 400 ids, which the pool (every defined word) exceeds.
+  const { data: allSrs } = await fetchAll((from, to) =>
     supabase
       .from("srs_items")
-      .select("vocabulary_item_id")
+      .select("vocabulary_item_id, due_at")
       .eq("profile_id", profileId)
-      .in("vocabulary_item_id", [...poolIds])
-      .lte("due_at", new Date().toISOString())
-      .order("due_at")
-      .limit(limit),
-    supabase.from("srs_items").select("vocabulary_item_id").eq("profile_id", profileId),
-  ]);
-
-  const dueIds = (dueSrs ?? []).map((d) => d.vocabulary_item_id);
+      .order("vocabulary_item_id")
+      .range(from, to),
+  );
+  const nowIso = new Date().toISOString();
+  const dueIds = allSrs
+    .filter((s) => poolIds.has(s.vocabulary_item_id) && s.due_at <= nowIso)
+    .sort((a, b) => a.due_at.localeCompare(b.due_at))
+    .slice(0, limit)
+    .map((d) => d.vocabulary_item_id);
   const remaining = limit - dueIds.length;
 
   let extraIds: string[] = [];
