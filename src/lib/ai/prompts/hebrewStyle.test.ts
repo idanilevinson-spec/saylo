@@ -40,5 +40,9 @@ describe("Hebrew gender-neutral note", () => {
     it(`${name} includes the rule`, () => {
       expect(prompt).toContain(HEBREW_GENDER_NEUTRAL_NOTE);
     });
+    // "חם ומעודד" is what produced "אתם עומדים להיכנס לעולם מרתק... בהצלחה".
+    it(`${name} doesn't ask for a cheerleading voice in Hebrew`, () => {
+      expect(prompt).not.toMatch(/חם ומעודד|סיכום מעודד|warm, encouraging summary IN HEBREW/);
+    });
   }
 });
