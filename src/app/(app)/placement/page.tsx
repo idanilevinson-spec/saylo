@@ -3,29 +3,17 @@
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { Volume2, Turtle, Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, ChevronLeft, type LucideIcon } from "lucide-react";
+import { Volume2, Turtle, Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, type LucideIcon } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
-import MotionLink from "@/components/MotionLink";
 import AiConsentGate from "@/components/AiConsentGate";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { speak } from "@/lib/speech/browserTts";
-import { getCanDoStatement } from "@/lib/content/canDoStatements";
-import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
-import type { CefrLevel, PlacementQuestion, SkillArea } from "@/types/database";
-import { modulesForUnits, type BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
-import { BAGRUT_PLACEMENT_SECTIONS, BAGRUT_READINESS_COPY, bagrutReadiness } from "@/lib/content/bagrut/placementItems";
+import type { PlacementQuestion, SkillArea } from "@/types/database";
+import type { BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
+import { BAGRUT_PLACEMENT_SECTIONS } from "@/lib/content/bagrut/placementItems";
 import BagrutCredit from "@/components/BagrutCredit";
-
-const SKILL_LABELS_HE: Record<SkillArea, string> = {
-  vocabulary: "אוצר מילים",
-  grammar: "דקדוק",
-  listening: "האזנה",
-  reading: "קריאה",
-  writing: "כתיבה",
-  speaking: "דיבור",
-};
+import { PlacementFinishing, PlacementResultView, SKILL_LABELS_HE, SKILL_ORDER, type PlacementResult } from "@/components/placement/PlacementResult";
 
 const SKILL_ICONS: Record<SkillArea, LucideIcon> = {
   vocabulary: BookOpen,
@@ -36,7 +24,7 @@ const SKILL_ICONS: Record<SkillArea, LucideIcon> = {
   speaking: Mic,
 };
 
-const SKILL_ORDER: SkillArea[] = ["vocabulary", "grammar", "reading", "listening", "writing", "speaking"];
+
 
 const WRITING_SAMPLE_PROMPT_HE =
   "כתבו 2-4 משפטים באנגלית על עצמכם: מה שמכם, מאיפה אתם, ודבר אחד שאתם אוהבים לעשות.";
@@ -61,19 +49,6 @@ function renderPromptWithUniformBlanks(prompt: string): ReactNode[] {
   );
 }
 
-interface SkillScore {
-  skill: SkillArea;
-  percentCorrect: number;
-  cefrLevel: string;
-}
-
-interface PlacementResult {
-  overallCefr: string;
-  summary: string;
-  scores: SkillScore[];
-  bagrut: { units: BagrutStudyUnits; correct: number; total: number; percent: number } | null;
-}
-
 type Goal = "general" | BagrutStudyUnits;
 
 const GOAL_OPTIONS: { value: Goal; label: string; hint: string }[] = [
@@ -94,6 +69,7 @@ export default function PlacementPage() {
   const [showWritingStep, setShowWritingStep] = useState(false);
   const [writingSample, setWritingSample] = useState("");
   const [finishing, setFinishing] = useState(false);
+  const [finishingWithWriting, setFinishingWithWriting] = useState(false);
   const [result, setResult] = useState<PlacementResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [goal, setGoal] = useState<Goal | null>(null);
@@ -228,90 +204,7 @@ export default function PlacementPage() {
   }
 
   if (result) {
-    const canDo = getCanDoStatement("speaking", result.overallCefr as CefrLevel);
-    return (
-      <div className="max-w-3xl mx-auto px-4 pt-10 pb-16">
-        <motion.section
-          initial={{ opacity: 0, transform: "translateY(12px) scale(0.985)" }}
-          animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
-          transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-          className="relative overflow-hidden rounded-lg bg-primary text-primary-ink p-6 sm:p-8"
-        >
-          <p className="text-sm font-bold text-primary-ink/75">התוצאה שלכם</p>
-          <div className="mt-2 flex items-end gap-5">
-            <EnglishText as="span" className="chyron text-8xl sm:text-9xl leading-[0.8]">
-              {result.overallCefr}
-            </EnglishText>
-            <div className="pb-1">
-              <p className="text-2xl font-black">{CEFR_NAME_HE[result.overallCefr as CefrLevel]}</p>
-              {canDo && <p className="mt-1 max-w-sm text-sm text-primary-ink/80 leading-relaxed">{canDo}</p>}
-            </div>
-          </div>
-          <Link
-            href="/dashboard"
-            className="game-press mt-6 inline-flex items-center gap-2 min-h-12 px-5 rounded-lg bg-background text-foreground font-bold transition-transform duration-150"
-          >
-            לתוכנית של היום <ChevronLeft size={17} aria-hidden="true" />
-          </Link>
-        </motion.section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
-          className="mt-4 rounded-lg border border-card-border bg-card p-5 sm:p-6"
-          aria-labelledby="by-skill"
-        >
-          <h2 id="by-skill" className="font-black">לפי מיומנות</h2>
-          <ul className="mt-4 space-y-3.5">
-            {SKILL_ORDER.map((skill) => {
-              const s = result.scores.find((sc) => sc.skill === skill);
-              return (
-                <li key={skill} className="grid grid-cols-[6.5rem_1fr_auto] items-center gap-3 text-sm">
-                  <span className="font-bold">{SKILL_LABELS_HE[skill]}</span>
-                  {s ? (
-                    <>
-                      <span className="h-2 overflow-hidden rounded-full bg-background-2" aria-hidden="true">
-                        <motion.span
-                          className="block h-full rounded-full bg-primary"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${s.percentCorrect}%` }}
-                          transition={{ duration: 0.7, delay: 0.25, ease: [0.23, 1, 0.32, 1] }}
-                        />
-                      </span>
-                      <span className="flex items-center gap-2 tabular-nums">
-                        <span className="text-muted">{s.percentCorrect}%</span>
-                        <span className="chyron text-lg text-primary" dir="ltr">
-                          {s.cefrLevel}
-                        </span>
-                      </span>
-                    </>
-                  ) : (
-                    <span className="col-span-2 text-muted">
-                      {skill === "speaking" ? "נבדק בשיחה הראשונה עם המורה" : "לא נבדק הפעם"}
-                    </span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </motion.section>
-
-        {result.summary && (
-          <motion.section
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.25 }}
-            className="mt-4 rounded-lg border border-card-border bg-card p-5 sm:p-6"
-          >
-            <h2 className="font-black">מה המורה ראה במבחן</h2>
-            <p className="mt-2 leading-relaxed text-foreground/90">{result.summary}</p>
-          </motion.section>
-        )}
-
-        {result.bagrut && <BagrutResultCard bagrut={result.bagrut} />}
-      </div>
-    );
+    return <PlacementResultView result={result} />;
   }
 
   const question = questions[index];
@@ -319,6 +212,7 @@ export default function PlacementPage() {
 
   async function submitFinal(sample: string) {
     if (!testId) return;
+    setFinishingWithWriting(sample.trim().length > 0);
     setFinishing(true);
     setError(null);
     // This call has no upper bound otherwise — it waits on two sequential
@@ -393,9 +287,7 @@ export default function PlacementPage() {
   }
 
   if (finishing) {
-    return (
-      <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">מנתח את התוצאות שלכם...</div>
-    );
+    return <PlacementFinishing withWriting={finishingWithWriting} />;
   }
 
   if (showBagrutStep && bagrutSection) {
@@ -608,46 +500,5 @@ export default function PlacementPage() {
         </button>
       </motion.div>
     </div>
-  );
-}
-
-function BagrutResultCard({ bagrut }: { bagrut: NonNullable<PlacementResult["bagrut"]> }) {
-  const readiness = BAGRUT_READINESS_COPY[bagrutReadiness(bagrut.percent)];
-  const startModule = modulesForUnits(bagrut.units)[0];
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.35 }}
-      aria-labelledby="bagrut-result-title"
-      className="relative overflow-hidden mt-6 bg-card border border-card-border rounded-lg p-6"
-    >
-      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
-      <h2 id="bagrut-result-title" className="text-lg font-bold flex items-center gap-2">
-        <GraduationCap size={18} aria-hidden="true" className="text-primary shrink-0" />
-        בגרות {bagrut.units} יח״ל: {readiness.titleHe}
-      </h2>
-      <p className="mt-1 text-sm text-muted tabular-nums">
-        {bagrut.correct} מתוך {bagrut.total} נכונות בקטע הבגרות
-      </p>
-      <p className="mt-2 text-sm leading-relaxed">{readiness.bodyHe}</p>
-      <p className="mt-2 text-xs text-muted">זו בדיקה קצרה של ההיכרות עם סוגי השאלות, לא הערכה של ציון בבגרות.</p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <MotionLink
-          whileTap={{ scale: 0.97 }}
-          href={`/bagrut/track/${bagrut.units}#module-${startModule}`}
-          className="px-4 py-2 rounded-lg bg-primary text-primary-ink text-sm font-medium hover:bg-primary-hover transition-colors"
-        >
-          להתחיל במודול {startModule}
-        </MotionLink>
-        <MotionLink
-          whileTap={{ scale: 0.97 }}
-          href={`/bagrut/track/${bagrut.units}`}
-          className="px-4 py-2 rounded-lg border border-card-border text-sm font-medium hover:border-primary/40 transition-colors"
-        >
-          אזור הלימוד של {bagrut.units} יח״ל
-        </MotionLink>
-      </div>
-    </motion.section>
   );
 }

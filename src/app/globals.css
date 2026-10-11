@@ -601,3 +601,22 @@ textarea::placeholder {
 :root[data-a11y-motion="reduced"] .game-drain {
   animation-duration: var(--game-clock) !important;
 }
+
+/* An honest "working" line for waits with no measurable progress (the
+   placement results): a short segment crossing the track, right to left
+   like the Hebrew around it. Never a fake percentage. */
+@keyframes working-sweep {
+  from { transform: translateX(100%); }
+  to { transform: translateX(-300%); }
+}
+.working-sweep {
+  animation: working-sweep 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .working-sweep {
+    animation: none;
+  }
+}
+:root[data-a11y-motion="reduced"] .working-sweep {
+  animation: none;
+}
