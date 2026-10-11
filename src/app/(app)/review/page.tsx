@@ -53,12 +53,7 @@ export default function ReviewPage() {
 
   if (items.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="max-w-xl mx-auto px-4 py-24 text-center"
-      >
+      <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
           <IconBadge icon={PartyPopper} tone="accent" />
         </motion.div>
@@ -67,18 +62,13 @@ export default function ReviewPage() {
         <Link href="/vocabulary" className="mt-6 inline-block text-primary font-medium">
           לאוצר המילים ←
         </Link>
-      </motion.div>
+      </div>
     );
   }
 
   if (index >= items.length) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="max-w-xl mx-auto px-4 py-24 text-center"
-      >
+      <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
           <IconBadge icon={CheckCircle2} tone="success" />
         </motion.div>
@@ -86,7 +76,7 @@ export default function ReviewPage() {
         <Link href="/dashboard" className="mt-6 inline-block text-primary font-medium">
           ללוח הבקרה ←
         </Link>
-      </motion.div>
+      </div>
     );
   }
 

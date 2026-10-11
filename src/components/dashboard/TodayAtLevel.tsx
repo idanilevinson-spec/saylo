@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import {
   PenLine,
@@ -21,8 +20,6 @@ import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { getCanDoStatement } from "@/lib/content/canDoStatements";
 import type { LevelPlan, PlanKind } from "@/lib/content/levelPlan";
 import type { CefrLevel, SkillArea } from "@/types/database";
-
-const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export const KIND_META: Record<PlanKind, { label: string; icon: LucideIcon; area: string; noun: [string, string] }> = {
   grammar: { label: "דקדוק", icon: PenLine, area: "/grammar", noun: ["נושא", "נושאים"] },
@@ -52,11 +49,8 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
   return (
     <div className="mt-6 space-y-4">
       {/* The level plate */}
-      <motion.section
+      <section
         aria-labelledby="level-title"
-        initial={{ opacity: 0, transform: "translateY(10px)" }}
-        animate={{ opacity: 1, transform: "translateY(0px)" }}
-        transition={{ duration: 0.45, ease: EASE_OUT }}
         className="relative overflow-hidden rounded-lg bg-primary text-primary-ink"
       >
         <div
@@ -118,7 +112,7 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
             })}
           </dl>
         </div>
-      </motion.section>
+      </section>
 
       {/* Today's plan */}
       {plan.items.length > 0 && (
@@ -137,15 +131,10 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
             </p>
           </div>
           <ol className="mt-3 divide-y divide-card-border">
-            {plan.items.map((item, idx) => {
+            {plan.items.map((item) => {
               const meta = KIND_META[item.kind];
               return (
-                <motion.li
-                  key={item.kind}
-                  initial={{ opacity: 0, transform: "translateY(6px)" }}
-                  animate={{ opacity: 1, transform: "translateY(0px)" }}
-                  transition={{ duration: 0.3, delay: 0.1 + idx * 0.04, ease: EASE_OUT }}
-                >
+                <li key={item.kind}>
                   <Link
                     href={item.href}
                     className="game-press group flex items-center gap-4 px-5 py-4 hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
@@ -182,7 +171,7 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
                     </span>
                     <ChevronLeft size={17} aria-hidden="true" className="shrink-0 text-muted transition-transform group-hover:-translate-x-0.5" />
                   </Link>
-                </motion.li>
+                </li>
               );
             })}
           </ol>

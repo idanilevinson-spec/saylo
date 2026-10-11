@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { BookOpen, PenLine, Sparkles } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
@@ -55,25 +54,15 @@ export default function DailyLessonPage() {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="text-center"
-      >
+      <div className="text-center">
         <span className="inline-flex w-14 h-14 items-center justify-center rounded-lg bg-accent/15 text-accent-hover">
           <Sparkles size={26} />
         </span>
         <h1 className="mt-4 text-2xl font-bold">השיעור היומי שלכם</h1>
         <p className="mt-1 text-sm text-muted">{new Date().toLocaleDateString("he-IL", { weekday: "long", day: "numeric", month: "long" })}</p>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 16, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.4, delay: 0.1, type: "spring", bounce: 0.35 }}
-        className="mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-8"
-      >
+      <div className="mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-8">
         <div className="flex items-center gap-4">
           <span className="w-12 h-12 shrink-0 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
             <Icon size={22} />
@@ -98,7 +87,7 @@ export default function DailyLessonPage() {
         >
           התחילו את השיעור →
         </MotionLink>
-      </motion.div>
+      </div>
 
       <p className="mt-4 text-center text-xs text-muted">שיעור חדש יבחר בשבילכם כל יום</p>
     </div>
