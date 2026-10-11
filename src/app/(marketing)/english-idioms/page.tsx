@@ -57,7 +57,7 @@ export default async function EnglishIdiomsPage() {
             <a
               key={l}
               href={`#level-${l}`}
-              className="chyron rounded-md bg-background-2 px-2 py-1 text-sm text-primary hover:underline"
+              className="chyron inline-flex min-h-7 items-center rounded-md bg-background-2 px-2.5 text-sm text-primary hover:underline"
               dir="ltr"
             >
               {l}

@@ -62,7 +62,7 @@ export default async function EnglishLevelPage({ params }: { params: Promise<{ l
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbJsonLd([{ name: "Saylo", path: "/" }, { name: "מבחן רמה", path: "/english-level-test" }, { name: `רמה ${level}`, path: `/english-level/${level.toLowerCase()}` }])) }}
       />
       <div className="max-w-4xl mx-auto px-4 pt-10 pb-16">
-        <Link href="/english-level-test" className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+        <Link href="/english-level-test" className="-my-2.5 inline-flex items-center gap-1 py-2.5 text-sm font-bold text-primary hover:underline">
           <ChevronRight size={15} aria-hidden="true" /> מבחן רמה וכל הרמות
         </Link>
         <h1 className="mt-4 flex flex-wrap items-baseline gap-3 text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
@@ -131,10 +131,10 @@ export default async function EnglishLevelPage({ params }: { params: Promise<{ l
               <h2 id="grammar" className="text-xl font-black tracking-tight">
                 נושאי דקדוק ברמה {level}
               </h2>
-              <ul className="mt-3 space-y-1.5 text-sm">
+              <ul className="mt-3 space-y-0.5 text-sm">
                 {samples.grammar.map((g) => (
-                  <li key={g.slug} className="border-b border-card-border pb-1.5">
-                    <Link href={`/english-grammar/${g.slug}`} className="flex justify-between gap-3 hover:text-primary">
+                  <li key={g.slug} className="border-b border-card-border pb-0.5">
+                    <Link href={`/english-grammar/${g.slug}`} className="flex justify-between gap-3 py-1 hover:text-primary">
                       <span className="font-bold">{g.name_he}</span>
                       <span dir="ltr" lang="en" className="text-muted font-content">
                         {g.name_en}
@@ -150,10 +150,10 @@ export default async function EnglishLevelPage({ params }: { params: Promise<{ l
               <h2 id="readings" className="text-xl font-black tracking-tight">
                 טקסטים לקריאה ברמה {level}
               </h2>
-              <ul className="mt-3 space-y-1.5 text-sm">
+              <ul className="mt-3 space-y-0.5 text-sm">
                 {samples.readings.map((r) => (
-                  <li key={r.title_en} className="border-b border-card-border pb-1.5">
-                    <Link href={`/english-reading/${readingSlug(r.title_en)}`} className="flex justify-between gap-3 hover:text-primary">
+                  <li key={r.title_en} className="border-b border-card-border pb-0.5">
+                    <Link href={`/english-reading/${readingSlug(r.title_en)}`} className="flex justify-between gap-3 py-1 hover:text-primary">
                       <span className="font-bold">{r.title_he}</span>
                       <span dir="ltr" lang="en" className="text-muted font-content">
                         {r.title_en}
@@ -176,13 +176,13 @@ export default async function EnglishLevelPage({ params }: { params: Promise<{ l
 
         <nav aria-label="רמות אחרות" className="mt-10 flex flex-wrap items-center gap-2">
           {i > 0 && (
-            <Link href={`/english-level/${LEVELS[i - 1].toLowerCase()}`} className="text-sm font-bold text-primary hover:underline">
+            <Link href={`/english-level/${LEVELS[i - 1].toLowerCase()}`} className="py-2 text-sm font-bold text-primary hover:underline">
               → רמה {LEVELS[i - 1]}
             </Link>
           )}
           <span className="flex-1" />
           {i < LEVELS.length - 1 && (
-            <Link href={`/english-level/${LEVELS[i + 1].toLowerCase()}`} className="text-sm font-bold text-primary hover:underline">
+            <Link href={`/english-level/${LEVELS[i + 1].toLowerCase()}`} className="py-2 text-sm font-bold text-primary hover:underline">
               רמה {LEVELS[i + 1]} ←
             </Link>
           )}

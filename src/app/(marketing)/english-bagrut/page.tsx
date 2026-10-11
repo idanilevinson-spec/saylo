@@ -98,7 +98,7 @@ export default function EnglishBagrutPage() {
                     return (
                       <li key={code} className="rounded-lg bg-background-2 p-3.5">
                         <p className="flex items-baseline justify-between gap-2">
-                          <Link href={`/english-bagrut/${code.toLowerCase()}`} className="chyron text-2xl hover:text-primary hover:underline">
+                          <Link href={`/english-bagrut/${code.toLowerCase()}`} className="chyron -my-1 inline-block py-1 text-2xl hover:text-primary hover:underline">
                             שאלון {code}
                           </Link>
                           {f.timeMinutes && (

@@ -71,7 +71,7 @@ export default async function EnglishWritingPage() {
                       <PracticeLink
                         signedInHref={`/writing/${p.id}`}
                         signedInLabel="לכתוב על הנושא"
-                        className="mt-3 self-start text-sm font-bold text-primary hover:underline"
+                        className="mt-1.5 -mb-1.5 self-start py-1.5 text-sm font-bold text-primary hover:underline"
                       >
                         לכתוב ולקבל משוב
                       </PracticeLink>
