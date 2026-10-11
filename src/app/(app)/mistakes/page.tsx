@@ -53,7 +53,9 @@ function exerciseOf(item: MixedItem): Exercise {
 
 function labelOf(item: MixedItem): { title: string; subtitle: string } {
   return item.kind === "vocabulary"
-    ? { title: item.vocab.headword, subtitle: item.vocab.translationHe }
+    ? // Not the headword and its translation: the question asks for exactly
+      // that, so showing them above it gave the answer away.
+      { title: "מילה לחזרה", subtitle: "" }
     : { title: "נושא דקדוק לחזרה", subtitle: item.mistake.topicNameHe };
 }
 

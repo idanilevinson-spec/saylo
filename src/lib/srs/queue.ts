@@ -1,7 +1,8 @@
 import { supabase } from "@/lib/supabase/browserClient";
 import { shuffle } from "@/lib/utils/shuffle";
 import { sm2, SM2_INITIAL_STATE, nextDueDate } from "./sm2";
-import type { Exercise } from "@/types/database";
+import type { CefrLevel, Exercise } from "@/types/database";
+import { newWordsAtLevel } from "./newWords";
 
 export interface SrsUpdateResult {
   repetitions: number;
@@ -74,7 +75,7 @@ export async function getDailyReview(profileId: string, limit = 20): Promise<Due
   // instead of three sequential ones — this fetch reruns on every
   // "play again" click, so the latency compounds directly into how long
   // that click feels.
-  const [{ data: dueSrs }, { data: allSrs }, { data: candidates }] = await Promise.all([
+  const [{ data: dueSrs }, { data: allSrs }, { data: candidates }, { data: vocabLevel }] = await Promise.all([
     supabase
       .from("srs_items")
       .select("vocabulary_item_id")
@@ -83,7 +84,8 @@ export async function getDailyReview(profileId: string, limit = 20): Promise<Due
       .order("due_at")
       .limit(limit),
     supabase.from("srs_items").select("vocabulary_item_id").eq("profile_id", profileId),
-    supabase.from("vocabulary_items").select("id").eq("status", "published").order("sort_order").limit(200),
+    supabase.from("vocabulary_items").select("id, cefr_level").eq("status", "published").order("sort_order").limit(1000),
+    supabase.from("skill_levels").select("cefr_level").eq("profile_id", profileId).eq("skill", "vocabulary").maybeSingle(),
   ]);
 
   const dueIds = (dueSrs ?? []).map((d) => d.vocabulary_item_id);
@@ -92,7 +94,11 @@ export async function getDailyReview(profileId: string, limit = 20): Promise<Due
   let newIds: string[] = [];
   if (remaining > 0) {
     const knownIds = new Set((allSrs ?? []).map((s) => s.vocabulary_item_id));
-    newIds = (candidates ?? []).map((c) => c.id).filter((id) => !knownIds.has(id)).slice(0, remaining);
+    // New words come from the learner's vocabulary level and the one below,
+    // not from the first rows of the table: "team" (A2) was being served to
+    // a C2 learner as a word to learn. Without a level yet, any level.
+    const unseen = (candidates ?? []).filter((c) => !knownIds.has(c.id));
+    newIds = newWordsAtLevel(unseen, (vocabLevel?.cefr_level as CefrLevel | undefined) ?? null, remaining);
   }
 
   const allIds = [...dueIds, ...newIds];

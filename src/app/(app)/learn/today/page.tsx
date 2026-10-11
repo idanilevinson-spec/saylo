@@ -100,7 +100,7 @@ export default function DailyLessonPage() {
         </MotionLink>
       </motion.div>
 
-      <p className="mt-4 text-center text-xs text-muted">שיעור חדש יבחר בשבילכם כל יום</p>
+      <p className="mt-4 text-center text-xs text-muted">שיעור חדש ייבחר בשבילכם כל יום</p>
     </div>
   );
 }
