@@ -1,12 +1,13 @@
 // Writes supabase/seed/027_reading_listening_b1_c2.sql from
 // scripts/content/readingListening.mjs. Validates every question before
 // writing anything. Run: node scripts/generate-reading-listening.mjs
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { createClient } from "@supabase/supabase-js";
 // Optional args: content module (default readingListening.mjs) and seed
 // file name, so the same validation serves every reading/listening batch.
 const contentPath = process.argv[2] ?? "./content/readingListening.mjs";
 const seedName = process.argv[3] ?? "027_reading_listening_b1_c2.sql";
-const { READING = [], LISTENING = [], IDIOMS = [], EXISTING_LISTENING_MCQ = {} } = await import(
+const { READING = [], LISTENING = [], IDIOMS = [], EXISTING_LISTENING_MCQ = {}, TRANSCRIPT_UPDATES = {} } = await import(
   new URL(contentPath, import.meta.url).href
 );
 
@@ -31,6 +32,35 @@ for (const l of LISTENING) {
 for (const [title, qs] of Object.entries(EXISTING_LISTENING_MCQ)) qs.forEach((m, i) => checkMcq(`${title} q${i + 1}`, m));
 const titles = [...READING, ...LISTENING].map((x) => x.title_en);
 if (new Set(titles).size !== titles.length) errors.push("duplicate titles");
+
+// A rewritten transcript must still contain the clip's dictation sentence,
+// or the existing dictation would ask for words the audio no longer says.
+const updateTitles = Object.keys(TRANSCRIPT_UPDATES);
+if (updateTitles.length) {
+  const envPath = new URL("../.env.local", import.meta.url);
+  if (!existsSync(envPath)) errors.push("TRANSCRIPT_UPDATES needs .env.local to check the dictations");
+  else {
+    const env = Object.fromEntries(
+      readFileSync(envPath, "utf8")
+        .split(/\r?\n/)
+        .filter((l) => l.includes("=") && !l.startsWith("#"))
+        .map((l) => [l.slice(0, l.indexOf("=")), l.slice(l.indexOf("=") + 1).replace(/^"|"$/g, "")]),
+    );
+    const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
+    for (const title of updateTitles) {
+      const { data: clip } = await sb.from("listening_clips").select("id").eq("title_en", title).maybeSingle();
+      if (!clip) {
+        errors.push(`${title}: no such clip`);
+        continue;
+      }
+      const { data: dict } = await sb.from("exercises").select("content").eq("listening_clip_id", clip.id).eq("type", "dictation");
+      for (const d of dict ?? []) {
+        const sentence = d.content.audioText.replace(/[.?!]$/, "").toLowerCase();
+        if (!TRANSCRIPT_UPDATES[title].toLowerCase().includes(sentence)) errors.push(`${title}: new transcript drops the dictation "${d.content.audioText}"`);
+      }
+    }
+  }
+}
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);
@@ -103,6 +133,11 @@ join (values
 ${LISTENING.map((l) => `  (${q(l.title_en)}, ${json({ audioText: l.dictation, correctAnswer: l.dictation })})`).join(",\n")}
 ) as gen(title_en, content)
   on lc.title_en = gen.title_en;
+`);
+
+if (updateTitles.length)
+  out.push(`-- Transcripts rewritten in place (learners' answers to these clips are kept).
+${updateTitles.map((t) => `update public.listening_clips set transcript_en = ${q(TRANSCRIPT_UPDATES[t])} where title_en = ${q(t)};`).join("\n")}
 `);
 
 // Questions added to clips that already exist. Cleared first by prompt so a
