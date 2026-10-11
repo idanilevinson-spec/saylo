@@ -10,13 +10,25 @@ import { animate, useReducedMotionConfig } from "framer-motion";
 // see the number, not an empty span); it animates only on a change, from
 // the previous value, never from zero on page load; and it honours the
 // site's own "stop animations" switch through MotionConfig, not just the
-// operating system's setting.
-export default function CountUp({ value, className, duration = 0.45 }: { value: number; className?: string; duration?: number }) {
+// operating system's setting. Pass `from` to roll in from a known earlier
+// value on mount (e.g. what the learner saw last time); without it, the
+// first value just shows.
+export default function CountUp({
+  value,
+  from,
+  className,
+  duration = 0.45,
+}: {
+  value: number;
+  from?: number;
+  className?: string;
+  duration?: number;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
-  const shown = useRef(value);
+  const shown = useRef(from ?? value);
   // React renders the first value once and never touches the text again;
   // from then on the effect owns it, so the two never fight over the node.
-  const [initial] = useState(value);
+  const [initial] = useState(from ?? value);
   const reduced = useReducedMotionConfig();
 
   // Layout effect: start from the old number before the browser paints,

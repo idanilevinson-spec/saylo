@@ -251,11 +251,8 @@ export default function SpeakingPage() {
           )}
 
           {/* The on-air plate */}
-          <motion.section
+          <section
             aria-labelledby="studio-title"
-            initial={{ opacity: 0, transform: "translateY(12px) scale(0.985)" }}
-            animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
-            transition={{ duration: 0.45, ease: EASE_OUT }}
             className="relative mt-6 overflow-hidden rounded-lg bg-primary text-primary-ink shadow-[0_24px_60px_-24px_rgb(0_0_0/0.55)]"
           >
             {/* A broadcast grid behind everything: the studio floor. */}
@@ -329,7 +326,7 @@ export default function SpeakingPage() {
                 </span>
               </div>
             </div>
-          </motion.section>
+          </section>
 
           <TeacherNotebook
             profileId={profile.id}
@@ -349,11 +346,8 @@ export default function SpeakingPage() {
             <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               {STARTERS.map((s, i) => (
                 <li key={s.en}>
-                  <motion.button
+                  <button
                     type="button"
-                    initial={{ opacity: 0, transform: "translateY(8px)" }}
-                    animate={{ opacity: 1, transform: "translateY(0px)" }}
-                    transition={{ duration: 0.3, delay: 0.05 + i * 0.035, ease: EASE_OUT }}
                     onClick={() => startConversation(null, { starter: s.en })}
                     disabled={starting}
                     className="game-press group flex w-full items-center gap-3.5 rounded-lg border border-card-border bg-card p-4 text-start transition-[border-color,transform,box-shadow] duration-150 hover:border-primary/50 hover:shadow-[0_10px_28px_-16px_rgb(0_0_0/0.5)] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
@@ -371,7 +365,7 @@ export default function SpeakingPage() {
                       </EnglishText>
                       <span className="mt-0.5 block text-sm text-muted">{s.he}</span>
                     </span>
-                  </motion.button>
+                  </button>
                 </li>
               ))}
             </ul>

@@ -221,22 +221,12 @@ export default function ProgressPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-      <motion.h1
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="text-3xl font-bold"
-      >
+      <h1 className="text-3xl font-bold">
         ההתקדמות שלי
-      </motion.h1>
+      </h1>
       <p className="mt-2 text-muted">מבט על השבועיים האחרונים וההישגים שצברתם עד עכשיו</p>
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.05 }}
-        className="mt-6 relative overflow-hidden rounded-lg border border-card-border p-6 sm:p-8"
-      >
+      <div className="mt-6 relative overflow-hidden rounded-lg border border-card-border p-6 sm:p-8">
         <motion.div
           aria-hidden="true"
           className="absolute inset-0"
@@ -270,7 +260,7 @@ export default function ProgressPage() {
           />
           <StatHero icon={Flame} tone="text-muted" value={data.longestStreak} label="השיא שלכם" />
         </div>
-      </motion.div>
+      </div>
 
       {profile.age_band === "adult" && (
         <Link
@@ -303,39 +293,24 @@ export default function ProgressPage() {
       </div>
 
       <div className="mt-3 grid sm:grid-cols-2 gap-4">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="bg-card border border-card-border rounded-lg p-6"
-        >
+        <div className="bg-card border border-card-border rounded-lg p-6">
           <h2 className="font-bold">XP לפי יום</h2>
           <p className="text-xs text-muted mt-0.5">{RANGE_CHART_DAYS[range]} הימים האחרונים</p>
           <XpBarChart buckets={chartData.buckets} values={chartData.dailyXp} />
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
-          className="bg-card border border-card-border rounded-lg p-6"
-        >
+        <div className="bg-card border border-card-border rounded-lg p-6">
           <h2 className="font-bold">אחוז הצלחה בתרגילים</h2>
           <p className="text-xs text-muted mt-0.5">{RANGE_CHART_DAYS[range]} הימים האחרונים</p>
           <AccuracyLineChart buckets={chartData.buckets} values={chartData.dailyAccuracy} />
-        </motion.div>
+        </div>
       </div>
 
       <ScoreHistoryPanel summary={summary} />
 
       <SkillLevelsPanel skillLevels={data.skillLevels} />
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-        className="mt-4 bg-card border border-card-border rounded-lg p-6"
-      >
+      <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
         <h2 className="font-bold">דיוק לפי תחום</h2>
         <p className="text-xs text-muted mt-0.5">מכל הזמנים</p>
         <div className="mt-5 space-y-4">
@@ -366,27 +341,17 @@ export default function ProgressPage() {
             );
           })}
         </div>
-      </motion.div>
+      </div>
 
       {data.conversationScores.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.25 }}
-          className="mt-4 bg-card border border-card-border rounded-lg p-6"
-        >
+        <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
           <h2 className="font-bold">ציוני שיחות עם AI</h2>
           <p className="text-xs text-muted mt-0.5">10 השיחות האחרונות שסיימתם</p>
           <ScoreSparkline values={data.conversationScores} />
-        </motion.div>
+        </div>
       )}
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.3 }}
-        className="mt-4 bg-card border border-card-border rounded-lg p-6"
-      >
+      <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
         <h2 className="font-bold">תגים שהרווחתם</h2>
         {data.badges.length === 0 ? (
           <div className="mt-4 text-center py-6">
@@ -395,12 +360,9 @@ export default function ProgressPage() {
           </div>
         ) : (
           <div className="mt-4 grid sm:grid-cols-2 gap-3">
-            {data.badges.map((b, i) => (
-              <motion.div
+            {data.badges.map((b) => (
+              <div
                 key={b.name_he + b.earned_at}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.05 * i, type: "spring", bounce: 0.4 }}
                 className="flex items-center gap-3 p-3 rounded-lg bg-background-2"
               >
                 <span className="inline-flex w-10 h-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent-hover">
@@ -410,23 +372,18 @@ export default function ProgressPage() {
                   <p className="font-medium text-sm truncate">{b.name_he}</p>
                   <p className="text-xs text-muted truncate">{b.description_he}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 }
 
 function ScoreHistoryPanel({ summary }: { summary: ScoreSummary | null }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.18 }}
-      className="mt-4 bg-card border border-card-border rounded-lg p-6"
-    >
+    <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
       <h2 className="font-bold">מה עשיתם</h2>
       <p className="text-xs text-muted mt-0.5">תרגולים, מבחנים ושיחות עם המורה בטווח שבחרתם למעלה</p>
 
@@ -481,7 +438,7 @@ function ScoreHistoryPanel({ summary }: { summary: ScoreSummary | null }) {
           )}
         </>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -495,12 +452,7 @@ function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillAr
   const weakestSkills = assessed.filter((s) => CEFR_ORDER.indexOf(skillLevels[s] as CefrLevel) === weakestRank);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.18 }}
-      className="mt-4 bg-card border border-card-border rounded-lg p-6"
-    >
+    <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
       <h2 className="font-bold">חוזקות וחולשות</h2>
       <p className="text-xs text-muted mt-0.5">רמת CEFR נוכחית בכל תחום, מתעדכנת ככל שאתם מתרגלים</p>
 
@@ -549,7 +501,7 @@ function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillAr
           })}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 

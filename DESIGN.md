@@ -98,3 +98,9 @@ framer-motion stays the default for UI state. Two libraries were added, each for
 - **React Bits**: `CountUp` adapted from its CountUp (credit in the file). In `LandingLevels` the counts no longer remount with the level card; they stay put and roll from the old level's numbers to the new one's, so the difference between levels is visible. The real number is in the server HTML.
 
 Rules carried by all three: content is fully visible before any script runs (the animated state is never the default); everything goes through `useReducedMotionPreference` / `prefersReducedMotion` (`src/lib/motion/reducedMotion.ts`), which honours both the OS setting and the site's own "stop animations" switch, live. Nothing new runs during an exercise or a game round.
+
+## App navigation: no entrance choreography (2026-10-11)
+
+Navigation screens in the app (dashboard, today's plan, `ContentCard` grids, profile, the speaking hub, progress, the review/mistakes empty and done screens, the daily lesson) no longer fade and rise in on every visit. Some staggered up to ~0.9s before the last block settled, on the screen a learner opens most. Content is simply there; this is the Operate rule ("don't make users wait through page-load choreography") and the owner's latency rule. Motion that stays: feedback inside a flow (answer panels, chat messages, game moments), hover/press, and data drawing on the progress charts.
+
+The one authored moment that replaced it is `DailyGoal` (dashboard): the day's XP rolls from what this learner last saw on the dashboard (sessionStorage, per day and per tab) to the new total, with the bar (a transform, not width) and a "+N" for what was added. A first look or nothing new shows the number as is.

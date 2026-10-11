@@ -68,8 +68,8 @@ export default async function BagrutModulePage({ params }: PageProps) {
       </p>
 
       <div className="mt-6 grid sm:grid-cols-2 gap-4">
-        {units.map((unit, i) => (
-          <ContentCard key={unit.unitSlug} href={`/bagrut/${moduleCode}/${unit.unitSlug}`} index={i}>
+        {units.map((unit) => (
+          <ContentCard key={unit.unitSlug} href={`/bagrut/${moduleCode}/${unit.unitSlug}`}>
             <p className="font-bold">{unit.titleHe}</p>
             <p className="mt-1 text-xs text-muted">ערכה {unit.unitSlug}</p>
           </ContentCard>

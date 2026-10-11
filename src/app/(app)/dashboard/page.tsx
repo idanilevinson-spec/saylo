@@ -3,7 +3,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import {
   Target,
@@ -29,6 +28,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
+import DailyGoal from "@/components/dashboard/DailyGoal";
 import TeacherSuggestionCard from "@/components/TeacherSuggestionCard";
 import TodayAtLevel, { MoreAtLevel } from "@/components/dashboard/TodayAtLevel";
 import { getLevelPlan, type LevelPlan } from "@/lib/content/levelPlan";
@@ -100,8 +100,6 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
     ],
   },
 ];
-
-const DAILY_XP_GOAL = 50;
 
 function greeting() {
   const hour = new Date().getHours();
@@ -189,7 +187,6 @@ export default function DashboardPage() {
   }
 
   const todayXp = stats?.todayXp ?? 0;
-  const goalPct = Math.min(100, Math.round((todayXp / DAILY_XP_GOAL) * 100));
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
@@ -197,12 +194,7 @@ export default function DashboardPage() {
           primary-colored top edge as every other plate on the site
           (hero, correction demo, auth forms) — one recurring detail
           instead of a device invented per surface. */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="relative bg-card border border-card-border rounded-lg overflow-hidden sm:flex sm:items-stretch"
-      >
+      <div className="relative bg-card border border-card-border rounded-lg overflow-hidden sm:flex sm:items-stretch">
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="p-6 sm:p-7 sm:flex-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -245,7 +237,7 @@ export default function DashboardPage() {
             )}
           </div>
         )}
-      </motion.div>
+      </div>
 
       {/* The lead: the learner's level and today's plan at it — or, before
           the placement test, the one thing to do first. */}
@@ -253,12 +245,7 @@ export default function DashboardPage() {
         <TodayAtLevel plan={plan} level={plan.overall} />
       ) : (
         placementDone === false && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.05 }}
-            className="mt-6"
-          >
+          <div className="mt-6">
             <Link
               href="/placement"
               className="game-press group relative flex flex-col sm:flex-row sm:items-center gap-5 overflow-hidden rounded-lg bg-primary text-primary-ink p-6 sm:p-8 transition-transform duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
@@ -276,7 +263,7 @@ export default function DashboardPage() {
                 להתחיל את המבחן <ChevronLeft size={17} aria-hidden="true" />
               </span>
             </Link>
-          </motion.div>
+          </div>
         )
       )}
 
@@ -286,47 +273,11 @@ export default function DashboardPage() {
 
       {/* Today's XP goal beside the two ways to talk with the AI teacher. */}
       <div className="mt-10 grid lg:grid-cols-[1.1fr_1fr] gap-3">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="rounded-lg border border-card-border bg-card p-5 flex flex-col justify-between"
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-sm font-bold text-muted">היעד היומי</p>
-              <p className="mt-1 flex items-baseline gap-1.5">
-                <span className="chyron text-4xl tabular-nums">{todayXp}</span>
-                <span className="text-sm font-medium text-muted">/ {DAILY_XP_GOAL} XP</span>
-              </p>
-            </div>
-            <span className={`shrink-0 mt-1 text-sm font-bold tabular-nums ${goalPct >= 100 ? "text-success" : "text-primary"}`}>
-              {goalPct}%
-            </span>
-          </div>
-          <div className="mt-4">
-            <div className="h-2 rounded-full bg-background-2 overflow-hidden">
-              <motion.div
-                className={`h-full rounded-full ${goalPct >= 100 ? "bg-success" : "bg-primary"}`}
-                initial={{ width: 0 }}
-                animate={{ width: `${goalPct}%` }}
-                transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.2 }}
-              />
-            </div>
-            <p className="mt-2 text-xs text-muted">
-              {goalPct >= 100 ? "היעד של היום הושלם" : "כל תרגיל, משחק ושיחה נספרים ביעד"}
-            </p>
-          </div>
-        </motion.div>
+        <DailyGoal profileId={profile.id} todayXp={todayXp} />
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-3">
-          {FEATURED_MODULES.map((m, i) => (
-            <motion.div
-              key={m.title}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.15 + i * 0.05 }}
-            >
+          {FEATURED_MODULES.map((m) => (
+            <div key={m.title}>
               <Link
                 href={m.href}
                 className="game-press group h-full flex items-center gap-4 rounded-lg border border-card-border bg-card p-4 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
@@ -344,7 +295,7 @@ export default function DashboardPage() {
                 </div>
                 <ChevronLeft size={17} aria-hidden="true" className="shrink-0 text-muted transition-transform group-hover:-translate-x-0.5" />
               </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -353,13 +304,8 @@ export default function DashboardPage() {
 
       <h2 className="mt-12 text-xl font-black tracking-tight">כל האזורים</h2>
       <div className="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-        {MODULE_GROUPS.map((group, gi) => (
-          <motion.div
-            key={group.title}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 + gi * 0.08 }}
-          >
+        {MODULE_GROUPS.map((group) => (
+          <div key={group.title}>
             <h2 className="text-sm font-bold text-muted mb-3">{group.title}</h2>
             <div className="rounded-lg border border-card-border bg-card overflow-hidden divide-y divide-card-border">
               {group.items.map((m) => (
@@ -382,7 +328,7 @@ export default function DashboardPage() {
                 </Link>
               ))}
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
