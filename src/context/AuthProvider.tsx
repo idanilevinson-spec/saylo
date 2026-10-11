@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/browserClient";
 import type { Profile } from "@/types/database";
@@ -35,23 +35,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [session, loadProfile]);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      if (data.session?.user.id) {
-        loadProfile(data.session.user.id).finally(() => setLoading(false));
-      } else {
-        setLoading(false);
-      }
-    });
+  // The profile is loaded from onAuthStateChange alone: it fires
+  // INITIAL_SESSION on subscribe, so the separate getSession() call that was
+  // here loaded the same row a second time on every page load. Two rules
+  // from Supabase's docs apply to that callback:
+  // - it runs while the client holds its auth lock, and a query started
+  //   inside it has to wait for that lock, so the load is deferred with
+  //   setTimeout until the callback has returned;
+  // - TOKEN_REFRESHED (and other events for the same user) don't change the
+  //   profile, so they don't reload it.
+  const loadedFor = useRef<string | null>(null);
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
-      if (newSession?.user.id) {
-        loadProfile(newSession.user.id);
-      } else {
+      const userId = newSession?.user.id ?? null;
+      if (!userId) {
+        loadedFor.current = null;
         setProfile(null);
+        setLoading(false);
+        return;
       }
+      if (loadedFor.current === userId && event !== "USER_UPDATED") return;
+      loadedFor.current = userId;
+      setTimeout(() => {
+        loadProfile(userId).finally(() => setLoading(false));
+      }, 0);
     });
 
     return () => listener.subscription.unsubscribe();
@@ -59,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
+    loadedFor.current = null;
     setProfile(null);
   }, []);
 
