@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import CountUp from "@/components/CountUp";
 import EnglishText from "@/components/EnglishText";
 import { getCanDoStatement } from "@/lib/content/canDoStatements";
 import type { LevelCatalogEntry } from "@/lib/content/levelCatalog";
@@ -89,17 +90,19 @@ export default function LandingLevels({ catalog }: { catalog: Record<CefrLevel, 
           </div>
         </div>
 
-        {/* What this level looks like */}
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={level}
-            initial={{ opacity: 0, transform: "translateY(8px)" }}
-            animate={{ opacity: 1, transform: "translateY(0px)" }}
-            exit={{ opacity: 0, transform: "translateY(-4px)" }}
-            transition={{ duration: 0.2, ease: EASE_OUT }}
-            className="mt-8 grid gap-4 md:grid-cols-[1.1fr_1fr]"
-          >
-            <div className="relative overflow-hidden rounded-lg border border-card-border bg-card p-6">
+        {/* What this level looks like. The description swaps; the counts
+            stay where they are and roll to the new level's numbers, so the
+            difference between two levels is something you watch happen. */}
+        <div className="relative mt-8 grid gap-4 md:grid-cols-[1.1fr_1fr]">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.div
+              key={level}
+              initial={{ opacity: 0, transform: "translateY(8px)" }}
+              animate={{ opacity: 1, transform: "translateY(0px)" }}
+              exit={{ opacity: 0, transform: "translateY(-4px)" }}
+              transition={{ duration: 0.2, ease: EASE_OUT }}
+              className="relative overflow-hidden rounded-lg border border-card-border bg-card p-6"
+            >
               <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 bg-primary" />
               <p className="flex items-baseline gap-3">
                 <EnglishText as="span" className="chyron text-6xl leading-none text-primary">
@@ -121,17 +124,19 @@ export default function LandingLevels({ catalog }: { catalog: Record<CefrLevel, 
                   </div>
                 )}
               </dl>
-            </div>
-            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-card-border bg-card-border">
-              {COUNTS.map(({ key, label }) => (
-                <div key={key} className="flex flex-col-reverse bg-card px-4 py-3.5">
-                  <dt className="mt-1 text-xs text-muted">{label}</dt>
-                  <dd className="chyron text-3xl leading-none tabular-nums">{entry[key]}</dd>
-                </div>
-              ))}
-            </dl>
-          </motion.div>
-        </AnimatePresence>
+            </motion.div>
+          </AnimatePresence>
+          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-card-border bg-card-border">
+            {COUNTS.map(({ key, label }) => (
+              <div key={key} className="flex flex-col-reverse bg-card px-4 py-3.5">
+                <dt className="mt-1 text-xs text-muted">{label}</dt>
+                <dd className="chyron text-3xl leading-none tabular-nums">
+                  <CountUp value={entry[key]} />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
         <p className="mt-3 text-xs text-muted">
           המספרים נספרים מהמאגר עצמו ומתעדכנים כשנוסף תוכן. הרמה ב-Saylo היא הערכה פנימית, לא תעודה רשמית.
         </p>

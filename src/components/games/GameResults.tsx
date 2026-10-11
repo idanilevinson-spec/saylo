@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import { motion } from "framer-motion";
 import { RotateCcw, Trophy, Volume2 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import { gsap, useGSAP } from "@/lib/motion/gsap";
+import { useReducedMotionPreference } from "@/lib/motion/reducedMotion";
 import { supabase } from "@/lib/supabase/browserClient";
 import { speak } from "@/lib/speech/browserTts";
 import EnglishText from "@/components/EnglishText";
@@ -79,12 +81,61 @@ export default function GameResults({ title, percent, score, detail, gameType, s
   const words = recap?.words ?? missed;
   const unique = words.filter((w, i) => words.findIndex((m) => m.headword === w.headword) === i);
 
+  // The final whistle, as one short sequence: the round replays across the
+  // answer track, one segment per answer in the order they were played,
+  // while the score counts up to where it landed. About a second, once,
+  // only here at the end — never anything that delays an answer mid-round.
+  // The finished numbers are what's rendered; the sequence only plays
+  // toward them, so with reduced motion (or before it runs) they're there.
+  const summaryRef = useRef<HTMLElement>(null);
+  const reduced = useReducedMotionPreference();
+  useGSAP(
+    () => {
+      if (reduced) return;
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const segments = gsap.utils.toArray<HTMLElement>("[data-round-segment]", summaryRef.current);
+      if (segments.length) {
+        tl.from(
+          segments,
+          { scaleY: 0, transformOrigin: "50% 100%", duration: 0.22, stagger: { amount: Math.min(0.7, segments.length * 0.05) } },
+          0.2
+        );
+      }
+      const scoreEl = summaryRef.current?.querySelector<HTMLElement>("[data-score-count]");
+      if (scoreEl && percent !== undefined && percent > 0) {
+        const counter = { value: 0 };
+        tl.to(
+          counter,
+          {
+            value: percent,
+            duration: 0.9,
+            ease: "power2.out",
+            onUpdate: () => {
+              scoreEl.textContent = String(Math.round(counter.value));
+            },
+          },
+          0.15
+        );
+      }
+    },
+    { scope: summaryRef, dependencies: [reduced], revertOnUpdate: true }
+  );
+
   return (
     <div className="max-w-xl mx-auto px-4 py-12">
-      <section className="relative overflow-hidden bg-card border border-card-border rounded-lg p-6 sm:p-8 text-center">
+      <section ref={summaryRef} className="relative overflow-hidden bg-card border border-card-border rounded-lg p-6 sm:p-8 text-center">
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <h1 className="text-2xl font-bold">{title}</h1>
-        <GameCompletionScore>{score ?? `${percent}%`}</GameCompletionScore>
+        <GameCompletionScore>
+          {score ?? (
+            <>
+              <span className="sr-only">{percent}%</span>
+              <span aria-hidden="true">
+                <span data-score-count>{percent}</span>%
+              </span>
+            </>
+          )}
+        </GameCompletionScore>
         <p className="mt-2 text-muted tabular-nums">{detail}</p>
 
         {results && results.length > 0 && (
@@ -92,6 +143,7 @@ export default function GameResults({ title, percent, score, detail, gameType, s
             {results.map((r, i) => (
               <span
                 key={i}
+                data-round-segment
                 className={`h-2 w-full max-w-6 rounded-[2px] ${r === "correct" ? "bg-success" : r === "wrong" ? "bg-danger" : "bg-card-border"}`}
               />
             ))}

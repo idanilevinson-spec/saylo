@@ -88,3 +88,13 @@ All vocabulary games and the practice test are built from one kit, `src/componen
 - **Pacing:** a right answer moves on by itself (450–1000 ms, compact card); a wrong one stops on the full word card until the learner taps "next" (Enter on a keyboard). Per-question clocks pause while the card is up, so reading costs nothing.
 - **Motion:** press feedback on `:active` (`.game-press`, scale 0.97), one shake on a wrong answer, a short pop when the score changes, the clock as a single linear CSS animation. All of it respects both `prefers-reduced-motion` and the site's own "stop animations" toggle, except the clock, which carries information and keeps running.
 - **iOS app:** the falling word in "catch" moves by writing its transform directly each frame (no React re-render per frame); controls have `touch-action: manipulation`, no text selection or callout on long-press, and touch devices get touch instructions instead of arrow-key ones.
+
+## Motion libraries (2026-10-11)
+
+framer-motion stays the default for UI state. Two libraries were added, each for one job it does better, and nowhere else:
+
+- **GSAP + ScrollTrigger** (`src/lib/motion/gsap.ts` registers plugins once). Used twice. (1) `LandingSteps`: the rundown cues itself as you read it. The segment under the reading line lights in the logo blue, passed ones settle to muted, upcoming ones stay unlit, and a playhead on the rail tracks progress. This replaced the generic fade-up of the whole section; the scroll relationship carries meaning here, which is the only reason it's scroll-driven. (2) `GameResults`: the finish sequence. The answer track replays segment by segment in play order while the score counts up to its final value. About a second, once, at the end only.
+- **Lenis** (`SmoothScroll`, mounted by `(marketing)/layout.tsx`): smoothed mouse-wheel scrolling on the public pages only. Touch stays native, the app/auth/admin keep browser scroll, and it is off inside the iOS app.
+- **React Bits**: `CountUp` adapted from its CountUp (credit in the file). In `LandingLevels` the counts no longer remount with the level card; they stay put and roll from the old level's numbers to the new one's, so the difference between levels is visible. The real number is in the server HTML.
+
+Rules carried by all three: content is fully visible before any script runs (the animated state is never the default); everything goes through `useReducedMotionPreference` / `prefersReducedMotion` (`src/lib/motion/reducedMotion.ts`), which honours both the OS setting and the site's own "stop animations" switch, live. Nothing new runs during an exercise or a game round.
