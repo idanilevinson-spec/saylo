@@ -20,23 +20,35 @@ function normalizeWord(word: string): string {
   return word.toLowerCase().replace(/[^a-z']/g, "");
 }
 
-function tokenizeWords(text: string, vocabByWord: Record<string, VocabularyLookupEntry>, onWordClick: (word: string, entry: VocabularyLookupEntry) => void) {
+// Only words at the text's level or one below are marked, the same rule as
+// the glossary: underlining "employee" and "savings" in a C2 text is noise.
+// Punctuation stays outside the button, so "welfare," marks just "welfare".
+function tokenizeWords(
+  text: string,
+  vocabByWord: Record<string, VocabularyLookupEntry>,
+  minLevel: number,
+  onWordClick: (word: string, entry: VocabularyLookupEntry) => void,
+) {
   return text.split(/(\s+)/).map((token, i) => {
     if (/^\s*$/.test(token)) return <span key={i}>{token}</span>;
     const clean = normalizeWord(token);
     const entry = vocabByWord[clean];
-    if (!entry) return <span key={i}>{token}</span>;
+    if (!entry || CEFR_ORDER.indexOf(entry.cefr_level) < minLevel) return <span key={i}>{token}</span>;
+    const [, lead, core, trail] = token.match(/^([^A-Za-z']*)(.*?)([^A-Za-z']*)$/) ?? ["", "", token, ""];
     return (
-      <button
-        key={i}
-        onClick={() => {
-          onWordClick(clean, entry);
-          speak(clean);
-        }}
-        className="underline decoration-dotted decoration-primary/50 hover:bg-primary/10 rounded px-0.5 transition-colors"
-      >
-        {token}
-      </button>
+      <span key={i}>
+        {lead}
+        <button
+          onClick={() => {
+            onWordClick(clean, entry);
+            speak(clean);
+          }}
+          className="underline decoration-dotted decoration-primary/50 hover:bg-primary/10 rounded px-0.5 transition-colors"
+        >
+          {core}
+        </button>
+        {trail}
+      </span>
     );
   });
 }
@@ -130,7 +142,7 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord, textLevel }: Re
                 <Play size={11} />
               )}
             </button>
-            {tokenizeWords(paragraph, vocabByWord, (word, entry) => setPopover({ word, entry }))}
+            {tokenizeWords(paragraph, vocabByWord, minLevel, (word, entry) => setPopover({ word, entry }))}
           </p>
         ))}
       </div>

@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/browserClient";
+import { fetchAll } from "@/lib/supabase/fetchAll";
 import { shuffle } from "@/lib/utils/shuffle";
 
 // Mastery is derived entirely from srs_items.repetitions (SM-2, see
@@ -73,13 +74,19 @@ export async function getLearnPool(profileId: string, topicId?: string, limit = 
 
   const poolIds = pool.map((p) => p.id);
 
-  const { data: srsRows } = await supabase
-    .from("srs_items")
-    .select("vocabulary_item_id, repetitions, due_at")
-    .eq("profile_id", profileId)
-    .in("vocabulary_item_id", poolIds);
-
-  const srsByItem = new Map((srsRows ?? []).map((r) => [r.vocabulary_item_id, r]));
+  // All of this learner's review rows, filtered here: passing every pool id
+  // to .in() puts them in the request URL, and past about 400 ids (the pool
+  // is up to 500) the request fails and every word looked never-reviewed.
+  const { data: srsRows } = await fetchAll((from, to) =>
+    supabase
+      .from("srs_items")
+      .select("vocabulary_item_id, repetitions, due_at")
+      .eq("profile_id", profileId)
+      .order("vocabulary_item_id")
+      .range(from, to),
+  );
+  const inPool = new Set(poolIds);
+  const srsByItem = new Map(srsRows.filter((r) => inPool.has(r.vocabulary_item_id)).map((r) => [r.vocabulary_item_id, r]));
   const nowIso = new Date().toISOString();
 
   const due = pool.filter((p) => {
