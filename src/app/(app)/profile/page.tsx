@@ -200,7 +200,7 @@ export default function ProfilePage() {
             </div>
             <div className="flex items-baseline gap-1.5">
               <dd className="chyron text-2xl leading-none tabular-nums">{stats.level}</dd>
-              <dt className="text-muted">רמת XP</dt>
+              <dt className="text-muted">שלב XP</dt>
             </div>
             <div className="flex items-baseline gap-1.5">
               <dd className="chyron text-2xl leading-none tabular-nums">{stats.currentStreak}</dd>
