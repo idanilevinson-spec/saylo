@@ -239,7 +239,7 @@ export default function DashboardPage() {
                 ) : null
               }
             />
-            <StatField icon={Star} tone="primary" value={String(stats.totalXp)} label={`XP · רמה ${stats.level}`} />
+            <StatField icon={Star} tone="primary" value={String(stats.totalXp)} label={`XP · שלב ${stats.level}`} />
             {hearts && (
               <StatField icon={Heart} tone="danger" value={`${hearts.current}/${hearts.max}`} label="לבבות" />
             )}

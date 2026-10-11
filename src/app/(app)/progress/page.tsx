@@ -250,7 +250,7 @@ export default function ProgressPage() {
         />
         <div className="relative grid grid-cols-2 sm:grid-cols-4 gap-6">
           <StatHero icon={Star} tone="text-primary" value={data.totalXp} label="XP סה״כ" />
-          <StatHero icon={Trophy} tone="text-accent-hover" value={data.level} label="רמה" />
+          <StatHero icon={Trophy} tone="text-accent-hover" value={data.level} label="שלב XP" />
           <StatHero
             icon={Flame}
             tone="text-accent-hover"

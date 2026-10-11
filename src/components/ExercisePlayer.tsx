@@ -7,6 +7,9 @@ import { CheckCircle2, XCircle, Heart, PartyPopper, Flame, CornerDownLeft } from
 import { useAuth } from "@/context/AuthProvider";
 import { startAttempt, type AttemptResult } from "@/lib/exercises/recordAttempt";
 import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
+import { streakLabel } from "@/lib/format/streak";
+import FillBlankExplanation from "@/components/FillBlankExplanation";
+import type { FillBlankContent } from "@/types/exercises";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import type { Exercise } from "@/types/database";
 import McqQuestion from "@/components/McqQuestion";
@@ -123,11 +126,15 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                   {result.isCorrect ? <CheckCircle2 size={17} aria-hidden="true" /> : <XCircle size={17} aria-hidden="true" />}
                   {result.isCorrect ? "תשובה נכונה" : "לא בדיוק"}
                 </p>
-                {!result.isCorrect && (
-                  <p className="mt-1.5 text-sm">
-                    <span className="text-muted">התשובה הנכונה: </span>
-                    <EnglishText className="font-bold">{correctAnswerLabel(exercise.type, exercise.content)}</EnglishText>
-                  </p>
+                {!result.isCorrect && exercise.type === "fill_blank" ? (
+                  <FillBlankExplanation content={exercise.content as unknown as FillBlankContent} />
+                ) : (
+                  !result.isCorrect && (
+                    <p className="mt-1.5 text-sm">
+                      <span className="text-muted">התשובה הנכונה: </span>
+                      <EnglishText className="font-bold">{correctAnswerLabel(exercise.type, exercise.content)}</EnglishText>
+                    </p>
+                  )
                 )}
               </motion.div>
             ))}
@@ -137,7 +144,7 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
               <span className="font-bold text-accent-hover tabular-nums">+{result.xpAwarded} XP</span>
               {details && (
                 <span className="inline-flex items-center gap-1 tabular-nums">
-                  <Flame size={14} aria-hidden="true" className="text-accent-hover" /> רצף של {details.currentStreak} ימים
+                  <Flame size={14} aria-hidden="true" className="text-accent-hover" /> {streakLabel(details.currentStreak)}
                 </span>
               )}
               {details && details.heartsRemaining !== null && (
