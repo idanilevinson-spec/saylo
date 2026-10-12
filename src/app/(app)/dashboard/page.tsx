@@ -255,7 +255,7 @@ export default function DashboardPage() {
               </span>
               <div className="min-w-0">
                 <h2 className="text-2xl font-black tracking-tight">מתחילים במבחן רמה</h2>
-                <p className="mt-1 max-w-lg text-primary-ink/80 leading-relaxed">
+                <p className="mt-1 max-w-lg text-primary-ink/90 leading-relaxed">
                   בערך 10 דקות. בסופו תקבלו את הרמה שלכם בכל מיומנות, ותוכנית יומית שבנויה בדיוק לרמה הזו.
                 </p>
               </div>

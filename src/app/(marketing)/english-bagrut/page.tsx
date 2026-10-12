@@ -170,7 +170,7 @@ export default function EnglishBagrutPage() {
 
         <section className="mt-14 rounded-lg bg-primary px-6 py-7 text-primary-ink">
           <h2 className="text-2xl font-black">מתחילים מהמסלול שלכם</h2>
-          <p className="mt-1 text-primary-ink/80">מבחן רמה של כ-10 דקות, בחירת מסלול, ואזור בגרות שנפתח לפיו.</p>
+          <p className="mt-1 text-primary-ink/90">מבחן רמה של כ-10 דקות, בחירת מסלול, ואזור בגרות שנפתח לפיו.</p>
           <Link href="/signup" className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold">
             להרשמה חינם
           </Link>

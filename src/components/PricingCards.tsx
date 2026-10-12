@@ -56,6 +56,10 @@ export default function PricingCards() {
     (PRICING_PLANS.find((p) => p.badge) ?? PRICING_PLANS[PRICING_PLANS.length - 1]).code,
   );
   const selected = PRICING_PLANS.find((p) => p.code === selectedCode) ?? PRICING_PLANS[0];
+  // The summary card answers a plan change with a short settle, but on
+  // page load it is simply there at full strength: the server-rendered
+  // HTML must not ship a faded price and button while scripts load.
+  const [planChanged, setPlanChanged] = useState(false);
 
   // On the native app every price shown must be exactly what Apple charges,
   // so it comes from StoreKit rather than plans.ts.
@@ -165,7 +169,10 @@ export default function PricingCards() {
                 type="button"
                 role="radio"
                 aria-checked={active}
-                onClick={() => setSelectedCode(plan.code)}
+                onClick={() => {
+                  setSelectedCode(plan.code);
+                  setPlanChanged(true);
+                }}
                 className={`game-press flex w-full items-center gap-4 rounded-lg border px-4 py-3.5 text-start transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                   active ? "border-primary bg-primary/[0.07]" : "border-card-border bg-card hover:border-primary/40"
                 }`}
@@ -200,7 +207,7 @@ export default function PricingCards() {
 
         <motion.div
           key={selected.code}
-          initial={{ opacity: 0.6, transform: "translateY(4px)" }}
+          initial={planChanged ? { opacity: 0.6, transform: "translateY(4px)" } : false}
           animate={{ opacity: 1, transform: "translateY(0px)" }}
           transition={{ duration: 0.2, ease: EASE_OUT }}
           className="relative overflow-hidden rounded-lg border border-primary bg-card p-6 sm:p-7 lg:sticky lg:top-24"

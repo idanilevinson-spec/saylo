@@ -69,13 +69,13 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
               <span className="chyron block text-7xl sm:text-8xl leading-[0.85]" dir="ltr">
                 {level}
               </span>
-              <span className="mt-1 block text-xs font-bold text-primary-ink/75">{CEFR_NAME_HE[level]}</span>
+              <span className="mt-1 block text-xs font-bold text-primary-ink/90">{CEFR_NAME_HE[level]}</span>
             </div>
             <div className="min-w-0">
               <h2 id="level-title" className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                 הרמה שלכם
               </h2>
-              {canDo && <p className="mt-1.5 max-w-md text-primary-ink/80 leading-relaxed">{canDo}</p>}
+              {canDo && <p className="mt-1.5 max-w-md text-primary-ink/90 leading-relaxed">{canDo}</p>}
               {next ? (
                 <Link
                   href={next.href}
@@ -100,7 +100,7 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
               const l = plan.bySkill[skill] ?? null;
               return (
                 <div key={skill} className="rounded-lg bg-primary-ink/10 ring-1 ring-primary-ink/15 px-3 py-2 min-w-[5.5rem]">
-                  <dt className="flex items-center gap-1 text-[0.7rem] font-bold text-primary-ink/75">
+                  <dt className="flex items-center gap-1 text-[0.7rem] font-bold text-primary-ink/90">
                     <Icon size={12} aria-hidden="true" />
                     {label}
                   </dt>

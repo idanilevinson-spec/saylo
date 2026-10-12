@@ -110,3 +110,9 @@ The one authored moment that replaced it is `DailyGoal` (dashboard): the day's X
 The end of the placement test is the first time a learner sees where they stand, so it gets the one authored sequence in the app (`src/components/placement/PlacementResult.tsx`, GSAP timeline, about 2s, once): the overall level rises in like a chyron cut-in, each skill bar fills in order (a transform from the reading start) while its percentage counts up, its CEFR level appears as the bar arrives, then the summary and Bagrut cards settle. Everything renders at its final state; with reduced motion the sequence does not run.
 
 The wait before it (two AI calls, up to 30s) was a single grey line. It is now a plate that says what is happening and how long it can take, with a `.working-sweep` line: a segment crossing the track, never a fake percentage.
+
+## Text on the blue field (2026-10-11)
+
+Secondary text on a solid `bg-primary` field is `text-primary-ink/90` at the lowest. Measured on the composited colors: `/80` is 4.03:1 in light mode (fails AA), `/75` fails in both themes, `/90` is 4.69 (light) and 5.90 (dark). Blue text on the light `bg-primary/15` tint uses `text-primary-hover` (6.0 / 6.4), not `text-primary` (4.35 in light). A contrast scan of every public page in both themes (all text nodes against their composited background) came back clean after these changes.
+
+The pricing summary card renders at full strength on load; its short settle plays only when the plan changes. It used to ship from the server at 60% opacity, so a slow phone showed a faded price and button until scripts ran.

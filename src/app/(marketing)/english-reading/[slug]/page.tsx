@@ -131,7 +131,7 @@ export default async function EnglishReadingText({ params }: { params: Promise<{
         <section className="mt-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg bg-primary px-6 py-5 text-primary-ink">
           <div>
             <h2 className="text-lg font-black">לענות ולקבל משוב</h2>
-            <p className="text-sm text-primary-ink/80">באפליקציה עונים על השאלות, רואים מיד מה נכון, ומקבלים משוב על התשובות הפתוחות.</p>
+            <p className="text-sm text-primary-ink/90">באפליקציה עונים על השאלות, רואים מיד מה נכון, ומקבלים משוב על התשובות הפתוחות.</p>
           </div>
           <PracticeLink
             signedInHref={`/reading/${text.id}`}

@@ -144,7 +144,7 @@ export default async function ReadingPage() {
           href={`/reading/${next.id}`}
           className="game-press group relative mt-8 block overflow-hidden rounded-lg bg-primary text-primary-ink p-6 sm:p-7 transition-transform duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
-          <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold text-primary-ink/80">
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold text-primary-ink/90">
             <span className="inline-flex items-center gap-1.5">
               <BookOpen size={16} aria-hidden="true" />
               {readCount === 0 ? "מתחילים מכאן" : "הטקסט הבא בשבילכם"}
@@ -160,8 +160,8 @@ export default async function ReadingPage() {
           <EnglishText as="span" className="mt-3 block text-right text-2xl sm:text-3xl font-black leading-tight">
             {next.title_en}
           </EnglishText>
-          <span className="mt-1 block text-primary-ink/80">{next.title_he}</span>
-          <span dir="ltr" lang="en" className="mt-4 block max-w-2xl text-left text-sm leading-relaxed text-primary-ink/70 line-clamp-2">
+          <span className="mt-1 block text-primary-ink/90">{next.title_he}</span>
+          <span dir="ltr" lang="en" className="mt-4 block max-w-2xl text-left text-sm leading-relaxed text-primary-ink/90 line-clamp-2">
             {excerpt(next.body_en)}
           </span>
           <span className="mt-5 inline-flex items-center gap-2 min-h-11 px-5 rounded-lg bg-background text-foreground font-bold">
