@@ -5,6 +5,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Volume2, Turtle, Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, type LucideIcon } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import { placementInstructionHe } from "@/lib/placement/instructionHe";
 import AiConsentGate from "@/components/AiConsentGate";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -442,7 +443,12 @@ export default function PlacementPage() {
       >
         {question.skill_area === "listening" && question.audio_text ? (
           <div>
-            <p className="font-medium text-lg mb-3">{renderPromptWithUniformBlanks(question.prompt)}</p>
+            {placementInstructionHe(question.prompt) && (
+              <p className="mb-1.5 text-sm text-muted">{placementInstructionHe(question.prompt)}</p>
+            )}
+            <EnglishText as="p" className="font-medium text-lg mb-3">
+              {renderPromptWithUniformBlanks(question.prompt)}
+            </EnglishText>
             <div className="flex gap-2">
               <button
                 onClick={() => speak(question.audio_text as string, 1)}
@@ -459,9 +465,14 @@ export default function PlacementPage() {
             </div>
           </div>
         ) : (
-          <EnglishText as="p" className="font-medium text-lg">
-            {renderPromptWithUniformBlanks(question.prompt)}
-          </EnglishText>
+          <>
+            {placementInstructionHe(question.prompt) && (
+              <p className="mb-1.5 text-sm text-muted">{placementInstructionHe(question.prompt)}</p>
+            )}
+            <EnglishText as="p" className="font-medium text-lg">
+              {renderPromptWithUniformBlanks(question.prompt)}
+            </EnglishText>
+          </>
         )}
 
         <div className="mt-4 space-y-2">
