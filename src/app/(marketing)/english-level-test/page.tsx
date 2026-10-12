@@ -17,7 +17,7 @@ const DESCRIPTION =
   "מבחן רמה באנגלית של כ-10 דקות: אוצר מילים, דקדוק, קריאה והאזנה. בסופו רמה מ-A1 עד C2 לכל מיומנות בנפרד, ותוכנית תרגול יומית שבנויה עליה.";
 
 export const metadata: Metadata = {
-  title: "מבחן רמה באנגלית לפי CEFR — Saylo",
+  title: "מבחן רמה באנגלית לפי CEFR | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-level-test" },
   openGraph: pageOpenGraph("מבחן רמה באנגלית לפי CEFR", DESCRIPTION, "/english-level-test"),

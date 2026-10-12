@@ -4,7 +4,7 @@ import LegalPage, { BusinessDetails, EmailLink, LegalSection, LegalList } from "
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 export const metadata: Metadata = {
-  title: "ביטולים והחזרים — Saylo",
+  title: "ביטולים והחזרים | Saylo",
 };
 
 const linkClass = "text-primary hover:underline";

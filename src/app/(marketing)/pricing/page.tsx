@@ -3,7 +3,7 @@ import PricingCards from "@/components/PricingCards";
 import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "מסלולים ומחירים — Saylo",
+  title: "מסלולים ומחירים | Saylo",
 };
 
 export default function PricingPage() {

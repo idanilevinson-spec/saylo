@@ -6,7 +6,7 @@ import { join } from "node:path";
 // AI-written Hebrew is held to it by HEBREW_GENDER_NEUTRAL_NOTE; this holds
 // the Hebrew written into the code itself to the same rule: lesson and
 // Bagrut content, pattern drills, the help chat's knowledge base and the
-// public pages. Page titles ("… — Saylo") are the one deliberate exception.
+// public pages, page titles included ("… | Saylo").
 const ROOTS = ["src/lib/content", "src/lib/patterns", "src/lib/support/knowledgeBase.ts", "src/app/(marketing)"];
 
 function filesUnder(path: string): string[] {
@@ -22,8 +22,7 @@ describe("Hebrew copy in code", () => {
     for (const file of ROOTS.flatMap(filesUnder).filter((f) => /\.tsx?$/.test(f) && !f.includes(".test."))) {
       const source = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ""));
       source.split("\n").forEach((line, i) => {
-        const code = line.replace(/(^|[^:])\/\/.*$/, "$1").replace(/— Saylo/g, "");
-        if (/^\s*title:/.test(code)) return;
+        const code = line.replace(/(^|[^:])\/\/.*$/, "$1");
         if (HEBREW_NEAR_DASH.test(code)) offenders.push(`${file}:${i + 1}`);
       });
     }

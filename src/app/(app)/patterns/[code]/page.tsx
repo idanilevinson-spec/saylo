@@ -11,7 +11,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { code } = await params;
   const definition = getPatternDefinition(code);
-  return { title: definition ? `תרגול: ${definition.labelHe} — Saylo` : "תרגול — Saylo" };
+  return { title: definition ? `תרגול: ${definition.labelHe} | Saylo` : "תרגול | Saylo" };
 }
 
 export default async function PatternDrillPage({ params }: PageProps) {

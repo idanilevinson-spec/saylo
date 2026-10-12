@@ -9,7 +9,7 @@ import { getLearnerLevels, levelFor } from "@/lib/content/learnerLevel";
 import type { IdiomPhrasalVerb } from "@/types/database";
 
 export const metadata: Metadata = {
-  title: "ניבים ופעלים דו-מיליים — Saylo",
+  title: "ניבים ופעלים דו-מיליים | Saylo",
 };
 
 function PhraseCard({ item }: { item: IdiomPhrasalVerb }) {

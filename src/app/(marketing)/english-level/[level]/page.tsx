@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ level: st
   const description = `מה אפשר לעשות באנגלית ברמה ${level} לפי סולם CEFR, ודוגמאות אמיתיות למילים, לנושאי הדקדוק ולטקסטים שלומדים ברמה הזו.`;
   const path = `/english-level/${level.toLowerCase()}`;
   return {
-    title: `${title} — Saylo`,
+    title: `${title} | Saylo`,
     description,
     alternates: { canonical: path },
     openGraph: pageOpenGraph(title, description, path),

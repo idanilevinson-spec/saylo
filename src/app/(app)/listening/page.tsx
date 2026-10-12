@@ -8,7 +8,7 @@ import { getLearnerLevels, levelFor } from "@/lib/content/learnerLevel";
 import type { ListeningClip } from "@/types/database";
 
 export const metadata: Metadata = {
-  title: "האזנה — Saylo",
+  title: "האזנה | Saylo",
 };
 
 function clipTile(clip: ListeningClip, natural: boolean) {

@@ -4,7 +4,7 @@ import LegalPage, { EmailLink, LegalSection } from "@/components/LegalPage";
 import OpenSupportButton from "@/components/support/OpenSupportButton";
 
 export const metadata: Metadata = {
-  title: "תמיכה — Saylo",
+  title: "תמיכה | Saylo",
   description: "יצירת קשר, ביטול מנוי, מחיקת חשבון ותשובות לשאלות נפוצות על Saylo.",
 };
 

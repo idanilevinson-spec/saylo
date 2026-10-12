@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ module: s
   const description = `איך בנוי שאלון ${code} בבגרות באנגלית: ${f.sections.map((s) => `${s.nameHe} (${s.points} נק׳)`).join(", ")}${f.timeMinutes ? `, ${f.timeMinutes} דקות` : ""}. מיומנויות עם דוגמה פתורה וערכות תרגול באותו מבנה.`;
   const path = `/english-bagrut/${code.toLowerCase()}`;
   return {
-    title: `${title} — Saylo`,
+    title: `${title} | Saylo`,
     description,
     alternates: { canonical: path },
     openGraph: pageOpenGraph(title, description, path),

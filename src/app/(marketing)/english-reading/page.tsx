@@ -16,7 +16,7 @@ const DESCRIPTION =
   "קטעי קריאה באנגלית עם שאלות הבנה, לפי רמה מ-A1 עד C2: טקסטים מקוריים על חיי היום-יום, מדע, חברה ותרבות, באורך שמתאים לכל רמה.";
 
 export const metadata: Metadata = {
-  title: "קטעי קריאה באנגלית עם שאלות, לפי רמה — Saylo",
+  title: "קטעי קריאה באנגלית עם שאלות, לפי רמה | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-reading" },
   openGraph: pageOpenGraph("קטעי קריאה באנגלית עם שאלות, לפי רמה", DESCRIPTION, "/english-reading"),
