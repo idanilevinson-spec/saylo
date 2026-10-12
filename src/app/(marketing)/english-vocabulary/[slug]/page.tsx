@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = `אוצר מילים באנגלית בנושא ${topic.name_he} (רמה ${topic.cefr_level}): ${sample} ועוד, כל מילה עם תרגום, הגייה ומשפט לדוגמה.`;
   const path = `/english-vocabulary/${topic.slug}`;
   return {
-    title: `${title} — Saylo`,
+    title: `${title} | Saylo`,
     description,
     alternates: { canonical: path },
     openGraph: pageOpenGraph(title, description, path),

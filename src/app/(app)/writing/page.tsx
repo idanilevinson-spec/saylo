@@ -8,7 +8,7 @@ import { getLearnerLevels, levelFor } from "@/lib/content/learnerLevel";
 import type { WritingPrompt } from "@/types/database";
 
 export const metadata: Metadata = {
-  title: "כתיבה — Saylo",
+  title: "כתיבה | Saylo",
 };
 
 export default async function WritingPage() {

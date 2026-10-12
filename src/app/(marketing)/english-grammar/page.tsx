@@ -18,7 +18,7 @@ const DESCRIPTION =
   "הסברים בעברית לכל נושאי הדקדוק באנגלית, מ-A1 עד C2: מבנה, דוגמאות, טבלאות השוואה והטעויות הנפוצות של דוברי עברית.";
 
 export const metadata: Metadata = {
-  title: "דקדוק באנגלית: הסברים בעברית לפי רמה — Saylo",
+  title: "דקדוק באנגלית: הסברים בעברית לפי רמה | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-grammar" },
   openGraph: pageOpenGraph("דקדוק באנגלית: הסברים בעברית לפי רמה", DESCRIPTION, "/english-grammar"),

@@ -24,7 +24,7 @@ function parseUnits(raw: string): BagrutStudyUnits | null {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const units = parseUnits((await params).units);
-  return { title: units ? `בגרות ${units} יח״ל — Saylo` : "בגרות — Saylo" };
+  return { title: units ? `בגרות ${units} יח״ל | Saylo` : "בגרות | Saylo" };
 }
 
 function sectionIcon(nameHe: string) {

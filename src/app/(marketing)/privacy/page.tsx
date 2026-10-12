@@ -3,7 +3,7 @@ import LegalPage, { ContactDetails, LegalSection, LegalList } from "@/components
 import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 export const metadata: Metadata = {
-  title: "מדיניות פרטיות — Saylo",
+  title: "מדיניות פרטיות | Saylo",
 };
 
 function MailLink() {

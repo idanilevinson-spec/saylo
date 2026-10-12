@@ -17,7 +17,7 @@ const DESCRIPTION =
   "נושאים לכתיבה ולחיבור באנגלית לפי רמה, מ-A1 עד C2: מהצגה עצמית ועד מסה ומכתב רשמי. באפליקציה כותבים ומקבלים משוב על הטקסט.";
 
 export const metadata: Metadata = {
-  title: "נושאים לחיבור ולכתיבה באנגלית, לפי רמה — Saylo",
+  title: "נושאים לחיבור ולכתיבה באנגלית, לפי רמה | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-writing" },
   openGraph: pageOpenGraph("נושאים לחיבור ולכתיבה באנגלית, לפי רמה", DESCRIPTION, "/english-writing"),

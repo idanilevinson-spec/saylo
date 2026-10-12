@@ -429,7 +429,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
           "Keeping records of what was planted",
         ],
         correctOptionIndex: 1,
-        modelAnswerHe: "תשובה נכונה: B — מכירת ירקות מחוץ לבית הספר אינה מוזכרת בטקסט.",
+        modelAnswerHe: "תשובה נכונה: B. מכירת ירקות מחוץ לבית הספר אינה מוזכרת בטקסט.",
       },
       {
         formatHe: "אוצר מילים בהקשר",
@@ -490,7 +490,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "שאלה פתוחה",
         promptEn:
           "According to Mr. Harel, what do people actually leave the Repair Café with, besides a fixed item? Support your answer with information from the text.",
-        modelAnswerHe: "תשובה מקובלת: זמן שבילו עם שכן — חיבור חברתי, לא רק הפריט המתוקן עצמו.",
+        modelAnswerHe: "תשובה מקובלת: זמן שבילו עם שכן: חיבור חברתי, לא רק הפריט המתוקן עצמו.",
       },
     ],
     writingTask: {
@@ -524,7 +524,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         promptEn:
           "What does the detail of the students 'barely glancing back' suggest about how ordinary the moment felt to them, compared to how it felt to Mrs. Avram? Answer in your own words, referring to the text.",
         modelAnswerHe:
-          "תשובה מקובלת: בעוד שעבור התלמידים זה היה עוד שיעור רגיל שנגמר, עבור מורה אברם זה היה רגע משמעותי של סיום קריירה שלמה — הטקסט מדגיש את הפער בין איך שני הצדדים חוו את אותו רגע.",
+          "תשובה מקובלת: בעוד שעבור התלמידים זה היה עוד שיעור רגיל שנגמר, עבור מורה אברם זה היה רגע משמעותי של סיום קריירה שלמה. הטקסט מדגיש את הפער בין איך שני הצדדים חוו את אותו רגע.",
       },
       {
         formatHe: "השלמת משפט",
@@ -536,7 +536,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         promptEn:
           "In your opinion, why does the story end with the note rather than with a classroom ceremony? What does this suggest about the kind of ending the writer believes a long career 'truly needed'? Answer in your own words.",
         modelAnswerHe:
-          "תשובה פתוחה — התלמיד צריך להתייחס לרעיון שהכרה אמיתית ותודה אישית, אפילו קטנה ואנונימית, משמעותית יותר מטקס רשמי; חשוב שהתשובה תתבסס על הטקסט עצמו.",
+          "תשובה פתוחה. צריך להתייחס לרעיון שהכרה אמיתית ותודה אישית, אפילו קטנה ואנונימית, משמעותית יותר מטקס רשמי; חשוב שהתשובה תתבסס על הטקסט עצמו.",
       },
     ],
     writingTask: {
@@ -612,7 +612,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
       {
         formatHe: "שאלה פתוחה",
         promptEn: "Why do you think the number of daily bike trips surprised city planners? Support your answer with information from the text.",
-        modelAnswerHe: "תשובה מקובלת: תוכננה רק מספר מוגבל של תחנות/אופניים מתוך ציפייה נמוכה, ומספר הנסיעות היומי חצה עשרת אלפים — הרבה מעבר לתחזית.",
+        modelAnswerHe: "תשובה מקובלת: תוכננה רק מספר מוגבל של תחנות/אופניים מתוך ציפייה נמוכה, ומספר הנסיעות היומי חצה עשרת אלפים, הרבה מעבר לתחזית.",
       },
       {
         formatHe: "השלמת משפט",
@@ -701,7 +701,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "שאלה פתוחה",
         promptEn: "What broader idea does the writer suggest the library's project proved, according to the text? Support your answer with information from the text.",
         modelAnswerHe:
-          "תשובה מקובלת: שגישה (לא רק תוכן) יכולה לקבוע אם שירות ציבורי באמת משרת את הקהילה שלו — תושבים כמו אחיות במשמרת לילה או הורים עייפים זקוקים לגישה בשעות שלא תואמות יום עבודה רגיל.",
+          "תשובה מקובלת: שגישה (לא רק תוכן) יכולה לקבוע אם שירות ציבורי באמת משרת את הקהילה שלו: תושבים כמו אחיות במשמרת לילה או הורים עייפים זקוקים לגישה בשעות שלא תואמות יום עבודה רגיל.",
       },
     ],
     writingTask: {
@@ -735,7 +735,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "שאלה פתוחה",
         promptEn: "According to the text, how can an 'expectation of availability' form without any explicit workplace rule? Explain in your own words.",
         modelAnswerHe:
-          "תשובה מקובלת: דרך אותות עקיפים ולא מכוונים — למשל מנהל ששולח הודעות בשעות מאוחרות, גם בלי לצפות לתגובה מיידית, יוצר תחושה שהעובדים צריכים להיראות זמינים כדי לא להיתפס כלא מחויבים.",
+          "תשובה מקובלת: דרך אותות עקיפים ולא מכוונים, למשל מנהל ששולח הודעות בשעות מאוחרות, גם בלי לצפות לתגובה מיידית, יוצר תחושה שהעובדים צריכים להיראות זמינים כדי לא להיתפס כלא מחויבים.",
       },
       {
         formatHe: "השלמת משפט",
@@ -758,7 +758,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "שאלה פתוחה",
         promptEn: "What is the 'underlying fact' the text says few people dispute, regardless of which side of the debate they take? Support your answer with information from the text.",
         modelAnswerHe:
-          "תשובה מקובלת: שלא ההודעה עצמה היא הבעיה העיקרית, אלא התחושה החצי-מודעת של ציפייה להגיב אליה — זה מה שגובה את המחיר הגבוה יותר.",
+          "תשובה מקובלת: שלא ההודעה עצמה היא הבעיה העיקרית, אלא התחושה החצי-מודעת של ציפייה להגיב אליה. זה מה שגובה את המחיר הגבוה יותר.",
       },
     ],
     writingTask: {
@@ -939,7 +939,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
       {
         formatHe: "שאלה פתוחה",
         promptEn: "According to the text, how does a customer receive a suspended coffee? Answer in your own words.",
-        modelAnswerHe: "תשובה מקובלת: פשוט מבקשים 'suspended coffee' ליד הקופה, בלי לתת הסבר ובלי שאלות — על בסיס אמון.",
+        modelAnswerHe: "תשובה מקובלת: פשוט מבקשים 'suspended coffee' ליד הקופה, בלי לתת הסבר ובלי שאלות, על בסיס אמון.",
       },
       {
         formatHe: "רב-ברירה",
@@ -994,7 +994,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         promptEn:
           "What does the phrase 'A house keeps nothing, really, for itself' suggest about the speaker's view of a house's true meaning? Answer in your own words, referring to the poem.",
         modelAnswerHe:
-          "תשובה מקובלת אם מתייחסת לרעיון שהבית עצמו הוא רק מסגרת ריקה — המשמעות האמיתית שלו היא האנשים והזכרונות שחיו בו, לא המבנה הפיזי.",
+          "תשובה מקובלת אם מתייחסת לרעיון שהבית עצמו הוא רק מסגרת ריקה: המשמעות האמיתית שלו היא האנשים והזכרונות שחיו בו, לא המבנה הפיזי.",
       },
       {
         formatHe: "השלמת משפט",
@@ -1006,7 +1006,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         promptEn:
           "Why do you think the poet repeats small, ordinary details (keys dropped, a stuck door, singing slightly off-key) instead of describing one dramatic event? What effect does this create? Answer in your own words.",
         modelAnswerHe:
-          "תשובה פתוחה — התלמיד צריך להתייחס לכך שפרטים קטנים ויומיומיים דווקא ממחישים טוב יותר איך זיכרון אמיתי נשמר, יותר מאירוע דרמטי בודד; חשוב שהתשובה תתייחס לטקסט.",
+          "תשובה פתוחה. צריך להתייחס לכך שפרטים קטנים ויומיומיים דווקא ממחישים טוב יותר איך זיכרון אמיתי נשמר, יותר מאירוע דרמטי בודד; חשוב שהתשובה תתייחס לטקסט.",
       },
     ],
     writingTask: {
@@ -1082,7 +1082,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
       {
         formatHe: "שאלה פתוחה",
         promptEn: "How does Victor describe his own role in the project, according to the last paragraph? Explain in your own words.",
-        modelAnswerHe: "תשובה מקובלת: הוא מתאר את עצמו בבדיחות כ'מומחה בטעות' להשאלת פטישים — לא תפקיד שציפה לקחת על עצמו.",
+        modelAnswerHe: "תשובה מקובלת: הוא מתאר את עצמו בבדיחות כ'מומחה בטעות' להשאלת פטישים, לא תפקיד שציפה לקחת על עצמו.",
       },
       {
         formatHe: "השלמת משפט",
@@ -1208,7 +1208,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "שאלה פתוחה",
         promptEn: "According to critics, what principle does the right to be forgotten conflict with? Explain in your own words.",
         modelAnswerHe:
-          "תשובה מקובלת: חופש המידע וזכות הציבור לגשת לרשומה היסטורית מדויקת — יש חשש שמחיקת תוצאות חיפוש אמיתיות תמחק בשקט היסטוריה ציבורית לגיטימית.",
+          "תשובה מקובלת: חופש המידע וזכות הציבור לגשת לרשומה היסטורית מדויקת. יש חשש שמחיקת תוצאות חיפוש אמיתיות תמחק בשקט היסטוריה ציבורית לגיטימית.",
       },
       {
         formatHe: "השלמת משפט",
@@ -1231,7 +1231,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "שאלה פתוחה",
         promptEn: "According to the final paragraph, why does the text suggest this debate is unlikely to resolve itself cleanly? Support your answer with information from the text.",
         modelAnswerHe:
-          "תשובה מקובלת: כי זה מעמיד שני ערכים חשובים זה מול זה, לא ערך ברור מול טעות ברורה — ומחלוקות מהסוג הזה נוטות להימשך זמן רב.",
+          "תשובה מקובלת: כי זה מעמיד שני ערכים חשובים זה מול זה, לא ערך ברור מול טעות ברורה, ומחלוקות מהסוג הזה נוטות להימשך זמן רב.",
       },
     ],
     writingTask: {

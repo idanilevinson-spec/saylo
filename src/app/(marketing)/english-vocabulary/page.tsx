@@ -17,7 +17,7 @@ const DESCRIPTION =
   "אוצר מילים באנגלית לפי נושא ורמה, מ-A1 עד C2: כל מילה עם תרגום, הגייה, משפט לדוגמה והגדרה באנגלית, ואפשרות לשמוע אותה.";
 
 export const metadata: Metadata = {
-  title: "אוצר מילים באנגלית לפי נושא ורמה — Saylo",
+  title: "אוצר מילים באנגלית לפי נושא ורמה | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-vocabulary" },
   openGraph: pageOpenGraph("אוצר מילים באנגלית לפי נושא ורמה", DESCRIPTION, "/english-vocabulary"),

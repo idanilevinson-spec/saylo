@@ -25,7 +25,7 @@ import type { BagrutUnitProgress } from "@/types/database";
 import BagrutCredit from "@/components/BagrutCredit";
 
 export const metadata: Metadata = {
-  title: "בגרות באנגלית — Saylo",
+  title: "בגרות באנגלית | Saylo",
 };
 
 const TRACKS: BagrutStudyUnits[] = [3, 4, 5];

@@ -12,7 +12,7 @@ import type { CefrLevel, ReadingText } from "@/types/database";
 import { fetchAll } from "@/lib/supabase/fetchAll";
 
 export const metadata: Metadata = {
-  title: "קריאה — Saylo",
+  title: "קריאה | Saylo",
 };
 
 // Synthesized from widely-published reading-comprehension test-taking

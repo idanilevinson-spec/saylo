@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "הדף לא נמצא — Saylo",
+  title: "הדף לא נמצא | Saylo",
   robots: { index: false },
 };
 

@@ -14,7 +14,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const skill = getBagrutSkill((await params).slug);
-  return { title: skill ? `${skill.titleHe} — בגרות — Saylo` : "בגרות — Saylo" };
+  return { title: skill ? `${skill.titleHe} | בגרות | Saylo` : "בגרות | Saylo" };
 }
 
 export default async function BagrutSkillPage({ params, searchParams }: PageProps) {

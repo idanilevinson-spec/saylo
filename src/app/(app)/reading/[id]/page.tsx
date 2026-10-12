@@ -18,7 +18,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const text = await getReadingText(id);
-  return { title: text ? `${text.title_he} — קריאה` : "קריאה" };
+  return { title: text ? `${text.title_he} | קריאה` : "קריאה" };
 }
 
 export default async function ReadingTextPage({ params }: PageProps) {

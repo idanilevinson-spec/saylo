@@ -18,7 +18,7 @@ const DESCRIPTION =
   "מבנה כל שאלון בבגרות באנגלית (A עד G), מיומנויות עם דוגמה פתורה, וערכות תרגול באותו מבנה, עם שעון באורך הבחינה. לפי 3, 4 ו-5 יחידות לימוד.";
 
 export const metadata: Metadata = {
-  title: "הכנה לבגרות באנגלית: 3, 4 ו-5 יח״ל — Saylo",
+  title: "הכנה לבגרות באנגלית: 3, 4 ו-5 יח״ל | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-bagrut" },
   openGraph: pageOpenGraph("הכנה לבגרות באנגלית: 3, 4 ו-5 יח״ל", DESCRIPTION, "/english-bagrut"),

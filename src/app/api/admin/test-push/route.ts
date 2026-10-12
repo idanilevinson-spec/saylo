@@ -19,7 +19,7 @@ export async function GET() {
   const { data: profile } = await supabase.from("profiles").select("is_admin").eq("id", user.id).maybeSingle();
   if (!profile?.is_admin) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
-  const payload = { title: "בדיקת התראות Saylo", body: "אם אתם רואים את זה — ההתראות עובדות!", url: "/dashboard" };
+  const payload = { title: "בדיקת התראות Saylo", body: "אם אתם רואים את זה, ההתראות עובדות!", url: "/dashboard" };
 
   const [{ data: webSubs }, { data: deviceTokens }] = await Promise.all([
     supabase.from("push_subscriptions").select("*").eq("profile_id", user.id),

@@ -7,7 +7,7 @@ import { listVocabularyTopics } from "@/lib/content/vocabulary";
 import { getLearnerLevels, levelFor } from "@/lib/content/learnerLevel";
 
 export const metadata: Metadata = {
-  title: "אוצר מילים — Saylo",
+  title: "אוצר מילים | Saylo",
 };
 
 export default async function VocabularyPage() {

@@ -16,7 +16,7 @@ const DESCRIPTION =
   "ביטויים ופעלים מורכבים באנגלית ופירושם בעברית, מ-A1 עד C2: piece of cake, break the ice, the elephant in the room ועוד, כל אחד עם משפט לדוגמה.";
 
 export const metadata: Metadata = {
-  title: "ביטויים באנגלית ופירושם בעברית, לפי רמה — Saylo",
+  title: "ביטויים באנגלית ופירושם בעברית, לפי רמה | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-idioms" },
   openGraph: pageOpenGraph(

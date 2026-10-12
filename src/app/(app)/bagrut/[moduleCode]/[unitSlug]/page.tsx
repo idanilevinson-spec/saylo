@@ -14,7 +14,7 @@ function isModuleCode(value: string): value is BagrutModuleCode {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { moduleCode } = await params;
-  return { title: isModuleCode(moduleCode) ? `תרגול מודול ${moduleCode} — בגרות — Saylo` : "תרגול בגרות — Saylo" };
+  return { title: isModuleCode(moduleCode) ? `תרגול מודול ${moduleCode} | בגרות | Saylo` : "תרגול בגרות | Saylo" };
 }
 
 export default async function BagrutUnitPage({ params }: PageProps) {
