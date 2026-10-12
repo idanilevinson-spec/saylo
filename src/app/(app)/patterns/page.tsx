@@ -11,6 +11,7 @@ import { fetchMyPatternStats, type PatternStat } from "@/lib/patterns/getMyPatte
 import { getPatternDefinition } from "@/lib/patterns/patternDefinitions";
 import { getReviewedDrill } from "@/lib/patterns/drills";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const TREND_META = {
   improving: { Icon: TrendingDown, label: "משתפר", className: "text-success" },
   worsening: { Icon: TrendingUp, label: "מחמיר", className: "text-danger" },
@@ -48,7 +49,7 @@ export default function MyPatternsPage() {
       <motion.h1
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.4, ease: EASE_OUT }}
         className="text-3xl font-bold"
       >
         הדפוסים שלי
@@ -74,7 +75,7 @@ export default function MyPatternsPage() {
                 key={stat.code}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
+                transition={{ duration: 0.4, delay: i * 0.05, ease: EASE_OUT }}
                 className="rounded-lg border border-card-border p-5"
               >
                 <div className="flex items-start justify-between gap-3">

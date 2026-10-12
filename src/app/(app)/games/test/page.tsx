@@ -11,6 +11,7 @@ import VocabTest from "@/components/VocabTest";
 import IconBadge from "@/components/IconBadge";
 import type { Topic } from "@/types/database";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const MIN_POOL_SIZE = 8;
 
 type Phase = "picker" | "generating" | "ready" | "empty";
@@ -102,14 +103,14 @@ function VocabTestPageInner() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: EASE_OUT }}>
         <h1 className="text-3xl font-bold">בחרו נושא למבחן</h1>
         <p className="mt-2 text-muted">מבחן אחד מלא: רב-ברירה, השלמת מילה ונכון/לא נכון, עם סיכום וציון בסוף.</p>
       </motion.div>
 
       <button
         onClick={() => generate()}
-        className="mt-6 w-full flex items-center gap-4 bg-primary/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-all text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
+        className="mt-6 w-full flex items-center gap-4 bg-primary/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-[border-color,box-shadow,scale] text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
       >
         <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary-hover">
           <Layers size={22} />
@@ -126,7 +127,7 @@ function VocabTestPageInner() {
             key={topic.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: i * 0.03 }}
+            transition={{ duration: 0.3, delay: i * 0.03, ease: EASE_OUT }}
             whileTap={{ scale: 0.98 }}
             onClick={() => generate(topic.id)}
             className="w-full flex items-center justify-between gap-3 bg-card border border-card-border rounded-lg p-4 hover:border-primary/40 transition-colors text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, X } from "lucide-react";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 // Shown once, right after a successful account deletion redirects here (see
 // profile/page.tsx). Makes the end of that flow visible instead of a silent
 // drop onto the homepage — the confirmation App Review's account-deletion
@@ -31,7 +32,7 @@ export default function AccountDeletedNotice() {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, ease: EASE_OUT }}
           className="fixed inset-x-3 top-3 z-[60] sm:inset-x-auto sm:start-4 sm:max-w-md"
         >
           <div className="flex items-start gap-3 bg-card border border-card-border rounded-lg shadow-2xl p-4">

@@ -29,6 +29,7 @@ import EnglishText from "@/components/EnglishText";
 import ThemeToggle from "@/components/ThemeToggle";
 import ScrollProgress from "@/components/ScrollProgress";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 // Same client-mounted idiom as OfflineBanner's useSyncExternalStore (not a
 // setState-in-effect) — true only after hydration, so the mobile menu's
 // createPortal target (document.body) is never touched during SSR.
@@ -239,7 +240,7 @@ export default function Navbar() {
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.16 }}
+                transition={{ duration: 0.16, ease: EASE_OUT }}
                 className="md:hidden fixed inset-x-0 bottom-0 z-30 bg-background overflow-y-auto"
                 style={{ top: "var(--navbar-h)" }}
               >

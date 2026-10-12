@@ -26,6 +26,7 @@ import { buildScoreSummary, type ScoreRange, type ScoreSummary } from "@/lib/rep
 import type { CefrLevel, SkillArea } from "@/types/database";
 import { fetchAll } from "@/lib/supabase/fetchAll";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const CEFR_ORDER: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const RANGE_LABELS: Record<ScoreRange, string> = { week: "השבוע", month: "החודש", all: "הכל" };
@@ -610,7 +611,7 @@ function AccuracyLineChart({ buckets, values }: { buckets: DayBucket[]; values: 
         fill="url(#accuracyAreaGradient)"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: EASE_OUT }}
       />
       <motion.path
         d={linePath.join(" ")}

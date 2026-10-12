@@ -26,6 +26,7 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { requiresParentalConsent } from "@/lib/auth/consentGate";
 import type { ConversationScenario, ConversationTopicCategory } from "@/types/database";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const CATEGORIES: Record<
   ConversationTopicCategory,
   { label: string; icon: ComponentType<LucideProps>; blurb: string }
@@ -123,7 +124,7 @@ export default function VoiceConversationHubPage() {
           <motion.button
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: EASE_OUT }}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => startConversation(null)}
@@ -159,7 +160,7 @@ export default function VoiceConversationHubPage() {
                       key={s.id}
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, delay: 0.03 * Math.min(i, 6) + groupIndex * 0.02 }}
+                      transition={{ duration: 0.35, delay: 0.03 * Math.min(i, 6) + groupIndex * 0.02, ease: EASE_OUT }}
                       whileHover={{ y: -3 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => startConversation(s.id)}

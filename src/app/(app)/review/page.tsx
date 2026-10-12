@@ -14,6 +14,7 @@ import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import type { McqResponse } from "@/types/exercises";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 export default function ReviewPage() {
   const { profile, loading: authLoading } = useAuth();
   const [items, setItems] = useState<DueReviewItem[] | null>(null);
@@ -54,7 +55,7 @@ export default function ReviewPage() {
   if (items.length === 0) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
+        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", bounce: 0.2, delay: 0.1 }}>
           <IconBadge icon={PartyPopper} tone="accent" />
         </motion.div>
         <h1 className="text-2xl font-bold">אין לכם היום מילים לחזרה</h1>
@@ -69,7 +70,7 @@ export default function ReviewPage() {
   if (index >= items.length) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
+        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", bounce: 0.2, delay: 0.1 }}>
           <IconBadge icon={CheckCircle2} tone="success" />
         </motion.div>
         <h1 className="text-2xl font-bold">סיימתם את החזרה היומית!</h1>
@@ -113,7 +114,7 @@ export default function ReviewPage() {
                 role="status"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: EASE_OUT }}
                 className={`mt-6 p-4 rounded-lg ${result.isCorrect ? "bg-success/10" : "bg-danger/10"}`}
               >
                 <p className={`flex items-center gap-1.5 font-bold ${result.isCorrect ? "text-success" : "text-danger"}`}>

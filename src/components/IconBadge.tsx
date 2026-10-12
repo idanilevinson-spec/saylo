@@ -24,9 +24,9 @@ const TONES = {
 export default function IconBadge({ icon: Icon, tone = "primary", className = "" }: IconBadgeProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.6 }}
+      initial={{ opacity: 0, scale: 0.85 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: "spring", bounce: 0.5, duration: 0.6 }}
+      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
       className={`inline-flex w-16 h-16 items-center justify-center rounded-full mb-4 ${TONES[tone]} ${className}`}
     >
       <Icon size={30} strokeWidth={2} />

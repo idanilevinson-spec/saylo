@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Lightbulb } from "lucide-react";
 import { useAiConsent } from "@/components/AiConsentGate";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 export default function TeacherSuggestionCard() {
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
@@ -29,7 +30,7 @@ export default function TeacherSuggestionCard() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.15 }}
+      transition={{ duration: 0.4, delay: 0.15, ease: EASE_OUT }}
       className="mt-6 bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start gap-3"
     >
       <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
