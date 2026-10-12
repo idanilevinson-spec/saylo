@@ -174,7 +174,7 @@ export function PlacementResultView({ result }: { result: PlacementResult }) {
   return (
     <div ref={rootRef} className="max-w-3xl mx-auto px-4 pt-10 pb-16">
       <section data-plate className="relative overflow-hidden rounded-lg bg-primary text-primary-ink p-6 sm:p-8">
-        <p className="text-sm font-bold text-primary-ink/75">התוצאה שלכם</p>
+        <p className="text-sm font-bold text-primary-ink/90">התוצאה שלכם</p>
         <div className="mt-2 flex items-end gap-5">
           <span data-level className="inline-block">
             <EnglishText as="span" className="chyron text-8xl sm:text-9xl leading-[0.8]">
@@ -183,7 +183,7 @@ export function PlacementResultView({ result }: { result: PlacementResult }) {
           </span>
           <div className="pb-1">
             <p className="text-2xl font-black">{CEFR_NAME_HE[result.overallCefr as CefrLevel]}</p>
-            {canDo && <p className="mt-1 max-w-sm text-sm text-primary-ink/80 leading-relaxed">{canDo}</p>}
+            {canDo && <p className="mt-1 max-w-sm text-sm text-primary-ink/90 leading-relaxed">{canDo}</p>}
           </div>
         </div>
         <Link

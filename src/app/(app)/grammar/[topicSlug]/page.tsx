@@ -95,7 +95,7 @@ export default async function GrammarTopicPage({ params }: PageProps) {
             <section className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg bg-primary px-6 py-5 text-primary-ink">
               <div>
                 <h2 className="text-lg font-black">עכשיו לתרגול</h2>
-                <p className="text-sm text-primary-ink/80">
+                <p className="text-sm text-primary-ink/90">
                   {practiceSummary ? `${practiceSummary}, ` : ""}עם בדיקה מיידית והסבר על כל טעות.
                 </p>
               </div>

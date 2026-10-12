@@ -70,7 +70,7 @@ export default async function EnglishVocabularyIndex() {
 
         <section className="mt-14 rounded-lg bg-primary px-6 py-7 text-primary-ink">
           <h2 className="text-2xl font-black">ללמוד את המילים, לא רק לקרוא אותן</h2>
-          <p className="mt-1 text-primary-ink/80">באפליקציה: תרגול לכל מילה, חזרה במרווחים כדי שלא תישכח, ובדיקת הגייה.</p>
+          <p className="mt-1 text-primary-ink/90">באפליקציה: תרגול לכל מילה, חזרה במרווחים כדי שלא תישכח, ובדיקת הגייה.</p>
           <PracticeLink signedInHref="/vocabulary" signedInLabel="לאוצר המילים באפליקציה" className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold">
             להתחיל בחינם
           </PracticeLink>

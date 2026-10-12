@@ -251,7 +251,7 @@ function ReadingDemo() {
     <button
       type="button"
       onClick={() => setOpen(open === w ? null : w)}
-      className={`relative rounded px-0.5 font-semibold underline decoration-primary/60 decoration-2 underline-offset-4 ${open === w ? "bg-primary/15 text-primary" : ""}`}
+      className={`relative rounded px-0.5 font-semibold underline decoration-primary/60 decoration-2 underline-offset-4 ${open === w ? "bg-primary/15 text-primary-hover" : ""}`}
     >
       {w}
       {open === w && (

@@ -125,7 +125,7 @@ export default async function EnglishGrammarTopic({ params }: { params: Promise<
         <section className="mt-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg bg-primary px-6 py-5 text-primary-ink">
           <div>
             <h2 className="text-lg font-black">לתרגל את הנושא עד הסוף</h2>
-            <p className="text-sm text-primary-ink/80">
+            <p className="text-sm text-primary-ink/90">
               {topic.practiceCount} תרגילים על הנושא הזה באפליקציה, עם בדיקה מיידית והסבר על כל טעות.
             </p>
           </div>

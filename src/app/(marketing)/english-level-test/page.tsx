@@ -95,7 +95,7 @@ export default async function EnglishLevelTestPage() {
 
         <section className="mt-14 rounded-lg bg-primary px-6 py-7 text-primary-ink">
           <h2 className="text-2xl font-black">ומה אחרי המבחן?</h2>
-          <p className="mt-1 max-w-xl text-primary-ink/80 leading-relaxed">
+          <p className="mt-1 max-w-xl text-primary-ink/90 leading-relaxed">
             דף הבית נפתח על הרמה שלכם: תרגיל דקדוק, נושא מילים, טקסט, קטע האזנה, שיחה עם המורה וכתיבה, כל אחד ברמה שלכם
             במיומנות שלו.
           </p>

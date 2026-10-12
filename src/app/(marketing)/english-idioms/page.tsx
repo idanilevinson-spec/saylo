@@ -119,7 +119,7 @@ export default async function EnglishIdiomsPage() {
 
         <section className="mt-14 rounded-lg bg-primary px-6 py-7 text-primary-ink">
           <h2 className="text-2xl font-black">לזכור אותם, לא רק לקרוא</h2>
-          <p className="mt-1 text-primary-ink/80">
+          <p className="mt-1 text-primary-ink/90">
             באפליקציה יש תרגול לכל הביטויים, לפי הרמה שלכם.
           </p>
           <PracticeLink signedInHref="/idioms/practice" signedInLabel="לתרגול הביטויים"
