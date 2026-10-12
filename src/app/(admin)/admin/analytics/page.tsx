@@ -61,7 +61,7 @@ function Bar({ label, count, max }: { label: string; count: number; max: number 
         </span>
       </div>
       <div className="h-2.5 rounded-full bg-background-2 overflow-hidden">
-        <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${pct}%` }} />
+        <div className="h-full bg-primary rounded-full transition-[width] duration-300" style={{ width: `${pct}%` }} />
       </div>
     </div>
   );

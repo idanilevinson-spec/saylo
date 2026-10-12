@@ -356,9 +356,9 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
         style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       >
         {open ? (
-          <X size={22} className="text-foreground" aria-hidden="true" />
+          <X size={22} className="icon-swap text-foreground" aria-hidden="true" />
         ) : (
-          <MessageCircleQuestionMark size={24} aria-hidden="true" />
+          <MessageCircleQuestionMark size={24} className="icon-swap" aria-hidden="true" />
         )}
       </button>
 
@@ -371,7 +371,7 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
           aria-labelledby="support-title"
           // z-[61]: above the accessibility button (z-60), which otherwise
           // sits on top of the send button on a full-screen phone panel.
-          className="fixed z-[61] inset-x-0 top-0 h-[100dvh] sm:inset-auto sm:top-auto sm:bottom-[8.5rem] sm:end-4 sm:w-[25rem] sm:h-[min(40rem,calc(100dvh-10rem))] flex flex-col bg-card sm:border sm:border-card-border sm:rounded-lg shadow-2xl overflow-hidden"
+          className="launch-panel launch-panel-sheet fixed z-[61] inset-x-0 top-0 h-[100dvh] sm:inset-auto sm:top-auto sm:bottom-[8.5rem] sm:end-4 sm:w-[25rem] sm:h-[min(40rem,calc(100dvh-10rem))] flex flex-col bg-card sm:border sm:border-card-border sm:rounded-lg shadow-2xl overflow-hidden"
           style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
         >
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary sm:rounded-t-lg" />

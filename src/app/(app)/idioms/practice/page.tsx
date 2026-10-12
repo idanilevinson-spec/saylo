@@ -15,6 +15,7 @@ import EnglishText from "@/components/EnglishText";
 import { GameCompletionScore } from "@/components/games/GameMoments";
 import type { IdiomPhrasalVerb } from "@/types/database";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const ROUND_SIZE = 10;
 
 export default function IdiomsPracticePage() {
@@ -132,7 +133,7 @@ export default function IdiomsPracticePage() {
         </p>
         <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
           <div
-            className="h-full bg-primary transition-all"
+            className="h-full bg-primary transition-[width] duration-300"
             style={{ width: `${((index + 1) / questions.length) * 100}%` }}
           />
         </div>
@@ -141,7 +142,7 @@ export default function IdiomsPracticePage() {
           key={index}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, ease: EASE_OUT }}
           className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           <p className="text-sm text-muted">איזה ביטוי מתאים למשמעות הבאה?</p>
@@ -175,7 +176,7 @@ export default function IdiomsPracticePage() {
               <motion.p
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
+                transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                 className={`mt-4 flex items-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
               >
                 {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}

@@ -323,7 +323,7 @@ export default function DashboardPage() {
                   </div>
                   <ChevronLeft
                     size={16}
-                    className="shrink-0 text-muted group-hover:text-primary group-hover:-translate-x-0.5 transition-all"
+                    className="shrink-0 text-muted group-hover:text-primary group-hover:-translate-x-0.5 transition-[color,translate]"
                   />
                 </Link>
               ))}

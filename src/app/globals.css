@@ -101,6 +101,20 @@
   --accent-soft: color-mix(in srgb, var(--accent) 45%, var(--background));
 }
 
+/* Motion tokens. Tailwind's stock curves are too soft to read as intent;
+   these replace them, so every `transition`, `ease-out` and `ease-in-out`
+   utility across the site picks them up without touching a class.
+   ease-out: arrivals and feedback (fast start, long settle).
+   ease-in-out: something already on screen moving to a new place.
+   ease-drawer: sheets and panels sliding in from an edge. */
+@theme {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-background-2: var(--background-2);
@@ -316,6 +330,113 @@ textarea::placeholder {
 @media (prefers-reduced-motion: reduce) {
   .rise-in {
     animation: none;
+  }
+}
+
+/* Page cut (PageTransition.tsx). The old page holds until the new one is
+   ready, then leaves fast while the new one dissolves in: a broadcast cut,
+   not a slide. Asymmetric on purpose, exit faster than entry, and short
+   enough that a learner tapping through exercises never waits on it.
+   Opacity only, so it stays under reduced motion too (a dissolve is not
+   movement); the site's own "stop animations" switch turns it off. */
+@keyframes page-cut-fade {
+  from {
+    opacity: 0;
+  }
+}
+::view-transition-old(.page-cut-out) {
+  animation: page-cut-fade 90ms var(--ease-out) both reverse;
+}
+::view-transition-new(.page-cut-in) {
+  animation: page-cut-fade 180ms var(--ease-out) both;
+}
+/* The navbar and page ground are not part of the cut; they stay put. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+/* Taps during the cut reach the live page instead of the overlay. */
+::view-transition {
+  pointer-events: none;
+}
+:root[data-a11y-motion="reduced"]::view-transition-old(*),
+:root[data-a11y-motion="reduced"]::view-transition-new(*),
+:root[data-a11y-motion="reduced"]::view-transition-group(*) {
+  animation: none !important;
+}
+
+/* Floating panels opened from the corner launchers (help chat,
+   accessibility). They grow out of the corner their button sits in (bottom,
+   inline-end, which is the left in this RTL layout) instead of appearing
+   from nowhere. Entry only, through @starting-style: closing is instant,
+   which is what a dismissal should feel like. Browsers without
+   @starting-style just show the panel, as before. */
+.launch-panel {
+  transform-origin: bottom left;
+  transition:
+    opacity 200ms var(--ease-out),
+    scale 200ms var(--ease-out),
+    translate 200ms var(--ease-out);
+}
+@starting-style {
+  .launch-panel {
+    opacity: 0;
+    scale: 0.96;
+    translate: 0 8px;
+  }
+}
+/* On a phone the help chat is a full-screen sheet: it rises instead. */
+@media (max-width: 639.98px) {
+  .launch-panel-sheet {
+    transition:
+      opacity 180ms var(--ease-out),
+      translate 320ms var(--ease-drawer);
+  }
+  @starting-style {
+    .launch-panel-sheet {
+      opacity: 0;
+      scale: 1;
+      translate: 0 32px;
+    }
+  }
+}
+/* A launcher's icon swapping (help ↔ close) dissolves into place rather
+   than snapping: the remounted icon starts small and soft. */
+.icon-swap {
+  transition:
+    opacity 160ms var(--ease-out),
+    scale 160ms var(--ease-out),
+    filter 160ms var(--ease-out);
+}
+@starting-style {
+  .icon-swap {
+    opacity: 0;
+    scale: 0.6;
+    filter: blur(2px);
+  }
+}
+/* The storage notice arrives a beat after the page, so it never competes
+   with the first thing a visitor reads. */
+.notice-rise {
+  transition:
+    opacity 320ms var(--ease-out) 500ms,
+    translate 420ms var(--ease-out) 500ms;
+}
+@starting-style {
+  .notice-rise {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .launch-panel,
+  .launch-panel-sheet,
+  .notice-rise {
+    translate: none;
+    scale: none;
+  }
+  .icon-swap {
+    transition: opacity 160ms var(--ease-out);
   }
 }
 

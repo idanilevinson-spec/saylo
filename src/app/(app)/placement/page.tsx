@@ -16,6 +16,7 @@ import { BAGRUT_PLACEMENT_SECTIONS } from "@/lib/content/bagrut/placementItems";
 import BagrutCredit from "@/components/BagrutCredit";
 import { PlacementFinishing, PlacementResultView, SKILL_LABELS_HE, SKILL_ORDER, type PlacementResult } from "@/components/placement/PlacementResult";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const SKILL_ICONS: Record<SkillArea, LucideIcon> = {
   vocabulary: BookOpen,
   grammar: PenLine,
@@ -373,7 +374,7 @@ export default function PlacementPage() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
+          transition={{ duration: 0.35, ease: EASE_OUT }}
           className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           <p className="font-medium text-lg">{WRITING_SAMPLE_PROMPT_HE}</p>
@@ -429,7 +430,7 @@ export default function PlacementPage() {
       </p>
       <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
         <div
-          className="h-full bg-primary transition-all"
+          className="h-full bg-primary transition-[width] duration-300"
           style={{ width: `${((index + 1) / questions.length) * 100}%` }}
         />
       </div>
@@ -438,7 +439,7 @@ export default function PlacementPage() {
         key={index}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
+        transition={{ duration: 0.35, ease: EASE_OUT }}
         className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
       >
         {question.skill_area === "listening" && question.audio_text ? (

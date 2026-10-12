@@ -15,6 +15,7 @@ import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 interface SpeakingTestProps {
   steps: SpeakingTestStep[];
 }
@@ -316,7 +317,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
           <motion.div
             className="h-full bg-accent"
             animate={{ width: `${(stepIndex / steps.length) * 100}%` }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.3, ease: EASE_OUT }}
           />
         </div>
 
@@ -325,7 +326,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
             key={stepIndex}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.3, ease: EASE_OUT }}
             className="bg-card border border-card-border rounded-lg p-6 sm:p-8 text-center"
           >
             {step.type === "vocab" ? (

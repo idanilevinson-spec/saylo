@@ -9,6 +9,7 @@ import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/s
 import type { PatternDefinition } from "@/lib/patterns/patternDefinitions";
 import type { PatternDrill } from "@/lib/patterns/drills";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 interface PatternDrillRunnerProps {
   definition: PatternDefinition;
   drill: PatternDrill;
@@ -74,7 +75,7 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
         key={index}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.3, ease: EASE_OUT }}
         className="mt-4 rounded-lg border border-card-border p-6"
       >
         <EnglishText as="p" className="text-lg font-medium">

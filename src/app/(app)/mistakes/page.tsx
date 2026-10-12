@@ -106,7 +106,7 @@ export default function MistakesPage() {
   if (items.length === 0) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
+        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", bounce: 0.2, delay: 0.1 }}>
           <IconBadge icon={PartyPopper} tone="accent" />
         </motion.div>
         <h1 className="text-2xl font-bold">אין לכם היום מה לחזור</h1>
@@ -123,7 +123,7 @@ export default function MistakesPage() {
   if (index >= items.length) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
+        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", bounce: 0.2, delay: 0.1 }}>
           <IconBadge icon={PartyPopper} tone="accent" />
         </motion.div>
         <h1 className="text-2xl font-bold">סיימתם את החזרה של היום!</h1>
