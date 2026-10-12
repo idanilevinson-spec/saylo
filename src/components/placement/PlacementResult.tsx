@@ -115,7 +115,11 @@ export function PlacementResultView({ result }: { result: PlacementResult }) {
 
   useGSAP(
     () => {
-      if (reduced) return;
+      // A hidden page (the learner switched apps during the half-minute
+      // check) doesn't run animation frames, so the sequence would sit on
+      // its first frame, "0%" bars, until they come back. Then the result
+      // is simply shown, like with reduced motion.
+      if (reduced || document.hidden) return;
       const root = rootRef.current;
       if (!root) return;
       const q = gsap.utils.selector(root);
