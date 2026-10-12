@@ -354,7 +354,7 @@ export default function SpeakingPage() {
                   >
                     <span
                       className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
-                        i % 3 === 1 ? "bg-accent/15 text-accent-hover" : "bg-primary/12 text-primary"
+                        i % 3 === 1 ? "bg-accent/15 text-accent-hover" : "bg-primary/12 text-primary-hover"
                       }`}
                     >
                       <s.icon size={20} aria-hidden="true" />
