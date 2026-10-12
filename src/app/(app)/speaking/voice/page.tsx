@@ -131,7 +131,7 @@ export default function VoiceConversationHubPage() {
             disabled={starting}
             className="mt-8 w-full text-right bg-primary/5 border border-primary/20 rounded-lg p-5 hover:border-primary/40 transition-[border-color] disabled:opacity-60"
           >
-            <span className="inline-flex w-10 h-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <span className="inline-flex w-10 h-10 items-center justify-center rounded-xl bg-primary/10 text-primary-hover">
               <Phone size={20} />
             </span>
             <h2 className="mt-2 font-bold">שיחת חולין חופשית</h2>
@@ -145,7 +145,7 @@ export default function VoiceConversationHubPage() {
             return (
               <div key={group.category} className="mt-10">
                 <div className="flex items-center gap-2.5">
-                  <span className="inline-flex w-8 h-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <span className="inline-flex w-8 h-8 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                     <meta.icon size={16} />
                   </span>
                   <div>

@@ -284,7 +284,7 @@ export default function DashboardPage() {
               >
                 <span
                   className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
-                    m.tone === "accent" ? "bg-accent/15 text-accent-hover" : "bg-primary/10 text-primary"
+                    m.tone === "accent" ? "bg-accent/15 text-accent-hover" : "bg-primary/10 text-primary-hover"
                   }`}
                 >
                   <m.icon size={21} strokeWidth={2} aria-hidden="true" />
@@ -314,7 +314,7 @@ export default function DashboardPage() {
                   href={m.href}
                   className="group flex items-center gap-3 px-4 py-3.5 hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
                 >
-                  <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                     <m.icon size={18} strokeWidth={2} />
                   </span>
                   <div className="min-w-0 flex-1">

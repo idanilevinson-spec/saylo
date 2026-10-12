@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = `${text.title_he}: קטע קריאה באנגלית ברמה ${text.cefr_level}, ${text.words} מילים, עם ${text.questions.length} שאלות הבנה${text.openQuestions.length ? " ושאלות פתוחות" : ""}.`;
   const path = `/english-reading/${text.slug}`;
   return {
-    title: `${title} — Saylo`,
+    title: `${title} | Saylo`,
     description,
     alternates: { canonical: path },
     openGraph: pageOpenGraph(title, description, path),

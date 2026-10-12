@@ -209,7 +209,7 @@ export const BAGRUT_SAMPLE_UNITS_SET3: BagrutSampleUnit[] = [
         promptEn: "Which problem is NOT mentioned in the first broadcasts?",
         options: ["An old microphone", "Students speaking too fast", "A program recorded without sound", "Too few listeners"],
         correctOptionIndex: 3,
-        modelAnswerHe: "תשובה נכונה: D — מספר המאזינים לא מוזכר.",
+        modelAnswerHe: "תשובה נכונה: D. מספר המאזינים לא מוזכר.",
       },
       {
         formatHe: "שאלה פתוחה",
@@ -358,7 +358,7 @@ export const BAGRUT_SAMPLE_UNITS_SET3: BagrutSampleUnit[] = [
       {
         formatHe: "מארגן גרפי",
         promptEn: "Complete the table: Method — Drip irrigation | Benefit: ___ | Problem: ___.",
-        modelAnswerHe: "תשובה: יתרון — חיסכון במים / פחות עשבים; בעיה — עלות התקנה וצורך בניקוי קבוע.",
+        modelAnswerHe: "תשובה: היתרון הוא חיסכון במים / פחות עשבים; הבעיה היא עלות התקנה וצורך בניקוי קבוע.",
       },
       {
         formatHe: "השלמת משפט",

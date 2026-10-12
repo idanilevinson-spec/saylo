@@ -10,7 +10,7 @@ import OfflineBanner from "@/components/OfflineBanner";
 import PageTransition from "@/components/PageTransition";
 import AccessibilityProvider from "@/components/AccessibilityProvider";
 import CookieNotice from "@/components/CookieNotice";
-import SupportChat from "@/components/support/SupportChat";
+import SupportChat from "@/components/support/SupportChatLazy";
 
 const rubik = Rubik({
   variable: "--font-rubik",

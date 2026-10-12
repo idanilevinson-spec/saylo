@@ -7,7 +7,7 @@ import { listGrammarTopics } from "@/lib/content/grammar";
 import { getLearnerLevels, levelFor } from "@/lib/content/learnerLevel";
 
 export const metadata: Metadata = {
-  title: "דקדוק — Saylo",
+  title: "דקדוק | Saylo",
 };
 
 export default async function GrammarPage() {

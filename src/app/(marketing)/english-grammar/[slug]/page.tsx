@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = `הסבר בעברית ל-${topic.name_en} (רמה ${topic.cefr_level}): מתי משתמשים, איך בונים משפט, דוגמאות, והטעויות הנפוצות של דוברי עברית.`;
   const path = `/english-grammar/${topic.slug}`;
   return {
-    title: `${title} — Saylo`,
+    title: `${title} | Saylo`,
     description,
     alternates: { canonical: path },
     openGraph: pageOpenGraph(title, description, path),

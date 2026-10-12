@@ -209,7 +209,7 @@ export default function LandingCorrectionDemo() {
               animate={{ opacity: 1, transform: "scale(1)" }}
               transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
               dir="auto"
-              className="rounded-md bg-primary/12 px-2 py-1 text-xs font-bold text-primary"
+              className="rounded-md bg-primary/12 px-2 py-1 text-xs font-bold text-primary-hover"
             >
               {e.rule}
             </motion.li>

@@ -16,7 +16,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { topicSlug } = await params;
   const topic = await getGrammarTopicBySlug(topicSlug);
-  return { title: topic ? `${topic.name_he} — דקדוק` : "דקדוק" };
+  return { title: topic ? `${topic.name_he} | דקדוק` : "דקדוק" };
 }
 
 export default async function GrammarTopicPage({ params }: PageProps) {

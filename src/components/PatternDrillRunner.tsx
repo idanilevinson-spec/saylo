@@ -124,7 +124,7 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
 
 function IconCircle() {
   return (
-    <div className="inline-flex w-16 h-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+    <div className="inline-flex w-16 h-16 items-center justify-center rounded-full bg-primary/10 text-primary-hover">
       <PartyPopper size={28} />
     </div>
   );

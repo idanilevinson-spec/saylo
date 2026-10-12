@@ -19,7 +19,7 @@ import { APP_STORE_URL, INSTAGRAM_URL } from "@/lib/site/links";
 import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 export const metadata: Metadata = {
-  title: "Saylo — לומדים אנגלית בקצב שלכם",
+  title: "Saylo | לומדים אנגלית בקצב שלכם",
 };
 
 // Who we are, for search engines: the organization, the site, and the

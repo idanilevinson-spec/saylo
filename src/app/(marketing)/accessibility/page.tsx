@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import LegalPage, { EmailLink, LegalSection, LegalList } from "@/components/LegalPage";
 
 export const metadata: Metadata = {
-  title: "הצהרת נגישות — Saylo",
+  title: "הצהרת נגישות | Saylo",
 };
 
 export default function AccessibilityPage() {

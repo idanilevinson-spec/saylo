@@ -14,7 +14,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const skill = getBagrutSkill((await params).slug);
-  return { title: skill ? `${skill.titleHe} — בגרות — Saylo` : "בגרות — Saylo" };
+  return { title: skill ? `${skill.titleHe} | בגרות | Saylo` : "בגרות | Saylo" };
 }
 
 export default async function BagrutSkillPage({ params, searchParams }: PageProps) {
@@ -58,7 +58,7 @@ export default async function BagrutSkillPage({ params, searchParams }: PageProp
         <ol className="mt-3 space-y-3">
           {skill.stepsHe.map((step, i) => (
             <li key={i} className="flex gap-3">
-              <span className="chyron inline-flex w-7 h-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary text-lg tabular-nums">
+              <span className="chyron inline-flex w-7 h-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary-hover text-lg tabular-nums">
                 {i + 1}
               </span>
               <span className="leading-relaxed pt-0.5">{step}</span>

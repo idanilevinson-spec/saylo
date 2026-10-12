@@ -18,7 +18,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const clip = await getListeningClip(id);
-  return { title: clip ? `${clip.title_he} — האזנה` : "האזנה" };
+  return { title: clip ? `${clip.title_he} | האזנה` : "האזנה" };
 }
 
 export default async function ListeningClipPage({ params }: PageProps) {

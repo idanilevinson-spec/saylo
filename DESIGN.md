@@ -117,6 +117,10 @@ Secondary text on a solid `bg-primary` field is `text-primary-ink/90` at the low
 
 The pricing summary card renders at full strength on load; its short settle plays only when the plan changes. It used to ship from the server at 60% opacity, so a slow phone showed a faded price and button until scripts ran.
 
+## Text on a tint (2026-10-13)
+
+A tinted chip or badge (`bg-primary/10`, `bg-success/12`, `bg-danger/15`, any tint up to 20%) takes the `-hover` step of its colour for its text, never the base colour: `text-primary` on its own tint measured 3.7-4.0:1 in light mode, under AA. `--success-hover` and `--danger-hover` were added for this (light `#0b6630` / `#a51616`, dark `#86efac` / `#fca5a5`; worst case over card, background and background-2 at 10-15% tint: 4.90 / 5.12 light, 8.70 / 7.08 dark). All 42 such places in the app and site were switched; a scan of every background/text pair written on one element passes in both themes.
+
 ## Motion (2026-10-13)
 
 - **Shared curves.** `globals.css` defines `--ease-out` (0.23, 1, 0.32, 1), `--ease-in-out` and `--ease-drawer` in `@theme`, and sets Tailwind's default transition curve to the ease-out (160ms). Every `transition-*`, `ease-out` and `ease-in-out` class across the site now uses them. framer-motion gets the same values from `src/lib/motion/easing.ts`; a `duration` without an `ease` in framer falls back to ease-in-out (slow start), so every tween names `EASE_OUT`.

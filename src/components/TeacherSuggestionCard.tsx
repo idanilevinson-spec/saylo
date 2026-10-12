@@ -33,7 +33,7 @@ export default function TeacherSuggestionCard() {
       transition={{ duration: 0.4, delay: 0.15, ease: EASE_OUT }}
       className="mt-6 bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start gap-3"
     >
-      <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+      <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
         <Lightbulb size={18} />
       </span>
       <div>
