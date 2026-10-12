@@ -22,7 +22,7 @@ const HEART_REGEN_HOURS = REGEN_INTERVAL_MS / (60 * 60 * 1000);
 
 const planLines = PRICING_PLANS.map(
   (p) =>
-    `- ${p.label}: ₪${p.totalPrice} בתשלום אחד${p.months > 1 ? ` (כ-₪${monthlyEquivalent(p)} לחודש)` : ""}${p.badge ? `, ${p.badge}` : ""}`
+    `- ${p.label}: ₪${p.totalPrice} בתשלום אחד${p.months > 1 ? ` (כ-₪${monthlyEquivalent(p)} לחודש)` : ""}${p.badge ? ` (${p.badge})` : ""}`
 ).join("\n");
 
 export const SUPPORT_KNOWLEDGE_BASE = `

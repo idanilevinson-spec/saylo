@@ -490,7 +490,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "שאלה פתוחה",
         promptEn:
           "According to Mr. Harel, what do people actually leave the Repair Café with, besides a fixed item? Support your answer with information from the text.",
-        modelAnswerHe: "תשובה מקובלת: זמן שבילו עם שכן: חיבור חברתי, לא רק הפריט המתוקן עצמו.",
+        modelAnswerHe: "תשובה מקובלת: זמן שבילו עם שכן, כלומר חיבור חברתי, לא רק הפריט המתוקן עצמו.",
       },
     ],
     writingTask: {
@@ -536,7 +536,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         promptEn:
           "In your opinion, why does the story end with the note rather than with a classroom ceremony? What does this suggest about the kind of ending the writer believes a long career 'truly needed'? Answer in your own words.",
         modelAnswerHe:
-          "תשובה פתוחה. צריך להתייחס לרעיון שהכרה אמיתית ותודה אישית, אפילו קטנה ואנונימית, משמעותית יותר מטקס רשמי; חשוב שהתשובה תתבסס על הטקסט עצמו.",
+          "תשובה פתוחה. כדאי להתייחס לרעיון שהכרה אמיתית ותודה אישית, אפילו קטנה ואנונימית, משמעותית יותר מטקס רשמי; חשוב שהתשובה תתבסס על הטקסט עצמו.",
       },
     ],
     writingTask: {
@@ -735,7 +735,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         formatHe: "שאלה פתוחה",
         promptEn: "According to the text, how can an 'expectation of availability' form without any explicit workplace rule? Explain in your own words.",
         modelAnswerHe:
-          "תשובה מקובלת: דרך אותות עקיפים ולא מכוונים, למשל מנהל ששולח הודעות בשעות מאוחרות, גם בלי לצפות לתגובה מיידית, יוצר תחושה שהעובדים צריכים להיראות זמינים כדי לא להיתפס כלא מחויבים.",
+          "תשובה מקובלת: דרך אותות עקיפים ולא מכוונים. למשל, מנהל ששולח הודעות בשעות מאוחרות, גם בלי לצפות לתגובה מיידית, יוצר תחושה שהעובדים צריכים להיראות זמינים כדי לא להיתפס כלא מחויבים.",
       },
       {
         formatHe: "השלמת משפט",
@@ -1006,7 +1006,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
         promptEn:
           "Why do you think the poet repeats small, ordinary details (keys dropped, a stuck door, singing slightly off-key) instead of describing one dramatic event? What effect does this create? Answer in your own words.",
         modelAnswerHe:
-          "תשובה פתוחה. צריך להתייחס לכך שפרטים קטנים ויומיומיים דווקא ממחישים טוב יותר איך זיכרון אמיתי נשמר, יותר מאירוע דרמטי בודד; חשוב שהתשובה תתייחס לטקסט.",
+          "תשובה פתוחה. כדאי להתייחס לכך שפרטים קטנים ויומיומיים דווקא ממחישים טוב יותר איך זיכרון אמיתי נשמר, יותר מאירוע דרמטי בודד; חשוב שהתשובה תתייחס לטקסט.",
       },
     ],
     writingTask: {

@@ -358,7 +358,7 @@ export const BAGRUT_SAMPLE_UNITS_SET3: BagrutSampleUnit[] = [
       {
         formatHe: "מארגן גרפי",
         promptEn: "Complete the table: Method — Drip irrigation | Benefit: ___ | Problem: ___.",
-        modelAnswerHe: "תשובה: יתרון: חיסכון במים / פחות עשבים; בעיה: עלות התקנה וצורך בניקוי קבוע.",
+        modelAnswerHe: "תשובה: היתרון הוא חיסכון במים / פחות עשבים; הבעיה היא עלות התקנה וצורך בניקוי קבוע.",
       },
       {
         formatHe: "השלמת משפט",

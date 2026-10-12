@@ -213,9 +213,9 @@ function Options({
             dir={english ? "ltr" : undefined}
             className={`game-press flex w-full items-center justify-between gap-2 rounded-lg border px-3.5 py-2.5 text-sm font-medium transition-[background-color,border-color,opacity,transform] duration-150 ${
               state === "right"
-                ? "border-success bg-success/12 text-success"
+                ? "border-success bg-success/12 text-success-hover"
                 : state === "wrong"
-                  ? "border-danger bg-danger/10 text-danger"
+                  ? "border-danger bg-danger/10 text-danger-hover"
                   : state === "dim"
                     ? "border-card-border opacity-50"
                     : "border-card-border bg-card hover:border-primary/50"
@@ -407,9 +407,9 @@ function MatchDemo() {
               onClick={() => setLeft(i)}
               className={`game-press w-full rounded-lg border px-2 py-2.5 text-sm font-bold transition-[background-color,border-color,opacity,transform] duration-150 ${
                 done.includes(i)
-                  ? "border-success/50 bg-success/10 text-success"
+                  ? "border-success/50 bg-success/10 text-success-hover"
                   : left === i
-                    ? "border-primary bg-primary/12 text-primary"
+                    ? "border-primary bg-primary/12 text-primary-hover"
                     : "border-card-border bg-card"
               }`}
             >
@@ -426,9 +426,9 @@ function MatchDemo() {
               onClick={() => pickRight(i)}
               className={`game-press w-full rounded-lg border px-2 py-2.5 text-sm font-bold transition-[background-color,border-color,opacity,transform] duration-150 ${
                 done.includes(i)
-                  ? "border-success/50 bg-success/10 text-success"
+                  ? "border-success/50 bg-success/10 text-success-hover"
                   : miss === i
-                    ? "border-danger bg-danger/10 text-danger"
+                    ? "border-danger bg-danger/10 text-danger-hover"
                     : "border-card-border bg-card"
               }`}
             >
@@ -438,7 +438,7 @@ function MatchDemo() {
         </div>
       </div>
       {finished && (
-        <div className="mt-4 flex items-center justify-between rounded-lg bg-success/12 px-3 py-2.5 text-sm font-bold text-success">
+        <div className="mt-4 flex items-center justify-between rounded-lg bg-success/12 px-3 py-2.5 text-sm font-bold text-success-hover">
           <span className="inline-flex items-center gap-1.5">
             <CheckCircle2 size={16} aria-hidden="true" /> כל הזוגות נכונים
           </span>
@@ -506,7 +506,7 @@ function SpellingDemo() {
         ))}
       </div>
       {filled && (
-        <div className={`mt-5 rounded-lg px-3 py-2.5 text-sm font-bold ${correct ? "bg-success/12 text-success" : "bg-danger/10 text-danger"}`}>
+        <div className={`mt-5 rounded-lg px-3 py-2.5 text-sm font-bold ${correct ? "bg-success/12 text-success-hover" : "bg-danger/10 text-danger-hover"}`}>
           <p>{correct ? "מצוין! kitchen" : "לא בדיוק. נכון: kitchen"}</p>
           <button type="button" onClick={() => setTyped([])} className="mt-1 inline-flex items-center gap-1 text-xs text-foreground">
             <RotateCcw size={13} aria-hidden="true" /> לנסות שוב
@@ -551,9 +551,9 @@ function TeacherDemo() {
             {m.text}
             {m.fix && (
               <span className="mt-1.5 flex items-center gap-1.5 text-xs font-bold">
-                <span className="rounded bg-danger/12 px-1.5 py-0.5 text-danger line-through">{m.fix[0]}</span>
+                <span className="rounded bg-danger/12 px-1.5 py-0.5 text-danger-hover line-through">{m.fix[0]}</span>
                 <span aria-hidden="true">→</span>
-                <span className="rounded bg-success/15 px-1.5 py-0.5 text-success">{m.fix[1]}</span>
+                <span className="rounded bg-success/15 px-1.5 py-0.5 text-success-hover">{m.fix[1]}</span>
               </span>
             )}
           </motion.div>

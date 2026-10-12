@@ -116,3 +116,7 @@ The wait before it (two AI calls, up to 30s) was a single grey line. It is now a
 Secondary text on a solid `bg-primary` field is `text-primary-ink/90` at the lowest. Measured on the composited colors: `/80` is 4.03:1 in light mode (fails AA), `/75` fails in both themes, `/90` is 4.69 (light) and 5.90 (dark). Blue text on the light `bg-primary/15` tint uses `text-primary-hover` (6.0 / 6.4), not `text-primary` (4.35 in light). A contrast scan of every public page in both themes (all text nodes against their composited background) came back clean after these changes.
 
 The pricing summary card renders at full strength on load; its short settle plays only when the plan changes. It used to ship from the server at 60% opacity, so a slow phone showed a faded price and button until scripts ran.
+
+## Text on a tint (2026-10-13)
+
+A tinted chip or badge (`bg-primary/10`, `bg-success/12`, `bg-danger/15`, any tint up to 20%) takes the `-hover` step of its colour for its text, never the base colour: `text-primary` on its own tint measured 3.7-4.0:1 in light mode, under AA. `--success-hover` and `--danger-hover` were added for this (light `#0b6630` / `#a51616`, dark `#86efac` / `#fca5a5`; worst case over card, background and background-2 at 10-15% tint: 4.90 / 5.12 light, 8.70 / 7.08 dark). All 42 such places in the app and site were switched; a scan of every background/text pair written on one element passes in both themes.

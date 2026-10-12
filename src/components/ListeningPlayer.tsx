@@ -47,7 +47,7 @@ export default function ListeningPlayer({ transcriptEn, defaultRate = 1 }: Liste
               key={r}
               onClick={() => setRate(r)}
               className={`px-2.5 py-1.5 rounded-md font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
-                rate === r ? "bg-primary/15 text-primary" : "text-muted hover:bg-background-2"
+                rate === r ? "bg-primary/15 text-primary-hover" : "text-muted hover:bg-background-2"
               }`}
             >
               {r}x

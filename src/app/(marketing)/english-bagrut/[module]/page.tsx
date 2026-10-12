@@ -134,7 +134,7 @@ export default async function BagrutModulePage({ params }: { params: Promise<{ m
                     <li
                       key={o}
                       className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
-                        i === sample.example.correctOptionIndex ? "bg-success/12 font-bold text-success" : "bg-background-2"
+                        i === sample.example.correctOptionIndex ? "bg-success/12 font-bold text-success-hover" : "bg-background-2"
                       }`}
                     >
                       {i === sample.example.correctOptionIndex && <CheckCircle2 size={15} aria-hidden="true" />}
