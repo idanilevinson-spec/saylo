@@ -141,7 +141,7 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
                   >
                     <span
                       className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
-                        item.doneToday ? "bg-success/15 text-success" : "bg-primary/10 text-primary"
+                        item.doneToday ? "bg-success/15 text-success-hover" : "bg-primary/10 text-primary-hover"
                       }`}
                     >
                       {item.doneToday ? <CheckCircle2 size={21} aria-hidden="true" /> : <meta.icon size={20} aria-hidden="true" />}
@@ -201,7 +201,7 @@ export function MoreAtLevel({ plan }: { plan: LevelPlan }) {
                 href={meta.area}
                 className="game-press group flex h-full items-center gap-3 rounded-lg border border-card-border bg-card p-4 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
-                <span className="inline-flex w-10 h-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span className="inline-flex w-10 h-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                   <meta.icon size={19} aria-hidden="true" />
                 </span>
                 <span className="min-w-0">
