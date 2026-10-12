@@ -57,7 +57,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
     ],
     verified: true,
     sourceNotesHe:
-      "kidum.com (מדריך 3 יח\"ל) + high-q.co.il (סקירת שאלונים) — שני מקורות עצמאיים מסכימים על 30/70 ו-75 דק'. ראו docs/specs/bagrut-track.md §2.1.",
+      "kidum.com (מדריך 3 יח\"ל) + high-q.co.il (סקירת שאלונים). שני מקורות עצמאיים מסכימים על 30/70 ו-75 דק'. ראו docs/specs/bagrut-track.md §2.1.",
   },
   B: {
     code: "B",
@@ -68,7 +68,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
       { nameHe: "כתיבה", points: 30, wordCountRange: [35, 40] },
     ],
     verified: true,
-    sourceNotesHe: "kidum.com, מדריך מודול B (3 יח\"ל) — ראו docs/specs/bagrut-track.md §2.1.",
+    sourceNotesHe: "kidum.com, מדריך מודול B (3 יח\"ל). ראו docs/specs/bagrut-track.md §2.1.",
   },
   C: {
     code: "C",
@@ -80,7 +80,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
     ],
     verified: true,
     sourceNotesHe:
-      "משך הבחינה וחלוקת הנקודות הוכרעו ב-2.10.2026 מול השאלון הרשמי הנוכחי בפועל (מועד חורף תשפ\"ו 2026, מספר שאלון 16382, ארכיון משרד החינוך) — נקראו ונוצלו אך ורק עמודי ההוראות המנהליות (משך, נקודות, הנחיית אורך לחיבור), לא תוכן הבחינה עצמו. אורך קטע הקריאה (280–320 מילים) אושש ב-2.10.2026 מתוך כמה מדריכי הכנה של צד שלישי שמסכימים ביניהם (kidum.com, high-q.co.il ואחרים) — לא מהבחינה האמיתית. נבדק גם מול מתווה ההקלות הרשמי של משרד החינוך למחזור הנוכחי (ynet/mako, 2026): לשוניות כמו אנגלית קיבלו תוספת ציון גורפת של 10%, בלי שינוי במבנה השאלון עצמו — אין סיכון שהמבנה המתועד כאן התיישן בעקבות ההקלות.",
+      "משך הבחינה וחלוקת הנקודות הוכרעו ב-2.10.2026 מול השאלון הרשמי הנוכחי בפועל (מועד חורף תשפ\"ו 2026, מספר שאלון 16382, ארכיון משרד החינוך). נקראו ונוצלו אך ורק עמודי ההוראות המנהליות (משך, נקודות, הנחיית אורך לחיבור), לא תוכן הבחינה עצמו. אורך קטע הקריאה (280–320 מילים) אושש ב-2.10.2026 מתוך כמה מדריכי הכנה של צד שלישי שמסכימים ביניהם (kidum.com, high-q.co.il ואחרים). לא מהבחינה האמיתית. נבדק גם מול מתווה ההקלות הרשמי של משרד החינוך למחזור הנוכחי (ynet/mako, 2026): לשוניות כמו אנגלית קיבלו תוספת ציון גורפת של 10%, בלי שינוי במבנה השאלון עצמו. אין סיכון שהמבנה המתועד כאן התיישן בעקבות ההקלות.",
   },
   D: {
     code: "D",
@@ -96,7 +96,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
     ],
     verified: true,
     sourceNotesHe:
-      "kidum.com + limudnaim.co.il — שני מדריכי הכנה עצמאיים מסכימים על 70/30, 100–120 מילים ו-75 דק'. מקור שלישי (matic.co.il) תיאר את המודול כציון פנימי של בית הספר בלבד; זה לא תואם את ארכיון הבחינות הרשמי של משרד החינוך (pop.education.gov.il), שמראה שמדובר בבחינה חיצונית מלאה עם קוד שאלון (16483/16484) — לכן המקור הזה נפסל. ראו docs/specs/bagrut-track.md §2.1.",
+      "kidum.com + limudnaim.co.il. שני מדריכי הכנה עצמאיים מסכימים על 70/30, 100–120 מילים ו-75 דק'. מקור שלישי (matic.co.il) תיאר את המודול כציון פנימי של בית הספר בלבד; זה לא תואם את ארכיון הבחינות הרשמי של משרד החינוך (pop.education.gov.il), שמראה שמדובר בבחינה חיצונית מלאה עם קוד שאלון (16483/16484). לכן המקור הזה נפסל. ראו docs/specs/bagrut-track.md §2.1.",
   },
   E: {
     code: "E",
@@ -120,7 +120,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
       },
     ],
     verified: true,
-    sourceNotesHe: "safotsheli.co.il, מדריך מודול E — ראו docs/specs/bagrut-track.md §2.1.",
+    sourceNotesHe: "safotsheli.co.il, מדריך מודול E. ראו docs/specs/bagrut-track.md §2.1.",
   },
   F: {
     code: "F",
@@ -131,7 +131,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
       { nameHe: "חיבור", points: 40, wordCountRange: [120, 140], notesHe: "מאז 2020 אין ספרות במודול זה, רק חיבורים." },
     ],
     verified: true,
-    sourceNotesHe: "jpostlite.co.il, מדריך מודולים E/F/G — ראו docs/specs/bagrut-track.md §2.1.",
+    sourceNotesHe: "jpostlite.co.il, מדריך מודולים E/F/G. ראו docs/specs/bagrut-track.md §2.1.",
   },
   G: {
     code: "G",
@@ -148,7 +148,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
     ],
     verified: true,
     sourceNotesHe:
-      "jpostlite.co.il (מדריך ייעודי למודול G) + high-q.co.il (סקירה כללית) — שני מקורות עצמאיים מסכימים על חלוקת 60/40 ועל 105 דק'. ראו docs/specs/bagrut-track.md §2.1.",
+      "jpostlite.co.il (מדריך ייעודי למודול G) + high-q.co.il (סקירה כללית). שני מקורות עצמאיים מסכימים על חלוקת 60/40 ועל 105 דק'. ראו docs/specs/bagrut-track.md §2.1.",
   },
 };
 
