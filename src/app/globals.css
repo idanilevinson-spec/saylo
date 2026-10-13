@@ -766,6 +766,14 @@ textarea::placeholder {
   aspect-ratio: 780 / 702;
   margin-bottom: 6vh;
 }
+/* On a laptop or desktop screen the logo takes the stage: up to 420px wide,
+   held to the height of the window. The pieces are cut at 780px across, so
+   that is still sharp on a 2x display. */
+@media (min-width: 768px) {
+  .app-intro__lockup {
+    width: min(34vw, 46vh, 420px);
+  }
+}
 .app-intro__lockup > span {
   position: absolute;
   display: block;
