@@ -28,6 +28,7 @@ import { useAuth } from "@/context/AuthProvider";
 import EnglishText from "@/components/EnglishText";
 import ThemeToggle from "@/components/ThemeToggle";
 import ScrollProgress from "@/components/ScrollProgress";
+import { useBodyScrollLock } from "@/lib/utils/scrollLock";
 
 import { EASE_OUT } from "@/lib/motion/easing";
 // Same client-mounted idiom as OfflineBanner's useSyncExternalStore (not a
@@ -133,14 +134,12 @@ export default function Navbar() {
 
   // Full-screen takeover locks the dashboard behind it from scrolling, the
   // way a native app's own menu would — without this, the page underneath
-  // keeps scrolling along with the open menu on a long dashboard.
-  useEffect(() => {
-    if (!menuOpen) return;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
+  // keeps scrolling along with the open menu on a long dashboard. Shared,
+  // reference-counted lock (see scrollLock.ts) so this coexists safely with
+  // any other overlay — e.g. the support chat panel — locking at the same
+  // time, instead of the two fighting over document.body.style.overflow
+  // directly and leaving it stuck on "hidden".
+  useBodyScrollLock(menuOpen);
 
   const isActive = (href: string) => (href === "/dashboard" ? pathname === href : pathname.startsWith(href));
 
