@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Volume2, Turtle, Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, type LucideIcon } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import { placementInstructionHe } from "@/lib/placement/instructionHe";
+import { optionOrder } from "@/lib/utils/shuffle";
 import AiConsentGate from "@/components/AiConsentGate";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -329,7 +330,8 @@ export default function PlacementPage() {
                 {renderPromptWithUniformBlanks(q.promptEn)}
               </EnglishText>
               <div className="mt-3 space-y-2" role="radiogroup" aria-label={`שאלה ${qi + 1}`}>
-                {q.options.map((option, oi) => {
+                {optionOrder(q.options.length, q.promptEn).map((oi) => {
+                  const option = q.options[oi];
                   const active = bagrutAnswers[qi] === oi;
                   return (
                     <button
@@ -477,7 +479,7 @@ export default function PlacementPage() {
         )}
 
         <div className="mt-4 space-y-2">
-          {question.options.map((option, i) => (
+          {optionOrder(question.options.length, question.id).map((i) => (
             <motion.button
               key={i}
               whileHover={{ x: -2 }}
@@ -487,7 +489,7 @@ export default function PlacementPage() {
                 selected === i ? "border-primary bg-primary/5" : "border-card-border hover:border-primary/40"
               }`}
             >
-              <EnglishText>{option}</EnglishText>
+              <EnglishText>{question.options[i]}</EnglishText>
             </motion.button>
           ))}
         </div>

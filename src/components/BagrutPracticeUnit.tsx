@@ -9,6 +9,8 @@ import EnglishText from "@/components/EnglishText";
 import ListeningPlayer from "@/components/ListeningPlayer";
 import type { BagrutSampleUnit, BagrutReadingQuestion, BagrutVocabularyQuestion } from "@/lib/content/bagrut/sampleUnits";
 import BagrutCredit from "@/components/BagrutCredit";
+import { optionOrder } from "@/lib/utils/shuffle";
+import { withoutAnswerLetter } from "@/lib/content/bagrut/answerLetter";
 import type { BagrutModuleFormat } from "@/lib/content/bagrut/moduleFormats";
 
 interface BagrutPracticeUnitProps {
@@ -268,7 +270,8 @@ function QuestionCard({
 
       {question.options ? (
         <div className="mt-3 flex flex-col gap-2">
-          {question.options.map((option, i) => {
+          {optionOrder(question.options.length, question.promptEn).map((i) => {
+            const option = question.options![i];
             const isSelected = selected === i;
             const isCorrectOption = i === question.correctOptionIndex;
             const showState = selected !== null && (isSelected || isCorrectOption);
@@ -299,7 +302,8 @@ function QuestionCard({
               ) : (
                 <XCircle size={15} className="text-danger shrink-0 mt-0.5" />
               )}
-              {question.modelAnswerHe}
+              {withoutAnswerLetter(question.modelAnswerHe) ||
+                (selected === question.correctOptionIndex ? "נכון." : "התשובה הנכונה מסומנת בירוק.")}
             </p>
           )}
         </div>
