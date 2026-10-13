@@ -745,6 +745,19 @@ textarea::placeholder {
      until the plate was gone, so it popped in at the end. */
   will-change: transform, opacity;
 }
+/* Gone: AppIntro sets this a beat after the exit (see the note there). */
+:root[data-intro="done"] .app-intro {
+  display: none;
+}
+/* The navbar's backdrop blur stays off for as long as the intro is on the
+   page or has been: on iPhone a backdrop layer under the plate was not drawn
+   until the plate went, so the navbar popped in two frames late. The bar is
+   90% opaque, so the blur is barely missed, and never switching it back on
+   means nothing has to redraw. */
+:root[data-intro] [data-navbar] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
 :root[data-intro="skip"] .app-intro {
   animation: intro-skip 200ms var(--ease-out) both;
   pointer-events: none;
