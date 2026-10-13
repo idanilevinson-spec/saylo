@@ -26,7 +26,8 @@ export function gradeExercise(
     case "fill_blank": {
       const c = content as unknown as FillBlankContent;
       const r = response as unknown as FillBlankResponse;
-      return normalize(r.text) === normalize(c.correctAnswer);
+      const given = normalize(r.text);
+      return [c.correctAnswer, ...(c.acceptedAnswers ?? [])].some((a) => normalize(a) === given);
     }
     case "match": {
       const c = content as unknown as MatchContent;

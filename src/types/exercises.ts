@@ -13,6 +13,9 @@ export const McqContentSchema = z.object({
 export const FillBlankContentSchema = z.object({
   sentence: z.string(),
   correctAnswer: z.string(),
+  // Other answers that are just as right ("shows" for "suggests"). The
+  // correct answer stays the one shown after a mistake.
+  acceptedAnswers: z.array(z.string()).optional(),
   hint: z.string().optional(),
 });
 
