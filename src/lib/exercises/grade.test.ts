@@ -38,6 +38,17 @@ describe("gradeExercise — fill_blank", () => {
   it("marks a wrong answer as incorrect", () => {
     expect(gradeExercise("fill_blank", content, { text: "is" })).toBe(false);
   });
+
+  it("accepts any of the other accepted answers, normalized the same way", () => {
+    const c: FillBlankContent = {
+      sentence: "The data ___ that it works.",
+      correctAnswer: "suggests",
+      acceptedAnswers: ["shows", "indicates"],
+    };
+    expect(gradeExercise("fill_blank", c, { text: "Shows" })).toBe(true);
+    expect(gradeExercise("fill_blank", c, { text: "suggests" })).toBe(true);
+    expect(gradeExercise("fill_blank", c, { text: "proves" })).toBe(false);
+  });
 });
 
 describe("gradeExercise — match", () => {

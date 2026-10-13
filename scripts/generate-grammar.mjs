@@ -100,7 +100,10 @@ ${GRAMMAR_TOPICS.map((g) => `  (${q(g.slug)}, ${q(g.title_he)}, ${dollar(g.body_
 ) as l(slug, title_he, body_md) on gt.slug = l.slug;
 `);
 const fillRows = GRAMMAR_TOPICS.flatMap((g) =>
-  g.fill.map(([sentence, correctAnswer, hint], i) => `  (${q(g.slug)}, ${json({ sentence, correctAnswer, hint })}, ${i + 1})`),
+  // Optional 4th item: other answers that are just as right.
+  g.fill.map(([sentence, correctAnswer, hint, acceptedAnswers], i) =>
+    `  (${q(g.slug)}, ${json({ sentence, correctAnswer, ...(acceptedAnswers?.length ? { acceptedAnswers } : {}), hint })}, ${i + 1})`,
+  ),
 );
 out.push(`insert into public.exercises (type, skill_area, grammar_topic_id, cefr_level, content, sort_order)
 select 'fill_blank'::exercise_type, 'grammar'::skill_area, gt.id, gt.cefr_level, gen.content::jsonb, gen.sort_order
