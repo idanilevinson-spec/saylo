@@ -3,6 +3,7 @@ import LegalPage, { EmailLink, LegalSection, LegalList } from "@/components/Lega
 
 export const metadata: Metadata = {
   title: "הצהרת נגישות | Saylo",
+  alternates: { canonical: "/accessibility" },
 };
 
 export default function AccessibilityPage() {

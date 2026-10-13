@@ -5,6 +5,7 @@ import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 export const metadata: Metadata = {
   title: "ביטולים והחזרים | Saylo",
+  alternates: { canonical: "/refunds" },
 };
 
 const linkClass = "text-primary hover:underline";
