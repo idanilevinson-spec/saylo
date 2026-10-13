@@ -26,6 +26,8 @@ export const MatchContentSchema = z.object({
 export const ReorderContentSchema = z.object({
   tokens: z.array(z.string()).min(2),
   correctOrder: z.array(z.number().int().nonnegative()),
+  // Other word orders that are just as right, as full sentences.
+  acceptedSentences: z.array(z.string()).optional(),
 });
 
 export const DictationContentSchema = z.object({
