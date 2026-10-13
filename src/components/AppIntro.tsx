@@ -23,6 +23,10 @@ import { useEffect, useRef } from "react";
 // with a ceiling so a slow network never holds people on the logo. The CSS
 // keeps a late fade of its own (7s) in case this script never runs.
 const EXIT_EARLIEST_MS = 2950;
+// The logo starts once the screen has settled (appIntroScript writes when,
+// in ms, into data-intro-settled), and its own timeline runs about 1.85s
+// from there. It gets its full look before the exit however late it began.
+const LOGO_FULL_LOOK_MS = 2700;
 const EXIT_LATEST_MS = 6000;
 // Consecutive frames, each within this many ms of the last, that count as
 // "calm". 24ms leaves room for a 60Hz frame and some jitter.
@@ -65,13 +69,19 @@ export default function AppIntro() {
       clearTimeout(latestTimer);
       if (root.getAttribute("data-intro") === "play") root.setAttribute("data-intro", "exit");
     };
+    // Not before the logo has had its full look: counted from when it
+    // actually started (the screen settling), not from launch.
+    const logoDone = () => {
+      const settledAt = root.getAttribute("data-intro-settled");
+      return settledAt !== null && elapsed() >= Number(settledAt || 0) + LOGO_FULL_LOOK_MS;
+    };
     const watchForCalm = () => {
       let last = performance.now();
       let calm = 0;
       const tick = (now: number) => {
         calm = now - last <= CALM_FRAME_MS ? calm + 1 : 0;
         last = now;
-        if (calm >= CALM_FRAMES) leave();
+        if (calm >= CALM_FRAMES && logoDone()) leave();
         else raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);
