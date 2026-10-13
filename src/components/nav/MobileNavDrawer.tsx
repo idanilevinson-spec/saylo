@@ -4,25 +4,36 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useBodyScrollLock } from "@/lib/utils/scrollLock";
 
-// The phone menu as a side drawer on the reading-start edge (the right, in
-// this RTL app). It opens from the ☰ button or by swiping in from that edge,
-// the way a native app's drawer does, and closes by swiping it back, tapping
-// the dimmed page, or Escape.
+// The phone menu as a side drawer on the left, the side its ☰ button sits on
+// (the owner's choice: the menu comes out where the button is). It opens from
+// the button or by swiping right from just inside the left edge, the way a
+// native app's drawer does, and closes by swiping it back left, tapping the
+// dimmed page, or Escape.
 //
 // While a finger is down the drawer follows it 1:1: positions are written
 // straight to the elements' style, no React render per frame. On release a
 // quick flick is enough (velocity), not only dragging past halfway.
 //
 // Edge cases left alone on purpose:
-// - The iOS app's own swipe-back lives on the left edge; this uses the right.
+// - The very left edge stays the iOS app's own swipe-back (and Safari's back
+//   gesture on the website): iOS claims touches that start within about 20px
+//   of it. The opening swipe starts in a band just inside that, 20-80px in,
+//   so the two never compete.
+// - Anything draggable (the match game's cards) keeps its own drags.
+// - It stacks above the floating help and accessibility buttons (z 58-61),
+//   which sit at the bottom left, on the drawer's side: they dim with the
+//   page instead of covering the menu's last items.
 // - A swipe that starts on something that scrolls sideways (a carousel, the
 //   Bagrut sub-menu) belongs to that element, not to the drawer.
 // - Inside a game the edge never opens the menu: a stray swipe mid-round
 //   would cost the learner their answer.
 
-const EDGE = 28; // px from the right edge where an opening swipe may start
+// The band, in px from the left edge, where an opening swipe may start.
+const EDGE_MIN = 20;
+const EDGE_MAX = 80;
 const INTENT = 10; // px of travel before deciding horizontal vs vertical
 const FLICK = 0.11; // px/ms; a faster release counts as a decision on its own
+const FLICK_MIN_TRAVEL = 0.15; // ...provided it moved this share of the drawer's width
 const OPEN_MS = 320;
 const CLOSE_MS = 220;
 const DRAWER_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
@@ -41,7 +52,7 @@ type Drag = {
 function scrollsSideways(target: EventTarget | null): boolean {
   let el = target instanceof Element ? target : null;
   while (el && el !== document.body) {
-    if (el.closest("[data-no-edge-swipe]")) return true;
+    if (el.closest('[data-no-edge-swipe], [draggable="true"]')) return true;
     const style = getComputedStyle(el);
     if ((style.overflowX === "auto" || style.overflowX === "scroll") && el.scrollWidth > el.clientWidth) return true;
     el = el.parentElement;
@@ -78,7 +89,7 @@ export default function MobileNavDrawer({
     const transition = animate ? `transform ${ms}ms ${DRAWER_EASE}` : "none";
     panel.style.transition = transition;
     scrim.style.transition = animate ? `opacity ${ms}ms ${DRAWER_EASE}` : "none";
-    panel.style.transform = `translateX(${(1 - progress) * 100}%)`;
+    panel.style.transform = `translateX(${-(1 - progress) * 100}%)`;
     scrim.style.opacity = String(progress);
   }, []);
 
@@ -125,7 +136,7 @@ export default function MobileNavDrawer({
       const t = e.touches[0];
       const isOpen = openRef.current;
       if (!isOpen) {
-        if (inGame || t.clientX < window.innerWidth - EDGE || scrollsSideways(e.target)) return;
+        if (inGame || t.clientX < EDGE_MIN || t.clientX > EDGE_MAX || scrollsSideways(e.target)) return;
       }
       const width = panelRef.current?.offsetWidth ?? 0;
       if (!width) return;
@@ -155,9 +166,9 @@ export default function MobileNavDrawer({
       if (!d.decided) {
         if (Math.abs(dx) < INTENT && Math.abs(dy) < INTENT) return;
         d.decided = true;
-        // Opening must move left, closing must move right; anything else,
+        // Opening must move right, closing must move left; anything else,
         // or a mostly vertical move, is a scroll and is let go.
-        const rightWay = d.fromOpen ? dx > 0 : dx < 0;
+        const rightWay = d.fromOpen ? dx < 0 : dx > 0;
         d.horizontal = rightWay && Math.abs(dx) > Math.abs(dy) * 1.2;
         if (!d.horizontal) {
           drag.current = null;
@@ -169,8 +180,8 @@ export default function MobileNavDrawer({
       e.preventDefault();
       d.lastX = t.clientX;
       const progress = d.fromOpen
-        ? 1 - Math.max(0, dx) / d.width
-        : Math.min(1, Math.max(0, -dx) / d.width);
+        ? 1 - Math.max(0, -dx) / d.width
+        : Math.min(1, Math.max(0, dx) / d.width);
       paint(progress, false);
     }
 
@@ -184,7 +195,10 @@ export default function MobileNavDrawer({
       const elapsed = Math.max(1, performance.now() - d.startTime);
       const velocity = Math.abs(dx) / elapsed;
       const travelled = Math.abs(dx) / d.width;
-      const decided = velocity > FLICK || travelled > 0.4;
+      // A flick decides on its own, but only once it has really travelled:
+      // the opening band sits on page content, and a quick finger slip of a
+      // few pixels while tapping or scrolling there must not open the menu.
+      const decided = (velocity > FLICK && travelled > FLICK_MIN_TRAVEL) || travelled > 0.4;
       const nextOpen = d.fromOpen ? !decided : decided;
       paint(nextOpen ? 1 : 0, true, nextOpen ? OPEN_MS : CLOSE_MS);
       if (nextOpen !== openRef.current) onOpenChange(nextOpen);
@@ -209,7 +223,7 @@ export default function MobileNavDrawer({
         ref={scrimRef}
         aria-hidden="true"
         onClick={() => onOpenChange(false)}
-        className={`fixed inset-0 z-50 bg-black/50 ${shown ? "" : "pointer-events-none"}`}
+        className={`fixed inset-0 z-[65] bg-black/50 ${shown ? "" : "pointer-events-none"}`}
         style={{ opacity: 0 }}
       />
       <div
@@ -219,11 +233,11 @@ export default function MobileNavDrawer({
         aria-modal="true"
         aria-label="תפריט ניווט"
         inert={!shown}
-        className={`fixed inset-y-0 start-0 z-50 w-[min(20rem,85vw)] bg-background border-e border-card-border overflow-y-auto overscroll-contain ${
+        className={`fixed inset-y-0 left-0 z-[65] w-[min(20rem,85vw)] bg-background border-r border-card-border overflow-y-auto overscroll-contain ${
           shown ? "shadow-2xl" : ""
         }`}
         style={{
-          transform: "translateX(100%)",
+          transform: "translateX(-100%)",
           paddingTop: "env(safe-area-inset-top)",
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
