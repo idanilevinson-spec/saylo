@@ -341,38 +341,6 @@ textarea::placeholder {
   }
 }
 
-/* Page cut (PageTransition.tsx). The old page holds until the new one is
-   ready, then leaves fast while the new one dissolves in: a broadcast cut,
-   not a slide. Asymmetric on purpose, exit faster than entry, and short
-   enough that a learner tapping through exercises never waits on it.
-   Opacity only, so it stays under reduced motion too (a dissolve is not
-   movement); the site's own "stop animations" switch turns it off. */
-@keyframes page-cut-fade {
-  from {
-    opacity: 0;
-  }
-}
-::view-transition-old(.page-cut-out) {
-  animation: page-cut-fade 90ms var(--ease-out) both reverse;
-}
-::view-transition-new(.page-cut-in) {
-  animation: page-cut-fade 180ms var(--ease-out) both;
-}
-/* The navbar and page ground are not part of the cut; they stay put. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-}
-/* Taps during the cut reach the live page instead of the overlay. */
-::view-transition {
-  pointer-events: none;
-}
-:root[data-a11y-motion="reduced"]::view-transition-old(*),
-:root[data-a11y-motion="reduced"]::view-transition-new(*),
-:root[data-a11y-motion="reduced"]::view-transition-group(*) {
-  animation: none !important;
-}
-
 /* Floating panels opened from the corner launchers (help chat,
    accessibility). They grow out of the corner their button sits in (bottom,
    inline-end, which is the left in this RTL layout) instead of appearing

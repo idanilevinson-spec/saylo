@@ -1,27 +1,19 @@
 "use client";
 
-import { ViewTransition } from "react";
+import { Fragment } from "react";
 import { usePathname } from "next/navigation";
 
-// A cut between pages, not an entrance. An earlier version faded the new
-// page in from nothing (opacity 0 → 1 over 300ms), which showed a blank
-// screen on every tap on top of the network wait, and was removed. This
-// uses the browser's View Transitions instead: the old page stays on screen
-// until the new one is ready, then the two crossfade in under 200ms (see
-// "Page cut" in globals.css). Nothing is ever blank, and the new page is
-// readable from its first frame.
-//
-// The key still changes with the pathname so a new route remounts and
-// per-page state (an answered question, a typed input) never leaks into the
-// next one. enter/exit fire only on navigation; default="none" keeps every
-// other transition inside a page (form submits, Suspense reveals) still.
-// Browsers without View Transitions simply swap the page, as before.
+// Deliberately does NOT animate. Two attempts, both removed:
+// - an entrance fade (opacity 0 → 1, 300ms) showed a blank screen on every
+//   tap on top of the network wait;
+// - a View Transitions crossfade (PR #133) never went blank, but on iPhone
+//   it still felt stuck: the browser snapshots the whole page before the cut
+//   starts, and React holds the commit until the new page's images load.
+// Frequent actions should feel instant. The keyed Fragment stays because a
+// new pathname must still remount the page, so per-page state (an answered
+// question, a typed input) never leaks into the next route.
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  return (
-    <ViewTransition key={pathname} enter="page-cut-in" exit="page-cut-out" default="none">
-      {children}
-    </ViewTransition>
-  );
+  return <Fragment key={pathname}>{children}</Fragment>;
 }
