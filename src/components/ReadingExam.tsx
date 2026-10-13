@@ -289,7 +289,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
           {summaryLoading ? (
             <p className="mt-2 text-sm text-muted">מכינים סיכום...</p>
           ) : (
-            <p className="mt-2 leading-relaxed">{summary ?? "כל הכבוד על סיום המבחן!"}</p>
+            <p className="mt-2 leading-relaxed">{summary ?? "המבחן הסתיים. כדאי לחזור לשאלות שהיו קשות."}</p>
           )}
         </div>
 

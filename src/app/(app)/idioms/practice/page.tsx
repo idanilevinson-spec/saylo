@@ -180,7 +180,7 @@ export default function IdiomsPracticePage() {
                 className={`mt-4 flex items-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
               >
                 {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
-                {wasCorrect ? "כל הכבוד!" : `לא בדיוק. הביטוי הנכון: "${item.options[item.correctIndex]}"`}
+                {wasCorrect ? "נכון." : `לא בדיוק. הביטוי הנכון: "${item.options[item.correctIndex]}"`}
               </motion.p>
               <EnglishText as="p" className="mt-1 text-sm text-muted">
                 {item.exampleEn}
