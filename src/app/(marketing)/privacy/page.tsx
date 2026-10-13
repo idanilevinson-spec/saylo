@@ -4,6 +4,7 @@ import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 export const metadata: Metadata = {
   title: "מדיניות פרטיות | Saylo",
+  alternates: { canonical: "/privacy" },
 };
 
 function MailLink() {

@@ -20,6 +20,7 @@ import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 export const metadata: Metadata = {
   title: "Saylo | לומדים אנגלית בקצב שלכם",
+  alternates: { canonical: "/" },
 };
 
 // Who we are, for search engines: the organization, the site, and the
