@@ -24,3 +24,20 @@ export function cefrLevelFromPercent(percentCorrect: number): CefrLevel {
 export function capLevelToContentDifficulty(rawLevel: CefrLevel, hardestContentLevel: CefrLevel): CefrLevel {
   return CEFR_ORDER.indexOf(rawLevel) <= CEFR_ORDER.indexOf(hardestContentLevel) ? rawLevel : hardestContentLevel;
 }
+
+// The placement test has the same number of questions at every level (six
+// each, A1 to C2), all multiple choice with four options. Someone who
+// knows everything up to level k and guesses above it is expected to score
+// (k + 0.25 × (6 − k)) / 6, so the cut-offs sit halfway between those
+// expected scores. Without the guessing allowance a B2 learner, who guesses
+// about a quarter of the twelve C questions right, would come out C1.
+// Ongoing practice keeps cefrLevelFromPercent above: its content isn't
+// spread across levels, and its result is capped by what was attempted.
+export function placementLevelFromPercent(percentCorrect: number): CefrLevel {
+  if (percentCorrect < 44) return "A1";
+  if (percentCorrect < 56) return "A2";
+  if (percentCorrect < 69) return "B1";
+  if (percentCorrect < 81) return "B2";
+  if (percentCorrect < 94) return "C1";
+  return "C2";
+}

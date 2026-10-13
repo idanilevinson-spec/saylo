@@ -10,7 +10,7 @@ import { buildWritingCoachPrompt } from "@/lib/ai/prompts/writingCoach";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { hasAiConsent } from "@/lib/ai/consent";
 import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
-import { cefrLevelFromPercent } from "@/lib/assessment/cefrScoring";
+import { cefrLevelFromPercent, placementLevelFromPercent } from "@/lib/assessment/cefrScoring";
 import { gradeBagrutSection } from "@/lib/content/bagrut/placementItems";
 import type { SkillArea } from "@/types/database";
 
@@ -61,12 +61,12 @@ export async function POST(request: Request) {
 
   const scores: SkillScore[] = [...bySkill.entries()].map(([skill, { correct, total }]) => {
     const percentCorrect = Math.round((correct / total) * 100);
-    return { skill, percentCorrect, cefrLevel: cefrLevelFromPercent(percentCorrect) };
+    return { skill, percentCorrect, cefrLevel: placementLevelFromPercent(percentCorrect) };
   });
 
   const totalCorrect = responses.filter((r) => r.is_correct).length;
   const overallPercent = Math.round((totalCorrect / responses.length) * 100);
-  const overallCefr = cefrLevelFromPercent(overallPercent);
+  const overallCefr = placementLevelFromPercent(overallPercent);
 
   // The level is computed from the answers alone. The writing sample and the
   // written summary go to the AI provider, so they only happen once the
