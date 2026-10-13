@@ -1,1 +1,1 @@
-export { default } from "@/components/PageSkeleton";
+export { ExerciseSkeleton as default } from "@/components/PageSkeleton";
