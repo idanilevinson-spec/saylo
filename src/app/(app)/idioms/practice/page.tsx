@@ -140,7 +140,7 @@ export default function IdiomsPracticePage() {
 
         <motion.div
           key={index}
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: EASE_OUT }}
           className="bg-card border border-card-border rounded-lg p-6 sm:p-8"

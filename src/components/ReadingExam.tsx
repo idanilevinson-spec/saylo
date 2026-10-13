@@ -359,7 +359,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
 
         <motion.div
           key={stepIndex}
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: EASE_OUT }}
           className="relative overflow-hidden mt-4 bg-card border border-card-border rounded-lg p-5 sm:p-7"

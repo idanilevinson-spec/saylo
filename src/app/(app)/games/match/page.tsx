@@ -428,7 +428,7 @@ function MatchGamePage({ onReplay }: { onReplay: () => void }) {
                     aria-pressed={selectedEndpoint?.side === "source" && selectedEndpoint.id === p.id}
                     aria-disabled={isMatched}
                     animate={isWrong ? { x: [0, -6, 6, -4, 4, 0] } : {}}
-                    transition={{ duration: 0.4, ease: EASE_OUT }}
+                    transition={{ duration: 0.25, ease: EASE_OUT }}
                     style={{ touchAction: "none" }}
                     className={`select-none rounded-lg border px-3 py-3 min-h-11 flex items-center text-sm cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched
@@ -463,7 +463,7 @@ function MatchGamePage({ onReplay }: { onReplay: () => void }) {
                     aria-pressed={selectedEndpoint?.side === "target" && selectedEndpoint.id === t}
                     aria-disabled={isMatched}
                     animate={isWrong ? { x: [0, 6, -6, 4, -4, 0] } : {}}
-                    transition={{ duration: 0.4, ease: EASE_OUT }}
+                    transition={{ duration: 0.25, ease: EASE_OUT }}
                     style={{ touchAction: "none" }}
                     className={`select-none rounded-lg border px-3 py-3 min-h-11 flex items-center text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched

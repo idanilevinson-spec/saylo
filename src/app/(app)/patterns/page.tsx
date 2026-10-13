@@ -47,9 +47,9 @@ export default function MyPatternsPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <motion.h1
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: EASE_OUT }}
+        transition={{ duration: 0.25, ease: EASE_OUT }}
         className="text-3xl font-bold"
       >
         הדפוסים שלי
@@ -73,9 +73,9 @@ export default function MyPatternsPage() {
             return (
               <motion.div
                 key={stat.code}
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.05, ease: EASE_OUT }}
+                transition={{ duration: 0.25, delay: i * 0.05, ease: EASE_OUT }}
                 className="rounded-lg border border-card-border p-5"
               >
                 <div className="flex items-start justify-between gap-3">

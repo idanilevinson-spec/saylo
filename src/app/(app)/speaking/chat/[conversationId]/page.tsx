@@ -122,9 +122,9 @@ function SpeakingChatInner() {
     return (
       <div className="max-w-xl mx-auto px-4 py-12">
         <motion.h1
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: EASE_OUT }}
+          transition={{ duration: 0.25, ease: EASE_OUT }}
           className="text-2xl font-bold text-center"
         >
           סיכום השיחה
@@ -138,9 +138,9 @@ function SpeakingChatInner() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3, ease: EASE_OUT }}
+          transition={{ duration: 0.25, delay: 0.3, ease: EASE_OUT }}
           className="mt-6 bg-card border border-card-border rounded-lg p-6"
         >
           <p className="leading-relaxed">{score.feedback.generalSuggestionsHe}</p>

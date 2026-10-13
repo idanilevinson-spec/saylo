@@ -81,15 +81,15 @@ export default function ProfileSetupPage() {
 
   return (
     <div className="max-w-md mx-auto px-4 py-16">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: EASE_OUT }}>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: EASE_OUT }}>
         <h1 className="text-3xl font-bold text-center">כמה פרטים אחרונים</h1>
         <p className="mt-2 text-center text-muted">כדי שנוכל להתאים לכם את קצב הלימוד הנכון</p>
       </motion.div>
 
       <motion.form
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1, ease: EASE_OUT }}
+        transition={{ duration: 0.25, delay: 0.1, ease: EASE_OUT }}
         onSubmit={handleSubmit}
         className="mt-8 space-y-4"
       >

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
   X,
@@ -28,9 +27,8 @@ import { useAuth } from "@/context/AuthProvider";
 import EnglishText from "@/components/EnglishText";
 import ThemeToggle from "@/components/ThemeToggle";
 import ScrollProgress from "@/components/ScrollProgress";
-import { useBodyScrollLock } from "@/lib/utils/scrollLock";
+import MobileNavDrawer from "@/components/nav/MobileNavDrawer";
 
-import { EASE_OUT } from "@/lib/motion/easing";
 // Same client-mounted idiom as OfflineBanner's useSyncExternalStore (not a
 // setState-in-effect) — true only after hydration, so the mobile menu's
 // createPortal target (document.body) is never touched during SSR.
@@ -132,15 +130,6 @@ export default function Navbar() {
     ? [...AUTHED_LINKS, { href: "/admin", label: "ניהול", icon: ShieldCheck }]
     : AUTHED_LINKS;
 
-  // Full-screen takeover locks the dashboard behind it from scrolling, the
-  // way a native app's own menu would — without this, the page underneath
-  // keeps scrolling along with the open menu on a long dashboard. Shared,
-  // reference-counted lock (see scrollLock.ts) so this coexists safely with
-  // any other overlay — e.g. the support chat panel — locking at the same
-  // time, instead of the two fighting over document.body.style.overflow
-  // directly and leaving it stuck on "hidden".
-  useBodyScrollLock(menuOpen);
-
   const isActive = (href: string) => (href === "/dashboard" ? pathname === href : pathname.startsWith(href));
 
   const linkClass = (href: string) =>
@@ -215,9 +204,10 @@ export default function Navbar() {
               onClick={() => setMenuOpen((open) => !open)}
               aria-label={menuOpen ? "סגירת תפריט" : "פתיחת תפריט"}
               aria-expanded={menuOpen}
+              aria-controls="mobile-nav-drawer"
               className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
-              {menuOpen ? <X size={18} /> : <Menu size={18} />}
+              <Menu size={18} />
             </button>
           )}
         </div>
@@ -228,53 +218,55 @@ export default function Navbar() {
           // Portaled to <body>: the header above has `backdrop-blur`
           // (a `backdrop-filter`), which — like `filter`/`transform` —
           // establishes a new containing block for `position: fixed`
-          // descendants. Left nested inside <header>, this panel's
-          // "fixed, full height below the header" sizing resolves
-          // against the header's own ~60px box instead of the
-          // viewport and collapses to nothing. Portaling out of that
+          // descendants. Left nested inside <header>, the drawer's
+          // full-height fixed sizing would resolve against the
+          // header's own ~60px box instead of the viewport and
+          // collapse to nothing. Portaling out of that
           // subtree is the standard fix, not a layout workaround.
-          <AnimatePresence>
-            {session && menuOpen && (
-              <motion.nav
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.16, ease: EASE_OUT }}
-                className="md:hidden fixed inset-x-0 bottom-0 z-30 bg-background overflow-y-auto"
-                style={{ top: "var(--navbar-h)" }}
-              >
-                <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-1">
-                  {links.map((link) => (
-                    <MobileNavRow
-                      key={link.href}
-                      {...link}
-                      active={isActive(link.href)}
-                      onClick={() => setMenuOpen(false)}
-                    />
-                  ))}
-                </div>
+          session && (
+            <MobileNavDrawer open={menuOpen} onOpenChange={setMenuOpen}>
+              <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-card-border">
+                <span className="text-sm font-bold">{profile?.display_name ?? "תפריט"}</span>
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  aria-label="סגירת תפריט"
+                  className="w-9 h-9 flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                >
+                  <X size={18} />
+                </button>
+              </div>
 
-                <div className="max-w-6xl mx-auto mt-2 border-t border-card-border px-4 py-4 flex flex-col gap-1">
+              <nav aria-label="ניווט ראשי" className="px-3 py-3 flex flex-col gap-1">
+                {links.map((link) => (
                   <MobileNavRow
-                    href="/profile"
-                    label={profile?.display_name ?? "פרופיל"}
-                    icon={User}
-                    active={isActive("/profile")}
+                    key={link.href}
+                    {...link}
+                    active={isActive(link.href)}
                     onClick={() => setMenuOpen(false)}
                   />
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-danger hover:bg-danger/10 transition-colors"
-                  >
-                    <span className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0 bg-danger/10">
-                      <LogOut size={18} />
-                    </span>
-                    <span className="flex-1 text-right">התנתקות</span>
-                  </button>
-                </div>
-              </motion.nav>
-            )}
-          </AnimatePresence>,
+                ))}
+              </nav>
+
+              <div className="mt-1 border-t border-card-border px-3 py-3 flex flex-col gap-1">
+                <MobileNavRow
+                  href="/profile"
+                  label={profile?.display_name ?? "פרופיל"}
+                  icon={User}
+                  active={isActive("/profile")}
+                  onClick={() => setMenuOpen(false)}
+                />
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-danger hover:bg-danger/10 transition-colors"
+                >
+                  <span className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0 bg-danger/10">
+                    <LogOut size={18} />
+                  </span>
+                  <span className="flex-1 text-right">התנתקות</span>
+                </button>
+              </div>
+            </MobileNavDrawer>
+          ),
           document.body
         )}
     </header>

@@ -103,7 +103,7 @@ function VocabTestPageInner() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: EASE_OUT }}>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: EASE_OUT }}>
         <h1 className="text-3xl font-bold">בחרו נושא למבחן</h1>
         <p className="mt-2 text-muted">מבחן אחד מלא: רב-ברירה, השלמת מילה ונכון/לא נכון, עם סיכום וציון בסוף.</p>
       </motion.div>
@@ -125,7 +125,7 @@ function VocabTestPageInner() {
         {topics.map((topic, i) => (
           <motion.button
             key={topic.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: i * 0.03, ease: EASE_OUT }}
             whileTap={{ scale: 0.98 }}

@@ -324,7 +324,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
         <AnimatePresence mode="wait">
           <motion.div
             key={stepIndex}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: EASE_OUT }}
             className="bg-card border border-card-border rounded-lg p-6 sm:p-8 text-center"
