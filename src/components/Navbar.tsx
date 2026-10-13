@@ -146,6 +146,7 @@ export default function Navbar() {
   return (
     <header
       ref={headerRef}
+      data-navbar=""
       className="sticky top-0 z-40 border-b-2 border-accent bg-background/90 backdrop-blur relative"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >

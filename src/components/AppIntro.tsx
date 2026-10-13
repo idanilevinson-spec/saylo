@@ -25,7 +25,7 @@ export default function AppIntro() {
     // A slow phone can hydrate after the intro already ended (it is CSS and
     // hides itself either way); just tidy up.
     if (el.getAnimations().every((a) => a.playState === "finished")) {
-      root.removeAttribute("data-intro");
+      root.setAttribute("data-intro", "done");
       return;
     }
 
@@ -42,10 +42,16 @@ export default function AppIntro() {
       window.removeEventListener("wheel", skip);
     };
     // Only the plate's own exit ends it; the pieces inside finish earlier.
+    // Taken off the page a beat after that event, not on it: on iPhone the
+    // compositor starts the lift late while the page is still loading, and
+    // the event keeps the original schedule, so removing the plate on it cut
+    // the lift off with 40% of the screen still to go. Until then it sits
+    // off screen (lifted) or transparent (skipped), so the wait costs nothing.
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const done = (e: AnimationEvent) => {
       if (e.target === el && /intro-(lift|skip)/.test(e.animationName)) {
-        root.removeAttribute("data-intro");
         stopListening();
+        timer = setTimeout(() => root.setAttribute("data-intro", "done"), 700);
       }
     };
     el.addEventListener("pointerdown", skip);
@@ -53,6 +59,7 @@ export default function AppIntro() {
     window.addEventListener("wheel", skip, { passive: true });
     el.addEventListener("animationend", done);
     return () => {
+      clearTimeout(timer);
       stopListening();
       el.removeEventListener("animationend", done);
     };
