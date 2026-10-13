@@ -733,9 +733,11 @@ textarea::placeholder {
    (part of the page showing at the bottom, then a jump) through four rounds
    of fixes, while it ran smoothly on a desktop. A fade has no edge to catch,
    and a late frame in it is invisible.
-   The first 0.26s is the bare plate on purpose: on iPhone the web view
-   shifts by the status-bar inset just after first paint, and the logo should
-   not be on screen for that. */
+   The logo's times count from the moment the screen holds still, not from
+   launch: on iPhone the web view drops by the status-bar inset just after
+   its first frames, and the logo must not be on screen for that (a fixed
+   0.26s wait was not always enough on a cold launch). See
+   data-intro-settled below; the 0.26s is now a short beat after it. */
 .app-intro {
   display: none;
 }
@@ -832,6 +834,15 @@ textarea::placeholder {
 .app-intro__lockup > span {
   position: absolute;
   display: block;
+}
+/* The logo holds (its pieces paused before their first frame, so nothing of
+   it shows) until the screen stops moving: appIntroScript sets
+   data-intro-settled once the window's geometry has held still for 150ms.
+   On iPhone the web view drops by the status bar's height just after its
+   first frames, and a logo already on screen jumped down with it. Every
+   piece's own delay then counts from this moment. */
+:root[data-intro]:not([data-intro-settled]) .app-intro__lockup > span {
+  animation-play-state: paused;
 }
 .app-intro__mark {
   left: 24.87%;

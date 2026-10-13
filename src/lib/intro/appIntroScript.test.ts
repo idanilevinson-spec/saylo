@@ -73,3 +73,80 @@ describe("appIntroScript", () => {
     expect(run({ search: "?intro=1", seen: true, reload: true, path: "/admin" }).plays).toBe(true);
   });
 });
+
+// The logo waits for the screen to hold still (see settleWatcher). Driven
+// frame by frame on a fake clock: `geometry(t)` is the window's height at
+// time t, the way the iOS web view drops by the status bar just after launch.
+function settleAt(geometry: (t: number) => number, { frameMs = 16, withRaf = true, until = 2000, app = false } = {}) {
+  const attrs: Record<string, string> = {};
+  let now = 0;
+  let queued: ((t: number) => void) | null = null;
+  const html = { setAttribute: (k: string, v: string) => (attrs[k] = v), clientWidth: 430, get clientHeight() { return geometry(now); } };
+  const env = {
+    document: { documentElement: html },
+    location: { pathname: "/", search: "?intro=1" },
+    navigator: { userAgent: "iPhone" },
+    sessionStorage: { getItem: () => null, setItem: () => undefined },
+    localStorage: { getItem: () => null },
+    performance: { getEntriesByType: () => [{ type: "navigate" }], now: () => now },
+    matchMedia: () => ({ matches: false }),
+    window: app ? { Capacitor: { isNativePlatform: () => true }, screen: { height: 932 } } : {},
+    screen: { height: 932 },
+    innerWidth: 430,
+    get innerHeight() { return geometry(now); },
+    pageYOffset: 0,
+    requestAnimationFrame: withRaf ? (cb: (t: number) => void) => { queued = cb; return 1; } : undefined,
+  };
+  // The page's globals, innerHeight read live through its getter; anything
+  // else (JSON, Math, RegExp) falls through to the real ones.
+  const scope = new Proxy(env, {
+    has: (t, k) => k in t,
+    get: (t, k) => (k === Symbol.unscopables ? undefined : (t as Record<string | symbol, unknown>)[k]),
+  });
+  new Function("scope", `with (scope) { ${appIntroScript} }`)(scope);
+  while (!("data-intro-settled" in attrs) && now < until && queued) {
+    const cb: (t: number) => void = queued;
+    queued = null;
+    now += frameMs;
+    cb(now);
+  }
+  return "data-intro-settled" in attrs ? now : null;
+}
+
+describe("appIntroScript: the logo waits for a still screen", () => {
+  it("starts soon when the screen is still from the first frame", () => {
+    const t = settleAt(() => 932)!;
+    expect(t).toBeGreaterThanOrEqual(150);
+    expect(t).toBeLessThan(200);
+  });
+
+  it("in the app, waits out the status-bar drop, then holds 150ms past it", () => {
+    // As in the owner's recording: about 50ms after launch the web view drops
+    // (the window, full screen height until then, shrinks by the insets).
+    const t = settleAt((now) => (now < 50 ? 932 : 873), { app: true })!;
+    expect(t).toBeGreaterThanOrEqual(50 + 150);
+    expect(t).toBeLessThan(50 + 150 + 32);
+  });
+
+  it("in the app, a late drop on a slow cold launch still comes before the logo", () => {
+    const t = settleAt((now) => (now < 400 ? 932 : 873), { app: true })!;
+    expect(t).toBeGreaterThanOrEqual(400 + 150);
+    expect(t).toBeLessThan(400 + 150 + 32);
+  });
+
+  it("in the app, if the drop never shows, the logo comes late (1.2s) rather than jumping", () => {
+    const t = settleAt(() => 932, { app: true })!;
+    expect(t).toBeGreaterThanOrEqual(1200);
+    expect(t).toBeLessThan(1240);
+  });
+
+  it("never holds the logo past 0.9s, even on a screen that keeps moving", () => {
+    const t = settleAt((now) => 900 + (Math.floor(now / 16) % 2))!;
+    expect(t).toBeGreaterThanOrEqual(900);
+    expect(t).toBeLessThan(940);
+  });
+
+  it("settles at once where there are no animation frames", () => {
+    expect(settleAt(() => 932, { withRaf: false })).toBe(0);
+  });
+});
