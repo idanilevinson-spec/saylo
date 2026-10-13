@@ -117,6 +117,36 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     }
   }
 
+  // Stops whatever is being said right now. The reply plays through the
+  // reused <audio> element, which keeps playing on its own after the call
+  // ends or the page is left (it isn't in the DOM), so ending the call or
+  // leaving has to pause it explicitly, not only cancel the browser voice.
+  function stopSpeaking() {
+    const audio = audioElRef.current;
+    if (audio) {
+      audio.onended = null;
+      audio.onerror = null;
+      audio.pause();
+    }
+    window.speechSynthesis?.cancel();
+  }
+
+  useEffect(() => stopSpeaking, []);
+
+  function endCall() {
+    stopSpeaking();
+    if (activeRecognizerRef.current) safeClose(activeRecognizerRef.current);
+    activeRecognizerRef.current = null;
+    onEnd();
+  }
+
+  function exitCall() {
+    stopSpeaking();
+    if (activeRecognizerRef.current) safeClose(activeRecognizerRef.current);
+    activeRecognizerRef.current = null;
+    onExit();
+  }
+
   function selectVoice(pref: VoicePref) {
     setVoicePref(pref);
     voicePrefRef.current = pref;
@@ -131,7 +161,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     if (ending) {
       // The parent is scoring/closing the conversation — stop the loop
       // and let it take over, don't start another listen cycle.
-      window.speechSynthesis?.cancel();
+      stopSpeaking();
       return () => {
         cancelled = true;
       };
@@ -345,7 +375,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
     return () => {
       cancelled = true;
-      window.speechSynthesis?.cancel();
+      stopSpeaking();
       if (activeRecognizerRef.current) safeClose(activeRecognizerRef.current);
       activeRecognizerRef.current = null;
     };
@@ -437,7 +467,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         </motion.button>
 
         <button
-          onClick={onExit}
+          onClick={exitCall}
           className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors"
         >
           <Keyboard size={13} /> להמשיך בהקלדה בלי לסיים
@@ -567,7 +597,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       )}
 
       <button
-        onClick={onEnd}
+        onClick={endCall}
         disabled={ending || !canEnd}
         title={!canEnd ? "אמרו משהו קודם כדי לקבל משוב" : undefined}
         className="mt-2 flex items-center gap-1.5 px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
@@ -576,7 +606,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       </button>
 
       <button
-        onClick={onExit}
+        onClick={exitCall}
         disabled={ending}
         className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors disabled:opacity-50"
       >
