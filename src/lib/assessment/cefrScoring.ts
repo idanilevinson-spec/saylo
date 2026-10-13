@@ -41,3 +41,33 @@ export function placementLevelFromPercent(percentCorrect: number): CefrLevel {
   if (percentCorrect < 94) return "C1";
   return "C2";
 }
+
+// The placement test offers "don't know? skip", and a skipped question is
+// not counted wrong. But leaving it out of the score altogether rewarded
+// skipping: someone who knew A1-B2 and honestly skipped the twelve C
+// questions scored 24/24 = 100% and came out C2. A skip is the learner
+// saying "I'd only be guessing", so it counts exactly as a guess would on
+// average: a quarter of a point (four options). No penalty against
+// guessing, no bonus over it, and the cut-offs above stay right.
+// `percentCorrect` is what the learner is shown: right answers out of every
+// question in the test, skipped ones included.
+export const PLACEMENT_OPTION_COUNT = 4;
+
+export function placementScore({
+  correct,
+  answered,
+  questions,
+}: {
+  correct: number;
+  answered: number;
+  questions: number;
+}): { percentCorrect: number; level: CefrLevel } {
+  const total = Math.max(questions, answered);
+  if (total === 0) return { percentCorrect: 0, level: "A1" };
+  const skipped = total - answered;
+  const credited = (correct + skipped / PLACEMENT_OPTION_COUNT) / total;
+  return {
+    percentCorrect: Math.round((correct / total) * 100),
+    level: placementLevelFromPercent(Math.round(credited * 100)),
+  };
+}
