@@ -92,6 +92,21 @@ export default function MobileNavDrawer({
     }
   }, [open, paint]);
 
+  // On close, give focus back to the ☰ button, the way a dialog does: the
+  // panel turns inert, so focus left inside it would drop to the page's
+  // start and a keyboard or screen-reader user would lose their place.
+  // Only when focus was in the drawer (or already lost): a tap elsewhere
+  // that closed it keeps whatever it focused.
+  const wasOpen = useRef(open);
+  useEffect(() => {
+    if (wasOpen.current && !open) {
+      const active = document.activeElement;
+      const lost = !active || active === document.body || panelRef.current?.contains(active);
+      if (lost) document.querySelector<HTMLElement>('[aria-controls="mobile-nav-drawer"]')?.focus({ preventScroll: true });
+    }
+    wasOpen.current = open;
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
