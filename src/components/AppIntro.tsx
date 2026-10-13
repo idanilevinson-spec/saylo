@@ -5,7 +5,8 @@ import { useEffect, useRef } from "react";
 // Opening titles for the iOS app: the logo assembles itself (the bubble
 // arrives, its three dots type, "saylo" writes in, the "o" turns into place),
 // a blue cue line runs along the bottom and the whole plate lifts away to
-// the page underneath. About 2.4s, once per app launch, tap anywhere to skip.
+// the page underneath. About 3.25s (the full logo holds for about 1.5s),
+// once per app launch, tap anywhere to skip.
 //
 // Pure CSS (`.app-intro` in globals.css), so it starts on the first frame
 // rather than after hydration. Whether it plays is decided before paint by

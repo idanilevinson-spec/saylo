@@ -724,8 +724,8 @@ textarea::placeholder {
    measured on the 1254px source in a 780 x 702 box from (238, 262), so the
    pieces land exactly where the logo has them. Timeline:
    0.06s bubble arrives · 0.38s dots type · 0.82s "sayl" writes in ·
-   1.06s "o" turns into place · 1.22s tagline · 1.56s blue cue line ·
-   1.95s the plate lifts away (gone at 2.45s). */
+   1.06s "o" turns into place · 1.22s tagline · 2.36s blue cue line ·
+   2.75s the plate lifts away (gone at 3.25s). */
 .app-intro {
   display: none;
 }
@@ -736,7 +736,7 @@ textarea::placeholder {
   display: grid;
   place-items: center;
   background: var(--background);
-  animation: intro-lift 500ms var(--ease-in-out) 1950ms both;
+  animation: intro-lift 500ms var(--ease-in-out) 2750ms both;
 }
 :root[data-intro="skip"] .app-intro {
   animation: intro-skip 200ms var(--ease-out) both;
@@ -751,7 +751,7 @@ textarea::placeholder {
   height: 6px;
   background: var(--primary);
   transform-origin: right;
-  animation: intro-cue 380ms var(--ease-in-out) 1560ms both;
+  animation: intro-cue 380ms var(--ease-in-out) 2360ms both;
 }
 .app-intro__lockup {
   position: relative;
