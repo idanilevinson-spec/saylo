@@ -17,7 +17,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { topicSlug } = await params;
   const topic = await getVocabularyTopicBySlug(topicSlug);
-  return { title: topic ? `${topic.name_he} | אוצר מילים` : "אוצר מילים" };
+  return { title: topic ? `${topic.name_he} | אוצר מילים | Saylo` : "אוצר מילים | Saylo" };
 }
 
 export default async function VocabularyTopicPage({ params }: PageProps) {

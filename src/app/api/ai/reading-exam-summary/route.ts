@@ -71,7 +71,7 @@ export async function POST(request: Request) {
   const parsedResult = parseJsonResponse<ExamSummaryResult>(raw);
   if (!parsedResult) await reportAiParseFailure("reading-exam-summary", raw);
   const parsed = parsedResult ?? {
-    summaryHe: "כל הכבוד על סיום המבחן! המשיכו לתרגל קריאה בקצב קבוע.",
+    summaryHe: "המבחן הסתיים. כדאי לחזור לשאלות שהיו קשות ולתרגל קריאה בקצב קבוע.",
   };
 
   await logAiUsage(supabase, user.id, "reading_exam_summary", message.usage.input_tokens, message.usage.output_tokens);

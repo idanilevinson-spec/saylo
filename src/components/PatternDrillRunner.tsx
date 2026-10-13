@@ -52,7 +52,7 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
     return (
       <div className="max-w-xl mx-auto px-4 py-12 text-center">
         <IconCircle />
-        <h1 className="mt-4 text-2xl font-bold">כל הכבוד!</h1>
+        <h1 className="mt-4 text-2xl font-bold">התרגול הסתיים</h1>
         <p className="mt-2 text-muted">
           {correctCount} מתוך {drill.items.length} תשובות נכונות בתרגול על &quot;{definition.labelHe}&quot;.
         </p>
