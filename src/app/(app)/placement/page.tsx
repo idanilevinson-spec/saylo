@@ -3,14 +3,14 @@
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Volume2, Turtle, Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, type LucideIcon } from "lucide-react";
+import { Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, type LucideIcon } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import { placementInstructionHe } from "@/lib/placement/instructionHe";
 import { optionOrder } from "@/lib/utils/shuffle";
 import AiConsentGate from "@/components/AiConsentGate";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
-import { speak } from "@/lib/speech/browserTts";
+import SentenceAudioButtons from "@/components/SentenceAudioButtons";
 import type { PlacementQuestion, SkillArea } from "@/types/database";
 import type { BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_PLACEMENT_SECTIONS } from "@/lib/content/bagrut/placementItems";
@@ -452,20 +452,7 @@ export default function PlacementPage() {
             <EnglishText as="p" className="font-medium text-lg mb-3">
               {renderPromptWithUniformBlanks(question.prompt)}
             </EnglishText>
-            <div className="flex gap-2">
-              <button
-                onClick={() => speak(question.audio_text as string, 1)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-              >
-                <Volume2 size={16} /> השמעה
-              </button>
-              <button
-                onClick={() => speak(question.audio_text as string, 0.6)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-              >
-                <Turtle size={16} /> לאט
-              </button>
-            </div>
+            <SentenceAudioButtons key={question.id} text={question.audio_text} />
           </div>
         ) : (
           <>

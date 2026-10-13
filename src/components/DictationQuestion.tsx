@@ -2,8 +2,7 @@
 
 import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useState } from "react";
-import { Volume2, Turtle } from "lucide-react";
-import { speak } from "@/lib/speech/browserTts";
+import SentenceAudioButtons from "@/components/SentenceAudioButtons";
 import type { DictationContent, DictationResponse } from "@/types/exercises";
 
 interface DictationQuestionProps {
@@ -19,20 +18,7 @@ export default function DictationQuestion({ content, disabled, onSubmit }: Dicta
   return (
     <div>
       <p className="font-medium text-lg mb-4">הקשיבו וכתבו את מה ששמעתם</p>
-      <div className="flex gap-2">
-        <button
-          onClick={() => speak(c.audioText, 1)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-[border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
-        >
-          <Volume2 size={16} /> השמעה
-        </button>
-        <button
-          onClick={() => speak(c.audioText, 0.6)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-[border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
-        >
-          <Turtle size={16} /> לאט
-        </button>
-      </div>
+      <SentenceAudioButtons key={c.audioText} text={c.audioText} />
       <input
         type="text"
         {...ENGLISH_WORD_INPUT}
