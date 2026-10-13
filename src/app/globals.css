@@ -719,3 +719,175 @@ textarea::placeholder {
 :root[data-a11y-motion="reduced"] .working-sweep {
   animation: none;
 }
+
+/* App launch intro (AppIntro.tsx). Positions are the logo's own layout,
+   measured on the 1254px source in a 780 x 702 box from (238, 262), so the
+   pieces land exactly where the logo has them. Timeline:
+   0.06s bubble arrives · 0.38s dots type · 0.82s "sayl" writes in ·
+   1.06s "o" turns into place · 1.22s tagline · 2.36s blue cue line ·
+   2.75s the plate lifts away (gone at 3.25s). */
+.app-intro {
+  display: none;
+}
+:root[data-intro] .app-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: var(--background);
+  animation: intro-lift 500ms var(--ease-in-out) 2750ms both;
+}
+:root[data-intro="skip"] .app-intro {
+  animation: intro-skip 200ms var(--ease-out) both;
+}
+/* The plate's edge, as on every plate in the site: here it runs along the
+   bottom from the reading start, then leads the lift. */
+.app-intro::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 6px;
+  background: var(--primary);
+  transform-origin: right;
+  animation: intro-cue 380ms var(--ease-in-out) 2360ms both;
+}
+.app-intro__lockup {
+  position: relative;
+  width: min(60vw, 260px);
+  aspect-ratio: 780 / 702;
+  margin-bottom: 6vh;
+}
+.app-intro__lockup > span {
+  position: absolute;
+  display: block;
+}
+.app-intro__mark {
+  left: 24.87%;
+  top: 0;
+  width: 50.51%;
+  height: 54.42%;
+  background: url("/intro/mark.png") center / 100% 100% no-repeat;
+  animation: intro-mark 520ms var(--ease-out) 60ms both;
+}
+.app-intro__dot {
+  top: 29.56%;
+  width: 3.21%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--foreground);
+  animation: intro-dot 900ms var(--ease-out) 380ms both;
+}
+.app-intro__dot:nth-of-type(2) {
+  left: 44.04%;
+}
+.app-intro__dot:nth-of-type(3) {
+  left: 50.38%;
+  animation-delay: 470ms;
+}
+.app-intro__dot:nth-of-type(4) {
+  left: 56.79%;
+  animation-delay: 560ms;
+}
+.app-intro__sayl,
+.app-intro__o {
+  top: 51.85%;
+  height: 38.75%;
+}
+.app-intro__sayl {
+  left: 0;
+  width: 76.54%;
+  background: var(--foreground);
+  mask: url("/intro/sayl.png") center / 100% 100% no-repeat;
+  animation: intro-write 560ms var(--ease-out) 820ms both;
+}
+.app-intro__o {
+  left: 76.54%;
+  width: 23.46%;
+  background: url("/intro/o.png") center / 100% 100% no-repeat;
+  transform-origin: 50% 52%;
+  animation: intro-turn 620ms var(--ease-out) 1060ms both;
+}
+.app-intro__tagline {
+  left: 9.74%;
+  top: 93.73%;
+  width: 81.79%;
+  height: 5.98%;
+  background: var(--muted);
+  mask: url("/intro/tagline.png") center / 100% 100% no-repeat;
+  animation: intro-tagline 420ms var(--ease-out) 1220ms both;
+}
+@keyframes intro-mark {
+  from {
+    opacity: 0;
+    transform: translateY(6%) scale(0.86);
+  }
+}
+/* Arrive, then one typing wave: each dot lifts in turn, like a message
+   being written. */
+@keyframes intro-dot {
+  0% {
+    transform: scale(0);
+  }
+  30% {
+    transform: scale(1);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  66% {
+    transform: translateY(-70%);
+  }
+  84%,
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes intro-write {
+  from {
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-3%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+@keyframes intro-turn {
+  from {
+    opacity: 0;
+    transform: rotate(-140deg) scale(0.85);
+  }
+}
+@keyframes intro-tagline {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+}
+@keyframes intro-cue {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes intro-lift {
+  to {
+    transform: translateY(-100%);
+    visibility: hidden;
+  }
+}
+@keyframes intro-skip {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-intro] .app-intro {
+    display: none;
+  }
+}
+:root[data-a11y-motion="reduced"][data-intro] .app-intro {
+  display: none;
+}
