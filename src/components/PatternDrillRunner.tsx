@@ -10,6 +10,7 @@ import type { PatternDefinition } from "@/lib/patterns/patternDefinitions";
 import type { PatternDrill } from "@/lib/patterns/drills";
 
 import { EASE_OUT } from "@/lib/motion/easing";
+import { optionOrder } from "@/lib/utils/shuffle";
 interface PatternDrillRunnerProps {
   definition: PatternDefinition;
   drill: PatternDrill;
@@ -83,7 +84,8 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
         </EnglishText>
 
         <div className="mt-5 flex flex-col gap-2">
-          {item.options.map((option, i) => {
+          {optionOrder(item.options.length, item.promptWithBlank).map((i) => {
+            const option = item.options[i];
             const isSelected = selected === i;
             const isCorrectOption = i === item.correctOptionIndex;
             const showState = selected !== null && (isSelected || isCorrectOption);
