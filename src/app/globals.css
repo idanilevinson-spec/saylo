@@ -753,6 +753,20 @@ textarea::placeholder {
      until the plate was gone, so it popped in at the end. */
   will-change: transform, opacity;
 }
+/* The page itself is held back for the first 0.8s of the intro. In the
+   owner's screen recordings the iPhone drew the bottom of the page (a card
+   edge and the accessibility button) over the plate for the first two frames
+   after launch, before the web view had settled; making the plate bigger did
+   not help, because the page was drawn above it, not peeking out from under
+   it. Nothing on the page is drawn until 0.8s, well inside the plate's opaque
+   stretch, and the page is fully painted long before the exit. A skip shows
+   it at once. No direct child of <body> has an animation of its own. */
+:root[data-intro] body > :not(.app-intro) {
+  animation: intro-page-hold 1ms linear 800ms both;
+}
+:root[data-intro="skip"] body > :not(.app-intro) {
+  animation: none;
+}
 /* Gone: AppIntro sets this a beat after the exit (see the note there). */
 :root[data-intro="done"] .app-intro {
   display: none;
@@ -937,6 +951,14 @@ textarea::placeholder {
   to {
     opacity: 0;
     visibility: hidden;
+  }
+}
+@keyframes intro-page-hold {
+  from {
+    visibility: hidden;
+  }
+  to {
+    visibility: visible;
   }
 }
 @keyframes intro-exit {
