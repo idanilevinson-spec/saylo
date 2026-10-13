@@ -274,11 +274,11 @@ export default function PlacementPage() {
     else setShowWritingStep(true);
   }
 
-  // No response is recorded for a skipped question — it's excluded from
-  // that skill's score entirely (same as a skill nobody got any questions
-  // for: the results screen already shows "טרם נבדק" for it) rather than
-  // counted wrong, since a guess-free skip isn't evidence the learner
-  // doesn't know the material.
+  // No response is recorded for a skipped question. It is not counted
+  // wrong: the server scores it as a guess would score on average (a
+  // quarter of a point), so skipping neither costs nor gains anything over
+  // guessing (see placementScore). A skill with no answers at all still
+  // shows "לא נבדק הפעם" on the results screen.
   function handleSkip() {
     if (!testId) return;
     setSelected(null);
