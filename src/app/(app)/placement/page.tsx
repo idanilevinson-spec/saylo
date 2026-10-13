@@ -128,7 +128,7 @@ export default function PlacementPage() {
       .filter((s) => s.count > 0);
     return (
       <div className="max-w-3xl mx-auto px-4 pt-10 pb-16">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">מבחן רמה</h1>
           <p className="mt-3 max-w-xl text-lg text-muted leading-relaxed">
             כ-10 דקות, {questions.length} שאלות קצרות. בסוף תקבלו רמה לכל מיומנות בנפרד, ותוכנית יומית שבנויה עליה.
@@ -374,9 +374,9 @@ export default function PlacementPage() {
       <div className="max-w-xl mx-auto px-4 py-12">
         <p className="text-sm text-muted mb-4">שלב אחרון (רשות)</p>
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, ease: EASE_OUT }}
+          transition={{ duration: 0.25, ease: EASE_OUT }}
           className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           <p className="font-medium text-lg">{WRITING_SAMPLE_PROMPT_HE}</p>
@@ -439,9 +439,9 @@ export default function PlacementPage() {
 
       <motion.div
         key={index}
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: EASE_OUT }}
+        transition={{ duration: 0.25, ease: EASE_OUT }}
         className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
       >
         {question.skill_area === "listening" && question.audio_text ? (

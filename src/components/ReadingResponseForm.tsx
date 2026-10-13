@@ -101,9 +101,9 @@ function ReadingResponseFormInner({
   if (result) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: EASE_OUT }}
+        transition={{ duration: 0.25, ease: EASE_OUT }}
         className="space-y-4"
       >
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">

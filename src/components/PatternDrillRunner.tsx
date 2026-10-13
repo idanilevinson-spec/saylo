@@ -74,7 +74,7 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
 
       <motion.div
         key={index}
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: EASE_OUT }}
         className="mt-4 rounded-lg border border-card-border p-6"
