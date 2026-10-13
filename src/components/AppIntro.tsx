@@ -4,9 +4,9 @@ import { useEffect, useRef } from "react";
 
 // Opening titles for the iOS app and the website: the logo assembles itself
 // (the bubble arrives, its three dots type, "saylo" writes in, the "o" turns
-// into place), a blue cue line runs along the bottom and the whole plate
-// lifts away to the page underneath. About 3.45s (the full logo holds for
-// about 1.5s), once per visit (see appIntroScript), skipped by a tap, a
+// into place), a blue cue line runs along the bottom, then the plate fades
+// to the page underneath as the logo grows a touch. About 3.4s (the full
+// logo holds for about 1.5s), once per visit (see appIntroScript), skipped by a tap, a
 // click, a key or the mouse wheel.
 //
 // Pure CSS (`.app-intro` in globals.css), so it starts on the first frame
@@ -15,15 +15,15 @@ import { useEffect, useRef } from "react";
 // that attribute this markup is display:none and its images never load.
 // The pieces are cut from the real logo by scripts/build-intro-assets.mjs.
 
-// The lift waits for the page, not the clock. On a phone the page is still
+// The exit waits for the page, not the clock. On a phone the page is still
 // loading and hydrating at the authored 2.95s, and an animation started on a
 // busy main thread reaches the screen late and jumps (the compositor shows it
-// already part-way through). So the plate lifts at the authored moment or
+// already part-way through). So the plate goes at the authored moment or
 // later: once the page has loaded and frames are arriving on time again,
 // with a ceiling so a slow network never holds people on the logo. The CSS
-// keeps a late lift of its own (7s) in case this script never runs.
-const LIFT_EARLIEST_MS = 2950;
-const LIFT_LATEST_MS = 6000;
+// keeps a late fade of its own (7s) in case this script never runs.
+const EXIT_EARLIEST_MS = 2950;
+const EXIT_LATEST_MS = 6000;
 // Consecutive frames, each within this many ms of the last, that count as
 // "calm". 24ms leaves room for a 60Hz frame and some jitter.
 const CALM_FRAMES = 6;
@@ -59,7 +59,7 @@ export default function AppIntro() {
     const elapsed = () => Number(el.getAnimations()[0]?.currentTime ?? 0);
     let raf = 0;
     let waitTimer: ReturnType<typeof setTimeout> | undefined;
-    const lift = () => {
+    const leave = () => {
       cancelAnimationFrame(raf);
       clearTimeout(waitTimer);
       clearTimeout(latestTimer);
@@ -71,26 +71,26 @@ export default function AppIntro() {
       const tick = (now: number) => {
         calm = now - last <= CALM_FRAME_MS ? calm + 1 : 0;
         last = now;
-        if (calm >= CALM_FRAMES) lift();
+        if (calm >= CALM_FRAMES) leave();
         else raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);
     };
     const afterLoad = () => {
-      waitTimer = setTimeout(watchForCalm, Math.max(0, LIFT_EARLIEST_MS - elapsed()));
+      waitTimer = setTimeout(watchForCalm, Math.max(0, EXIT_EARLIEST_MS - elapsed()));
     };
-    const latestTimer = setTimeout(lift, Math.max(0, LIFT_LATEST_MS - elapsed()));
+    const latestTimer = setTimeout(leave, Math.max(0, EXIT_LATEST_MS - elapsed()));
     if (document.readyState === "complete") afterLoad();
     else window.addEventListener("load", afterLoad, { once: true });
 
     // Only the plate's own exit ends it; the pieces inside finish earlier.
     // Taken off the page a beat after that event, not on it: if the screen
-    // runs behind the event, removing the plate on it would cut the lift off
-    // mid-way. Until then it sits off screen (lifted) or transparent
-    // (skipped), so the wait costs nothing.
+    // runs behind the event, removing the plate on it would cut the exit off
+    // mid-way. Until then it is transparent and lets taps through, so the
+    // wait costs nothing.
     let timer: ReturnType<typeof setTimeout> | undefined;
     const done = (e: AnimationEvent) => {
-      if (e.target === el && /intro-(lift|exit|skip)/.test(e.animationName)) {
+      if (e.target === el && /intro-(fallback|exit|skip)/.test(e.animationName)) {
         stopListening();
         timer = setTimeout(() => root.setAttribute("data-intro", "done"), 700);
       }

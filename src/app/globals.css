@@ -725,9 +725,14 @@ textarea::placeholder {
    pieces land exactly where the logo has them. Timeline:
    0.26s bubble arrives · 0.58s dots type · 1.02s "sayl" writes in ·
    1.26s "o" turns into place · 1.42s tagline · 2.56s blue cue line ·
-   2.95s or later the plate lifts away: AppIntro sets data-intro="exit" once
-   the page has loaded and the phone is drawing frames on time (by 6s at
-   most); the 7s lift here is only for when that script never runs.
+   2.95s or later the plate fades to the page while the logo grows a touch:
+   AppIntro sets data-intro="exit" once the page has loaded and the phone is
+   drawing frames on time (by 6s at most); the 7s fade here is only for when
+   that script never runs.
+   A fade, not a lift: on the owner's iPhone a full-screen lift kept catching
+   (part of the page showing at the bottom, then a jump) through four rounds
+   of fixes, while it ran smoothly on a desktop. A fade has no edge to catch,
+   and a late frame in it is invisible.
    The first 0.26s is the bare plate on purpose: on iPhone the web view
    shifts by the status-bar inset just after first paint, and the logo should
    not be on screen for that. */
@@ -741,8 +746,8 @@ textarea::placeholder {
   display: grid;
   place-items: center;
   background: var(--background);
-  animation: intro-lift 500ms var(--ease-in-out) 7000ms both;
-  /* Composited from the first frame, not promoted when the lift starts:
+  animation: intro-fallback 450ms var(--ease-in-out) 7000ms both;
+  /* Composited from the first frame, not promoted when the exit starts:
      on iPhone that late promotion painted fixed page elements over the
      plate for a frame and left the sticky (backdrop-blur) navbar undrawn
      until the plate was gone, so it popped in at the end. */
@@ -762,7 +767,12 @@ textarea::placeholder {
   backdrop-filter: none;
 }
 :root[data-intro="exit"] .app-intro {
-  animation: intro-exit 550ms var(--ease-in-out) both;
+  animation: intro-exit 450ms var(--ease-in-out) both;
+  pointer-events: none;
+}
+:root[data-intro="exit"] .app-intro__lockup {
+  /* Gone before the plate is: the logo never shows through the page. */
+  animation: intro-lockup-out 300ms var(--ease-out) both;
 }
 :root[data-intro="skip"] .app-intro {
   animation: intro-skip 200ms var(--ease-out) both;
@@ -771,18 +781,16 @@ textarea::placeholder {
 /* Overhang. For the first frames after launch the iOS web view has not
    settled its viewport (status-bar inset, height), and a plate sized exactly
    to it left a strip of the page showing at the bottom. This extends the
-   plate well past both edges until that is over, then goes, so the lift
-   still has the cue line as its edge. */
+   plate well past both edges. */
 .app-intro::before {
   content: "";
   position: absolute;
   inset: -25vh 0;
   z-index: -1;
   background: var(--background);
-  animation: intro-overhang 1ms linear 700ms both;
 }
 /* The plate's edge, as on every plate in the site: here it runs along the
-   bottom from the reading start, then leads the lift. */
+   bottom from the reading start, the cue that the page is ready. */
 .app-intro::after {
   content: "";
   position: absolute;
@@ -919,27 +927,30 @@ textarea::placeholder {
     transform: scaleX(0);
   }
 }
-/* Transform and opacity only, nothing else in these keyframes: iOS hands
-   such an animation to the compositor, where it stays smooth while the page
-   is still busy loading underneath. A `visibility` step in here kept the
-   whole lift on the main thread, and it stuttered. Fully lifted, the plate
-   is off screen; skipped, it is transparent and ignores taps. */
-@keyframes intro-lift {
+/* Opacity and transform only in the exit and skip keyframes: iOS hands such
+   an animation to the compositor, where it stays smooth while the page is
+   still busy underneath (a `visibility` step kept it on the main thread).
+   Taps pass through from the moment either starts. The fallback is the one
+   place visibility steps in: it runs only without the script, and then
+   nothing else would ever stop the transparent plate catching taps. */
+@keyframes intro-fallback {
   to {
-    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
   }
 }
 @keyframes intro-exit {
   to {
-    transform: translateY(-100%);
-  }
-}
-@keyframes intro-skip {
-  to {
     opacity: 0;
   }
 }
-@keyframes intro-overhang {
+@keyframes intro-lockup-out {
+  to {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+@keyframes intro-skip {
   to {
     opacity: 0;
   }
