@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Volume2, Play, Pause, Loader2 } from "lucide-react";
 import { useNeuralSpeech, NEURAL_SPEECH_RATES } from "@/lib/speech/useNeuralSpeech";
 import EnglishText from "@/components/EnglishText";
+import { dialogueSsml, parseDialogue } from "@/lib/speech/dialogue";
 
 interface ListeningPlayerProps {
   transcriptEn: string;
@@ -15,8 +16,14 @@ interface ListeningPlayerProps {
 
 export default function ListeningPlayer({ transcriptEn, defaultRate = 1 }: ListeningPlayerProps) {
   const [showTranscript, setShowTranscript] = useState(false);
+  const turns = useMemo(() => parseDialogue(transcriptEn), [transcriptEn]);
+  const isDialogue = turns[0].speaker !== null;
+  const segments = useMemo(
+    () => (isDialogue ? [{ text: turns.map((t) => t.text).join(" "), ssml: dialogueSsml(turns) }] : [transcriptEn]),
+    [isDialogue, turns, transcriptEn],
+  );
   const { state: playback, rate, togglePlayPause, setRate } = useNeuralSpeech(
-    [transcriptEn],
+    segments,
     defaultRate
   );
 
@@ -64,11 +71,21 @@ export default function ListeningPlayer({ transcriptEn, defaultRate = 1 }: Liste
         </button>
       </div>
 
-      {showTranscript && (
-        <EnglishText as="p" className="mt-6 text-lg leading-loose text-left">
-          {transcriptEn}
-        </EnglishText>
-      )}
+      {showTranscript &&
+        (isDialogue ? (
+          <div dir="ltr" lang="en" className="mt-6 space-y-2 text-lg leading-relaxed text-left font-content">
+            {turns.map((t, i) => (
+              <p key={i} className="flex gap-3">
+                <span className="w-5 shrink-0 text-sm font-bold text-muted pt-1">{t.speaker}</span>
+                <span>{t.text}</span>
+              </p>
+            ))}
+          </div>
+        ) : (
+          <EnglishText as="p" className="mt-6 text-lg leading-loose text-left">
+            {transcriptEn}
+          </EnglishText>
+        ))}
     </div>
   );
 }
