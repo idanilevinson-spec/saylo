@@ -4,7 +4,7 @@
 -- Not idempotent: run once (re-running the generator afterwards adds none).
 
 insert into public.exercises (type, skill_area, topic_id, cefr_level, content, sort_order)
-select 'match'::exercise_type, 'vocabulary'::skill_area, gen.topic_id::uuid, gen.cefr_level, gen.content::jsonb, gen.sort_order
+select 'match'::exercise_type, 'vocabulary'::skill_area, gen.topic_id::uuid, gen.cefr_level::cefr_level, gen.content::jsonb, gen.sort_order
 from (values
   ('0aac6fd1-c601-4c08-a375-99082af9e34a', 'A1', '{"pairs":[{"left":"two","right":"שתיים"},{"left":"five","right":"חמש"},{"left":"six","right":"שש"},{"left":"seven","right":"שבע"}]}', 101),
   ('0aac6fd1-c601-4c08-a375-99082af9e34a', 'A1', '{"pairs":[{"left":"eight","right":"שמונה"},{"left":"nine","right":"תשע"},{"left":"one","right":"אחת"},{"left":"two","right":"שתיים"}]}', 102),

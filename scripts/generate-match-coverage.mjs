@@ -54,7 +54,7 @@ writeFileSync(
 -- Not idempotent: run once (re-running the generator afterwards adds none).
 
 insert into public.exercises (type, skill_area, topic_id, cefr_level, content, sort_order)
-select 'match'::exercise_type, 'vocabulary'::skill_area, gen.topic_id::uuid, gen.cefr_level, gen.content::jsonb, gen.sort_order
+select 'match'::exercise_type, 'vocabulary'::skill_area, gen.topic_id::uuid, gen.cefr_level::cefr_level, gen.content::jsonb, gen.sort_order
 from (values
 ${rows.join(",\n")}
 ) as gen(topic_id, cefr_level, content, sort_order);
