@@ -747,6 +747,20 @@ textarea::placeholder {
 }
 :root[data-intro="skip"] .app-intro {
   animation: intro-skip 200ms var(--ease-out) both;
+  pointer-events: none;
+}
+/* Overhang. For the first frames after launch the iOS web view has not
+   settled its viewport (status-bar inset, height), and a plate sized exactly
+   to it left a strip of the page showing at the bottom. This extends the
+   plate well past both edges until that is over, then goes, so the lift
+   still has the cue line as its edge. */
+.app-intro::before {
+  content: "";
+  position: absolute;
+  inset: -25vh 0;
+  z-index: -1;
+  background: var(--background);
+  animation: intro-overhang 1ms linear 700ms both;
 }
 /* The plate's edge, as on every plate in the site: here it runs along the
    bottom from the reading start, then leads the lift. */
@@ -886,16 +900,24 @@ textarea::placeholder {
     transform: scaleX(0);
   }
 }
+/* Transform and opacity only, nothing else in these keyframes: iOS hands
+   such an animation to the compositor, where it stays smooth while the page
+   is still busy loading underneath. A `visibility` step in here kept the
+   whole lift on the main thread, and it stuttered. Fully lifted, the plate
+   is off screen; skipped, it is transparent and ignores taps. */
 @keyframes intro-lift {
   to {
     transform: translateY(-100%);
-    visibility: hidden;
   }
 }
 @keyframes intro-skip {
   to {
     opacity: 0;
-    visibility: hidden;
+  }
+}
+@keyframes intro-overhang {
+  to {
+    opacity: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {
