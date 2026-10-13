@@ -14,7 +14,12 @@ export const NEURAL_SPEECH_RATES = [0.75, 1, 1.25, 1.5] as const;
 // fallback to the browser's built-in Web Speech API if Azure is unavailable
 // or fails. Extracted from ReadingTextViewer, which was the original (and
 // until now, only) place this pattern existed.
-export function useNeuralSpeech(segments: string[], initialRate: number = 1) {
+// A segment is plain text, or text plus the SSML to synthesize it with (a
+// dialogue with a voice per speaker). The text is what the browser's own
+// voice reads if Azure is unavailable.
+export type SpeechSegment = string | { text: string; ssml: string };
+
+export function useNeuralSpeech(segments: SpeechSegment[], initialRate: number = 1) {
   const [state, setState] = useState<NeuralSpeechState>("idle");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [rate, setRateState] = useState(initialRate);
@@ -74,7 +79,9 @@ export function useNeuralSpeech(segments: string[], initialRate: number = 1) {
       setActiveIndex(index);
       setState("loading");
 
-      const text = segs[index];
+      const seg = segs[index];
+      const text = typeof seg === "string" ? seg : seg.text;
+      const ssml = typeof seg === "string" ? null : seg.ssml;
 
       const playViaBrowser = () => {
         if (myToken !== requestTokenRef.current || typeof window === "undefined" || !window.speechSynthesis) {
@@ -145,8 +152,10 @@ export function useNeuralSpeech(segments: string[], initialRate: number = 1) {
           speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
           const synthesizer = new sdk.SpeechSynthesizer(speechConfig, null);
 
-          synthesizer.speakTextAsync(
-            text,
+          const speak = ssml
+            ? synthesizer.speakSsmlAsync.bind(synthesizer, ssml)
+            : synthesizer.speakTextAsync.bind(synthesizer, text);
+          speak(
             (result) => {
               synthesizer.close();
               if (myToken !== requestTokenRef.current) return;

@@ -61,7 +61,7 @@ export const LISTENING = [
     level: "B1",
     title_en: "Choosing a Phone Plan",
     title_he: "בחירת חבילה סלולרית",
-    transcript: `So, which plan are you interested in? I'm not sure. I use my phone mostly for messages and maps, and I watch videos on the train. Then I'd recommend the basic plan with twenty gigabytes. It's forty-nine shekels a month. Is twenty enough if I watch videos every day? Probably not. Video uses a lot of data. In that case, the unlimited plan is better. It's sixty-nine shekels, and it includes calls abroad to thirty countries. Is there a contract? No, you can cancel at any time without paying anything extra. And if I join today, the first month is free. That sounds good. I'll take the unlimited plan, then.`,
+    transcript: `So, which plan are you interested in? I'm not sure. I use my phone mostly for messages and maps, and I watch videos on the train. Then I'd recommend the basic plan with twenty gigabytes. It's forty-nine shekels a month. Is twenty enough if I watch videos every day? Probably not. Video uses a lot of data. In that case, the unlimited plan is better. It's sixty-nine shekels, and it includes calls abroad to thirty countries. Is there a contract? No, you can cancel at any time without paying anything extra. And if you join today, the first month is free. That sounds good. I'll take the unlimited plan, then.`,
     mcq: [
       ["What does the customer use the phone for on the train?", ["Calls", "Games", "Videos", "Music"], 2],
       ["How much is the unlimited plan?", ["Forty-nine shekels", "Fifty-nine shekels", "Sixty-nine shekels", "Seventy-nine shekels"], 2],
