@@ -899,10 +899,14 @@ textarea::placeholder {
   mask: url("/intro/tagline.png") center / 100% 100% no-repeat;
   animation: intro-tagline 420ms var(--ease-out) 1420ms both;
 }
+/* The bubble arrives where it will stay: a fade and a small growth from its
+   own centre, no rise. It used to start 6% lower and lift into place, and on
+   the owner's iPhone that read as the logo appearing low and correcting
+   itself, the very thing the settle wait exists to prevent. */
 @keyframes intro-mark {
   from {
     opacity: 0;
-    transform: translateY(6%) scale(0.86);
+    transform: scale(0.9);
   }
 }
 /* Arrive, then one typing wave: each dot lifts in turn, like a message
@@ -941,10 +945,10 @@ textarea::placeholder {
     transform: rotate(-140deg) scale(0.85);
   }
 }
+/* The tagline fades in on its line, for the same reason as the bubble. */
 @keyframes intro-tagline {
   from {
     opacity: 0;
-    transform: translateY(40%);
   }
 }
 @keyframes intro-cue {
