@@ -15,6 +15,7 @@ import type { PlacementQuestion, SkillArea } from "@/types/database";
 import type { BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_PLACEMENT_SECTIONS } from "@/lib/content/bagrut/placementItems";
 import BagrutCredit from "@/components/BagrutCredit";
+import { placementResumePoint } from "@/lib/assessment/placementResume";
 import { PlacementFinishing, PlacementResultView, SKILL_LABELS_HE, SKILL_ORDER, type PlacementResult } from "@/components/placement/PlacementResult";
 
 import { EASE_OUT } from "@/lib/motion/easing";
@@ -61,6 +62,18 @@ const GOAL_OPTIONS: { value: Goal; label: string; hint: string }[] = [
   { value: 5, label: "בגרות 5 יח״ל", hint: "מודולים E, F, G" },
 ];
 
+// A test left unfinished (a call, the app closed in the background, a
+// stray swipe back) can be picked up for this long. In the data, three
+// learners lost 19, 20 and all 28 answers and had to start over; one of
+// them never finished.
+const RESUME_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+interface Resumable {
+  testId: string;
+  answered: number;
+  nextIndex: number;
+}
+
 export default function PlacementPage() {
   const { profile, loading: authLoading } = useAuth();
   const [questions, setQuestions] = useState<PlacementQuestion[] | null>(null);
@@ -78,6 +91,8 @@ export default function PlacementPage() {
   const [goal, setGoal] = useState<Goal | null>(null);
   const [showBagrutStep, setShowBagrutStep] = useState(false);
   const [bagrutAnswers, setBagrutAnswers] = useState<(number | null)[]>([]);
+  // undefined while checking, null when there's nothing to resume.
+  const [resumable, setResumable] = useState<Resumable | null | undefined>(undefined);
 
   useEffect(() => {
     if (!profile) return;
@@ -89,7 +104,32 @@ export default function PlacementPage() {
       .then(({ data }) => setQuestions(data ?? []));
   }, [profile]);
 
-  if (authLoading || questions === null) {
+  // The learner's latest unfinished test, if it has answers (see
+  // placementResumePoint for where it picks up).
+  useEffect(() => {
+    if (!profile || !questions) return;
+    const since = new Date(Date.now() - RESUME_WINDOW_MS).toISOString();
+    supabase
+      .from("placement_tests")
+      .select("id")
+      .eq("profile_id", profile.id)
+      .eq("status", "in_progress")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(async ({ data: test }) => {
+        if (!test) return setResumable(null);
+        const { data: answers } = await supabase.from("placement_test_responses").select("question_id").eq("placement_test_id", test.id);
+        const point = placementResumePoint(
+          questions.map((q) => q.id),
+          (answers ?? []).map((a) => a.question_id)
+        );
+        setResumable(point ? { testId: test.id, ...point } : null);
+      });
+  }, [profile, questions]);
+
+  if (authLoading || questions === null || (questions.length > 0 && resumable === undefined)) {
     return <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>;
   }
 
@@ -121,6 +161,20 @@ export default function PlacementPage() {
     setStarting(false);
   }
 
+  function handleResume() {
+    if (!resumable) return;
+    setBagrutAnswers(bagrutSection ? bagrutSection.questions.map(() => null) : []);
+    setTestId(resumable.testId);
+    setStarted(true);
+    if (resumable.nextIndex < questions!.length) {
+      setIndex(resumable.nextIndex);
+    } else if (bagrutSection) {
+      setShowBagrutStep(true);
+    } else {
+      setShowWritingStep(true);
+    }
+  }
+
   if (!started) {
     // The test as it actually is: how many questions in each skill.
     const perSkill = SKILL_ORDER.filter((s) => s !== "speaking" && s !== "writing")
@@ -129,6 +183,24 @@ export default function PlacementPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 pt-10 pb-16">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}>
+          {resumable && (
+            <section aria-labelledby="resume-title" className="relative mb-8 overflow-hidden rounded-lg border border-primary bg-card p-5 sm:p-6">
+              <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+              <h2 id="resume-title" className="text-lg font-black">יש לכם מבחן באמצע</h2>
+              <p className="mt-1 text-muted leading-relaxed">
+                {resumable.nextIndex < questions.length
+                  ? `עניתם על ${resumable.answered} מתוך ${questions.length} שאלות. אפשר להמשיך בדיוק מהמקום שבו עצרתם.`
+                  : "עניתם על כל השאלות. נשאר רק השלב האחרון, ואז מקבלים את הרמה."}
+              </p>
+              <button
+                type="button"
+                onClick={handleResume}
+                className="game-press mt-4 inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              >
+                להמשיך מהמקום שעצרתם
+              </button>
+            </section>
+          )}
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">מבחן רמה</h1>
           <p className="mt-3 max-w-xl text-lg text-muted leading-relaxed">
             כ-10 דקות, {questions.length} שאלות קצרות. בסוף תקבלו רמה לכל מיומנות בנפרד, ותוכנית יומית שבנויה עליה.
@@ -197,7 +269,7 @@ export default function PlacementPage() {
               className="game-press inline-flex items-center justify-center gap-2 min-h-13 px-8 rounded-lg bg-primary text-primary-ink text-lg font-bold hover:bg-primary-hover transition-[background-color,opacity,transform] duration-150 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
               <Target size={19} aria-hidden="true" />
-              {starting ? "מתחילים..." : chosenGoal === null ? "בחרו מטרה כדי להתחיל" : "להתחיל את המבחן"}
+              {starting ? "מתחילים..." : chosenGoal === null ? "בחרו מטרה כדי להתחיל" : resumable ? "להתחיל מבחן חדש" : "להתחיל את המבחן"}
             </button>
             <p className="text-xs text-muted">הערכה פנימית של Saylo לפי סולם CEFR, לא מבחן רשמי.</p>
           </div>
