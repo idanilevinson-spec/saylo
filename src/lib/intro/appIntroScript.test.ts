@@ -128,16 +128,19 @@ describe("appIntroScript: the logo waits for a still screen", () => {
     expect(t).toBeLessThan(50 + 150 + 32);
   });
 
-  it("in the app, a late drop on a slow cold launch still comes before the logo", () => {
-    const t = settleAt((now) => (now < 400 ? 932 : 873), { app: true })!;
-    expect(t).toBeGreaterThanOrEqual(400 + 150);
-    expect(t).toBeLessThan(400 + 150 + 32);
+  it("in the app, never more than half a second of empty plate", () => {
+    // The owner's second recording: the drop wasn't visible to the page at
+    // all, and a 1.2s cap left a long empty plate. Now 0.5s at most.
+    const t = settleAt(() => 932, { app: true })!;
+    expect(t).toBeGreaterThanOrEqual(500);
+    expect(t).toBeLessThan(520);
   });
 
-  it("in the app, if the drop never shows, the logo comes late (1.2s) rather than jumping", () => {
-    const t = settleAt(() => 932, { app: true })!;
-    expect(t).toBeGreaterThanOrEqual(1200);
-    expect(t).toBeLessThan(1240);
+  it("in the app, even a late drop (0.4s) lands before the bubble shows", () => {
+    // Released by the cap, the bubble still waits its own 0.26s beat.
+    const t = settleAt((now) => (now < 400 ? 932 : 873), { app: true })!;
+    expect(t).toBeLessThan(520);
+    expect(t + 260).toBeGreaterThan(400);
   });
 
   it("never holds the logo past 0.9s, even on a screen that keeps moving", () => {
