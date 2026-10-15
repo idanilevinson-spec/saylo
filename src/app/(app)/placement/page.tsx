@@ -217,7 +217,9 @@ export default function PlacementPage() {
                 </li>
               );
             })}
-            <li className="flex flex-col gap-1 bg-card px-4 py-4">
+            {/* Spans the row on phones, where the grid has two columns and the
+                fifth cell would otherwise leave a bare gap beside it. */}
+            <li className="col-span-2 sm:col-span-1 flex flex-col gap-1 bg-card px-4 py-4">
               <NotebookPen size={17} aria-hidden="true" className="text-muted" />
               <span className="chyron text-3xl leading-none text-muted" dir="ltr">+1</span>
               <span className="text-sm text-muted">כתיבה, לא חובה</span>
