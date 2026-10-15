@@ -775,12 +775,15 @@ textarea::placeholder {
 }
 /* The navbar's backdrop blur stays off for as long as the intro is on the
    page or has been: on iPhone a backdrop layer under the plate was not drawn
-   until the plate went, so the navbar popped in two frames late. The bar is
-   90% opaque, so the blur is barely missed, and never switching it back on
-   means nothing has to redraw. */
+   until the plate went, so the navbar popped in two frames late. Never
+   switching it back on means nothing has to redraw. Without the blur the
+   90% bar let the page show through as it scrolled under (the level card
+   and section titles were readable behind the logo), so the bar is fully
+   opaque while the blur is off. */
 :root[data-intro] [data-navbar] {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
+  background-color: var(--background);
 }
 :root[data-intro="exit"] .app-intro {
   animation: intro-exit 450ms var(--ease-in-out) both;
