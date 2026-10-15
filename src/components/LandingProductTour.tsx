@@ -463,12 +463,15 @@ function SpellingDemo() {
   const filled = typed.length === blanks.length;
   const correct = filled && blanks.every((pos, k) => typed[k] === WORD[pos]);
 
+  // The shortest demo: the word and the letters sit in the middle of the
+  // screen instead of at the top of a mostly empty phone.
   return (
-    <div>
+    <div className="flex h-full flex-col">
       <Kicker>איות · A2</Kicker>
       <h3 className="mt-1 text-lg font-black">אילו אותיות חסרות?</h3>
       <p className="text-sm text-muted">מטבח</p>
-      <div dir="ltr" className="mt-6 flex justify-center gap-1.5 font-content">
+      <div className="my-auto pb-10">
+      <div dir="ltr" className="flex justify-center gap-1.5 font-content">
         {[...MASK].map((c, i) => {
           const k = blanks.indexOf(i);
           const shown = c === "_" ? (typed[k] ?? "") : c;
@@ -507,12 +510,13 @@ function SpellingDemo() {
       </div>
       {filled && (
         <div className={`mt-5 rounded-lg px-3 py-2.5 text-sm font-bold ${correct ? "bg-success/12 text-success-hover" : "bg-danger/10 text-danger-hover"}`}>
-          <p>{correct ? "מצוין! kitchen" : "לא בדיוק. נכון: kitchen"}</p>
+          <p>{correct ? "נכון: kitchen" : "לא בדיוק. נכון: kitchen"}</p>
           <button type="button" onClick={() => setTyped([])} className="mt-1 inline-flex items-center gap-1 text-xs text-foreground">
             <RotateCcw size={13} aria-hidden="true" /> לנסות שוב
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }
