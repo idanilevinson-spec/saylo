@@ -9,6 +9,10 @@ describe("isCorrectRewrite", () => {
     expect(isCorrectRewrite("i went to the beach we ate ice cream.", fix)).toBe(true);
   });
 
+  it("accepts the fix inside a fuller sentence", () => {
+    expect(isCorrectRewrite("Yesterday I went to the beach", { original: "I go to the ים", better: "I went to the beach", why: "" })).toBe(true);
+  });
+
   it("rejects the original mistake", () => {
     expect(isCorrectRewrite("I go to the beach we eat ice cream", fix)).toBe(false);
   });

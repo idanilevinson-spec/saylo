@@ -17,7 +17,11 @@ import type { ConversationFix } from "@/lib/ai/conversationFix";
 const comparable = (s: string) => normalizeAnswer(s.replace(/\.{3}|…/g, " "));
 
 export function isCorrectRewrite(answer: string, fix: ConversationFix): boolean {
-  return comparable(answer) === comparable(fix.better);
+  // The fix is often a fragment ("I went to the beach") and the learner
+  // writes the whole sentence ("Yesterday I went to the beach"): right if
+  // the corrected words are all there, in order.
+  const given = ` ${comparable(answer)} `;
+  return given.includes(` ${comparable(fix.better)} `);
 }
 
 function CorrectionDrill({ fix, index }: { fix: ConversationFix; index: number }) {
