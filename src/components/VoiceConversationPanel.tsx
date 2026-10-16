@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PhoneOff, Keyboard, RotateCcw } from "lucide-react";
+import { PhoneOff, Keyboard, RotateCcw, Languages } from "lucide-react";
 import { speak as browserSpeak } from "@/lib/speech/browserTts";
 import SayloAvatar, { type AvatarExpression } from "@/components/SayloAvatar";
-import { loadVoicePref, saveVoicePref, NEURAL_VOICE, type VoicePref } from "@/lib/speech/voicePref";
+import { loadVoicePref, saveVoicePref, CONVERSATION_VOICE, type VoicePref } from "@/lib/speech/voicePref";
 import { NEURAL_SPEECH_RATES } from "@/lib/speech/useNeuralSpeech";
 import type { SpeechRecognizer } from "microsoft-cognitiveservices-speech-sdk";
 import { isMicPermissionDeniedError } from "@/lib/speech/micPermission";
@@ -77,6 +77,12 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   // re-prompt once denied.
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [restartTick, setRestartTick] = useState(0);
+  // "Ask in Hebrew": the next thing the learner says is recognised as Hebrew
+  // (one turn only), so "איך אומרים קבלה?" reaches the teacher as words, not
+  // as English guesses. A button rather than automatic language detection,
+  // which could take Israeli-accented English for Hebrew.
+  const hebrewNextRef = useRef(false);
+  const [hebrewTurn, setHebrewTurn] = useState(false);
   const [voicePref, setVoicePref] = useState<VoicePref>(() => loadVoicePref());
   const [viseme, setViseme] = useState<number | undefined>(undefined);
   const [rate, setRate] = useState(1);
@@ -204,7 +210,8 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         if (cancelled) return;
 
         const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(token, region);
-        speechConfig.speechRecognitionLanguage = "en-US";
+        speechConfig.speechRecognitionLanguage = hebrewNextRef.current ? "he-IL" : "en-US";
+        hebrewNextRef.current = false;
         const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
         const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
         activeRecognizerRef.current = recognizer;
@@ -218,6 +225,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
             safeClose(recognizer);
             if (activeRecognizerRef.current === recognizer) activeRecognizerRef.current = null;
             if (cancelled) return;
+            setHebrewTurn(false);
 
             if (result.reason !== sdk.ResultReason.RecognizedSpeech || !result.text.trim()) {
               silentTurnsRef.current += 1;
@@ -286,7 +294,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         .then(({ token, region, sdk }) => {
           if (cancelled) return;
           const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(token, region);
-          speechConfig.speechSynthesisVoiceName = NEURAL_VOICE[voicePrefRef.current];
+          speechConfig.speechSynthesisVoiceName = CONVERSATION_VOICE[voicePrefRef.current];
           speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
           // No AudioConfig (null) — deliberately NOT AudioConfig.fromDefaultSpeakerOutput().
           // That API drives Azure's own internal Web Audio playback, created fresh on
@@ -380,6 +388,15 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       activeRecognizerRef.current = null;
     };
   }, [onSend, restartTick, ending, started]);
+
+  function askInHebrew() {
+    if (state !== "listening") return;
+    hebrewNextRef.current = true;
+    setHebrewTurn(true);
+    if (activeRecognizerRef.current) safeClose(activeRecognizerRef.current);
+    activeRecognizerRef.current = null;
+    setRestartTick((t) => t + 1);
+  }
 
   function resume() {
     silentTurnsRef.current = 0;
@@ -564,7 +581,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
       <p className="text-xl sm:text-2xl font-semibold min-h-8 text-center px-4">
         {ending && "מסכמים את השיחה..."}
         {!ending && state === "connecting" && "מתחברים..."}
-        {!ending && state === "listening" && "מקשיבים לכם..."}
+        {!ending && state === "listening" && (hebrewTurn ? "מקשיבים לשאלה בעברית..." : "מקשיבים לכם...")}
         {!ending && state === "thinking" && "חושבים..."}
         {!ending && state === "speaking" && "Saylo עונה..."}
         {!ending && state === "paused" && "עדיין שם? הקישו כדי להמשיך"}
@@ -593,6 +610,16 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
           className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           נסו שוב
+        </button>
+      )}
+
+      {!ending && state === "listening" && !hebrewTurn && (
+        <button
+          type="button"
+          onClick={askInHebrew}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border text-sm font-medium hover:bg-background-2 transition-colors"
+        >
+          <Languages size={15} aria-hidden="true" /> לשאול בעברית
         </button>
       )}
 

@@ -6,6 +6,7 @@ import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
 import { hasParentalClearance } from "@/lib/auth/consentServer";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
+import { splitConversationReply, type ConversationFix } from "@/lib/ai/conversationFix";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -97,13 +98,15 @@ export async function POST(request: Request) {
       content: m.content,
     })),
   });
-  const reply = extractText(claudeMessage);
+  // The correction line (if any) comes off before the reply is stored, shown
+  // or read aloud; it travels separately and is kept on the reply row.
+  const { reply, fix } = splitConversationReply(extractText(claudeMessage));
 
   // Both writes are independent; the user's message goes first only in the
   // sense that it was already started, so created_at ordering is unchanged.
   await userMessageStored;
   await Promise.all([
-    supabase.from("conversation_messages").insert({ conversation_id: conversationId, role: "assistant", content: reply }),
+    storeReply(supabase, conversationId, reply, fix),
     logAiUsage(
       supabase,
       user.id,
@@ -114,5 +117,20 @@ export async function POST(request: Request) {
     ),
   ]);
 
-  return NextResponse.json({ reply });
+  return NextResponse.json({ reply, correction: fix });
+}
+
+// The correction column comes with seed 050. Until it exists the reply is
+// still stored, just without its card, so the order of deploy and SQL
+// doesn't matter.
+async function storeReply(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  conversationId: string,
+  content: string,
+  correction: ConversationFix | null,
+) {
+  const row = { conversation_id: conversationId, role: "assistant" as const, content };
+  const withCard: typeof row & { correction?: ConversationFix } = correction ? { ...row, correction } : row;
+  const { error } = await supabase.from("conversation_messages").insert(withCard);
+  if (error && correction) await supabase.from("conversation_messages").insert(row);
 }
