@@ -164,9 +164,9 @@ function SpeakingTestPageInner() {
           >
             <div>
               <p className="font-bold">{topic.name_he}</p>
-              <p className="mt-0.5 text-sm text-muted">
-                <span className="chyron me-1.5 text-primary" dir="ltr">{topic.cefr_level}</span>
-                {topic.name_en}
+              <p className="mt-0.5 flex items-center gap-2 text-sm text-muted">
+                <span className="chyron text-primary" dir="ltr">{topic.cefr_level}</span>
+                <span dir="ltr">{topic.name_en}</span>
               </p>
             </div>
             <Mic size={18} className="text-muted shrink-0" />
