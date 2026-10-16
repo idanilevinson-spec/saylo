@@ -13,7 +13,7 @@ import IconBadge from "@/components/IconBadge";
 import MotionLink from "@/components/MotionLink";
 import EnglishText from "@/components/EnglishText";
 import { GameCompletionScore } from "@/components/games/GameMoments";
-import type { IdiomPhrasalVerb } from "@/types/database";
+import type { CefrLevel, IdiomPhrasalVerb } from "@/types/database";
 
 import { EASE_OUT } from "@/lib/motion/easing";
 const ROUND_SIZE = 10;
@@ -33,11 +33,14 @@ export default function IdiomsPracticePage() {
 
   useEffect(() => {
     if (!profile) return;
-    supabase
-      .from("idioms_phrasal_verbs")
-      .select("*")
-      .eq("status", "published")
-      .then(({ data }) => setQuestions(buildIdiomsQuiz((data ?? []) as IdiomPhrasalVerb[], ROUND_SIZE)));
+    Promise.all([
+      supabase.from("idioms_phrasal_verbs").select("*").eq("status", "published"),
+      supabase.from("skill_levels").select("cefr_level").eq("profile_id", profile.id).eq("skill", "vocabulary").maybeSingle(),
+    ]).then(([{ data }, { data: levelRow }]) =>
+      setQuestions(
+        buildIdiomsQuiz((data ?? []) as IdiomPhrasalVerb[], ROUND_SIZE, (levelRow?.cefr_level as CefrLevel | undefined) ?? null),
+      ),
+    );
   }, [profile]);
 
   async function submitAnswer(selectedIndex: number) {
