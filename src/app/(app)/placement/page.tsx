@@ -410,6 +410,7 @@ export default function PlacementPage() {
                   return (
                     <button
                       key={oi}
+                      dir={/[֐-׿]/.test(option) ? "rtl" : "ltr"}
                       type="button"
                       role="radio"
                       aria-checked={active}
@@ -543,10 +544,11 @@ export default function PlacementPage() {
           {optionOrder(question.options.length, question.id).map((i) => (
             <motion.button
               key={i}
+              dir={/[֐-׿]/.test(question.options[i]) ? "rtl" : "ltr"}
               whileHover={{ x: -2 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setSelected(i)}
-              className={`w-full text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+              className={`w-full text-start px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                 selected === i ? "border-primary bg-primary/5" : "border-card-border hover:border-primary/40"
               }`}
             >
