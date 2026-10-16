@@ -217,7 +217,7 @@ export default function VocabTest({ steps, onRestart }: VocabTestProps) {
     return (
       <div className="max-w-xl mx-auto px-4 py-12 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">המבחן הושלם!</h1>
+        <h1 className="text-2xl font-bold">סיימתם את המבחן</h1>
         <GameCompletionScore>{accuracy}%</GameCompletionScore>
         <p className="mt-1 text-muted">
           <EnglishText as="span" className="font-bold">

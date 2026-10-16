@@ -4,7 +4,7 @@ import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, Sparkles, PartyPopper } from "lucide-react";
+import { GraduationCap, Star, PartyPopper } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import {
   getLearnPool,
@@ -242,7 +242,7 @@ function LearnModePageInner({ onReplay }: { onReplay: () => void }) {
           current={masteredWords.length}
           score={correctCount}
           scoreLabel="תשובות נכונות"
-          scoreIcon={Sparkles}
+          scoreIcon={Star}
         />
 
         <div className="relative">

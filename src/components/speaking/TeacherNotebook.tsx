@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronLeft, NotebookPen, Sparkles } from "lucide-react";
+import { ArrowLeft, ChevronLeft, NotebookPen, MessageCircle } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import { supabase } from "@/lib/supabase/browserClient";
 import { fetchMyPatternStats, type PatternStat } from "@/lib/patterns/getMyPatterns";
@@ -207,7 +207,7 @@ export default function TeacherNotebook({
                     onClick={() => onPractice(`Can we practice using these words: ${words.join(", ")}?`)}
                     className="game-press mt-3 inline-flex items-center gap-1.5 min-h-10 px-3.5 rounded-lg bg-primary text-primary-ink text-sm font-bold hover:bg-primary-hover transition-[background-color,transform] duration-150 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   >
-                    <Sparkles size={15} aria-hidden="true" /> לתרגל אותן בשיחה
+                    <MessageCircle size={15} aria-hidden="true" /> לתרגל אותן בשיחה
                   </button>
                 </div>
               )}
