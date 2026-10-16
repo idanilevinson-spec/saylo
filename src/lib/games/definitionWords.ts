@@ -1,6 +1,8 @@
 import { supabase } from "@/lib/supabase/browserClient";
 import { fetchAll } from "@/lib/supabase/fetchAll";
 import { shuffle } from "@/lib/utils/shuffle";
+import { newWordsAtLevel } from "@/lib/srs/newWords";
+import { learnerVocabLevel } from "./learnerVocabLevel";
 
 export interface DefinitionGameItem {
   vocabularyItemId: string;
@@ -22,7 +24,7 @@ export interface DefinitionGameItem {
 export async function getDefinitionGameWords(profileId: string, limit = 10): Promise<DefinitionGameItem[]> {
   const { data: defined } = await supabase
     .from("vocabulary_items")
-    .select("id, headword, translation_he, definition_en, example_en, ipa, part_of_speech")
+    .select("id, headword, translation_he, definition_en, example_en, ipa, part_of_speech, cefr_level")
     .not("definition_en", "is", null)
     .eq("status", "published");
 
@@ -56,7 +58,8 @@ export async function getDefinitionGameWords(profileId: string, limit = 10): Pro
   let extraIds: string[] = [];
   if (remaining > 0) {
     const knownIds = new Set((allSrs ?? []).map((s) => s.vocabulary_item_id));
-    extraIds = shuffle(pool.map((p) => p.id).filter((id) => !knownIds.has(id) && !dueIds.includes(id))).slice(0, remaining);
+    const unseen = shuffle(pool.filter((p) => !knownIds.has(p.id) && !dueIds.includes(p.id)));
+    extraIds = newWordsAtLevel(unseen, await learnerVocabLevel(profileId), remaining);
   }
 
   // Shuffled so due items (always listed due_at-ascending) don't show up
@@ -68,7 +71,11 @@ export async function getDefinitionGameWords(profileId: string, limit = 10): Pro
     .map((id) => byId.get(id))
     .filter((item): item is NonNullable<typeof item> => !!item)
     .map((item): DefinitionGameItem => {
-      const distractorPool = pool.filter((p) => p.id !== item.id);
+      // Distractors from the same level when there are enough, so the right
+      // answer isn't the only grown-up word among four.
+      const others = pool.filter((p) => p.id !== item.id);
+      const sameLevel = others.filter((p) => p.cefr_level === item.cefr_level);
+      const distractorPool = sameLevel.length >= 3 ? sameLevel : others;
       const distractors = shuffle(distractorPool).slice(0, 3).map((p) => p.headword);
       const correctIndex = Math.floor(Math.random() * 4);
       const options: string[] = [];
