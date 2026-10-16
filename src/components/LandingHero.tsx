@@ -70,8 +70,8 @@ export default function LandingHero() {
                 מתחילים מהרמה שלכם.
               </h2>
               <p className="mt-5 max-w-xl text-muted leading-relaxed">
-                מבחן רמה קצר, תוכנית יומית שבנויה בדיוק לרמה שלכם, ומורה שמדבר איתכם באנגלית ומתקן תוך כדי
-                שיחה.
+                קודם מבחן רמה קצר. אחר כך תרגול יומי ברמה שלכם, ומורה שמדבר איתכם באנגלית ומתקן אתכם תוך
+                כדי.
               </p>
 
               <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
