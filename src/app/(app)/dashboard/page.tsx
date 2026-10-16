@@ -303,7 +303,7 @@ export default function DashboardPage() {
       {plan?.overall && <MoreAtLevel plan={plan} />}
 
       <h2 className="mt-12 text-xl font-black tracking-tight">כל האזורים</h2>
-      <div className="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
         {MODULE_GROUPS.map((group) => (
           <div key={group.title}>
             <h2 className="text-sm font-bold text-muted mb-3">{group.title}</h2>
