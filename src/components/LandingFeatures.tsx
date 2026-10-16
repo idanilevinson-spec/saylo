@@ -31,7 +31,7 @@ const NOW_PLAYING = [
     icon: MessageCircle,
     en: "Or type it out, at your pace.",
     title: "צ'אט עם מורה AI",
-    body: "מעדיפים להקליד? אותם תרחישים ואותו מורה, בשיחת טקסט בקצב שלכם, בלי לחץ ועם זמן לחשוב על כל תשובה.",
+    body: "מעדיפים להקליד? אותם תרחישים ואותו מורה, בכתב. יש זמן לחשוב לפני כל תשובה.",
     href: "/speaking",
   },
 ];
@@ -92,7 +92,7 @@ export default function LandingFeatures() {
           הכל בערוץ אחד
         </h2>
         <p className="mt-3 mb-10 max-w-xl text-lg text-muted leading-relaxed">
-          שש מיומנויות, מורה אחד שזוכר את הטעויות שלכם, ותרגול ברמה שלכם בכל אחת מהן.
+          שש מיומנויות, כל אחת ברמה שלה. ומורה אחד שזוכר את הטעויות שלכם בכולן.
         </p>
 
         <div className="space-y-3 mb-3">
