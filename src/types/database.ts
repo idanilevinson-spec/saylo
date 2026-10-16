@@ -418,6 +418,9 @@ export interface ConversationMessage {
   role: "user" | "assistant";
   content: string;
   created_at: string;
+  // On a teacher reply: the correction it made to the learner's message
+  // before it, shown as a card (seed 050). Null when there was none.
+  correction?: { original: string; better: string; why: string } | null;
 }
 
 export interface ConversationFeedback {

@@ -12,6 +12,8 @@ import ParentalConsentGuard from "@/components/ParentalConsentGuard";
 import AiConsentGate from "@/components/AiConsentGate";
 import VoiceConversationPanel from "@/components/VoiceConversationPanel";
 import SayloAvatar from "@/components/SayloAvatar";
+import ChatMessageText from "@/components/speaking/ChatMessageText";
+import CorrectionCard from "@/components/speaking/CorrectionCard";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
@@ -192,9 +194,7 @@ function SpeakingChatInner() {
                           <p className={`text-xs mb-0.5 ${m.role === "user" ? "opacity-80" : "text-muted"}`}>
                             {m.role === "user" ? "אתם" : "מורה AI"}
                           </p>
-                          <EnglishText as="p" className="text-left leading-relaxed">
-                            {m.content}
-                          </EnglishText>
+                          <ChatMessageText text={m.content} />
                         </div>
                       </div>
                     ))}
@@ -258,7 +258,7 @@ function SpeakingChatInner() {
       <div className="flex-1 overflow-y-auto space-y-3 pb-4">
         {messages === null && <p className="text-center text-muted">טוען...</p>}
         <AnimatePresence initial={false}>
-          {messages?.map((m) => (
+          {messages?.map((m, i) => (
             <motion.div
               key={m.id}
               initial={{ opacity: 0, y: 10, scale: 0.97 }}
@@ -267,17 +267,19 @@ function SpeakingChatInner() {
               className={`flex items-end gap-2 ${m.role === "user" ? "justify-start" : "justify-end"}`}
             >
               {m.role === "user" ? (
-                <div className="max-w-[80%] px-4 py-2.5 rounded-lg bg-primary text-primary-ink">
-                  <EnglishText as="p" className="text-left leading-relaxed">
-                    {m.content}
-                  </EnglishText>
+                <div className="flex max-w-[80%] flex-col items-start">
+                  <div className="px-4 py-2.5 rounded-lg bg-primary text-primary-ink">
+                    <ChatMessageText text={m.content} />
+                  </div>
+                  {/* The teacher's reply right after this message carries its correction. */}
+                  {messages[i + 1]?.role === "assistant" && messages[i + 1].correction && (
+                    <CorrectionCard fix={messages[i + 1].correction!} />
+                  )}
                 </div>
               ) : (
                 <>
                   <div className="max-w-[80%] px-4 py-2.5 rounded-lg bg-card border border-card-border">
-                    <EnglishText as="p" className="text-left leading-relaxed">
-                      {m.content}
-                    </EnglishText>
+                    <ChatMessageText text={m.content} />
                   </div>
                   <SayloAvatar expression="idle" gender={teacherGender} size={28} className="shrink-0" />
                 </>
@@ -303,13 +305,17 @@ function SpeakingChatInner() {
           <input
             type="text"
             {...ENGLISH_TEXT_INPUT}
+            // Hebrew is welcome too ("איך אומרים...?"), so the field follows
+            // whatever is typed instead of being fixed left to right.
+            dir="auto"
+            lang={undefined}
             enterKeyHint="send"
-            aria-label="הקלידו הודעה באנגלית"
+            aria-label="הקלידו הודעה באנגלית, או שאלה בעברית"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             disabled={sending}
-            placeholder="Type in English..."
+            placeholder="כתבו באנגלית. אפשר גם לשאול בעברית"
             className="flex-1 px-4 py-2.5 rounded-lg border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
           />
           <motion.button

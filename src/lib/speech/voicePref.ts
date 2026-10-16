@@ -11,6 +11,15 @@ export const NEURAL_VOICE: Record<VoicePref, string> = {
   male: "en-US-GuyNeural",
 };
 
+// The AI teacher on a voice call. Multilingual voices, because the teacher
+// now answers a Hebrew question with a few Hebrew words ("in Hebrew you say
+// קבלה, in English it's a receipt") and the English-only voices can't say
+// them. Same gender as NEURAL_VOICE, so the avatar still matches.
+export const CONVERSATION_VOICE: Record<VoicePref, string> = {
+  female: "en-US-AvaMultilingualNeural",
+  male: "en-US-AndrewMultilingualNeural",
+};
+
 const STORAGE_KEY = "voiceConversationPref";
 
 export function loadVoicePref(): VoicePref {

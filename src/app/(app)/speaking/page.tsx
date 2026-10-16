@@ -276,7 +276,7 @@ export default function SpeakingPage() {
                   המורה שלכם מוכן לדבר
                 </h1>
                 <p className="mt-2 max-w-md text-primary-ink/90 leading-relaxed">
-                  שיחה אמיתית באנגלית, בקול או בכתב. המורה זוכר את הטעויות שלכם ומחזיר אותן לתרגול.
+                  שיחה אמיתית באנגלית, בקול או בכתב. המורה מבין גם עברית, אז כשנתקעים אפשר לשאול אותו בעברית. הוא זוכר את הטעויות שלכם ומחזיר אותן לתרגול.
                 </p>
                 <div className="mt-6 flex flex-col sm:flex-row gap-2.5">
                   <button
