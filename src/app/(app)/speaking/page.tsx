@@ -39,7 +39,8 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { requiresParentalConsent } from "@/lib/auth/consentGate";
 import { DAILY_CONVERSATION_LIMIT } from "@/lib/legal/siteInfo";
-import type { ConversationScenario, ConversationTopicCategory } from "@/types/database";
+import type { CefrLevel, ConversationScenario, ConversationTopicCategory } from "@/types/database";
+import { shelveByLevel } from "@/lib/content/levelOrder";
 
 // The AI teacher's home: a "studio" page. One committed blue on-air plate
 // (start talking: voice or chat, or pick up where you left off), a daily
@@ -138,14 +139,22 @@ export default function SpeakingPage() {
   const [starting, setStarting] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
 
+  // Scenarios at the learner's level first within each topic (speaking
+  // level, else vocabulary), as on the voice-call page.
   useEffect(() => {
-    supabase
-      .from("conversation_scenarios")
-      .select("*")
-      .eq("status", "published")
-      .order("sort_order")
-      .then(({ data }) => setScenarios(data ?? []));
-  }, []);
+    if (!profile) return;
+    Promise.all([
+      supabase.from("conversation_scenarios").select("*").eq("status", "published").order("sort_order"),
+      supabase.from("skill_levels").select("skill, cefr_level").eq("profile_id", profile.id).in("skill", ["speaking", "vocabulary"]),
+    ]).then(([{ data }, { data: levels }]) => {
+      const level = (levels?.find((l) => l.skill === "speaking")?.cefr_level ??
+        levels?.find((l) => l.skill === "vocabulary")?.cefr_level ??
+        null) as CefrLevel | null;
+      const shelves = shelveByLevel(data ?? [], level, (s) => s.cefr_level);
+      setScenarios([...shelves.atLevel, ...shelves.near, ...shelves.rest.flatMap((r) => r.items)]);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
 
   useEffect(() => {
     if (!profile) return;

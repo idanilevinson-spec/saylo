@@ -24,7 +24,8 @@ import AiConsentGate from "@/components/AiConsentGate";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { requiresParentalConsent } from "@/lib/auth/consentGate";
-import type { ConversationScenario, ConversationTopicCategory } from "@/types/database";
+import type { CefrLevel, ConversationScenario, ConversationTopicCategory } from "@/types/database";
+import { shelveByLevel } from "@/lib/content/levelOrder";
 
 import { EASE_OUT } from "@/lib/motion/easing";
 const CATEGORIES: Record<
@@ -59,15 +60,24 @@ export default function VoiceConversationHubPage() {
   const [starting, setStarting] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
 
+  // Within each topic, scenarios at the learner's level come first, then
+  // one step around it, then the rest: a C2 learner no longer scrolls past
+  // "ordering at a restaurant" (A1) to reach their own level. Speaking
+  // level if there is one, else vocabulary.
   useEffect(() => {
-    supabase
-      .from("conversation_scenarios")
-      .select("*")
-      .eq("status", "published")
-      .order("category")
-      .order("sort_order")
-      .then(({ data }) => setScenarios(data ?? []));
-  }, []);
+    if (!profile) return;
+    Promise.all([
+      supabase.from("conversation_scenarios").select("*").eq("status", "published").order("category").order("sort_order"),
+      supabase.from("skill_levels").select("skill, cefr_level").eq("profile_id", profile.id).in("skill", ["speaking", "vocabulary"]),
+    ]).then(([{ data }, { data: levels }]) => {
+      const level = (levels?.find((l) => l.skill === "speaking")?.cefr_level ??
+        levels?.find((l) => l.skill === "vocabulary")?.cefr_level ??
+        null) as CefrLevel | null;
+      const shelves = shelveByLevel(data ?? [], level, (s) => s.cefr_level);
+      setScenarios([...shelves.atLevel, ...shelves.near, ...shelves.rest.flatMap((r) => r.items)]);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
 
   if (authLoading || !profile) {
     return <div className="max-w-2xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>;
@@ -76,7 +86,7 @@ export default function VoiceConversationHubPage() {
   if (requiresParentalConsent(profile)) {
     return (
       <div className="max-w-md mx-auto px-4 py-16">
-        <h1 className="text-2xl font-bold text-center">שיחה עם נציג AI</h1>
+        <h1 className="text-2xl font-bold text-center">שיחה קולית עם המורה</h1>
         <ConsentRequestForm status={profile.parental_consent_status} />
       </div>
     );
@@ -105,11 +115,11 @@ export default function VoiceConversationHubPage() {
   })).filter((group) => group.items.length > 0);
 
   return (
-    <PremiumGate featureName="שיחה עם נציג AI" requirePaid>
+    <PremiumGate featureName="שיחה קולית עם המורה" requirePaid>
       <AiConsentGate declineHref="/speaking">
         <div className="max-w-3xl mx-auto px-4 py-12">
           <div className="animate-fade-up">
-            <h1 className="text-3xl font-bold">שיחה עם נציג AI</h1>
+            <h1 className="text-3xl font-bold">שיחה קולית עם המורה</h1>
             <p className="mt-2 text-muted">
               שיחה קולית עם המורה, כמו בטלפון. בחרו נושא, או פתחו שיחה חופשית על מה שבא לכם.
             </p>
