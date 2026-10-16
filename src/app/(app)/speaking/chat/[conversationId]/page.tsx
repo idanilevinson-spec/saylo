@@ -218,6 +218,9 @@ function SpeakingChatInner() {
   }
 
   const hasUserMessage = !!messages?.some((m) => m.role === "user");
+  const lastUserIndex = messages ? messages.map((m) => m.role).lastIndexOf("user") : -1;
+  const lastUser = lastUserIndex >= 0 ? messages![lastUserIndex] : null;
+  const lastUserFix = lastUserIndex >= 0 ? (messages![lastUserIndex + 1]?.correction ?? null) : null;
 
   return (
     <div
@@ -255,7 +258,9 @@ function SpeakingChatInner() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-3 pb-4">
+      {/* On a call the panel shows the latest exchange as captions, so the
+          scrolling transcript would only push the teacher off the screen. */}
+      <div className={`flex-1 overflow-y-auto space-y-3 pb-4 ${voiceMode ? "hidden" : ""}`}>
         {messages === null && <p className="text-center text-muted">טוען...</p>}
         <AnimatePresence initial={false}>
           {messages?.map((m, i) => (
@@ -291,13 +296,15 @@ function SpeakingChatInner() {
       </div>
 
       {voiceMode ? (
-        <div className="pt-2 border-t border-card-border">
+        <div className="flex-1 min-h-0">
           <VoiceConversationPanel
             onSend={sendMessage}
             onExit={() => setVoiceMode(false)}
             onEnd={handleEnd}
             ending={ending}
             canEnd={hasUserMessage}
+            lastUserText={lastUser?.content ?? null}
+            lastFix={lastUserFix}
           />
         </div>
       ) : (

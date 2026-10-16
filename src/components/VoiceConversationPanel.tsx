@@ -9,6 +9,9 @@ import { loadVoicePref, saveVoicePref, CONVERSATION_VOICE, type VoicePref } from
 import { NEURAL_SPEECH_RATES } from "@/lib/speech/useNeuralSpeech";
 import type { SpeechRecognizer } from "microsoft-cognitiveservices-speech-sdk";
 import { isMicPermissionDeniedError } from "@/lib/speech/micPermission";
+import ChatMessageText from "@/components/speaking/ChatMessageText";
+import CorrectionCard from "@/components/speaking/CorrectionCard";
+import type { ConversationFix } from "@/lib/ai/conversationFix";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
 
@@ -18,6 +21,10 @@ interface VoiceConversationPanelProps {
   onEnd: () => void;
   ending: boolean;
   canEnd: boolean;
+  // The learner's last line and the teacher's correction of it, shown as
+  // captions under the teacher so a call isn't audio only.
+  lastUserText?: string | null;
+  lastFix?: ConversationFix | null;
 }
 
 const MAX_SILENT_RETRIES = 3;
@@ -37,7 +44,7 @@ const TOKEN_REUSE_MS = 4 * 60 * 1000;
 // is already live the instant playback ends — otherwise that fetch+
 // import gap after "מקשיבים לכם..." appears is enough to clip the very
 // start of what the user says.
-export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, canEnd }: VoiceConversationPanelProps) {
+export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, canEnd, lastUserText, lastFix }: VoiceConversationPanelProps) {
   // The call doesn't auto-start: iOS Safari/WKWebView only allows
   // audio.play() when it's traceable to a real, synchronous tap. Every
   // reply plays several async hops after the user's last tap (recognized
@@ -77,6 +84,9 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   // re-prompt once denied.
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [restartTick, setRestartTick] = useState(0);
+  // What the teacher is saying (or last said), shown as a caption: learners
+  // who miss a word can read it, and the Hebrew in a reply is visible.
+  const [caption, setCaption] = useState<string | null>(null);
   // "Ask in Hebrew": the next thing the learner says is recognised as Hebrew
   // (one turn only), so "איך אומרים קבלה?" reaches the teacher as words, not
   // as English guesses. A button rather than automatic language detection,
@@ -271,6 +281,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
     function speakReply(replyText: string) {
       setState("speaking");
+      setCaption(replyText);
       // No live viseme data yet for this turn — the avatar falls back to
       // its decorative loop until the first visemeReceived event (Azure
       // path) sets a real value below, or stays undefined for the whole
@@ -447,7 +458,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
   if (!started) {
     return (
-      <div className="relative flex flex-col items-center justify-center gap-7 py-12 px-4 overflow-hidden">
+      <div className="relative flex h-full min-h-0 flex-col items-center justify-center gap-6 py-6 px-4 overflow-y-auto">
         <div className="flex items-center gap-1.5 p-1 rounded-lg bg-background-2 border border-card-border">
           <button
             onClick={() => selectVoice("female")}
@@ -471,7 +482,7 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
 
         <p className="text-xl sm:text-2xl font-semibold text-center px-4">מוכנים לשיחה?</p>
         <p className="text-sm text-muted text-center px-4 max-w-xs">
-          לחצו כדי להתחיל. הדפדפן יבקש גישה למיקרופון.
+          לחצו כדי להתחיל. הדפדפן יבקש גישה למיקרופון. נתקעתם באמצע? אפשר לשאול את המורה בעברית.
         </p>
 
         <motion.button
@@ -493,52 +504,33 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
     );
   }
 
+  // In call: the teacher on top, captions in the middle (what you said, the
+  // correction, what the teacher is saying), the controls at the bottom.
+  // Laid out to fill the chat's height on a phone without scrolling the page.
   return (
-    <div className="relative flex flex-col items-center justify-center gap-7 py-12 px-4 overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 55% at 50% 20%, color-mix(in srgb, var(--primary) 10%, transparent) 0%, transparent 60%), radial-gradient(ellipse 55% 50% at 50% 90%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 55%)",
-        }}
-      />
-
-      <div className="flex items-center gap-1.5 p-1 rounded-lg bg-background-2 border border-card-border">
-        <button
-          onClick={() => selectVoice("female")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            voicePref === "female" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
-          }`}
-        >
-          קול נשי
-        </button>
-        <button
-          onClick={() => selectVoice("male")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            voicePref === "male" ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
-          }`}
-        >
-          קול גברי
-        </button>
-      </div>
-
-      <div className="flex items-center gap-2 flex-wrap justify-center">
-        <button
-          onClick={replayLastReply}
-          disabled={!hasLastReply || ending || state === "speaking" || state === "thinking" || state === "connecting"}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-background-2 border border-card-border text-foreground hover:bg-card transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          <RotateCcw size={13} /> השמיעו שוב
-        </button>
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-background-2 border border-card-border text-xs">
+    <div className="relative flex h-full min-h-0 flex-col items-center px-1 pt-2 pb-2">
+      <div className="flex w-full items-center justify-between gap-2">
+        <div className="flex items-center gap-1 p-1 rounded-lg bg-background-2 border border-card-border text-xs" role="group" aria-label="קול המורה">
+          {(["female", "male"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => selectVoice(v)}
+              aria-pressed={voicePref === v}
+              className={`px-2.5 py-1 rounded-md font-medium transition-colors ${voicePref === v ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"}`}
+            >
+              {v === "female" ? "קול נשי" : "קול גברי"}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-1 p-1 rounded-lg bg-background-2 border border-card-border text-xs" role="group" aria-label="מהירות הדיבור">
           {NEURAL_SPEECH_RATES.map((r) => (
             <button
               key={r}
+              type="button"
               onClick={() => setRate(r)}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                rate === r ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"
-              }`}
+              aria-pressed={rate === r}
+              className={`px-2 py-1 rounded-md font-medium tabular-nums transition-colors ${rate === r ? "bg-primary text-primary-ink" : "text-muted hover:text-foreground"}`}
             >
               {r}x
             </button>
@@ -546,12 +538,10 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         </div>
       </div>
 
-      <div className="relative flex items-center justify-center w-64 h-64 sm:w-72 sm:h-72">
-        {/* A live-state ring, not a stamp — tinted by call state instead
-            of a fixed outline. */}
+      <div className="relative mt-3 flex shrink-0 items-center justify-center w-44 h-44 sm:w-52 sm:h-52">
         <div
           aria-hidden="true"
-          className={`absolute inset-[8%] rounded-full border-2 transition-colors duration-500 ${
+          className={`absolute inset-[6%] rounded-full border-2 transition-colors duration-500 ${
             state === "listening"
               ? "border-primary/50"
               : state === "speaking"
@@ -561,83 +551,122 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
                   : "border-card-border"
           }`}
         />
-
         <AnimatePresence>
           {!ending && state === "listening" && (
             <motion.span
               key="ring"
               initial={{ opacity: 0.5, scale: 1 }}
-              animate={{ opacity: 0, scale: 1.45 }}
+              animate={{ opacity: 0, scale: 1.4 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
-              className="absolute inset-[8%] rounded-full bg-primary/25"
+              className="absolute inset-[6%] rounded-full bg-primary/25"
             />
           )}
         </AnimatePresence>
-
-        <SayloAvatar expression={avatarExpression} gender={voicePref} visemeId={viseme} size={224} />
+        <SayloAvatar expression={avatarExpression} gender={voicePref} visemeId={viseme} size={160} />
       </div>
 
-      <p className="text-xl sm:text-2xl font-semibold min-h-8 text-center px-4">
-        {ending && "מסכמים את השיחה..."}
-        {!ending && state === "connecting" && "מתחברים..."}
-        {!ending && state === "listening" && (hebrewTurn ? "מקשיבים לשאלה בעברית..." : "מקשיבים לכם...")}
-        {!ending && state === "thinking" && "חושבים..."}
-        {!ending && state === "speaking" && "Saylo עונה..."}
-        {!ending && state === "paused" && "עדיין שם? הקישו כדי להמשיך"}
-        {!ending && state === "error" && errorMessage}
+      <p className="mt-2 min-h-6 text-center text-base font-semibold" aria-live="polite">
+        {ending
+            ? "מסכמים את השיחה..."
+            : state === "connecting"
+              ? "מתחברים..."
+              : state === "listening"
+                ? hebrewTurn
+                  ? "מקשיבים לשאלה בעברית..."
+                  : "מקשיבים לכם..."
+                : state === "thinking"
+                  ? "חושבים..."
+                  : state === "speaking"
+                    ? voicePref === "female"
+                      ? "המורה מדברת"
+                      : "המורה מדבר"
+                    : state === "paused"
+                      ? "עדיין שם? הקישו כדי להמשיך"
+                      : errorMessage}
       </p>
+
+      <div className="mt-3 w-full min-h-0 flex-1 overflow-y-auto space-y-2.5" aria-live="polite">
+        {lastUserText && (
+          <div className="flex flex-col items-start">
+            <div className="max-w-[90%] rounded-lg bg-primary px-3.5 py-2 text-primary-ink">
+              <p className="text-xs opacity-80">אתם</p>
+              <ChatMessageText text={lastUserText} />
+            </div>
+            {lastFix && <CorrectionCard fix={lastFix} />}
+          </div>
+        )}
+        {caption && (
+          <div
+            className={`rounded-lg border border-card-border bg-card px-3.5 py-2.5 transition-opacity duration-300 ${
+              state === "speaking" ? "opacity-100" : "opacity-75"
+            }`}
+          >
+            <p className="text-xs text-muted">המורה</p>
+            <ChatMessageText text={caption} className="text-[1.05rem]" />
+          </div>
+        )}
+      </div>
 
       {!ending && state === "paused" && (
         <button
           onClick={resume}
-          className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-3 px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           המשך האזנה
         </button>
       )}
 
-      {/* A denied mic permission gets no call to action at all here — no
+      {/* A denied mic permission gets no call to action at all here: no
           "try again" (the OS/browser won't re-prompt anyway) and, per App
           Review, not even an opt-in "open Settings" link: Apple's Guideline
           5.1.1(iv) treats any UI that leads back toward granting the
           permission as "directing" the learner to reconsider their choice.
           The message above already says what happened; "להמשיך בהקלדה בלי
-          לסיים" below is the real way out — switch to text, no mic needed. */}
+          לסיים" below is the real way out. */}
       {!ending && state === "error" && !permissionDenied && (
         <button
           onClick={resume}
-          className="px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          className="mt-3 px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
         >
           נסו שוב
         </button>
       )}
 
-      {!ending && state === "listening" && !hebrewTurn && (
+      <div className="mt-3 flex w-full items-center justify-center gap-2">
         <button
           type="button"
           onClick={askInHebrew}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border text-sm font-medium hover:bg-background-2 transition-colors"
+          disabled={ending || state !== "listening" || hebrewTurn}
+          className="flex flex-1 items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg border border-card-border text-sm font-medium hover:bg-background-2 transition-colors disabled:opacity-40"
         >
           <Languages size={15} aria-hidden="true" /> לשאול בעברית
         </button>
-      )}
+        <button
+          type="button"
+          onClick={replayLastReply}
+          disabled={!hasLastReply || ending || state === "speaking" || state === "thinking" || state === "connecting"}
+          className="flex flex-1 items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg border border-card-border text-sm font-medium hover:bg-background-2 transition-colors disabled:opacity-40"
+        >
+          <RotateCcw size={15} aria-hidden="true" /> להשמיע שוב
+        </button>
+      </div>
 
       <button
         onClick={endCall}
         disabled={ending || !canEnd}
         title={!canEnd ? "אמרו משהו קודם כדי לקבל משוב" : undefined}
-        className="mt-2 flex items-center gap-1.5 px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
+        className="mt-2 flex w-full items-center justify-center gap-1.5 px-6 py-3 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
       >
-        <PhoneOff size={16} /> סיום שיחה וקבלת משוב
+        <PhoneOff size={16} aria-hidden="true" /> סיום שיחה וקבלת משוב
       </button>
 
       <button
         onClick={exitCall}
         disabled={ending}
-        className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors disabled:opacity-50"
+        className="mt-1.5 flex items-center gap-1.5 py-1.5 text-xs text-muted hover:text-foreground transition-colors disabled:opacity-50"
       >
-        <Keyboard size={13} /> להמשיך בהקלדה בלי לסיים
+        <Keyboard size={13} aria-hidden="true" /> להמשיך בהקלדה בלי לסיים
       </button>
     </div>
   );
