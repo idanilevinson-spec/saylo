@@ -278,6 +278,9 @@ function QuestionCard({
             return (
               <button
                 key={option}
+                // English options read left to right, so a two-line answer
+                // lines up with the one-line answers instead of jumping sides.
+                dir={/[֐-׿]/.test(option) ? "rtl" : "ltr"}
                 onClick={() => {
                   setSelected(i);
                   onAnswer?.(i === question.correctOptionIndex);

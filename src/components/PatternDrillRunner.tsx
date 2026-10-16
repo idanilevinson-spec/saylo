@@ -93,6 +93,7 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
             return (
               <button
                 key={option}
+                dir={/[֐-׿]/.test(option) ? "rtl" : "ltr"}
                 onClick={() => choose(i)}
                 disabled={selected !== null}
                 className={`flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg border text-start transition-colors ${
