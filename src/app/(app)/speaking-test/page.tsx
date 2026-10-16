@@ -12,7 +12,8 @@ import SpeakingTest from "@/components/SpeakingTest";
 import ParentalConsentGuard from "@/components/ParentalConsentGuard";
 import AiConsentGate from "@/components/AiConsentGate";
 import IconBadge from "@/components/IconBadge";
-import type { Topic } from "@/types/database";
+import type { CefrLevel, Topic } from "@/types/database";
+import { CEFR_ORDER } from "@/lib/assessment/cefrScoring";
 
 import { EASE_OUT } from "@/lib/motion/easing";
 const MIN_POOL_SIZE = 8;
@@ -43,14 +44,24 @@ function SpeakingTestPageInner() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [steps, setSteps] = useState<SpeakingTestStep[]>([]);
 
+  // Topics at the learner's level first, then the one below, then the
+  // rest by distance: a C2 learner used to scroll past Numbers and Colors.
   useEffect(() => {
-    supabase
-      .from("topics")
-      .select("*")
-      .eq("status", "published")
-      .order("sort_order")
-      .then(({ data }) => setTopics(data ?? []));
-  }, []);
+    if (!profile) return;
+    Promise.all([
+      supabase.from("topics").select("*").eq("status", "published").order("sort_order"),
+      currentLevel(profile.id),
+    ]).then(([{ data }, level]) => {
+      const at = level ? CEFR_ORDER.indexOf(level as CefrLevel) : -1;
+      const distance = (t: Topic) => {
+        if (at < 0) return 0;
+        const d = CEFR_ORDER.indexOf(t.cefr_level) - at;
+        return d === 0 ? 0 : d === -1 ? 1 : Math.abs(d) + 1;
+      };
+      setTopics([...(data ?? [])].sort((a, b) => distance(a) - distance(b)));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
 
   useEffect(() => {
     if (initialTopicSlug && topics.length > 0) {
@@ -153,7 +164,10 @@ function SpeakingTestPageInner() {
           >
             <div>
               <p className="font-bold">{topic.name_he}</p>
-              <p className="mt-0.5 text-sm text-muted">{topic.name_en}</p>
+              <p className="mt-0.5 text-sm text-muted">
+                <span className="chyron me-1.5 text-primary" dir="ltr">{topic.cefr_level}</span>
+                {topic.name_en}
+              </p>
             </div>
             <Mic size={18} className="text-muted shrink-0" />
           </motion.button>
