@@ -46,7 +46,9 @@ export default function DailyGoal({ profileId, todayXp }: { profileId: string; t
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-bold text-muted">היעד היומי</p>
-          <p className="mt-1 flex items-baseline gap-1.5">
+          {/* Read left to right, "0 / 50 XP": in the RTL flow the parts came out
+              as "XP 50 / 0". justify-end keeps it on the start (right) side. */}
+          <p dir="ltr" className="mt-1 flex items-baseline justify-end gap-1.5">
             <CountUp value={todayXp} from={fromXp} duration={0.7} className="chyron text-4xl tabular-nums" />
             <span className="text-sm font-medium text-muted">/ {DAILY_XP_GOAL} XP</span>
             {added > 0 && (
