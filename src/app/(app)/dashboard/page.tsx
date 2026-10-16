@@ -19,7 +19,7 @@ import {
   Flame,
   Star,
   Heart,
-  Sparkles,
+  CalendarCheck,
   Gamepad2,
   Mic,
   ChevronLeft,
@@ -69,7 +69,7 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
   {
     title: "מסלול הלימוד",
     items: [
-      { icon: Sparkles, title: "שיעור יומי", body: "נושא אחד, נבחר בשבילכם להיום", href: "/learn/today" },
+      { icon: CalendarCheck, title: "שיעור יומי", body: "נושא אחד, נבחר בשבילכם להיום", href: "/learn/today" },
       { icon: Map, title: "מסלול לימוד", body: "כל הנושאים מ-A1 עד C2", href: "/learn" },
       { icon: Target, title: "מבחן רמה", body: "גלו את רמת האנגלית שלכם", href: "/placement" },
       { icon: Brain, title: "חזרה חכמה", body: "מילים ונושאי דקדוק שהגיע זמנם", href: "/mistakes" },
@@ -255,7 +255,7 @@ export default function DashboardPage() {
               </span>
               <div className="min-w-0">
                 <h2 className="text-2xl font-black tracking-tight">מתחילים במבחן רמה</h2>
-                <p className="mt-1 max-w-lg text-primary-ink/80 leading-relaxed">
+                <p className="mt-1 max-w-lg text-primary-ink/90 leading-relaxed">
                   בערך 10 דקות. בסופו תקבלו את הרמה שלכם בכל מיומנות, ותוכנית יומית שבנויה בדיוק לרמה הזו.
                 </p>
               </div>
@@ -284,7 +284,7 @@ export default function DashboardPage() {
               >
                 <span
                   className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
-                    m.tone === "accent" ? "bg-accent/15 text-accent-hover" : "bg-primary/10 text-primary"
+                    m.tone === "accent" ? "bg-accent/15 text-accent-hover" : "bg-primary/10 text-primary-hover"
                   }`}
                 >
                   <m.icon size={21} strokeWidth={2} aria-hidden="true" />
@@ -303,7 +303,7 @@ export default function DashboardPage() {
       {plan?.overall && <MoreAtLevel plan={plan} />}
 
       <h2 className="mt-12 text-xl font-black tracking-tight">כל האזורים</h2>
-      <div className="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
         {MODULE_GROUPS.map((group) => (
           <div key={group.title}>
             <h2 className="text-sm font-bold text-muted mb-3">{group.title}</h2>
@@ -314,7 +314,7 @@ export default function DashboardPage() {
                   href={m.href}
                   className="group flex items-center gap-3 px-4 py-3.5 hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
                 >
-                  <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                     <m.icon size={18} strokeWidth={2} />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -323,7 +323,7 @@ export default function DashboardPage() {
                   </div>
                   <ChevronLeft
                     size={16}
-                    className="shrink-0 text-muted group-hover:text-primary group-hover:-translate-x-0.5 transition-all"
+                    className="shrink-0 text-muted group-hover:text-primary group-hover:-translate-x-0.5 transition-[color,translate]"
                   />
                 </Link>
               ))}

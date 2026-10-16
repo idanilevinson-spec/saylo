@@ -26,6 +26,7 @@ import { buildScoreSummary, type ScoreRange, type ScoreSummary } from "@/lib/rep
 import type { CefrLevel, SkillArea } from "@/types/database";
 import { fetchAll } from "@/lib/supabase/fetchAll";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const CEFR_ORDER: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const RANGE_LABELS: Record<ScoreRange, string> = { week: "השבוע", month: "החודש", all: "הכל" };
@@ -320,7 +321,7 @@ export default function ProgressPage() {
             const meta = SKILL_META[area];
             return (
               <div key={area} className="flex items-center gap-3">
-                <span className="inline-flex w-8 h-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span className="inline-flex w-8 h-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                   <meta.icon size={16} />
                 </span>
                 <div className="flex-1 min-w-0">
@@ -471,7 +472,7 @@ function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillAr
                   isWeakest ? "border-accent/50 bg-accent/5" : "border-card-border"
                 }`}
               >
-                <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                   <meta.icon size={16} />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -610,7 +611,7 @@ function AccuracyLineChart({ buckets, values }: { buckets: DayBucket[]; values: 
         fill="url(#accuracyAreaGradient)"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: EASE_OUT }}
       />
       <motion.path
         d={linePath.join(" ")}

@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Saylo — לומדים אנגלית בקצב שלכם",
+    name: "Saylo: לומדים אנגלית בקצב שלכם",
     short_name: "Saylo",
     description: "לומדים אנגלית בקצב שלכם: מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם",
     start_url: "/dashboard",

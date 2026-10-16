@@ -15,6 +15,7 @@ import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 interface LevelConfig {
   type: MatchRoundType;
   label: string;
@@ -368,7 +369,7 @@ function MatchGamePage({ onReplay }: { onReplay: () => void }) {
               >
                 <p className="flex items-center gap-2 text-xl font-bold text-accent-hover">
                   <PartyPopper size={20} className="shrink-0" aria-hidden="true" />
-                  שלב הושלם!
+                  השלב הושלם
                 </p>
               </motion.div>
             )}
@@ -427,7 +428,7 @@ function MatchGamePage({ onReplay }: { onReplay: () => void }) {
                     aria-pressed={selectedEndpoint?.side === "source" && selectedEndpoint.id === p.id}
                     aria-disabled={isMatched}
                     animate={isWrong ? { x: [0, -6, 6, -4, 4, 0] } : {}}
-                    transition={{ duration: 0.4 }}
+                    transition={{ duration: 0.25, ease: EASE_OUT }}
                     style={{ touchAction: "none" }}
                     className={`select-none rounded-lg border px-3 py-3 min-h-11 flex items-center text-sm cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched
@@ -462,7 +463,7 @@ function MatchGamePage({ onReplay }: { onReplay: () => void }) {
                     aria-pressed={selectedEndpoint?.side === "target" && selectedEndpoint.id === t}
                     aria-disabled={isMatched}
                     animate={isWrong ? { x: [0, 6, -6, 4, -4, 0] } : {}}
-                    transition={{ duration: 0.4 }}
+                    transition={{ duration: 0.25, ease: EASE_OUT }}
                     style={{ touchAction: "none" }}
                     className={`select-none rounded-lg border px-3 py-3 min-h-11 flex items-center text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       isMatched

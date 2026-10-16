@@ -15,6 +15,7 @@ import EnglishText from "@/components/EnglishText";
 import { GameCompletionScore } from "@/components/games/GameMoments";
 import type { CefrLevel, IdiomPhrasalVerb } from "@/types/database";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const ROUND_SIZE = 10;
 
 export default function IdiomsPracticePage() {
@@ -99,7 +100,7 @@ export default function IdiomsPracticePage() {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">אתגר הניבים הושלם!</h1>
+        <h1 className="text-2xl font-bold">סיימתם את אתגר הניבים</h1>
         <GameCompletionScore>{accuracy}%</GameCompletionScore>
         <p className="mt-2 text-muted">{correctCount} מתוך {questions.length} נכונות</p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
@@ -135,16 +136,16 @@ export default function IdiomsPracticePage() {
         </p>
         <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
           <div
-            className="h-full bg-primary transition-all"
+            className="h-full bg-primary transition-[width] duration-300"
             style={{ width: `${((index + 1) / questions.length) * 100}%` }}
           />
         </div>
 
         <motion.div
           key={index}
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, ease: EASE_OUT }}
           className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           <p className="text-sm text-muted">איזה ביטוי מתאים למשמעות הבאה?</p>
@@ -178,11 +179,11 @@ export default function IdiomsPracticePage() {
               <motion.p
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
+                transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                 className={`mt-4 flex items-center gap-1.5 text-lg font-bold ${wasCorrect ? "text-success" : "text-danger"}`}
               >
                 {wasCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
-                {wasCorrect ? "כל הכבוד!" : `לא בדיוק. הביטוי הנכון: "${item.options[item.correctIndex]}"`}
+                {wasCorrect ? "נכון." : `לא בדיוק. הביטוי הנכון: "${item.options[item.correctIndex]}"`}
               </motion.p>
               <EnglishText as="p" className="mt-1 text-sm text-muted">
                 {item.exampleEn}

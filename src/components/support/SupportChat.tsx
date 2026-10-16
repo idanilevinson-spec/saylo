@@ -7,6 +7,7 @@ import ReactMarkdown, { type Components } from "react-markdown";
 import { Capacitor } from "@capacitor/core";
 import { MessageCircleQuestionMark, X, ArrowUp, Square, RotateCcw, ThumbsUp, ThumbsDown, UserRound, ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import { useBodyScrollLock } from "@/lib/utils/scrollLock";
 import { SUPPORT_MAX_MESSAGE_LENGTH, type SupportTopic } from "@/lib/support/topics";
 import { OPENS_CONTACT_FORM, QUICK_REPLIES, suggestionsFor, type QuickReplyId } from "@/lib/support/quickReplies";
 import SupportCallbackForm from "./SupportCallbackForm";
@@ -95,26 +96,41 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
     launcherRef.current?.focus();
   }, []);
 
-  // Escape closes from anywhere inside the panel; on phones the panel is
-  // full-screen, so the page behind it must not scroll underneath.
+  // Tracked continuously (not just read once on open) so the scroll lock
+  // below stays correct across an orientation change or a resize while the
+  // panel is open, not only at the instant it opened.
+  const [smallScreen, setSmallScreen] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const onChange = () => setSmallScreen(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  // On phones the panel is full-screen, so the page behind it must not
+  // scroll underneath. Shared, reference-counted lock (see scrollLock.ts)
+  // so this coexists safely with any other overlay — e.g. the nav menu —
+  // locking at the same time, instead of the two fighting over
+  // document.body.style.overflow directly and leaving it stuck on "hidden".
+  useBodyScrollLock(open && smallScreen);
+
+  // Escape closes from anywhere inside the panel.
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") close();
     }
     document.addEventListener("keydown", onKey);
-    const small = window.matchMedia("(max-width: 639px)").matches;
-    const previousOverflow = document.body.style.overflow;
-    if (small) document.body.style.overflow = "hidden";
     // On a phone, focusing the input opens the keyboard over half the
     // screen before the person has seen the suggestions; let them tap in.
-    const focusTimer = small ? undefined : window.setTimeout(() => inputRef.current?.focus(), 50);
+    const focusTimer = smallScreen ? undefined : window.setTimeout(() => inputRef.current?.focus(), 50);
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previousOverflow;
       window.clearTimeout(focusTimer);
     };
-  }, [open, close]);
+  }, [open, close, smallScreen]);
 
   // iOS (Safari and the app's WebView alike) shrinks only the *visual*
   // viewport when the keyboard opens; a full-screen fixed panel keeps the
@@ -356,9 +372,9 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
         style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       >
         {open ? (
-          <X size={22} className="text-foreground" aria-hidden="true" />
+          <X size={22} className="icon-swap text-foreground" aria-hidden="true" />
         ) : (
-          <MessageCircleQuestionMark size={24} aria-hidden="true" />
+          <MessageCircleQuestionMark size={24} className="icon-swap" aria-hidden="true" />
         )}
       </button>
 
@@ -371,7 +387,7 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
           aria-labelledby="support-title"
           // z-[61]: above the accessibility button (z-60), which otherwise
           // sits on top of the send button on a full-screen phone panel.
-          className="fixed z-[61] inset-x-0 top-0 h-[100dvh] sm:inset-auto sm:top-auto sm:bottom-[8.5rem] sm:end-4 sm:w-[25rem] sm:h-[min(40rem,calc(100dvh-10rem))] flex flex-col bg-card sm:border sm:border-card-border sm:rounded-lg shadow-2xl overflow-hidden"
+          className="launch-panel launch-panel-sheet fixed z-[61] inset-x-0 top-0 h-[100dvh] sm:inset-auto sm:top-auto sm:bottom-[8.5rem] sm:end-4 sm:w-[25rem] sm:h-[min(40rem,calc(100dvh-10rem))] flex flex-col bg-card sm:border sm:border-card-border sm:rounded-lg shadow-2xl overflow-hidden"
           style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
         >
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary sm:rounded-t-lg" />

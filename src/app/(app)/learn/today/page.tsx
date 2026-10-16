@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BookOpen, PenLine, Sparkles } from "lucide-react";
+import { BookOpen, PenLine, CalendarCheck } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import MotionLink from "@/components/MotionLink";
@@ -56,7 +56,7 @@ export default function DailyLessonPage() {
     <div className="max-w-xl mx-auto px-4 py-12">
       <div className="text-center">
         <span className="inline-flex w-14 h-14 items-center justify-center rounded-lg bg-accent/15 text-accent-hover">
-          <Sparkles size={26} />
+          <CalendarCheck size={26} />
         </span>
         <h1 className="mt-4 text-2xl font-bold">השיעור היומי שלכם</h1>
         <p className="mt-1 text-sm text-muted">{new Date().toLocaleDateString("he-IL", { weekday: "long", day: "numeric", month: "long" })}</p>
@@ -64,7 +64,7 @@ export default function DailyLessonPage() {
 
       <div className="mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-8">
         <div className="flex items-center gap-4">
-          <span className="w-12 h-12 shrink-0 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+          <span className="w-12 h-12 shrink-0 rounded-xl bg-primary/10 text-primary-hover flex items-center justify-center">
             <Icon size={22} />
           </span>
           <div className="min-w-0 flex-1">

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -17,7 +18,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { topicSlug } = await params;
   const topic = await getVocabularyTopicBySlug(topicSlug);
-  return { title: topic ? `${topic.name_he} — אוצר מילים` : "אוצר מילים" };
+  return { title: topic ? `${topic.name_he} | אוצר מילים | Saylo` : "אוצר מילים | Saylo" };
 }
 
 export default async function VocabularyTopicPage({ params }: PageProps) {
@@ -41,8 +42,6 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
   const firstExercise = exerciseIds?.length
     ? seededShuffle(exerciseIds, dailySeed(topic.id))[0]
     : null;
-
-  const intro = await getVocabularyTopicIntro(supabase, topic, items.slice(0, 6));
 
   const action =
     "game-press inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-lg font-bold transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2";
@@ -81,11 +80,12 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
         </div>
       </header>
 
-      {intro && (
-        <div className="mt-6">
-          <TeacherExplanationCard text={intro} />
-        </div>
-      )}
+      {/* Streamed in: on a topic's first visit the explanation is written by
+          the AI (about ten seconds) before it is cached, and the words below
+          shouldn't wait for it. */}
+      <Suspense fallback={<IntroPlaceholder />}>
+        <TopicIntro topic={topic} sampleItems={items.slice(0, 6)} />
+      </Suspense>
 
       <ul className="mt-8 grid gap-3 md:grid-cols-2">
         {items.map((item) => (
@@ -95,5 +95,28 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
         ))}
       </ul>
     </div>
+  );
+}
+
+async function TopicIntro({
+  topic,
+  sampleItems,
+}: {
+  topic: Parameters<typeof getVocabularyTopicIntro>[1];
+  sampleItems: Parameters<typeof getVocabularyTopicIntro>[2];
+}) {
+  const supabase = await createClient();
+  const intro = await getVocabularyTopicIntro(supabase, topic, sampleItems);
+  if (!intro) return null;
+  return (
+    <div className="mt-6">
+      <TeacherExplanationCard text={intro} />
+    </div>
+  );
+}
+
+function IntroPlaceholder() {
+  return (
+    <div aria-hidden="true" className="mt-6 h-32 animate-pulse rounded-lg border border-primary/20 bg-primary/5" />
   );
 }

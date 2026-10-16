@@ -19,7 +19,7 @@ async function getPrompt(id: string) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const prompt = await getPrompt(id);
-  return { title: prompt ? `${prompt.title_he} — כתיבה` : "כתיבה" };
+  return { title: prompt ? `${prompt.title_he} | כתיבה | Saylo` : "כתיבה | Saylo" };
 }
 
 export default async function WritingPromptPage({ params }: PageProps) {

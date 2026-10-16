@@ -28,7 +28,7 @@ const MODULE_ICON: Record<BagrutModuleCode, LucideIcon> = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { moduleCode } = await params;
-  return { title: isModuleCode(moduleCode) ? `מודול ${moduleCode} — בגרות — Saylo` : "תרגול בגרות — Saylo" };
+  return { title: isModuleCode(moduleCode) ? `מודול ${moduleCode} | בגרות | Saylo` : "תרגול בגרות | Saylo" };
 }
 
 export default async function BagrutModulePage({ params }: PageProps) {
@@ -49,7 +49,7 @@ export default async function BagrutModulePage({ params }: PageProps) {
       </Link>
 
       <div className="mt-3 flex items-center gap-3">
-        <span className="flex items-center justify-center w-11 h-11 rounded-lg bg-primary/10 text-primary shrink-0">
+        <span className="flex items-center justify-center w-11 h-11 rounded-lg bg-primary/10 text-primary-hover shrink-0">
           <Icon size={20} />
         </span>
         <div>

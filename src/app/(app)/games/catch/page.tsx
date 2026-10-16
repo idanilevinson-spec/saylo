@@ -403,9 +403,9 @@ function WordCatchPage({ onReplay }: { onReplay: () => void }) {
                 disabled={!!result}
                 className={`game-press min-h-16 px-1.5 sm:px-3 py-3 rounded-lg border text-sm sm:text-lg font-bold leading-tight transition-[background-color,border-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                   isCorrectOpt
-                    ? "border-success bg-success/10 text-success"
+                    ? "border-success bg-success/10 text-success-hover"
                     : isPicked
-                      ? "game-shake border-danger bg-danger/10 text-danger"
+                      ? "game-shake border-danger bg-danger/10 text-danger-hover"
                       : lane === i && !result
                         ? "border-primary bg-primary/[0.06]"
                         : "border-card-border bg-card hover:border-primary/50 disabled:opacity-50"

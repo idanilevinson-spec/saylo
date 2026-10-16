@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import EnglishText from "@/components/EnglishText";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 // The one signature moment of the hero: not a screenshot of the product,
 // but the product's actual mechanism playing out live. Reuses the same
 // clip-path wipe the headline reveals with, so the "typing" read is
@@ -131,7 +132,7 @@ export default function LandingCorrectionDemo() {
           key={`level-${index}`}
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, ease: EASE_OUT }}
           className="text-xs font-bold tracking-wide text-muted"
         >
           {example.level}
@@ -175,7 +176,7 @@ export default function LandingCorrectionDemo() {
                 key={`correct-${index}`}
                 initial={reduceMotion ? false : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: EASE_OUT }}
                 className="text-primary font-semibold"
               >
                 {" "}
@@ -190,7 +191,7 @@ export default function LandingCorrectionDemo() {
             key={`he-${index}`}
             initial={reduceMotion ? false : { opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.35, ease: EASE_OUT }}
             className="caption-track-he text-sm leading-relaxed text-primary-hover"
           >
             {example.he}
@@ -208,7 +209,7 @@ export default function LandingCorrectionDemo() {
               animate={{ opacity: 1, transform: "scale(1)" }}
               transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
               dir="auto"
-              className="rounded-md bg-primary/12 px-2 py-1 text-xs font-bold text-primary"
+              className="rounded-md bg-primary/12 px-2 py-1 text-xs font-bold text-primary-hover"
             >
               {e.rule}
             </motion.li>

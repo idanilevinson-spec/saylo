@@ -106,7 +106,7 @@ export default function MistakesPage() {
   if (items.length === 0) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
+        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", bounce: 0.2, delay: 0.1 }}>
           <IconBadge icon={PartyPopper} tone="accent" />
         </motion.div>
         <h1 className="text-2xl font-bold">אין לכם היום מה לחזור</h1>
@@ -123,10 +123,10 @@ export default function MistakesPage() {
   if (index >= items.length) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}>
+        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", bounce: 0.2, delay: 0.1 }}>
           <IconBadge icon={PartyPopper} tone="accent" />
         </motion.div>
-        <h1 className="text-2xl font-bold">סיימתם את החזרה של היום!</h1>
+        <h1 className="text-2xl font-bold">סיימתם את החזרה של היום</h1>
         <Link href="/dashboard" className="mt-6 inline-block text-primary font-medium">
           ללוח הבקרה ←
         </Link>
@@ -204,7 +204,7 @@ export default function MistakesPage() {
           )}
 
           {result && !result.isCorrect && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-6">
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-6">
               <button
                 onClick={goNext}
                 className="w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"

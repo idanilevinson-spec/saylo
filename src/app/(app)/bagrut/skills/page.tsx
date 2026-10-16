@@ -4,7 +4,7 @@ import { BookOpenText, Headphones, Feather, BookOpen, PenLine, ChevronLeft, type
 import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/lib/content/bagrut/skills";
 
 export const metadata: Metadata = {
-  title: "מיומנויות לבגרות — Saylo",
+  title: "מיומנויות לבגרות | Saylo",
 };
 
 const KIND_ORDER: BagrutSkillKind[] = ["reading", "listening", "literature", "vocabulary", "writing"];

@@ -9,6 +9,7 @@ import EnglishText from "@/components/EnglishText";
 import IconBadge from "@/components/IconBadge";
 import AiConsentGate from "@/components/AiConsentGate";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 interface ReadingResponseResult {
   score: number;
   feedback_he: string;
@@ -100,9 +101,9 @@ function ReadingResponseFormInner({
   if (result) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
+        transition={{ duration: 0.25, ease: EASE_OUT }}
         className="space-y-4"
       >
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">

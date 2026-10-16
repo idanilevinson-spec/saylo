@@ -2,7 +2,7 @@
 
 import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles } from "lucide-react";
+import { CalendarCheck, Star } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -158,7 +158,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
   if (items.length === 0) {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
-        <IconBadge icon={Sparkles} tone="accent" className="mx-auto" />
+        <IconBadge icon={CalendarCheck} tone="accent" className="mx-auto" />
         <h1 className="text-2xl font-bold">אין עדיין מספיק מילים לאתגר</h1>
         <p className="mt-2 text-muted">תרגלו כמה נושאי אוצר מילים קודם, ותחזרו הנה.</p>
       </div>
@@ -199,7 +199,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
           current={index}
           score={correctCount}
           scoreLabel="תשובות נכונות"
-          scoreIcon={Sparkles}
+          scoreIcon={Star}
         />
 
         <GameStage stageKey={index} className={mode === "spelling" ? "text-center" : ""}>
@@ -244,7 +244,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
                   onChange={(e) => setInput(e.target.value)}
                   disabled={locked}
                   maxLength={item.headword.length + 4}
-                  placeholder="Type the whole word"
+                  placeholder="הקלידו את כל המילה"
                   className="flex-1 min-w-0 min-h-12 px-4 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70 placeholder:text-muted"
                 />
                 <SpeakButton text={item.headword} label="רמז קולי: השמעת המילה" />

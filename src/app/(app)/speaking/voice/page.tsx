@@ -26,6 +26,7 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { requiresParentalConsent } from "@/lib/auth/consentGate";
 import type { ConversationScenario, ConversationTopicCategory } from "@/types/database";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const CATEGORIES: Record<
   ConversationTopicCategory,
   { label: string; icon: ComponentType<LucideProps>; blurb: string }
@@ -121,16 +122,16 @@ export default function VoiceConversationHubPage() {
           )}
 
           <motion.button
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
+            transition={{ duration: 0.25, delay: 0.1, ease: EASE_OUT }}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => startConversation(null)}
             disabled={starting}
             className="mt-8 w-full text-right bg-primary/5 border border-primary/20 rounded-lg p-5 hover:border-primary/40 transition-[border-color] disabled:opacity-60"
           >
-            <span className="inline-flex w-10 h-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <span className="inline-flex w-10 h-10 items-center justify-center rounded-xl bg-primary/10 text-primary-hover">
               <Phone size={20} />
             </span>
             <h2 className="mt-2 font-bold">שיחת חולין חופשית</h2>
@@ -144,7 +145,7 @@ export default function VoiceConversationHubPage() {
             return (
               <div key={group.category} className="mt-10">
                 <div className="flex items-center gap-2.5">
-                  <span className="inline-flex w-8 h-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <span className="inline-flex w-8 h-8 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                     <meta.icon size={16} />
                   </span>
                   <div>
@@ -157,9 +158,9 @@ export default function VoiceConversationHubPage() {
                   {group.items.map((s, i) => (
                     <motion.button
                       key={s.id}
-                      initial={{ opacity: 0, y: 12 }}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, delay: 0.03 * Math.min(i, 6) + groupIndex * 0.02 }}
+                      transition={{ duration: 0.35, delay: 0.03 * Math.min(i, 6) + groupIndex * 0.02, ease: EASE_OUT }}
                       whileHover={{ y: -3 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => startConversation(s.id)}

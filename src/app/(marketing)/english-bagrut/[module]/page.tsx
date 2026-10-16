@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ module: s
   const description = `איך בנוי שאלון ${code} בבגרות באנגלית: ${f.sections.map((s) => `${s.nameHe} (${s.points} נק׳)`).join(", ")}${f.timeMinutes ? `, ${f.timeMinutes} דקות` : ""}. מיומנויות עם דוגמה פתורה וערכות תרגול באותו מבנה.`;
   const path = `/english-bagrut/${code.toLowerCase()}`;
   return {
-    title: `${title} — Saylo`,
+    title: `${title} | Saylo`,
     description,
     alternates: { canonical: path },
     openGraph: pageOpenGraph(title, description, path),
@@ -134,7 +134,7 @@ export default async function BagrutModulePage({ params }: { params: Promise<{ m
                     <li
                       key={o}
                       className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
-                        i === sample.example.correctOptionIndex ? "bg-success/12 font-bold text-success" : "bg-background-2"
+                        i === sample.example.correctOptionIndex ? "bg-success/12 font-bold text-success-hover" : "bg-background-2"
                       }`}
                     >
                       {i === sample.example.correctOptionIndex && <CheckCircle2 size={15} aria-hidden="true" />}
@@ -159,7 +159,7 @@ export default async function BagrutModulePage({ params }: { params: Promise<{ m
           <h2 className="text-2xl font-black">
             {sets.length} ערכות תרגול במבנה של שאלון {code}
           </h2>
-          <p className="mt-1 text-primary-ink/80">עם שעון באורך הבחינה האמיתית ומעקב אחרי הציון הכי טוב שלכם.</p>
+          <p className="mt-1 text-primary-ink/90">עם שעון באורך הבחינה האמיתית ומעקב אחרי הציון הכי טוב שלכם.</p>
           <Link href="/signup" className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold">
             להתחיל לתרגל, 3 ימים חינם
           </Link>

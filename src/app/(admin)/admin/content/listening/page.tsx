@@ -165,7 +165,7 @@ export default function AdminListeningPage() {
                 <span className="text-xs text-muted">{clip.cefr_level}</span>
                 <StatusBadge status={clip.status} />
                 {clip.style === "natural_speech" && (
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">דיבור טבעי</span>
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary-hover">דיבור טבעי</span>
                 )}
               </div>
             </div>

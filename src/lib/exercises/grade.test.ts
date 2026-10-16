@@ -38,6 +38,17 @@ describe("gradeExercise — fill_blank", () => {
   it("marks a wrong answer as incorrect", () => {
     expect(gradeExercise("fill_blank", content, { text: "is" })).toBe(false);
   });
+
+  it("accepts any of the other accepted answers, normalized the same way", () => {
+    const c: FillBlankContent = {
+      sentence: "The data ___ that it works.",
+      correctAnswer: "suggests",
+      acceptedAnswers: ["shows", "indicates"],
+    };
+    expect(gradeExercise("fill_blank", c, { text: "Shows" })).toBe(true);
+    expect(gradeExercise("fill_blank", c, { text: "suggests" })).toBe(true);
+    expect(gradeExercise("fill_blank", c, { text: "proves" })).toBe(false);
+  });
 });
 
 describe("gradeExercise — match", () => {
@@ -87,6 +98,29 @@ describe("gradeExercise — reorder", () => {
 
   it("marks a response of the wrong length as incorrect", () => {
     expect(gradeExercise("reorder", content, { order: [0, 1] })).toBe(false);
+  });
+
+  it("treats two tiles with the same word as interchangeable", () => {
+    const c: ReorderContent = { tokens: ["Had", "I", "known", "I", "would", "have", "come"], correctOrder: [0, 1, 2, 3, 4, 5, 6] };
+    expect(gradeExercise("reorder", c, { order: [0, 3, 2, 1, 4, 5, 6] })).toBe(true);
+  });
+
+  it("keeps capitals: a mid-sentence \"The\" is wrong", () => {
+    const c: ReorderContent = { tokens: ["The", "meal", "was", "cooked", "by", "the", "chef"], correctOrder: [0, 1, 2, 3, 4, 5, 6] };
+    expect(gradeExercise("reorder", c, { order: [5, 1, 2, 3, 4, 0, 6] })).toBe(false);
+  });
+
+  it("accepts another listed word order", () => {
+    const c: ReorderContent = {
+      tokens: ["Prices", "rose", "and", "as", "a", "result", "sales", "fell"],
+      correctOrder: [0, 1, 2, 3, 4, 5, 6, 7],
+      acceptedSentences: ["Prices rose and sales fell as a result"],
+    };
+    expect(gradeExercise("reorder", c, { order: [0, 1, 2, 6, 7, 3, 4, 5] })).toBe(true);
+  });
+
+  it("rejects a tile used twice", () => {
+    expect(gradeExercise("reorder", content, { order: [0, 0, 2] })).toBe(false);
   });
 });
 

@@ -275,7 +275,7 @@ export default function SpeakingPage() {
                 <h1 id="studio-title" className="mt-4 text-3xl sm:text-4xl font-black tracking-tight leading-[1.05]">
                   המורה שלכם מוכן לדבר
                 </h1>
-                <p className="mt-2 max-w-md text-primary-ink/80 leading-relaxed">
+                <p className="mt-2 max-w-md text-primary-ink/90 leading-relaxed">
                   שיחה אמיתית באנגלית, בקול או בכתב. המורה זוכר את הטעויות שלכם ומחזיר אותן לתרגול.
                 </p>
                 <div className="mt-6 flex flex-col sm:flex-row gap-2.5">
@@ -312,7 +312,7 @@ export default function SpeakingPage() {
               <div className="relative mx-auto md:mx-0">
                 <div className="relative rounded-lg bg-primary-ink/10 px-6 py-5 ring-1 ring-primary-ink/20 rotate-[-2deg] shadow-[0_16px_32px_-18px_rgb(0_0_0/0.6)]">
                   <StudioMeter />
-                  <p className="mt-3 flex items-center justify-between gap-6 text-xs font-bold text-primary-ink/75">
+                  <p className="mt-3 flex items-center justify-between gap-6 text-xs font-bold text-primary-ink/90">
                     <span>המורה של Saylo</span>
                     <span className="chyron tracking-wide">Live</span>
                   </p>
@@ -354,7 +354,7 @@ export default function SpeakingPage() {
                   >
                     <span
                       className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
-                        i % 3 === 1 ? "bg-accent/15 text-accent-hover" : "bg-primary/12 text-primary"
+                        i % 3 === 1 ? "bg-accent/15 text-accent-hover" : "bg-primary/12 text-primary-hover"
                       }`}
                     >
                       <s.icon size={20} aria-hidden="true" />

@@ -10,6 +10,7 @@ import { isUserPremium } from "@/lib/subscriptions/subscriptionService";
 import { getCurrentHearts } from "@/lib/subscriptions/heartsService";
 import { recentlyAllowedToPractise, rememberPracticeAccess } from "@/lib/subscriptions/practiceAccessCache";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 // Wraps any practice UI (exercise player, daily review) and blocks entry
 // once a non-premium user is out of hearts — premium/trialing users always
 // pass straight through.
@@ -44,9 +45,9 @@ export default function HeartsGate({ children }: { children: ReactNode }) {
   if (status === "blocked") {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
+        transition={{ duration: 0.25, ease: EASE_OUT }}
         className="max-w-md mx-auto px-4 py-24 text-center"
       >
         <IconBadge icon={HeartCrack} tone="danger" />

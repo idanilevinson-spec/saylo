@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { israelWeekStart, israelMonthStart, isLastDayOfIsraelMonth } from "./buildScoreSummary";
+import { israelWeekStart, israelMonthStart, isLastDayOfIsraelMonth, practiceDayItems } from "./buildScoreSummary";
 
 function israelParts(d: Date) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -73,5 +73,27 @@ describe("israelMonthStart", () => {
     expect(parts.year).toBe(nowParts.year);
     expect(parts.month).toBe(nowParts.month);
     expect(start.getTime()).toBeLessThanOrEqual(now.getTime());
+  });
+});
+
+describe("practiceDayItems", () => {
+  it("folds exercise attempts into one row per Israel-local day", () => {
+    const items = practiceDayItems([
+      { is_correct: true, created_at: "2026-10-14T08:00:00Z" },
+      { is_correct: false, created_at: "2026-10-14T09:00:00Z" },
+      { is_correct: true, created_at: "2026-10-14T10:00:00Z" },
+      // 23:30 UTC is already the next day in Israel.
+      { is_correct: true, created_at: "2026-10-14T23:30:00Z" },
+    ]);
+    expect(items).toHaveLength(2);
+    const first = items.find((i) => i.id === "practice-2026-10-14")!;
+    expect(first.detail).toBe("2/3 נכונות");
+    expect(first.scorePct).toBe(67);
+    expect(first.createdAt).toBe("2026-10-14T10:00:00Z");
+    expect(items.find((i) => i.id === "practice-2026-10-15")!.detail).toBe("1/1 נכונות");
+  });
+
+  it("returns nothing without attempts", () => {
+    expect(practiceDayItems([])).toEqual([]);
   });
 });

@@ -3,18 +3,22 @@
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Volume2, Turtle, Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, type LucideIcon } from "lucide-react";
+import { Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, type LucideIcon } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import { placementInstructionHe } from "@/lib/placement/instructionHe";
+import { optionOrder } from "@/lib/utils/shuffle";
 import AiConsentGate from "@/components/AiConsentGate";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
-import { speak } from "@/lib/speech/browserTts";
+import SentenceAudioButtons from "@/components/SentenceAudioButtons";
 import type { PlacementQuestion, SkillArea } from "@/types/database";
 import type { BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_PLACEMENT_SECTIONS } from "@/lib/content/bagrut/placementItems";
 import BagrutCredit from "@/components/BagrutCredit";
+import { placementResumePoint } from "@/lib/assessment/placementResume";
 import { PlacementFinishing, PlacementResultView, SKILL_LABELS_HE, SKILL_ORDER, type PlacementResult } from "@/components/placement/PlacementResult";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const SKILL_ICONS: Record<SkillArea, LucideIcon> = {
   vocabulary: BookOpen,
   grammar: PenLine,
@@ -58,6 +62,18 @@ const GOAL_OPTIONS: { value: Goal; label: string; hint: string }[] = [
   { value: 5, label: "בגרות 5 יח״ל", hint: "מודולים E, F, G" },
 ];
 
+// A test left unfinished (a call, the app closed in the background, a
+// stray swipe back) can be picked up for this long. In the data, three
+// learners lost 19, 20 and all 28 answers and had to start over; one of
+// them never finished.
+const RESUME_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+interface Resumable {
+  testId: string;
+  answered: number;
+  nextIndex: number;
+}
+
 export default function PlacementPage() {
   const { profile, loading: authLoading } = useAuth();
   const [questions, setQuestions] = useState<PlacementQuestion[] | null>(null);
@@ -75,6 +91,8 @@ export default function PlacementPage() {
   const [goal, setGoal] = useState<Goal | null>(null);
   const [showBagrutStep, setShowBagrutStep] = useState(false);
   const [bagrutAnswers, setBagrutAnswers] = useState<(number | null)[]>([]);
+  // undefined while checking, null when there's nothing to resume.
+  const [resumable, setResumable] = useState<Resumable | null | undefined>(undefined);
 
   useEffect(() => {
     if (!profile) return;
@@ -86,7 +104,32 @@ export default function PlacementPage() {
       .then(({ data }) => setQuestions(data ?? []));
   }, [profile]);
 
-  if (authLoading || questions === null) {
+  // The learner's latest unfinished test, if it has answers (see
+  // placementResumePoint for where it picks up).
+  useEffect(() => {
+    if (!profile || !questions) return;
+    const since = new Date(Date.now() - RESUME_WINDOW_MS).toISOString();
+    supabase
+      .from("placement_tests")
+      .select("id")
+      .eq("profile_id", profile.id)
+      .eq("status", "in_progress")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(async ({ data: test }) => {
+        if (!test) return setResumable(null);
+        const { data: answers } = await supabase.from("placement_test_responses").select("question_id").eq("placement_test_id", test.id);
+        const point = placementResumePoint(
+          questions.map((q) => q.id),
+          (answers ?? []).map((a) => a.question_id)
+        );
+        setResumable(point ? { testId: test.id, ...point } : null);
+      });
+  }, [profile, questions]);
+
+  if (authLoading || questions === null || (questions.length > 0 && resumable === undefined)) {
     return <div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען...</div>;
   }
 
@@ -118,6 +161,20 @@ export default function PlacementPage() {
     setStarting(false);
   }
 
+  function handleResume() {
+    if (!resumable) return;
+    setBagrutAnswers(bagrutSection ? bagrutSection.questions.map(() => null) : []);
+    setTestId(resumable.testId);
+    setStarted(true);
+    if (resumable.nextIndex < questions!.length) {
+      setIndex(resumable.nextIndex);
+    } else if (bagrutSection) {
+      setShowBagrutStep(true);
+    } else {
+      setShowWritingStep(true);
+    }
+  }
+
   if (!started) {
     // The test as it actually is: how many questions in each skill.
     const perSkill = SKILL_ORDER.filter((s) => s !== "speaking" && s !== "writing")
@@ -125,7 +182,25 @@ export default function PlacementPage() {
       .filter((s) => s.count > 0);
     return (
       <div className="max-w-3xl mx-auto px-4 pt-10 pb-16">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}>
+          {resumable && (
+            <section aria-labelledby="resume-title" className="relative mb-8 overflow-hidden rounded-lg border border-primary bg-card p-5 sm:p-6">
+              <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
+              <h2 id="resume-title" className="text-lg font-black">יש לכם מבחן באמצע</h2>
+              <p className="mt-1 text-muted leading-relaxed">
+                {resumable.nextIndex < questions.length
+                  ? `עניתם על ${resumable.answered} מתוך ${questions.length} שאלות. אפשר להמשיך בדיוק מהמקום שבו עצרתם.`
+                  : "עניתם על כל השאלות. נשאר רק השלב האחרון, ואז מקבלים את הרמה."}
+              </p>
+              <button
+                type="button"
+                onClick={handleResume}
+                className="game-press mt-4 inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              >
+                להמשיך מהמקום שעצרתם
+              </button>
+            </section>
+          )}
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">מבחן רמה</h1>
           <p className="mt-3 max-w-xl text-lg text-muted leading-relaxed">
             כ-10 דקות, {questions.length} שאלות קצרות. בסוף תקבלו רמה לכל מיומנות בנפרד, ותוכנית יומית שבנויה עליה.
@@ -142,7 +217,9 @@ export default function PlacementPage() {
                 </li>
               );
             })}
-            <li className="flex flex-col gap-1 bg-card px-4 py-4">
+            {/* Spans the row on phones, where the grid has two columns and the
+                fifth cell would otherwise leave a bare gap beside it. */}
+            <li className="col-span-2 sm:col-span-1 flex flex-col gap-1 bg-card px-4 py-4">
               <NotebookPen size={17} aria-hidden="true" className="text-muted" />
               <span className="chyron text-3xl leading-none text-muted" dir="ltr">+1</span>
               <span className="text-sm text-muted">כתיבה, לא חובה</span>
@@ -194,7 +271,7 @@ export default function PlacementPage() {
               className="game-press inline-flex items-center justify-center gap-2 min-h-13 px-8 rounded-lg bg-primary text-primary-ink text-lg font-bold hover:bg-primary-hover transition-[background-color,opacity,transform] duration-150 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             >
               <Target size={19} aria-hidden="true" />
-              {starting ? "מתחילים..." : chosenGoal === null ? "בחרו מטרה כדי להתחיל" : "להתחיל את המבחן"}
+              {starting ? "מתחילים..." : chosenGoal === null ? "בחרו מטרה כדי להתחיל" : resumable ? "להתחיל מבחן חדש" : "להתחיל את המבחן"}
             </button>
             <p className="text-xs text-muted">הערכה פנימית של Saylo לפי סולם CEFR, לא מבחן רשמי.</p>
           </div>
@@ -271,11 +348,11 @@ export default function PlacementPage() {
     else setShowWritingStep(true);
   }
 
-  // No response is recorded for a skipped question — it's excluded from
-  // that skill's score entirely (same as a skill nobody got any questions
-  // for: the results screen already shows "טרם נבדק" for it) rather than
-  // counted wrong, since a guess-free skip isn't evidence the learner
-  // doesn't know the material.
+  // No response is recorded for a skipped question. It is not counted
+  // wrong: the server scores it as a guess would score on average (a
+  // quarter of a point), so skipping neither costs nor gains anything over
+  // guessing (see placementScore). A skill with no answers at all still
+  // shows "לא נבדק הפעם" on the results screen.
   function handleSkip() {
     if (!testId) return;
     setSelected(null);
@@ -327,11 +404,13 @@ export default function PlacementPage() {
                 {renderPromptWithUniformBlanks(q.promptEn)}
               </EnglishText>
               <div className="mt-3 space-y-2" role="radiogroup" aria-label={`שאלה ${qi + 1}`}>
-                {q.options.map((option, oi) => {
+                {optionOrder(q.options.length, q.promptEn).map((oi) => {
+                  const option = q.options[oi];
                   const active = bagrutAnswers[qi] === oi;
                   return (
                     <button
                       key={oi}
+                      dir={/[֐-׿]/.test(option) ? "rtl" : "ltr"}
                       type="button"
                       role="radio"
                       aria-checked={active}
@@ -370,9 +449,9 @@ export default function PlacementPage() {
       <div className="max-w-xl mx-auto px-4 py-12">
         <p className="text-sm text-muted mb-4">שלב אחרון (רשות)</p>
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
+          transition={{ duration: 0.25, ease: EASE_OUT }}
           className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
         >
           <p className="font-medium text-lg">{WRITING_SAMPLE_PROMPT_HE}</p>
@@ -428,54 +507,52 @@ export default function PlacementPage() {
       </p>
       <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
         <div
-          className="h-full bg-primary transition-all"
+          className="h-full bg-primary transition-[width] duration-300"
           style={{ width: `${((index + 1) / questions.length) * 100}%` }}
         />
       </div>
 
       <motion.div
         key={index}
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
+        transition={{ duration: 0.25, ease: EASE_OUT }}
         className="bg-card border border-card-border rounded-lg p-6 sm:p-8"
       >
         {question.skill_area === "listening" && question.audio_text ? (
           <div>
-            <p className="font-medium text-lg mb-3">{renderPromptWithUniformBlanks(question.prompt)}</p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => speak(question.audio_text as string, 1)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-              >
-                <Volume2 size={16} /> השמעה
-              </button>
-              <button
-                onClick={() => speak(question.audio_text as string, 0.6)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-card-border hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-              >
-                <Turtle size={16} /> לאט
-              </button>
-            </div>
+            {placementInstructionHe(question.prompt) && (
+              <p className="mb-1.5 text-sm text-muted">{placementInstructionHe(question.prompt)}</p>
+            )}
+            <EnglishText as="p" className="font-medium text-lg mb-3">
+              {renderPromptWithUniformBlanks(question.prompt)}
+            </EnglishText>
+            <SentenceAudioButtons key={question.id} text={question.audio_text} />
           </div>
         ) : (
-          <EnglishText as="p" className="font-medium text-lg">
-            {renderPromptWithUniformBlanks(question.prompt)}
-          </EnglishText>
+          <>
+            {placementInstructionHe(question.prompt) && (
+              <p className="mb-1.5 text-sm text-muted">{placementInstructionHe(question.prompt)}</p>
+            )}
+            <EnglishText as="p" className="font-medium text-lg">
+              {renderPromptWithUniformBlanks(question.prompt)}
+            </EnglishText>
+          </>
         )}
 
         <div className="mt-4 space-y-2">
-          {question.options.map((option, i) => (
+          {optionOrder(question.options.length, question.id).map((i) => (
             <motion.button
               key={i}
+              dir={/[֐-׿]/.test(question.options[i]) ? "rtl" : "ltr"}
               whileHover={{ x: -2 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setSelected(i)}
-              className={`w-full text-right px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+              className={`w-full text-start px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                 selected === i ? "border-primary bg-primary/5" : "border-card-border hover:border-primary/40"
               }`}
             >
-              <EnglishText>{option}</EnglishText>
+              <EnglishText>{question.options[i]}</EnglishText>
             </motion.button>
           ))}
         </div>

@@ -11,7 +11,7 @@ export function GameCompletionScore({ children }: { children: React.ReactNode })
     <motion.p
       initial={{ opacity: 0, scale: 0.7 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: "spring", bounce: 0.5, delay: 0.15 }}
+      transition={{ type: "spring", bounce: 0.2, delay: 0.15 }}
       className="mt-3 chyron text-7xl sm:text-8xl text-primary tabular-nums"
     >
       {children}

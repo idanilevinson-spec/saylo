@@ -10,6 +10,7 @@ import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 import TermsConsent from "@/components/TermsConsent";
 import { TERMS_REQUIRED_MESSAGE, termsConsentMetadata } from "@/lib/legal/consent";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 export default function ProfileSetupPage() {
   const router = useRouter();
   const { session, profile, loading: authLoading, refreshProfile } = useAuth();
@@ -80,15 +81,15 @@ export default function ProfileSetupPage() {
 
   return (
     <div className="max-w-md mx-auto px-4 py-16">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: EASE_OUT }}>
         <h1 className="text-3xl font-bold text-center">כמה פרטים אחרונים</h1>
         <p className="mt-2 text-center text-muted">כדי שנוכל להתאים לכם את קצב הלימוד הנכון</p>
       </motion.div>
 
       <motion.form
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
+        transition={{ duration: 0.25, delay: 0.1, ease: EASE_OUT }}
         onSubmit={handleSubmit}
         className="mt-8 space-y-4"
       >

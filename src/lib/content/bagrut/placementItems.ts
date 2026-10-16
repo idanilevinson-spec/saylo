@@ -219,13 +219,13 @@ export const BAGRUT_PLACEMENT_SECTIONS: Record<BagrutStudyUnits, BagrutPlacement
         correctOptionIndex: 2,
       },
       {
-        formatHe: "אוצר מילים — מילה בהקשר",
+        formatHe: "אוצר מילים: מילה בהקשר",
         promptEn: 'In paragraph 2, "considerable" is closest in meaning to ___.',
         options: ["little", "a lot of", "careful", "unexpected"],
         correctOptionIndex: 1,
       },
       {
-        formatHe: "אוצר מילים — השלמת משפט",
+        formatHe: "אוצר מילים: השלמת משפט",
         promptEn: "Rebuilding a suburb around walking instead of driving would be enormously ___.",
         options: ["expensive", "expense", "expensively", "expenses"],
         correctOptionIndex: 0,

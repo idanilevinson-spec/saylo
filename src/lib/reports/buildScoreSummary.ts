@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fetchAll } from "@/lib/supabase/fetchAll";
 
 export type ScoreRange = "week" | "month" | "all";
 
@@ -98,6 +99,31 @@ export function isLastDayOfIsraelMonth(now: Date = new Date()): boolean {
   return tomorrow.month !== today.month;
 }
 
+// Exercises (practice, review, the reading exam's questions) are answered
+// one at a time, so listing each attempt would bury everything else. They
+// are folded into one row per Israel-local day: how many, and how many
+// right. Before this the summary skipped them entirely, and a learner who
+// only practised saw "0 activities" for the week.
+export function practiceDayItems(attempts: { is_correct: boolean; created_at: string }[]): ScoreSummaryItem[] {
+  const byDay = new Map<string, { total: number; correct: number; latest: string }>();
+  for (const a of attempts) {
+    const { year, month, day } = israelDateParts(new Date(a.created_at));
+    const key = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const entry = byDay.get(key) ?? { total: 0, correct: 0, latest: a.created_at };
+    entry.total += 1;
+    if (a.is_correct) entry.correct += 1;
+    if (a.created_at > entry.latest) entry.latest = a.created_at;
+    byDay.set(key, entry);
+  }
+  return [...byDay.entries()].map(([key, d]) => ({
+    id: `practice-${key}`,
+    createdAt: d.latest,
+    typeLabel: "תרגול",
+    detail: `${d.correct}/${d.total} נכונות`,
+    scorePct: Math.round((d.correct / d.total) * 100),
+  }));
+}
+
 function rangeStart(range: ScoreRange, now: Date = new Date()): Date | null {
   if (range === "week") return israelWeekStart(now);
   if (range === "month") return israelMonthStart(now);
@@ -139,13 +165,36 @@ export async function buildScoreSummary(
     .order("created_at", { ascending: false });
   if (sinceIso) conversationQuery = conversationQuery.gte("created_at", sinceIso);
 
-  const [gamesRes, readingRes, conversationsRes] = await Promise.all([gameQuery, readingQuery, conversationQuery]);
+  // XP from every source (exercises, games, streak bonuses), not only the
+  // games' own share, so it matches the XP chart on the progress page.
+  const xpEvents = fetchAll<{ amount: number }>((from, to) => {
+    let q = supabase.from("xp_events").select("amount").eq("profile_id", profileId).order("id").range(from, to);
+    if (sinceIso) q = q.gte("created_at", sinceIso);
+    return q;
+  });
+  const attempts = fetchAll<{ is_correct: boolean; created_at: string }>((from, to) => {
+    let q = supabase
+      .from("exercise_attempts")
+      .select("is_correct, created_at")
+      .eq("profile_id", profileId)
+      .order("id")
+      .range(from, to);
+    if (sinceIso) q = q.gte("created_at", sinceIso);
+    return q;
+  });
 
-  const items: ScoreSummaryItem[] = [];
-  let xpEarned = 0;
+  const [gamesRes, readingRes, conversationsRes, xpRes, attemptsRes] = await Promise.all([
+    gameQuery,
+    readingQuery,
+    conversationQuery,
+    xpEvents,
+    attempts,
+  ]);
+
+  const items: ScoreSummaryItem[] = practiceDayItems(attemptsRes.data);
+  const xpEarned = xpRes.data.reduce((sum, e) => sum + e.amount, 0);
 
   for (const g of gamesRes.data ?? []) {
-    xpEarned += g.xp_awarded;
     const scorePct = g.total_questions > 0 ? Math.round((g.correct_count / g.total_questions) * 100) : null;
     items.push({
       id: g.id,

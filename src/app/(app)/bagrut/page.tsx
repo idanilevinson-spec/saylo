@@ -25,7 +25,7 @@ import type { BagrutUnitProgress } from "@/types/database";
 import BagrutCredit from "@/components/BagrutCredit";
 
 export const metadata: Metadata = {
-  title: "בגרות באנגלית — Saylo",
+  title: "בגרות באנגלית | Saylo",
 };
 
 const TRACKS: BagrutStudyUnits[] = [3, 4, 5];
@@ -80,7 +80,7 @@ export default async function BagrutHubPage() {
             <h1 id="bagrut-title" className="text-3xl sm:text-4xl font-black tracking-tight leading-[1.05]">
               בגרות באנגלית
             </h1>
-            <p className="mt-2 max-w-md text-primary-ink/80 leading-relaxed">
+            <p className="mt-2 max-w-md text-primary-ink/90 leading-relaxed">
               מבנה כל שאלון, המיומנויות שהוא בודק, וערכות תרגול באותו מבנה, גם בזמן אמיתי של בחינה.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-2.5">
@@ -112,7 +112,7 @@ export default async function BagrutHubPage() {
 
           {track && mine ? (
             <div className="rounded-lg bg-primary-ink/10 ring-1 ring-primary-ink/20 px-5 py-4 md:min-w-56">
-              <p className="text-xs font-bold text-primary-ink/75">המסלול שלכם</p>
+              <p className="text-xs font-bold text-primary-ink/90">המסלול שלכם</p>
               <p className="mt-1 flex items-baseline gap-1.5">
                 <span className="chyron text-6xl leading-none tabular-nums">{track}</span>
                 <span className="font-bold">יח״ל</span>
@@ -127,13 +127,13 @@ export default async function BagrutHubPage() {
               <span className="mt-3 block h-1.5 rounded-full bg-primary-ink/15 overflow-hidden" aria-hidden="true">
                 <span className="block h-full bg-primary-ink" style={{ width: `${mine.total ? (mine.done / mine.total) * 100 : 0}%` }} />
               </span>
-              <p className="mt-1.5 text-xs font-medium text-primary-ink/80 tabular-nums">
+              <p className="mt-1.5 text-xs font-medium text-primary-ink/90 tabular-nums">
                 {mine.done} מתוך {mine.total} ערכות תרגול
               </p>
             </div>
           ) : (
             <div className="rounded-lg bg-primary-ink/10 ring-1 ring-primary-ink/20 px-5 py-4">
-              <p className="text-xs font-bold text-primary-ink/75">באיזה מסלול אתם?</p>
+              <p className="text-xs font-bold text-primary-ink/90">באיזה מסלול אתם?</p>
               <p className="mt-2 flex gap-2">
                 {TRACKS.map((u) => (
                   <Link
@@ -175,7 +175,7 @@ export default async function BagrutHubPage() {
                       <span className="chyron text-6xl leading-none text-primary tabular-nums">{units}</span>
                       <span className="font-bold">יח״ל</span>
                     </span>
-                    {isMine && <span className="rounded-md bg-primary/12 px-2 py-0.5 text-xs font-bold text-primary">שלכם</span>}
+                    {isMine && <span className="rounded-md bg-primary/12 px-2 py-0.5 text-xs font-bold text-primary-hover">שלכם</span>}
                   </span>
                   <span className="mt-3 text-sm text-muted leading-snug">{TRACK_NOTE[units]}</span>
                   <span className="mt-4 flex items-center justify-between gap-2">
@@ -229,7 +229,7 @@ export default async function BagrutHubPage() {
             return (
               <li key={kind} className="mb-3 break-inside-avoid rounded-lg border border-card-border bg-card p-4">
                 <p className="flex items-center gap-2.5">
-                  <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                     <Icon size={18} aria-hidden="true" />
                   </span>
                   <span className="font-bold">{BAGRUT_SKILL_KIND_LABEL[kind]}</span>

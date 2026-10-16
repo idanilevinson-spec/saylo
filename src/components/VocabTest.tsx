@@ -217,7 +217,7 @@ export default function VocabTest({ steps, onRestart }: VocabTestProps) {
     return (
       <div className="max-w-xl mx-auto px-4 py-12 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">המבחן הושלם!</h1>
+        <h1 className="text-2xl font-bold">סיימתם את המבחן</h1>
         <GameCompletionScore>{accuracy}%</GameCompletionScore>
         <p className="mt-1 text-muted">
           <EnglishText as="span" className="font-bold">
@@ -386,9 +386,9 @@ export default function VocabTest({ steps, onRestart }: VocabTestProps) {
                       className={`game-press flex items-center justify-center gap-2 min-h-14 px-4 rounded-lg border-2 font-bold text-lg transition-[background-color,border-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                         answeredThisStep
                           ? isRight
-                            ? "border-success bg-success/10 text-success"
+                            ? "border-success bg-success/10 text-success-hover"
                             : chosen
-                              ? "game-shake border-danger bg-danger/10 text-danger"
+                              ? "game-shake border-danger bg-danger/10 text-danger-hover"
                               : "border-card-border opacity-50"
                           : answer
                             ? "border-success/40 text-success hover:bg-success/10"

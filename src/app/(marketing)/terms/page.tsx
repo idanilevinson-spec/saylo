@@ -5,7 +5,8 @@ import { BUSINESS_NAME, BUSINESS_TYPE, DAILY_CONVERSATION_LIMIT, DAILY_WRITING_L
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 export const metadata: Metadata = {
-  title: "תנאי שימוש — Saylo",
+  title: "תנאי שימוש | Saylo",
+  alternates: { canonical: "/terms" },
 };
 
 const linkClass = "text-primary hover:underline";

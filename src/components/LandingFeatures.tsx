@@ -138,7 +138,7 @@ export default function LandingFeatures() {
                 transition={{ duration: 0.16, ease: EASE_OUT }}
                 className="group flex items-center gap-4 px-5 py-4 bg-card hover:bg-background-2 transition-colors"
               >
-                <span className="inline-flex w-8 h-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span className="inline-flex w-8 h-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                   <f.icon size={16} strokeWidth={2} />
                 </span>
                 <div className="min-w-0 flex-1">

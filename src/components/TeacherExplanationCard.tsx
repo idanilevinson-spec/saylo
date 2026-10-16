@@ -14,7 +14,7 @@ interface TeacherExplanationCardProps {
 export default function TeacherExplanationCard({ text }: TeacherExplanationCardProps) {
   return (
     <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start gap-3">
-      <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+      <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
         <Presentation size={18} />
       </span>
       <div>

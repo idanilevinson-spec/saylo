@@ -26,7 +26,8 @@ export function gradeExercise(
     case "fill_blank": {
       const c = content as unknown as FillBlankContent;
       const r = response as unknown as FillBlankResponse;
-      return normalize(r.text) === normalize(c.correctAnswer);
+      const given = normalize(r.text);
+      return [c.correctAnswer, ...(c.acceptedAnswers ?? [])].some((a) => normalize(a) === given);
     }
     case "match": {
       const c = content as unknown as MatchContent;
@@ -39,10 +40,15 @@ export function gradeExercise(
     case "reorder": {
       const c = content as unknown as ReorderContent;
       const r = response as unknown as ReorderResponse;
-      return (
-        r.order.length === c.correctOrder.length &&
-        r.order.every((val, i) => val === c.correctOrder[i])
-      );
+      // Compared as words, not token positions: in "Had I known, I would
+      // have come" the two "I" tiles are interchangeable, and picking the
+      // second one first is not a mistake.
+      if (r.order.length !== c.tokens.length || new Set(r.order).size !== r.order.length) return false;
+      if (r.order.some((i) => c.tokens[i] === undefined)) return false;
+      // Exact, case included: "the chef" in the middle is not "The chef".
+      const given = r.order.map((i) => c.tokens[i]).join(" ");
+      const right = [c.correctOrder.map((i) => c.tokens[i]).join(" "), ...(c.acceptedSentences ?? [])];
+      return right.includes(given);
     }
     case "dictation": {
       const c = content as unknown as DictationContent;

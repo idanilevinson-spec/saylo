@@ -17,6 +17,7 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
 import type { ConversationMessage, ConversationScore } from "@/types/database";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 export default function SpeakingChatPage() {
   return (
     <PremiumGate featureName="שיחה עם מורה AI" requirePaid>
@@ -121,9 +122,9 @@ function SpeakingChatInner() {
     return (
       <div className="max-w-xl mx-auto px-4 py-12">
         <motion.h1
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.25, ease: EASE_OUT }}
           className="text-2xl font-bold text-center"
         >
           סיכום השיחה
@@ -137,9 +138,9 @@ function SpeakingChatInner() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          transition={{ duration: 0.25, delay: 0.3, ease: EASE_OUT }}
           className="mt-6 bg-card border border-card-border rounded-lg p-6"
         >
           <p className="leading-relaxed">{score.feedback.generalSuggestionsHe}</p>
@@ -177,7 +178,7 @@ function SpeakingChatInner() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25 }}
+                  transition={{ duration: 0.25, ease: EASE_OUT }}
                   className="overflow-hidden"
                 >
                   <div className="mt-3 bg-card border border-card-border rounded-lg p-5 sm:p-6 space-y-3 max-h-96 overflow-y-auto">
@@ -262,7 +263,7 @@ function SpeakingChatInner() {
               key={m.id}
               initial={{ opacity: 0, y: 10, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.25, ease: EASE_OUT }}
               className={`flex items-end gap-2 ${m.role === "user" ? "justify-start" : "justify-end"}`}
             >
               {m.role === "user" ? (
@@ -341,7 +342,7 @@ function ScoreTile({
     <motion.div
       initial={{ opacity: 0, y: 16, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.35, delay, type: "spring", bounce: 0.4 }}
+      transition={{ duration: 0.35, delay, type: "spring", bounce: 0.2 }}
       className={`rounded-lg p-4 text-center ${highlight ? "bg-primary text-primary-ink" : "bg-card border border-card-border"}`}
     >
       <p className="text-2xl font-bold">{value}</p>

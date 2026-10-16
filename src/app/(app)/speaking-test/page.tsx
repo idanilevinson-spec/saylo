@@ -12,8 +12,10 @@ import SpeakingTest from "@/components/SpeakingTest";
 import ParentalConsentGuard from "@/components/ParentalConsentGuard";
 import AiConsentGate from "@/components/AiConsentGate";
 import IconBadge from "@/components/IconBadge";
-import type { Topic } from "@/types/database";
+import type { CefrLevel, Topic } from "@/types/database";
+import { CEFR_ORDER } from "@/lib/assessment/cefrScoring";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 const MIN_POOL_SIZE = 8;
 
 type Phase = "picker" | "generating" | "ready" | "empty";
@@ -42,14 +44,24 @@ function SpeakingTestPageInner() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [steps, setSteps] = useState<SpeakingTestStep[]>([]);
 
+  // Topics at the learner's level first, then the one below, then the
+  // rest by distance: a C2 learner used to scroll past Numbers and Colors.
   useEffect(() => {
-    supabase
-      .from("topics")
-      .select("*")
-      .eq("status", "published")
-      .order("sort_order")
-      .then(({ data }) => setTopics(data ?? []));
-  }, []);
+    if (!profile) return;
+    Promise.all([
+      supabase.from("topics").select("*").eq("status", "published").order("sort_order"),
+      currentLevel(profile.id),
+    ]).then(([{ data }, level]) => {
+      const at = level ? CEFR_ORDER.indexOf(level as CefrLevel) : -1;
+      const distance = (t: Topic) => {
+        if (at < 0) return 0;
+        const d = CEFR_ORDER.indexOf(t.cefr_level) - at;
+        return d === 0 ? 0 : d === -1 ? 1 : Math.abs(d) + 1;
+      };
+      setTopics([...(data ?? [])].sort((a, b) => distance(a) - distance(b)));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
 
   useEffect(() => {
     if (initialTopicSlug && topics.length > 0) {
@@ -121,16 +133,16 @@ function SpeakingTestPageInner() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: EASE_OUT }}>
         <h1 className="text-3xl font-bold">בחרו נושא למבחן</h1>
         <p className="mt-2 text-muted">10 שאלות. עונים בקול על מילים באנגלית ועל שאלות פתוחות.</p>
       </motion.div>
 
       <button
         onClick={() => generate()}
-        className="mt-6 w-full flex items-center gap-4 bg-primary/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-all text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
+        className="mt-6 w-full flex items-center gap-4 bg-primary/10 border border-primary/25 rounded-lg p-5 hover:border-primary/45 hover:shadow-md transition-[border-color,box-shadow,scale] text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 active:scale-[0.98]"
       >
-        <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+        <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary-hover">
           <Layers size={22} />
         </span>
         <div className="flex-1 min-w-0">
@@ -143,16 +155,19 @@ function SpeakingTestPageInner() {
         {topics.map((topic, i) => (
           <motion.button
             key={topic.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: i * 0.03 }}
+            transition={{ duration: 0.3, delay: i * 0.03, ease: EASE_OUT }}
             whileTap={{ scale: 0.98 }}
             onClick={() => generate(topic.id, topic.name_en)}
             className="w-full flex items-center justify-between gap-3 bg-card border border-card-border rounded-lg p-4 hover:border-primary/40 transition-colors text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             <div>
               <p className="font-bold">{topic.name_he}</p>
-              <p className="mt-0.5 text-sm text-muted">{topic.name_en}</p>
+              <p className="mt-0.5 flex items-center gap-2 text-sm text-muted">
+                <span className="chyron text-primary" dir="ltr">{topic.cefr_level}</span>
+                <span dir="ltr">{topic.name_en}</span>
+              </p>
             </div>
             <Mic size={18} className="text-muted shrink-0" />
           </motion.button>

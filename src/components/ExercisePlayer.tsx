@@ -158,7 +158,7 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
             <motion.p
               initial={{ opacity: 0, transform: "scale(0.9)" }}
               animate={{ opacity: 1, transform: "scale(1)" }}
-              transition={{ type: "spring", bounce: 0.4, duration: 0.4 }}
+              transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
               className="mt-3 flex items-center gap-1.5 text-sm font-bold text-accent-hover"
             >
               <PartyPopper size={16} className="shrink-0" aria-hidden="true" />

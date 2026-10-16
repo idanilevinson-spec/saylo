@@ -18,7 +18,7 @@ const DESCRIPTION =
   "מבנה כל שאלון בבגרות באנגלית (A עד G), מיומנויות עם דוגמה פתורה, וערכות תרגול באותו מבנה, עם שעון באורך הבחינה. לפי 3, 4 ו-5 יחידות לימוד.";
 
 export const metadata: Metadata = {
-  title: "הכנה לבגרות באנגלית: 3, 4 ו-5 יח״ל — Saylo",
+  title: "הכנה לבגרות באנגלית: 3, 4 ו-5 יח״ל | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-bagrut" },
   openGraph: pageOpenGraph("הכנה לבגרות באנגלית: 3, 4 ו-5 יח״ל", DESCRIPTION, "/english-bagrut"),
@@ -170,7 +170,7 @@ export default function EnglishBagrutPage() {
 
         <section className="mt-14 rounded-lg bg-primary px-6 py-7 text-primary-ink">
           <h2 className="text-2xl font-black">מתחילים מהמסלול שלכם</h2>
-          <p className="mt-1 text-primary-ink/80">מבחן רמה של כ-10 דקות, בחירת מסלול, ואזור בגרות שנפתח לפיו.</p>
+          <p className="mt-1 text-primary-ink/90">מבחן רמה של כ-10 דקות, בחירת מסלול, ואזור בגרות שנפתח לפיו.</p>
           <Link href="/signup" className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold">
             להרשמה חינם
           </Link>

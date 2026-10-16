@@ -9,6 +9,8 @@ import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/s
 import type { PatternDefinition } from "@/lib/patterns/patternDefinitions";
 import type { PatternDrill } from "@/lib/patterns/drills";
 
+import { EASE_OUT } from "@/lib/motion/easing";
+import { optionOrder } from "@/lib/utils/shuffle";
 interface PatternDrillRunnerProps {
   definition: PatternDefinition;
   drill: PatternDrill;
@@ -50,7 +52,7 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
     return (
       <div className="max-w-xl mx-auto px-4 py-12 text-center">
         <IconCircle />
-        <h1 className="mt-4 text-2xl font-bold">כל הכבוד!</h1>
+        <h1 className="mt-4 text-2xl font-bold">התרגול הסתיים</h1>
         <p className="mt-2 text-muted">
           {correctCount} מתוך {drill.items.length} תשובות נכונות בתרגול על &quot;{definition.labelHe}&quot;.
         </p>
@@ -72,9 +74,9 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
 
       <motion.div
         key={index}
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.3, ease: EASE_OUT }}
         className="mt-4 rounded-lg border border-card-border p-6"
       >
         <EnglishText as="p" className="text-lg font-medium">
@@ -82,7 +84,8 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
         </EnglishText>
 
         <div className="mt-5 flex flex-col gap-2">
-          {item.options.map((option, i) => {
+          {optionOrder(item.options.length, item.promptWithBlank).map((i) => {
+            const option = item.options[i];
             const isSelected = selected === i;
             const isCorrectOption = i === item.correctOptionIndex;
             const showState = selected !== null && (isSelected || isCorrectOption);
@@ -90,6 +93,7 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
             return (
               <button
                 key={option}
+                dir={/[֐-׿]/.test(option) ? "rtl" : "ltr"}
                 onClick={() => choose(i)}
                 disabled={selected !== null}
                 className={`flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg border text-start transition-colors ${
@@ -123,7 +127,7 @@ export default function PatternDrillRunner({ definition, drill }: PatternDrillRu
 
 function IconCircle() {
   return (
-    <div className="inline-flex w-16 h-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+    <div className="inline-flex w-16 h-16 items-center justify-center rounded-full bg-primary/10 text-primary-hover">
       <PartyPopper size={28} />
     </div>
   );

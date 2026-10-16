@@ -5,7 +5,7 @@ import { BAGRUT_MODULE_FORMATS, modulesForUnits, type BagrutModuleCode, type Bag
 import BagrutCredit from "@/components/BagrutCredit";
 
 export const metadata: Metadata = {
-  title: "לקראת בחינת הבגרות — Saylo",
+  title: "לקראת בחינת הבגרות | Saylo",
 };
 
 const TRACKS: BagrutStudyUnits[] = [3, 4, 5];

@@ -15,6 +15,7 @@ import IconBadge from "@/components/IconBadge";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 interface SpeakingTestProps {
   steps: SpeakingTestStep[];
 }
@@ -221,7 +222,7 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
     return (
       <div className="max-w-xl mx-auto px-4 py-12 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">מבחן הדיבור הושלם!</h1>
+        <h1 className="text-2xl font-bold">סיימתם את מבחן הדיבור</h1>
         <p className="mt-2 text-muted">
           <EnglishText as="span" className="font-bold">
             {correctCount}/{outcomes.length}
@@ -316,16 +317,16 @@ export default function SpeakingTest({ steps }: SpeakingTestProps) {
           <motion.div
             className="h-full bg-accent"
             animate={{ width: `${(stepIndex / steps.length) * 100}%` }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.3, ease: EASE_OUT }}
           />
         </div>
 
         <AnimatePresence mode="wait">
           <motion.div
             key={stepIndex}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.3, ease: EASE_OUT }}
             className="bg-card border border-card-border rounded-lg p-6 sm:p-8 text-center"
           >
             {step.type === "vocab" ? (

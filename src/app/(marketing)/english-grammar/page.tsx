@@ -18,7 +18,7 @@ const DESCRIPTION =
   "הסברים בעברית לכל נושאי הדקדוק באנגלית, מ-A1 עד C2: מבנה, דוגמאות, טבלאות השוואה והטעויות הנפוצות של דוברי עברית.";
 
 export const metadata: Metadata = {
-  title: "דקדוק באנגלית: הסברים בעברית לפי רמה — Saylo",
+  title: "דקדוק באנגלית: הסברים בעברית לפי רמה | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-grammar" },
   openGraph: pageOpenGraph("דקדוק באנגלית: הסברים בעברית לפי רמה", DESCRIPTION, "/english-grammar"),
@@ -73,7 +73,7 @@ export default async function EnglishGrammarIndex() {
 
         <section className="mt-14 rounded-lg bg-primary px-6 py-7 text-primary-ink">
           <h2 className="text-2xl font-black">לא בטוחים מאיפה להתחיל?</h2>
-          <p className="mt-1 text-primary-ink/80">מבחן רמה של כ-10 דקות, ואחריו תוכנית יומית עם הנושאים שמתאימים לרמה שלכם.</p>
+          <p className="mt-1 text-primary-ink/90">מבחן רמה של כ-10 דקות, ואחריו תוכנית יומית עם הנושאים שמתאימים לרמה שלכם.</p>
           <PracticeLink signedInHref="/grammar" signedInLabel="לנושאי הדקדוק באפליקציה" className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold">
             למבחן הרמה, חינם
           </PracticeLink>

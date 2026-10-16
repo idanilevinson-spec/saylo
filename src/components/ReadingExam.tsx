@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Timer, ChevronDown, ChevronUp, Sparkles, CheckCircle2, XCircle } from "lucide-react";
+import { Timer, ChevronDown, ChevronUp, MessageSquareText, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { useAiConsent } from "@/components/AiConsentGate";
 import { startAttempt } from "@/lib/exercises/recordAttempt";
@@ -19,6 +19,7 @@ import type { VocabularyLookupEntry } from "@/lib/content/vocabulary";
 import type { Exercise, ReadingText, ReadingOpenQuestion, CefrLevel } from "@/types/database";
 import type { McqResponse } from "@/types/exercises";
 
+import { EASE_OUT } from "@/lib/motion/easing";
 // Timed portion only (the initial read stays untimed) — sized for a full
 // 7-MCQ + 3-open-question exam on a genuinely multi-paragraph passage,
 // not the old quick 2-question check.
@@ -283,12 +284,12 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
 
         <div className="mt-6 bg-accent/5 border border-accent/25 rounded-lg p-6 text-right">
           <p className="font-bold flex items-center gap-1.5 text-accent-hover">
-            <Sparkles size={16} /> סיכום כללי מה-AI
+            <MessageSquareText size={16} aria-hidden="true" /> סיכום מהמורה
           </p>
           {summaryLoading ? (
             <p className="mt-2 text-sm text-muted">מכינים סיכום...</p>
           ) : (
-            <p className="mt-2 leading-relaxed">{summary ?? "כל הכבוד על סיום המבחן!"}</p>
+            <p className="mt-2 leading-relaxed">{summary ?? "המבחן הסתיים. כדאי לחזור לשאלות שהיו קשות."}</p>
           )}
         </div>
 
@@ -346,7 +347,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.25, ease: EASE_OUT }}
               className="overflow-hidden"
             >
               <div className="mt-3 bg-background-2 border border-card-border rounded-lg p-5 sm:p-6 max-h-72 overflow-y-auto">
@@ -358,9 +359,9 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
 
         <motion.div
           key={stepIndex}
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, ease: EASE_OUT }}
           className="relative overflow-hidden mt-4 bg-card border border-card-border rounded-lg p-5 sm:p-7"
         >
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />

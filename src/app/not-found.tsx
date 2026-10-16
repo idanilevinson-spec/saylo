@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import NotFoundRestore from "@/components/NotFoundRestore";
+
+const NOT_FOUND_TITLE = "הדף לא נמצא | Saylo";
 
 export const metadata: Metadata = {
-  title: "הדף לא נמצא — Saylo",
+  title: NOT_FOUND_TITLE,
   robots: { index: false },
 };
 
@@ -18,6 +21,7 @@ const PLACES: { href: string; label: string }[] = [
 export default function NotFound() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-16 sm:py-24">
+      <NotFoundRestore title={NOT_FOUND_TITLE} />
       <p className="chyron text-7xl sm:text-8xl leading-none text-primary">
         404
       </p>

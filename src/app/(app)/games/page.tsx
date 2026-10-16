@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Zap,
   PenTool,
-  Sparkles,
+  CalendarCheck,
   BookOpenCheck,
   Link2,
   Hand,
@@ -211,8 +211,8 @@ export default function GamesHubPage() {
       >
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <span className="inline-flex w-12 h-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Sparkles size={22} aria-hidden="true" />
+          <span className="inline-flex w-12 h-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary-hover">
+            <CalendarCheck size={22} aria-hidden="true" />
           </span>
           <div className="flex-1 min-w-0">
             <h2 id="daily-title" className="text-lg font-bold">

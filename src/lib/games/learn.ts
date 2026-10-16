@@ -1,6 +1,8 @@
 import { supabase } from "@/lib/supabase/browserClient";
 import { fetchAll } from "@/lib/supabase/fetchAll";
 import { shuffle } from "@/lib/utils/shuffle";
+import { newWordsAtLevel } from "@/lib/srs/newWords";
+import { learnerVocabLevel } from "./learnerVocabLevel";
 
 // Mastery is derived entirely from srs_items.repetitions (SM-2, see
 // src/lib/srs/sm2.ts) rather than a new parallel field — it already
@@ -65,11 +67,21 @@ export function buildLearnQuestion(item: LearnItem, pool: LearnItem[]): LearnQue
 // backing MCQ exercises row, since Learn Mode generates its own
 // questions client-side and every published word is eligible.
 export async function getLearnPool(profileId: string, topicId?: string, limit = 12): Promise<LearnItem[]> {
-  let itemsQuery = supabase.from("vocabulary_items").select("id, headword, translation_he, example_en, ipa, part_of_speech")
-    .eq("status", "published");
-  if (topicId) itemsQuery = itemsQuery.eq("topic_id", topicId);
-  const { data: candidates } = await itemsQuery.order("sort_order").limit(500);
-  const pool = candidates ?? [];
+  // Every published word (paged: there are more than the API's 1000-row
+  // page would allow one day, and a plain .limit(500) already cut off the
+  // C-level words at the end of the sort order).
+  const [{ data: candidates }, level] = await Promise.all([
+    fetchAll((from, to) => {
+      let q = supabase
+        .from("vocabulary_items")
+        .select("id, headword, translation_he, example_en, ipa, part_of_speech, cefr_level")
+        .eq("status", "published");
+      if (topicId) q = q.eq("topic_id", topicId);
+      return q.order("sort_order").order("id").range(from, to);
+    }),
+    topicId ? Promise.resolve(null) : learnerVocabLevel(profileId),
+  ]);
+  const pool = candidates;
   if (pool.length === 0) return [];
 
   const poolIds = pool.map((p) => p.id);
@@ -96,7 +108,11 @@ export async function getLearnPool(profileId: string, topicId?: string, limit = 
   const neverReviewed = pool.filter((p) => !srsByItem.has(p.id));
 
   const dueIds = new Set(due.map((p) => p.id));
-  const selected = [...due, ...shuffle(neverReviewed.filter((p) => !dueIds.has(p.id)))].slice(0, limit);
+  // New words: within a chosen topic any of them; otherwise the learner's
+  // level first (and one below), shuffled so each round differs.
+  const fresh = shuffle(neverReviewed.filter((p) => !dueIds.has(p.id)));
+  const freshIds = new Set(newWordsAtLevel(fresh, level, Math.max(0, limit - due.length)));
+  const selected = [...due, ...fresh.filter((p) => freshIds.has(p.id))].slice(0, limit);
 
   return shuffle(
     selected.map((item) => ({

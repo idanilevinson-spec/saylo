@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = `אוצר מילים באנגלית בנושא ${topic.name_he} (רמה ${topic.cefr_level}): ${sample} ועוד, כל מילה עם תרגום, הגייה ומשפט לדוגמה.`;
   const path = `/english-vocabulary/${topic.slug}`;
   return {
-    title: `${title} — Saylo`,
+    title: `${title} | Saylo`,
     description,
     alternates: { canonical: path },
     openGraph: pageOpenGraph(title, description, path),
@@ -92,7 +92,7 @@ export default async function EnglishVocabularyTopic({ params }: { params: Promi
         <section className="mt-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg bg-primary px-6 py-5 text-primary-ink">
           <div>
             <h2 className="text-lg font-black">לתרגל את המילים האלה</h2>
-            <p className="text-sm text-primary-ink/80">
+            <p className="text-sm text-primary-ink/90">
               באפליקציה: תרגיל לכל מילה, חזרה במרווחים כדי שהמילים יישארו, ובדיקת הגייה של המשפטים.
             </p>
           </div>

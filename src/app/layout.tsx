@@ -10,7 +10,10 @@ import OfflineBanner from "@/components/OfflineBanner";
 import PageTransition from "@/components/PageTransition";
 import AccessibilityProvider from "@/components/AccessibilityProvider";
 import CookieNotice from "@/components/CookieNotice";
-import SupportChat from "@/components/support/SupportChat";
+import AppIntro from "@/components/AppIntro";
+import { appIntroScript } from "@/lib/intro/appIntroScript";
+import SupportChat from "@/components/support/SupportChatLazy";
+import SiteAnalytics from "@/components/SiteAnalytics";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -97,8 +100,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script id="no-flash-cookie" strategy="beforeInteractive">
           {noFlashCookieScript}
         </Script>
+        {/* A plain inline script, not next/script: beforeInteractive scripts
+            run from Next's bootstrap, after first paint, which would show the
+            page for a beat before the intro covers it. */}
+        <script id="app-intro" dangerouslySetInnerHTML={{ __html: appIntroScript }} />
       </head>
       <body className="min-h-full flex flex-col">
+        <AppIntro />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:right-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary focus:text-primary-ink focus:font-medium"
@@ -111,13 +119,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AccessibilityProvider>
           <AuthProvider>
             <Navbar />
-            <main id="main-content" tabIndex={-1} className="flex-1 pb-16 sm:pb-0 focus:outline-none">
+            <main id="main-content" tabIndex={-1} className="flex-1 pb-20 sm:pb-28 focus:outline-none">
               <PageTransition>{children}</PageTransition>
             </main>
             <SupportChat />
           </AuthProvider>
           <CookieNotice />
         </AccessibilityProvider>
+        <SiteAnalytics />
       </body>
     </html>
   );

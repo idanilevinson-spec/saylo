@@ -16,7 +16,7 @@ const DESCRIPTION =
   "ביטויים ופעלים מורכבים באנגלית ופירושם בעברית, מ-A1 עד C2: piece of cake, break the ice, the elephant in the room ועוד, כל אחד עם משפט לדוגמה.";
 
 export const metadata: Metadata = {
-  title: "ביטויים באנגלית ופירושם בעברית, לפי רמה — Saylo",
+  title: "ביטויים באנגלית ופירושם בעברית, לפי רמה | Saylo",
   description: DESCRIPTION,
   alternates: { canonical: "/english-idioms" },
   openGraph: pageOpenGraph(
@@ -119,7 +119,7 @@ export default async function EnglishIdiomsPage() {
 
         <section className="mt-14 rounded-lg bg-primary px-6 py-7 text-primary-ink">
           <h2 className="text-2xl font-black">לזכור אותם, לא רק לקרוא</h2>
-          <p className="mt-1 text-primary-ink/80">
+          <p className="mt-1 text-primary-ink/90">
             באפליקציה יש תרגול לכל הביטויים, לפי הרמה שלכם.
           </p>
           <PracticeLink signedInHref="/idioms/practice" signedInLabel="לתרגול הביטויים"

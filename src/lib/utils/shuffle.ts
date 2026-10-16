@@ -28,6 +28,17 @@ export function seededShuffle<T>(arr: T[], seed: string): T[] {
   return a;
 }
 
+// The order to show a question's options in, as original indexes. Seeded
+// by the question (and test) so it is the same on the server and in the
+// browser and doesn't jump on a re-render, but differs from question to
+// question: the right answer no longer sits in the same place every time.
+export function optionOrder(count: number, seed: string): number[] {
+  return seededShuffle(
+    Array.from({ length: count }, (_, i) => i),
+    seed,
+  );
+}
+
 // A seed that changes once per calendar day (UTC), for use with seededShuffle
 // on content the user might repeat within a single practice session.
 export function dailySeed(...parts: string[]): string {

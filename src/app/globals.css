@@ -32,8 +32,10 @@
   --accent-hover: #006663;
   --accent-ink: #f0fdfa;
   --success: #0f7a37;
+  --success-hover: #0b6630;
   --success-ink: #f0fdf4;
   --danger: #c81e1e;
+  --danger-hover: #a51616;
   --danger-ink: #fef2f2;
   --muted: #6e6656;
   /* Form-field outlines: --card-border is a decorative hairline (~1.3:1),
@@ -59,8 +61,10 @@
     --accent-hover: #5ee6e1;
     --accent-ink: #042e2c;
     --success: #4ade80;
+    --success-hover: #86efac;
     --success-ink: #052e13;
     --danger: #f87171;
+    --danger-hover: #fca5a5;
     --danger-ink: #450a0a;
     --muted: #a39c8c;
     --field-border: #6f7280;
@@ -80,8 +84,10 @@
   --accent-hover: #5ee6e1;
   --accent-ink: #042e2c;
   --success: #4ade80;
+  --success-hover: #86efac;
   --success-ink: #052e13;
   --danger: #f87171;
+  --danger-hover: #fca5a5;
   --danger-ink: #450a0a;
   --muted: #a39c8c;
   --field-border: #6f7280;
@@ -101,6 +107,20 @@
   --accent-soft: color-mix(in srgb, var(--accent) 45%, var(--background));
 }
 
+/* Motion tokens. Tailwind's stock curves are too soft to read as intent;
+   these replace them, so every `transition`, `ease-out` and `ease-in-out`
+   utility across the site picks them up without touching a class.
+   ease-out: arrivals and feedback (fast start, long settle).
+   ease-in-out: something already on screen moving to a new place.
+   ease-drawer: sheets and panels sliding in from an edge. */
+@theme {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-background-2: var(--background-2);
@@ -116,8 +136,10 @@
   --color-accent-ink: var(--accent-ink);
   --color-accent-soft: var(--accent-soft);
   --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
   --color-success-ink: var(--success-ink);
   --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
   --color-danger-ink: var(--danger-ink);
   --color-muted: var(--muted);
   --font-sans: var(--font-rubik);
@@ -280,7 +302,7 @@ textarea::placeholder {
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -288,7 +310,7 @@ textarea::placeholder {
   }
 }
 .animate-fade-up {
-  animation: fade-up 0.5s ease-out both;
+  animation: fade-up 0.3s var(--ease-out) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up {
@@ -316,6 +338,81 @@ textarea::placeholder {
 @media (prefers-reduced-motion: reduce) {
   .rise-in {
     animation: none;
+  }
+}
+
+/* Floating panels opened from the corner launchers (help chat,
+   accessibility). They grow out of the corner their button sits in (bottom,
+   inline-end, which is the left in this RTL layout) instead of appearing
+   from nowhere. Entry only, through @starting-style: closing is instant,
+   which is what a dismissal should feel like. Browsers without
+   @starting-style just show the panel, as before. */
+.launch-panel {
+  transform-origin: bottom left;
+  transition:
+    opacity 200ms var(--ease-out),
+    scale 200ms var(--ease-out),
+    translate 200ms var(--ease-out);
+}
+@starting-style {
+  .launch-panel {
+    opacity: 0;
+    scale: 0.96;
+    translate: 0 8px;
+  }
+}
+/* On a phone the help chat is a full-screen sheet: it rises instead. */
+@media (max-width: 639.98px) {
+  .launch-panel-sheet {
+    transition:
+      opacity 180ms var(--ease-out),
+      translate 320ms var(--ease-drawer);
+  }
+  @starting-style {
+    .launch-panel-sheet {
+      opacity: 0;
+      scale: 1;
+      translate: 0 32px;
+    }
+  }
+}
+/* A launcher's icon swapping (help ↔ close) dissolves into place rather
+   than snapping: the remounted icon starts small and soft. */
+.icon-swap {
+  transition:
+    opacity 160ms var(--ease-out),
+    scale 160ms var(--ease-out),
+    filter 160ms var(--ease-out);
+}
+@starting-style {
+  .icon-swap {
+    opacity: 0;
+    scale: 0.6;
+    filter: blur(2px);
+  }
+}
+/* The storage notice arrives a beat after the page, so it never competes
+   with the first thing a visitor reads. */
+.notice-rise {
+  transition:
+    opacity 320ms var(--ease-out) 500ms,
+    translate 420ms var(--ease-out) 500ms;
+}
+@starting-style {
+  .notice-rise {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .launch-panel,
+  .launch-panel-sheet,
+  .notice-rise {
+    translate: none;
+    scale: none;
+  }
+  .icon-swap {
+    transition: opacity 160ms var(--ease-out);
   }
 }
 
@@ -449,8 +546,10 @@ textarea::placeholder {
   --accent-hover: #004d4d !important;
   --accent-ink: #ffffff !important;
   --success: #006600 !important;
+  --success-hover: #006600 !important;
   --success-ink: #ffffff !important;
   --danger: #cc0000 !important;
+  --danger-hover: #cc0000 !important;
   --danger-ink: #ffffff !important;
   --field-border: #000000 !important;
 }
@@ -619,4 +718,288 @@ textarea::placeholder {
 }
 :root[data-a11y-motion="reduced"] .working-sweep {
   animation: none;
+}
+
+/* App launch intro (AppIntro.tsx). Positions are the logo's own layout,
+   measured on the 1254px source in a 780 x 702 box from (238, 262), so the
+   pieces land exactly where the logo has them. Timeline:
+   0.26s bubble arrives · 0.58s dots type · 1.02s "sayl" writes in ·
+   1.26s "o" turns into place · 1.42s tagline · 2.56s blue cue line ·
+   2.95s or later the plate fades to the page while the logo grows a touch:
+   AppIntro sets data-intro="exit" once the page has loaded and the phone is
+   drawing frames on time (by 6s at most); the 7s fade here is only for when
+   that script never runs.
+   A fade, not a lift: on the owner's iPhone a full-screen lift kept catching
+   (part of the page showing at the bottom, then a jump) through four rounds
+   of fixes, while it ran smoothly on a desktop. A fade has no edge to catch,
+   and a late frame in it is invisible.
+   The logo's times count from the moment the screen holds still, not from
+   launch: on iPhone the web view drops by the status-bar inset just after
+   its first frames, and the logo must not be on screen for that (a fixed
+   0.26s wait was not always enough on a cold launch). See
+   data-intro-settled below; the 0.26s is now a short beat after it. */
+.app-intro {
+  display: none;
+}
+:root[data-intro] .app-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: var(--background);
+  animation: intro-fallback 450ms var(--ease-in-out) 7000ms both;
+  /* Composited from the first frame, not promoted when the exit starts:
+     on iPhone that late promotion painted fixed page elements over the
+     plate for a frame and left the sticky (backdrop-blur) navbar undrawn
+     until the plate was gone, so it popped in at the end. */
+  will-change: transform, opacity;
+}
+/* The page itself is held back for the first 0.8s of the intro. In the
+   owner's screen recordings the iPhone drew the bottom of the page (a card
+   edge and the accessibility button) over the plate for the first two frames
+   after launch, before the web view had settled; making the plate bigger did
+   not help, because the page was drawn above it, not peeking out from under
+   it. Nothing on the page is drawn until 0.8s, well inside the plate's opaque
+   stretch, and the page is fully painted long before the exit. A skip shows
+   it at once. No direct child of <body> has an animation of its own. */
+:root[data-intro] body > :not(.app-intro) {
+  animation: intro-page-hold 1ms linear 800ms both;
+}
+:root[data-intro="skip"] body > :not(.app-intro) {
+  animation: none;
+}
+/* Gone: AppIntro sets this a beat after the exit (see the note there). */
+:root[data-intro="done"] .app-intro {
+  display: none;
+}
+/* The navbar's backdrop blur stays off for as long as the intro is on the
+   page or has been: on iPhone a backdrop layer under the plate was not drawn
+   until the plate went, so the navbar popped in two frames late. Never
+   switching it back on means nothing has to redraw. Without the blur the
+   90% bar let the page show through as it scrolled under (the level card
+   and section titles were readable behind the logo), so the bar is fully
+   opaque while the blur is off. */
+:root[data-intro] [data-navbar] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background-color: var(--background);
+}
+:root[data-intro="exit"] .app-intro {
+  animation: intro-exit 450ms var(--ease-in-out) both;
+  pointer-events: none;
+}
+:root[data-intro="exit"] .app-intro__lockup {
+  /* Gone before the plate is: the logo never shows through the page. */
+  animation: intro-lockup-out 300ms var(--ease-out) both;
+}
+:root[data-intro="skip"] .app-intro {
+  animation: intro-skip 200ms var(--ease-out) both;
+  pointer-events: none;
+}
+/* Overhang. For the first frames after launch the iOS web view has not
+   settled its viewport (status-bar inset, height), and a plate sized exactly
+   to it left a strip of the page showing at the bottom. This extends the
+   plate well past both edges. */
+.app-intro::before {
+  content: "";
+  position: absolute;
+  inset: -25vh 0;
+  z-index: -1;
+  background: var(--background);
+}
+/* The plate's edge, as on every plate in the site: here it runs along the
+   bottom from the reading start, the cue that the page is ready. */
+.app-intro::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 6px;
+  background: var(--primary);
+  transform-origin: right;
+  animation: intro-cue 380ms var(--ease-in-out) 2560ms both;
+}
+.app-intro__lockup {
+  position: relative;
+  width: min(60vw, 260px);
+  aspect-ratio: 780 / 702;
+  margin-bottom: 6vh;
+}
+/* On a laptop or desktop screen the logo takes the stage: up to 420px wide,
+   held to the height of the window. The pieces are cut at 780px across, so
+   that is still sharp on a 2x display. */
+@media (min-width: 768px) {
+  .app-intro__lockup {
+    width: min(34vw, 46vh, 420px);
+  }
+}
+.app-intro__lockup > span {
+  position: absolute;
+  display: block;
+}
+/* The logo holds (its pieces paused before their first frame, so nothing of
+   it shows) until the screen stops moving: appIntroScript sets
+   data-intro-settled once the window's geometry has held still for 150ms.
+   On iPhone the web view drops by the status bar's height just after its
+   first frames, and a logo already on screen jumped down with it. Every
+   piece's own delay then counts from this moment. */
+:root[data-intro]:not([data-intro-settled]) .app-intro__lockup > span {
+  animation-play-state: paused;
+}
+.app-intro__mark {
+  left: 24.87%;
+  top: 0;
+  width: 50.51%;
+  height: 54.42%;
+  background: url("/intro/mark.png") center / 100% 100% no-repeat;
+  animation: intro-mark 520ms var(--ease-out) 260ms both;
+}
+.app-intro__dot {
+  top: 29.56%;
+  width: 3.21%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--foreground);
+  animation: intro-dot 900ms var(--ease-out) 580ms both;
+}
+.app-intro__dot:nth-of-type(2) {
+  left: 44.04%;
+}
+.app-intro__dot:nth-of-type(3) {
+  left: 50.38%;
+  animation-delay: 670ms;
+}
+.app-intro__dot:nth-of-type(4) {
+  left: 56.79%;
+  animation-delay: 760ms;
+}
+.app-intro__sayl,
+.app-intro__o {
+  top: 51.85%;
+  height: 38.75%;
+}
+.app-intro__sayl {
+  left: 0;
+  width: 76.54%;
+  background: var(--foreground);
+  mask: url("/intro/sayl.png") center / 100% 100% no-repeat;
+  animation: intro-write 560ms var(--ease-out) 1020ms both;
+}
+.app-intro__o {
+  left: 76.54%;
+  width: 23.46%;
+  background: url("/intro/o.png") center / 100% 100% no-repeat;
+  transform-origin: 50% 52%;
+  animation: intro-turn 620ms var(--ease-out) 1260ms both;
+}
+.app-intro__tagline {
+  left: 9.74%;
+  top: 93.73%;
+  width: 81.79%;
+  height: 5.98%;
+  background: var(--muted);
+  mask: url("/intro/tagline.png") center / 100% 100% no-repeat;
+  animation: intro-tagline 420ms var(--ease-out) 1420ms both;
+}
+/* The bubble arrives where it will stay: a fade and a small growth from its
+   own centre, no rise. It used to start 6% lower and lift into place, and on
+   the owner's iPhone that read as the logo appearing low and correcting
+   itself, the very thing the settle wait exists to prevent. */
+@keyframes intro-mark {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+/* Arrive, then one typing wave: each dot lifts in turn, like a message
+   being written. */
+@keyframes intro-dot {
+  0% {
+    transform: scale(0);
+  }
+  30% {
+    transform: scale(1);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  66% {
+    transform: translateY(-70%);
+  }
+  84%,
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes intro-write {
+  from {
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-3%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+@keyframes intro-turn {
+  from {
+    opacity: 0;
+    transform: rotate(-140deg) scale(0.85);
+  }
+}
+/* The tagline fades in on its line, for the same reason as the bubble. */
+@keyframes intro-tagline {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes intro-cue {
+  from {
+    transform: scaleX(0);
+  }
+}
+/* Opacity and transform only in the exit and skip keyframes: iOS hands such
+   an animation to the compositor, where it stays smooth while the page is
+   still busy underneath (a `visibility` step kept it on the main thread).
+   Taps pass through from the moment either starts. The fallback is the one
+   place visibility steps in: it runs only without the script, and then
+   nothing else would ever stop the transparent plate catching taps. */
+@keyframes intro-fallback {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes intro-page-hold {
+  from {
+    visibility: hidden;
+  }
+  to {
+    visibility: visible;
+  }
+}
+@keyframes intro-exit {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes intro-lockup-out {
+  to {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+@keyframes intro-skip {
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-intro] .app-intro {
+    display: none;
+  }
+}
+:root[data-a11y-motion="reduced"][data-intro] .app-intro {
+  display: none;
 }
