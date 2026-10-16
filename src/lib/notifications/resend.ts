@@ -66,7 +66,7 @@ export async function sendStreakReminderEmail(to: string, displayName: string): 
   const { error } = await resend.emails.send({
     from: "Saylo <reminders@saylolearn.com>",
     to,
-    subject: "אל תשברו את הרצף שלכם היום",
+    subject: "הרצף שלכם מחכה להיום",
     html: `
       <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
         <h1 style="color: #0066d6;">היי ${escapeHtml(displayName)},</h1>
