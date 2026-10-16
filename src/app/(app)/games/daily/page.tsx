@@ -244,7 +244,7 @@ function DailyChallengePage({ onReplay }: { onReplay: () => void }) {
                   onChange={(e) => setInput(e.target.value)}
                   disabled={locked}
                   maxLength={item.headword.length + 4}
-                  placeholder="Type the whole word"
+                  placeholder="הקלידו את כל המילה"
                   className="flex-1 min-w-0 min-h-12 px-4 rounded-lg border border-card-border bg-background text-center font-content text-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70 placeholder:text-muted"
                 />
                 <SpeakButton text={item.headword} label="רמז קולי: השמעת המילה" />
