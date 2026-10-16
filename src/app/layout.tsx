@@ -13,6 +13,7 @@ import CookieNotice from "@/components/CookieNotice";
 import AppIntro from "@/components/AppIntro";
 import { appIntroScript } from "@/lib/intro/appIntroScript";
 import SupportChat from "@/components/support/SupportChatLazy";
+import SiteAnalytics from "@/components/SiteAnalytics";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -125,6 +126,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </AuthProvider>
           <CookieNotice />
         </AccessibilityProvider>
+        <SiteAnalytics />
       </body>
     </html>
   );
