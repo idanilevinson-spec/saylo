@@ -11,11 +11,12 @@ function run({
   reload = false,
   reducedMotion = false,
   stopAnimations = false,
+  referrer = "",
 } = {}) {
   const attrs: Record<string, string> = {};
   const session: Record<string, string> = seen ? { "saylo-intro-seen": "1" } : {};
   const local: Record<string, string> = stopAnimations ? { "saylo-a11y-prefs": JSON.stringify({ stopAnimations: true }) } : {};
-  const document = { documentElement: { setAttribute: (k: string, v: string) => (attrs[k] = v) } };
+  const document = { referrer, documentElement: { setAttribute: (k: string, v: string) => (attrs[k] = v) } };
   const location = { pathname: path, search };
   const navigator = { userAgent: ua };
   const sessionStorage = { getItem: (k: string) => session[k] ?? null, setItem: (k: string, v: string) => (session[k] = v) };
@@ -69,8 +70,36 @@ describe("appIntroScript", () => {
     expect(run({ stopAnimations: true }).plays).toBe(false);
   });
 
+  it("skips visitors from an ad or a social post, and marks the visit seen", () => {
+    for (const search of ["?utm_source=tiktok&utm_medium=paid", "?fbclid=IwZX", "?ttclid=E.C.P", "?gclid=Cj0K", "?ref=1&utm_campaign=promote_oct"]) {
+      const r = run({ search });
+      expect(r.plays, search).toBe(false);
+      expect(r.session["saylo-intro-seen"], search).toBe("1");
+    }
+    for (const referrer of ["https://www.tiktok.com/", "https://l.instagram.com/?u=x", "https://lm.facebook.com/l.php", "https://m.facebook.com/", "https://fb.me/abc"]) {
+      expect(run({ referrer }).plays, referrer).toBe(false);
+    }
+    for (const ua of [
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 musical_ly_36.0 BytedanceWebview/d8a21c6",
+      "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/128.0 Mobile Safari/537.36 trill_360 BytedanceWebview",
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Instagram 350.0.0",
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 [FBAN/FBIOS;FBAV/480.0]",
+    ]) {
+      expect(run({ ua }).plays, ua).toBe(false);
+    }
+  });
+
+  it("still plays for other arrivals, look-alike hosts and unrelated query params", () => {
+    expect(run({ referrer: "https://www.google.com/" }).plays).toBe(true);
+    expect(run({ referrer: "https://nottiktok.com/" }).plays).toBe(true);
+    expect(run({ referrer: "https://www.saylolearn.com/pricing" }).plays).toBe(true);
+    expect(run({ search: "?plan=yearly" }).plays).toBe(true);
+    expect(run({ search: "?xutm_source=1" }).plays).toBe(true);
+  });
+
   it("?intro=1 previews it regardless of visit, page or reload", () => {
     expect(run({ search: "?intro=1", seen: true, reload: true, path: "/admin" }).plays).toBe(true);
+    expect(run({ search: "?intro=1&utm_source=tiktok", referrer: "https://www.tiktok.com/" }).plays).toBe(true);
   });
 });
 
