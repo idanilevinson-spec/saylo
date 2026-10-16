@@ -369,7 +369,7 @@ function MatchGamePage({ onReplay }: { onReplay: () => void }) {
               >
                 <p className="flex items-center gap-2 text-xl font-bold text-accent-hover">
                   <PartyPopper size={20} className="shrink-0" aria-hidden="true" />
-                  שלב הושלם!
+                  השלב הושלם
                 </p>
               </motion.div>
             )}

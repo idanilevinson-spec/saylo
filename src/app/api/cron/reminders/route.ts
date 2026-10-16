@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 
     if (profile.push_reminders_enabled) {
       const pushPayload = {
-        title: "אל תשברו את הרצף! 🔥",
+        title: "הרצף שלכם מחכה להיום",
         body: `${streak.current_streak} ימים ברצף. 5 דקות היום, והרצף נשמר.`,
         url: "/dashboard",
       };

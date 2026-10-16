@@ -97,7 +97,7 @@ export default function IdiomsPracticePage() {
     return (
       <div className="max-w-xl mx-auto px-4 py-24 text-center">
         <IconBadge icon={Trophy} tone="accent" className="mx-auto" />
-        <h1 className="text-2xl font-bold">אתגר הניבים הושלם!</h1>
+        <h1 className="text-2xl font-bold">סיימתם את אתגר הניבים</h1>
         <GameCompletionScore>{accuracy}%</GameCompletionScore>
         <p className="mt-2 text-muted">{correctCount} מתוך {questions.length} נכונות</p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">

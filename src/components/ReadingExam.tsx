@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Timer, ChevronDown, ChevronUp, Sparkles, CheckCircle2, XCircle } from "lucide-react";
+import { Timer, ChevronDown, ChevronUp, MessageSquareText, CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { useAiConsent } from "@/components/AiConsentGate";
 import { startAttempt } from "@/lib/exercises/recordAttempt";
@@ -284,7 +284,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
 
         <div className="mt-6 bg-accent/5 border border-accent/25 rounded-lg p-6 text-right">
           <p className="font-bold flex items-center gap-1.5 text-accent-hover">
-            <Sparkles size={16} /> סיכום כללי מה-AI
+            <MessageSquareText size={16} aria-hidden="true" /> סיכום מהמורה
           </p>
           {summaryLoading ? (
             <p className="mt-2 text-sm text-muted">מכינים סיכום...</p>

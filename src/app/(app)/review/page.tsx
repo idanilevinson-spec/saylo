@@ -73,7 +73,7 @@ export default function ReviewPage() {
         <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", bounce: 0.2, delay: 0.1 }}>
           <IconBadge icon={CheckCircle2} tone="success" />
         </motion.div>
-        <h1 className="text-2xl font-bold">סיימתם את החזרה היומית!</h1>
+        <h1 className="text-2xl font-bold">סיימתם את החזרה היומית</h1>
         <Link href="/dashboard" className="mt-6 inline-block text-primary font-medium">
           ללוח הבקרה ←
         </Link>
