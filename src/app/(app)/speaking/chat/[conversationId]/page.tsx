@@ -14,6 +14,7 @@ import VoiceConversationPanel from "@/components/VoiceConversationPanel";
 import SayloAvatar from "@/components/SayloAvatar";
 import ChatMessageText from "@/components/speaking/ChatMessageText";
 import CorrectionCard from "@/components/speaking/CorrectionCard";
+import CorrectionsPractice from "@/components/speaking/CorrectionsPractice";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
@@ -147,6 +148,12 @@ function SpeakingChatInner() {
         >
           <p className="leading-relaxed">{score.feedback.generalSuggestionsHe}</p>
         </motion.div>
+
+        {/* The corrections the teacher made during the call, as a short
+            rewrite drill: the moment the fix actually sticks. */}
+        <CorrectionsPractice
+          fixes={(messages ?? []).flatMap((m) => (m.role === "assistant" && m.correction ? [m.correction] : []))}
+        />
 
         {score.feedback.grammarMistakes.length > 0 && (
           <FeedbackList title="טעויות דקדוק שכדאי לשים לב אליהן" items={score.feedback.grammarMistakes} />
