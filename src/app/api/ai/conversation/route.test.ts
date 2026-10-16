@@ -14,6 +14,7 @@ vi.mock("@/lib/subscriptions/requirePremium", () => ({ isPaidServer }));
 vi.mock("@/lib/ai/claudeClient", () => ({ anthropic: {}, CLAUDE_MODEL: "test-model", extractText: vi.fn() }));
 vi.mock("@/lib/ai/prompts/conversationPartner", () => ({ buildConversationSystemPrompt: vi.fn() }));
 vi.mock("@/lib/ai/usageLog", () => ({ logAiUsage: vi.fn() }));
+vi.mock("@/lib/ai/learnerMemory", () => ({ getLearnerMemory: vi.fn() }));
 
 import { POST } from "./route";
 

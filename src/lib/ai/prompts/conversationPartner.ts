@@ -72,7 +72,10 @@ export function buildConversationSystemPrompt(
   // which barely registers in a typed chat but breaks the "phone call" feel.
   // Text chat keeps the tool; voice mode drops both the instruction and (in
   // the route) the tool definition itself, and gets the spoken-style note.
-  allowWebSearch = true
+  allowWebSearch = true,
+  // What the teacher knows about this learner from earlier lessons
+  // (lib/ai/learnerMemory). Null for a first-time learner.
+  learnerMemory: string | null = null,
 ): string {
   const voice = !allowWebSearch;
   const parts = [
@@ -85,6 +88,7 @@ export function buildConversationSystemPrompt(
     buildHebrewBridgeNote(startingLevel),
     CORRECTION_NOTE,
     buildAdaptiveLevelNote(startingLevel),
+    learnerMemory ?? "",
     allowWebSearch ? WEB_SEARCH_NOTE : "",
     SAFETY_NOTE,
     GENDER_NEUTRAL_NOTE,

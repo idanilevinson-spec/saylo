@@ -7,6 +7,7 @@ import { isPaidServer } from "@/lib/subscriptions/requirePremium";
 import { hasParentalClearance } from "@/lib/auth/consentServer";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 import { splitConversationReply, type ConversationFix } from "@/lib/ai/conversationFix";
+import { getLearnerMemory } from "@/lib/ai/learnerMemory";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
   // The conversation is confirmed to be this user's, so the remaining reads
   // are independent of each other and share one round trip. History is read
   // before the new message is stored; the message is appended by hand below.
-  const [{ data: priorMessages }, { data: latestPlacement }] = await Promise.all([
+  const [{ data: priorMessages }, { data: latestPlacement }, memory] = await Promise.all([
     supabase
       .from("conversation_messages")
       .select("role, content")
@@ -68,6 +69,7 @@ export async function POST(request: Request) {
       .order("completed_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
+    getLearnerMemory(supabase, user.id, conversationId),
   ]);
   const history = [...(priorMessages ?? []), { role: "user", content: message }];
 
@@ -91,7 +93,7 @@ export async function POST(request: Request) {
     // search). See conversation-score route for how the truncation risk
     // was diagnosed.
     thinking: { type: "disabled" },
-    system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode),
+    system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode, memory),
     ...(voiceMode ? {} : { tools: [{ type: "web_search_20260318" as const, name: "web_search", max_uses: 2 }] }),
     messages: history.map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("assistant" as const),
