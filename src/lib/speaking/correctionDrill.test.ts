@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isCorrectRewrite } from "./CorrectionsPractice";
+import { isCorrectRewrite, sayableFix } from "@/lib/speaking/correctionDrill";
 
 const fix = { original: "I go to the beach... we eat ice cream", better: "I went to the beach... we ate ice cream", why: "" };
 
@@ -19,5 +19,12 @@ describe("isCorrectRewrite", () => {
 
   it("treats short and long forms the same", () => {
     expect(isCorrectRewrite("I do not agree", { original: "I am not agree", better: "I don't agree", why: "" })).toBe(true);
+  });
+});
+
+describe("sayableFix", () => {
+  it("turns the teacher's '...' into a sentence to say out loud", () => {
+    expect(sayableFix("I went to the beach... we ate ice cream")).toBe("I went to the beach, we ate ice cream");
+    expect(sayableFix("I'm very excited")).toBe("I'm very excited");
   });
 });
