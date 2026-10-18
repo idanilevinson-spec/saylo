@@ -36,15 +36,17 @@ export async function findLearnerWord(headword: string): Promise<string | null> 
   return data?.id ?? null;
 }
 
-// Stores the word and its review question; returns its vocabulary item id,
-// or null if it can't be stored (seed 051 not run, or a failed write).
-export async function saveLearnerWord(meaning: WordMeaning, sentence: string): Promise<string | null> {
+// Stores the word and its review question under the given id (made up
+// front, so the lookup can answer before this write finishes); returns the
+// id, or null if it can't be stored (seed 051 not run, or a failed write).
+export async function saveLearnerWord(meaning: WordMeaning, sentence: string, id: string): Promise<string | null> {
   const topic = await learnerTopicId();
   if (!topic) return null;
 
   const { data: item, error } = await supabaseAdmin
     .from("vocabulary_items")
     .insert({
+      id,
       topic_id: topic,
       headword: meaning.lemma,
       part_of_speech: meaning.pos,

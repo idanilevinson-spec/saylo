@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
 import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/ai/claudeClient";
 import {
@@ -58,6 +58,7 @@ export async function POST(request: Request) {
   const tapped = normalizeTappedWord(word);
   const catalog = await findInCatalog(tapped);
   let itemId: string | null = catalog?.id ?? null;
+  let newWordId: string | null = null;
   let meaning: WordMeaning | null = null;
 
   if (!catalog) {
@@ -74,18 +75,31 @@ export async function POST(request: Request) {
       meaning = cleanWordMeaning(parseJsonResponse(extractText(claudeMessage)));
       aiCache.set(key, meaning);
       if (aiCache.size > 3000) aiCache.delete(aiCache.keys().next().value as string);
-      await logAiUsage(supabase, user.id, "word_lookup", claudeMessage.usage.input_tokens, claudeMessage.usage.output_tokens);
+      const { input_tokens, output_tokens } = claudeMessage.usage;
+      after(() => logAiUsage(supabase, user.id, "word_lookup", input_tokens, output_tokens));
     }
     if (!meaning) return NextResponse.json({ error: "not found" }, { status: 404 });
     // Its base form in the catalog, else in the words learners already
     // added, else it joins them now, so it can always go into reviews.
-    if (meaning.lemma !== tapped) itemId = (await findInCatalog(meaning.lemma))?.id ?? null;
-    if (!itemId) itemId = await findLearnerWord(meaning.lemma);
-    if (!itemId && isStorableMeaning(meaning)) itemId = await saveLearnerWord(meaning, sentence);
+    const [lemmaInCatalog, learnerWordId] = await Promise.all([
+      meaning.lemma !== tapped ? findInCatalog(meaning.lemma) : null,
+      findLearnerWord(meaning.lemma),
+    ]);
+    itemId = lemmaInCatalog?.id ?? learnerWordId;
+    if (!itemId && isStorableMeaning(meaning)) {
+      // A new word: answer now, store it right after the response. The
+      // learner reads the card before tapping "add", and the add retries
+      // once if the word isn't written yet.
+      const id = crypto.randomUUID();
+      const toStore = meaning;
+      after(() => saveLearnerWord(toStore, sentence, id));
+      newWordId = id;
+      itemId = id;
+    }
   }
 
   let inMyWords = false;
-  if (itemId) {
+  if (itemId && itemId !== newWordId) {
     const { data: srs } = await supabase
       .from("srs_items")
       .select("id")
