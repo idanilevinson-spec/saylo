@@ -39,6 +39,13 @@ describe("buildPersonaNote", () => {
     expect(note).toMatch(/seems stuck/);
   });
 
+  it("knows a learner is preparing for the Bagrut, without claims about the exam", () => {
+    const note = buildPersonaNote({ category: null, ageBand: "teen", mood: "steady", bagrutUnits: 4 });
+    expect(note).toContain("Bagrut exam in English (4 units)");
+    expect(note).toMatch(/don't make claims about the exam itself/);
+    expect(buildPersonaNote({ category: null, ageBand: "teen", mood: "steady" })).not.toMatch(/Bagrut/);
+  });
+
   it("never uses the long dash", () => {
     for (const mood of ["stuck", "confident", "steady"] as const)
       expect(buildPersonaNote({ category: "travel", ageBand: "teen", mood })).not.toContain("—");

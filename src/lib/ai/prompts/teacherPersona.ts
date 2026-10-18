@@ -69,15 +69,21 @@ const MOOD: Record<LearnerMood, string> = {
   steady: "",
 };
 
+// What they are studying for, when they told us (placement / Bagrut area).
+const bagrutNote = (units: 3 | 4 | 5) =>
+  `The learner is preparing for the Israeli Bagrut exam in English (${units} units). When it fits naturally, choose topics a high-school student can talk about (school, friends, family, hobbies, a trip, technology, the environment) and help them practise answering in full sentences with a reason and an example: when they answer in a word or two ("Yes. Good."), now and then invite them to say it as a full answer and give the start of one ("Try a full answer: 'Yes, it was good because...'"). Don't turn the conversation into a test and don't make claims about the exam itself.`;
+
 export function buildPersonaNote(opts: {
   category: ConversationTopicCategory | null;
   ageBand: AgeBand | null;
   mood: LearnerMood;
+  bagrutUnits?: 3 | 4 | 5 | null;
 }): string {
   const parts = [
     "How to sound in this conversation (adapt your personality to the situation, the way a skilled human tutor would):",
     `- ${REGISTER[opts.category ?? "free"]}`,
     opts.ageBand ? `- ${AGE[opts.ageBand]}` : "",
+    opts.bagrutUnits ? `- ${bagrutNote(opts.bagrutUnits)}` : "",
     MOOD[opts.mood] ? `- ${MOOD[opts.mood]}` : "",
   ];
   return parts.filter(Boolean).join("\n");

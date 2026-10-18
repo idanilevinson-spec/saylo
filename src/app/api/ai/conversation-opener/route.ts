@@ -67,11 +67,12 @@ export async function POST(request: Request) {
       .limit(1)
       .maybeSingle(),
     getLearnerMemory(supabase, user.id, conversationId),
-    supabase.from("profiles").select("age_band").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("age_band, bagrut_units").eq("id", user.id).maybeSingle(),
   ]);
   const personaNote = buildPersonaNote({
     category: scenario?.category ?? null,
     ageBand: (learner?.age_band as AgeBand | undefined) ?? null,
+    bagrutUnits: (learner?.bagrut_units as 3 | 4 | 5 | null | undefined) ?? null,
     mood: "steady",
   });
 
