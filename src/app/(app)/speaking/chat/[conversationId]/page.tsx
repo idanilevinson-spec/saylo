@@ -17,6 +17,7 @@ import CorrectionCard from "@/components/speaking/CorrectionCard";
 import CorrectionsPractice from "@/components/speaking/CorrectionsPractice";
 import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
 import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
+import ConversationPhrases from "@/components/speaking/ConversationPhrases";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
@@ -233,7 +234,11 @@ function SpeakingChatInner() {
         {score.feedback.overusedWords.length > 0 && (
           <FeedbackList title="מילים שחזרו יותר מדי" items={score.feedback.overusedWords} english />
         )}
-        {score.feedback.suggestedVocabulary.length > 0 && (
+        <ConversationPhrases conversationId={conversationId} phrases={score.feedback.usefulPhrases ?? []} />
+
+        {/* Older summaries, saved before the phrases above existed, keep
+            their plain word list. */}
+        {!score.feedback.usefulPhrases?.length && score.feedback.suggestedVocabulary.length > 0 && (
           <FeedbackList title="מילים שהיה כדאי להשתמש בהן" items={score.feedback.suggestedVocabulary} english />
         )}
 

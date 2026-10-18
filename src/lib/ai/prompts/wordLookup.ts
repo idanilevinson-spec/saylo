@@ -36,7 +36,8 @@ Reply with raw JSON only, no markdown: {"lemma":"...","he":"...","pos":"noun | v
 
 const POS = new Set(["noun", "verb", "adjective", "adverb", "phrase", "name", "other"]);
 const LEVELS = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
-const ENGLISH_ENTRY = /^[a-z][a-z' -]{0,59}$/;
+// Words and expressions, including everyday ones like "can you simplify that?".
+const ENGLISH_ENTRY = /^[a-z][a-z' ,?!.-]{0,59}$/;
 
 export function cleanWordMeaning(parsed: Partial<Record<keyof WordMeaning, unknown>> | null): WordMeaning | null {
   if (!parsed || typeof parsed.lemma !== "string" || typeof parsed.he !== "string") return null;

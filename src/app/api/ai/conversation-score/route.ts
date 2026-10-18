@@ -9,8 +9,10 @@ import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import type { ConversationFeedback } from "@/types/database";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 import { recordPatternObservations } from "@/lib/patterns/recordObservations";
+import { cleanUsefulPhrases } from "@/lib/ai/prompts/usefulPhrases";
 
-interface ScoringResult extends ConversationFeedback {
+interface ScoringResult extends Omit<ConversationFeedback, "usefulPhrases"> {
+  usefulPhrases?: unknown;
   fluencyScore: number;
   grammarScore: number;
   vocabularyScore: number;
@@ -122,6 +124,7 @@ export async function POST(request: Request) {
           overusedWords: parsed.overusedWords ?? [],
           suggestedVocabulary: parsed.suggestedVocabulary ?? [],
           generalSuggestionsHe: parsed.generalSuggestionsHe ?? "",
+          usefulPhrases: cleanUsefulPhrases(parsed.usefulPhrases),
         },
       },
       { onConflict: "conversation_id" }
