@@ -54,7 +54,7 @@ export function wordAtPoint(x: number, y: number): { word: string; sentence: str
 
 type LookupState =
   | { status: "loading"; word: string }
-  | { status: "ready"; word: string; result: WordLookupResult; added: boolean; adding: boolean }
+  | { status: "ready"; word: string; result: WordLookupResult; added: boolean; adding: boolean; addFailed?: boolean }
   | { status: "error"; word: string };
 
 export function useWordLookup() {
@@ -86,11 +86,21 @@ export function useWordLookup() {
     const itemId = state.result.vocabularyItemId;
     setState({ ...state, adding: true });
     // A word already being reviewed keeps its progress: insert only.
-    const { error } = await supabase
-      .from("srs_items")
-      .upsert({ profile_id: profile.id, vocabulary_item_id: itemId }, { onConflict: "profile_id,vocabulary_item_id", ignoreDuplicates: true });
+    const add = () =>
+      supabase
+        .from("srs_items")
+        .upsert({ profile_id: profile.id, vocabulary_item_id: itemId }, { onConflict: "profile_id,vocabulary_item_id", ignoreDuplicates: true });
+    let { error } = await add();
+    // A brand-new word is stored just after its lookup answers; if the tap
+    // beat that write, give it a moment and try once more.
+    if (error) {
+      await new Promise((r) => setTimeout(r, 1500));
+      ({ error } = await add());
+    }
     setState((prev) =>
-      prev?.status === "ready" && prev.result.vocabularyItemId === itemId ? { ...prev, adding: false, added: !error } : prev,
+      prev?.status === "ready" && prev.result.vocabularyItemId === itemId
+        ? { ...prev, adding: false, added: !error, addFailed: !!error }
+        : prev,
     );
   }, [profile, state]);
 
@@ -165,6 +175,9 @@ export function WordCard({
             <Plus size={15} aria-hidden="true" /> הוספה למילים שלי לחזרה
           </button>
         ))}
+      {state.status === "ready" && state.addFailed && (
+        <p className="mt-1 text-sm text-danger">לא הצלחנו להוסיף את המילה. נסו שוב בעוד רגע.</p>
+      )}
     </div>
   );
 }

@@ -12,6 +12,15 @@ const { getUser, maybeSingle, from, isPaidServer, create, extractText, ilike, fi
   ilike: vi.fn(),
 }));
 
+// Background work runs straight away in tests, so its effects can be checked.
+const { pendingAfter } = vi.hoisted(() => ({ pendingAfter: [] as Promise<unknown>[] }));
+vi.mock("next/server", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/server")>()),
+  after: (fn: () => unknown) => {
+    pendingAfter.push(Promise.resolve(fn()));
+  },
+}));
+
 vi.mock("@/lib/supabase/serverClient", () => ({
   createClient: async () => ({ auth: { getUser }, from }),
 }));
@@ -103,10 +112,16 @@ describe("POST /api/ai/word-lookup", () => {
     extractText.mockReturnValue(
       JSON.stringify({ lemma: "pursue", he: "לעסוק ב", pos: "verb", level: "B2", distractors: ["avoid", "borrow", "repair"] }),
     );
-    saveLearnerWord.mockResolvedValue("lw1");
     const body = await (await POST(request("pursue", "I want to pursue marketing."))).json();
-    expect(saveLearnerWord).toHaveBeenCalledWith(expect.objectContaining({ lemma: "pursue", level: "B2" }), "I want to pursue marketing.");
-    expect(body).toMatchObject({ headword: "pursue", translationHe: "לעסוק ב", vocabularyItemId: "lw1" });
+    await Promise.all(pendingAfter);
+    // Answered with the id the word is then stored under, after the response.
+    expect(saveLearnerWord).toHaveBeenCalledWith(
+      expect.objectContaining({ lemma: "pursue", level: "B2" }),
+      "I want to pursue marketing.",
+      body.vocabularyItemId,
+    );
+    expect(body).toMatchObject({ headword: "pursue", translationHe: "לעסוק ב", inMyWords: false });
+    expect(body.vocabularyItemId).toMatch(/^[0-9a-f-]{36}$/);
   });
 
   it("reuses a word another learner already added", async () => {
