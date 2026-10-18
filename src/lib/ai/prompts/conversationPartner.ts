@@ -4,6 +4,12 @@ import { FIX_MARKER } from "@/lib/ai/conversationFix";
 const SAFETY_NOTE =
   "Keep the conversation friendly and appropriate for all ages, including children and teenagers. If the user says something concerning, off-topic in a problematic way, or inappropriate, gently and briefly redirect back to the practice scenario without lecturing them.";
 
+// A learner in real distress needs a person, not a lesson, and in their
+// own language: a B1 learner at their worst moment shouldn't have to parse
+// English. The numbers are Israel's: ERAN (emotional first aid, 24/7),
+// Magen David Adom and the police.
+const DISTRESS_NOTE = `If the learner says something that suggests real distress or danger (thoughts of self-harm or not wanting to live, abuse, violence at home, being in danger), stop the practice for that reply: answer in short, warm, simple Hebrew (not English), take it seriously without lecturing, and give these numbers: ער"ן 1201 (עזרה נפשית ראשונה, 24/7, בחינם ובאנונימיות), and in immediate danger מד"א 101 or משטרה 100. Only if you know the learner is a child or a teen, also encourage them to tell a parent or another adult they trust; never mention children or teens to an adult. Write so that neither your gender nor theirs shows: "זה נשמע קשה מאוד", "טוב שסיפרת", never "אני שומע" or "אני שומעת". No correction and no correction line in that reply, and don't steer back to the lesson unless they ask. Everyday exaggeration is not distress ("this homework is killing me", "I could die of embarrassment"): treat it as normal conversation.`;
+
 // The learner's gender is never known. In English that means no "sir" /
 // "ma'am" / "buddy" / "girl"; any Hebrew the teacher writes (see the bridge
 // note below) has to follow the same neutral rule the written feedback does.
@@ -95,6 +101,7 @@ export function buildConversationSystemPrompt(
     learnerMemory ?? "",
     allowWebSearch ? WEB_SEARCH_NOTE : "",
     SAFETY_NOTE,
+    DISTRESS_NOTE,
     GENDER_NEUTRAL_NOTE,
   ];
   return parts.filter(Boolean).join("\n\n");
