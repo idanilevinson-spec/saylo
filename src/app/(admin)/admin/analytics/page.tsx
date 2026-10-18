@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/browserClient";
 import { fetchAll } from "@/lib/supabase/fetchAll";
+import type { DashboardMetrics } from "@/lib/admin/dashboardMetrics";
 
 interface PlanBreakdown {
   code: string;
@@ -24,6 +25,8 @@ interface AiUsageRow {
 
 interface AnalyticsState {
   totalMrr: number;
+  payingCount: number;
+  unpricedCount: number;
   planBreakdown: PlanBreakdown[];
   activeLast7Days: number;
   totalUsers: number;
@@ -69,6 +72,7 @@ function Bar({ label, count, max }: { label: string; count: number; max: number 
 
 export default function AdminAnalyticsPage() {
   const [state, setState] = useState<AnalyticsState | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -77,26 +81,22 @@ export default function AdminAnalyticsPage() {
       const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
       const [
-        { data: activeSubs },
+        dashboardRes,
         { data: profiles },
         { data: streaks },
         { count: exerciseAttemptsLast7Days },
-        { data: attemptProfiles },
         { count: completedPlacements },
         { data: usersWithAttempts },
         { data: usersWithConversations },
         { data: aiUsageLast30Days },
         { count: aiUsageCallsLast7Days },
       ] = await Promise.all([
-        supabase.from("subscriptions").select("status, subscription_plans(code, price_ils, months)").eq("status", "active"),
+        fetch("/api/admin/metrics", { cache: "no-store" }),
         fetchAll((from, to) => supabase.from("profiles").select("id, created_at").order("id").range(from, to)),
         fetchAll((from, to) =>
           supabase.from("streaks").select("profile_id, last_active_date").order("profile_id").range(from, to),
         ),
         supabase.from("exercise_attempts").select("*", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
-        fetchAll((from, to) =>
-          supabase.from("exercise_attempts").select("profile_id").gte("created_at", sevenDaysAgo).order("id").range(from, to),
-        ),
         supabase.from("placement_tests").select("*", { count: "exact", head: true }).eq("status", "completed"),
         fetchAll((from, to) => supabase.from("exercise_attempts").select("profile_id").order("id").range(from, to)),
         fetchAll((from, to) => supabase.from("conversations").select("profile_id").order("id").range(from, to)),
@@ -111,21 +111,11 @@ export default function AdminAnalyticsPage() {
         supabase.from("ai_usage_log").select("*", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
       ]);
 
-      const planMap = new Map<string, PlanBreakdown>();
-      let totalMrr = 0;
-      (activeSubs ?? []).forEach((row) => {
-        const plan = row.subscription_plans as unknown as { code: string; price_ils: number; months: number } | null;
-        if (!plan || !plan.months) return;
-        const monthly = plan.price_ils / plan.months;
-        totalMrr += monthly;
-        const existing = planMap.get(plan.code) ?? { code: plan.code, count: 0, mrr: 0 };
-        existing.count += 1;
-        existing.mrr += monthly;
-        planMap.set(plan.code, existing);
-      });
-
-      const activeProfileIds = new Set((attemptProfiles ?? []).map((r) => r.profile_id));
-
+      if (!dashboardRes.ok) {
+        setFailed(true);
+        return;
+      }
+      const dashboard = (await dashboardRes.json()) as DashboardMetrics;
       const eligibleForRetention = (profiles ?? []).filter((p) => p.created_at < thirtyDaysAgo);
       const streakByProfile = new Map((streaks ?? []).map((s) => [s.profile_id, s.last_active_date]));
       const retainedCount = eligibleForRetention.filter((p) => {
@@ -154,14 +144,17 @@ export default function AdminAnalyticsPage() {
       );
 
       setState({
-        totalMrr: Math.round(totalMrr),
-        planBreakdown: [...planMap.values()].sort((a, b) => b.mrr - a.mrr),
-        activeLast7Days: activeProfileIds.size,
-        totalUsers: (profiles ?? []).length,
+        totalMrr: dashboard.revenue.mrr,
+        payingCount: dashboard.revenue.payingCount,
+        unpricedCount: dashboard.revenue.unpricedCount,
+        planBreakdown: dashboard.revenue.plans,
+        activeLast7Days: dashboard.activeLast7Days,
+        totalUsers: dashboard.totalUsers,
         exerciseAttemptsLast7Days: exerciseAttemptsLast7Days ?? 0,
         retainedPct: eligibleForRetention.length ? Math.round((retainedCount / eligibleForRetention.length) * 100) : 0,
         funnel: [
-          { label: "נרשמו", count: (profiles ?? []).length },
+          { label: "פתחו חשבון", count: dashboard.totalUsers + dashboard.incompleteSignups.length },
+          { label: "השלימו פרופיל", count: dashboard.totalUsers },
           { label: "השלימו מבחן רמה", count: completedPlacements ?? 0 },
           { label: "ביצעו תרגיל אחד לפחות", count: distinctAttemptUsers },
           { label: "ניסו שיחת AI", count: distinctConversationUsers },
@@ -173,6 +166,7 @@ export default function AdminAnalyticsPage() {
     load();
   }, []);
 
+  if (failed) return <p className="text-danger">לא הצלחנו לטעון את הנתונים. נסו לרענן את העמוד.</p>;
   if (!state) return <p className="text-muted">טוען...</p>;
 
   const funnelMax = state.funnel[0]?.count ?? 0;
@@ -185,11 +179,15 @@ export default function AdminAnalyticsPage() {
           <div className="bg-card border border-card-border rounded-lg p-5">
             <p className="text-sm text-muted">הכנסה חודשית משוערת (MRR)</p>
             <p className="mt-2 text-3xl font-bold">₪{state.totalMrr}</p>
+            <p className="mt-1 text-xs text-muted">
+              {state.payingCount} מנויים משלמים בתוקף
+              {state.unpricedCount > 0 && ` · ${state.unpricedCount} בלי מסלול מזוהה, לא נכללים בהכנסה`}
+            </p>
           </div>
           <div className="bg-card border border-card-border rounded-lg p-5">
             <p className="text-sm text-muted">פילוח לפי מסלול</p>
             <ul className="mt-2 space-y-1 text-sm">
-              {state.planBreakdown.length === 0 && <li className="text-muted">אין מנויים פעילים עדיין.</li>}
+              {state.planBreakdown.length === 0 && <li className="text-muted">אין מנויים משלמים בתוקף.</li>}
               {state.planBreakdown.map((p) => (
                 <li key={p.code} className="flex items-center justify-between">
                   <span>{p.code}</span>

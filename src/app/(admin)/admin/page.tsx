@@ -3,11 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/browserClient";
+import type { DashboardMetrics } from "@/lib/admin/dashboardMetrics";
 
 interface Metrics {
   totalUsers: number;
   activeSubs: number;
   mrr: number;
+  activeLast7Days: number;
+  incompleteSignups: number;
+  testAccountCount: number;
   avgStreak: number;
   publishedExercises: number;
   openReports: number;
@@ -26,35 +30,26 @@ function MetricCard({ label, value, href }: { label: string; value: string; href
 
 export default function AdminOverviewPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     async function load() {
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
       const [
-        { count: totalUsers },
-        { data: activeSubsData },
+        dashboardRes,
         { data: streaksData },
         { count: publishedExercises },
         { count: openReports },
-        { count: signupsLast7Days },
       ] = await Promise.all([
-        supabase.from("profiles").select("*", { count: "exact", head: true }),
-        supabase
-          .from("subscriptions")
-          .select("status, subscription_plans(price_ils, months)")
-          .eq("status", "active"),
+        fetch("/api/admin/metrics", { cache: "no-store" }),
         supabase.from("streaks").select("current_streak"),
         supabase.from("exercises").select("*", { count: "exact", head: true }).eq("status", "published"),
         supabase.from("content_reports").select("*", { count: "exact", head: true }).eq("status", "open"),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
       ]);
-
-      const mrr = (activeSubsData ?? []).reduce((sum, row) => {
-        const plan = row.subscription_plans as unknown as { price_ils: number; months: number } | null;
-        if (!plan || !plan.months) return sum;
-        return sum + plan.price_ils / plan.months;
-      }, 0);
+      if (!dashboardRes.ok) {
+        setFailed(true);
+        return;
+      }
+      const dashboard = (await dashboardRes.json()) as DashboardMetrics;
 
       const streaks = streaksData ?? [];
       const avgStreak = streaks.length
@@ -62,31 +57,50 @@ export default function AdminOverviewPage() {
         : 0;
 
       setMetrics({
-        totalUsers: totalUsers ?? 0,
-        activeSubs: activeSubsData?.length ?? 0,
-        mrr: Math.round(mrr),
+        totalUsers: dashboard.totalUsers,
+        activeSubs: dashboard.revenue.payingCount,
+        mrr: dashboard.revenue.mrr,
+        activeLast7Days: dashboard.activeLast7Days,
+        incompleteSignups: dashboard.incompleteSignups.length,
+        testAccountCount: dashboard.testAccountCount,
         avgStreak: Math.round(avgStreak * 10) / 10,
         publishedExercises: publishedExercises ?? 0,
         openReports: openReports ?? 0,
-        signupsLast7Days: signupsLast7Days ?? 0,
+        signupsLast7Days: dashboard.signupsLast7Days,
       });
     }
     load();
   }, []);
 
+  if (failed) {
+    return <p className="text-danger">לא הצלחנו לטעון את הנתונים. נסו לרענן את העמוד.</p>;
+  }
   if (!metrics) {
     return <p className="text-muted">טוען נתונים...</p>;
   }
 
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <MetricCard label="משתמשים רשומים" value={String(metrics.totalUsers)} href="/admin/users" />
-      <MetricCard label="הרשמות ב-7 ימים אחרונים" value={String(metrics.signupsLast7Days)} href="/admin/users" />
-      <MetricCard label="מנויים פעילים" value={String(metrics.activeSubs)} href="/admin/analytics" />
-      <MetricCard label="הכנסה חודשית משוערת" value={`₪${metrics.mrr}`} href="/admin/analytics" />
-      <MetricCard label="רצף ממוצע (ימים)" value={String(metrics.avgStreak)} href="/admin/analytics" />
-      <MetricCard label="תרגילים פורסמו" value={String(metrics.publishedExercises)} href="/admin/content/exercises" />
-      <MetricCard label="דיווחים פתוחים לבדיקה" value={String(metrics.openReports)} href="/admin/moderation" />
+    <div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <MetricCard label="משתמשים רשומים" value={String(metrics.totalUsers)} href="/admin/users" />
+        <MetricCard label="הרשמות ב-7 ימים אחרונים" value={String(metrics.signupsLast7Days)} href="/admin/users" />
+        <MetricCard
+          label="נרשמו ולא השלימו פרופיל"
+          value={String(metrics.incompleteSignups)}
+          href="/admin/users#incomplete"
+        />
+        <MetricCard label="משתמשים פעילים (7 ימים)" value={String(metrics.activeLast7Days)} href="/admin/analytics" />
+        <MetricCard label="מנויים משלמים בתוקף" value={String(metrics.activeSubs)} href="/admin/analytics" />
+        <MetricCard label="הכנסה חודשית משוערת" value={`₪${metrics.mrr}`} href="/admin/analytics" />
+        <MetricCard label="רצף ממוצע (ימים)" value={String(metrics.avgStreak)} href="/admin/analytics" />
+        <MetricCard label="תרגילים פורסמו" value={String(metrics.publishedExercises)} href="/admin/content/exercises" />
+        <MetricCard label="דיווחים פתוחים לבדיקה" value={String(metrics.openReports)} href="/admin/moderation" />
+      </div>
+      {metrics.testAccountCount > 0 && (
+        <p className="mt-4 text-xs text-muted">
+          {metrics.testAccountCount} חשבונות בדיקה לא נכללים במספרי המשתמשים, הפעילות וההכנסה.
+        </p>
+      )}
     </div>
   );
 }

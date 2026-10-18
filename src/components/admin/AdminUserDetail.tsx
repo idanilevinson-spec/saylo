@@ -5,6 +5,7 @@ import { Flame } from "lucide-react";
 import { supabase } from "@/lib/supabase/browserClient";
 import { useAuth } from "@/context/AuthProvider";
 import StatusBadge from "@/components/admin/StatusBadge";
+import { subscriptionLabel } from "@/lib/admin/metricRules";
 import type { AgeBand, GuardianLinkPublic, Profile, Streak, Subscription, UserXp } from "@/types/database";
 
 const AGE_BAND_LABELS: Record<AgeBand, string> = { child: "ילד/ה", teen: "נוער", adult: "מבוגר/ת" };
@@ -74,6 +75,25 @@ export default function AdminUserDetail({ profileId }: { profileId: string }) {
     setSaving(false);
   }
 
+  async function toggleTestAccount() {
+    if (state === null || state === "not_found" || !currentAdmin) return;
+    const nextValue = !state.profile.is_test_account;
+    setSaving(true);
+    const { error } = await supabase.from("profiles").update({ is_test_account: nextValue }).eq("id", profileId);
+    if (error) {
+      window.alert("לא הצלחנו לעדכן. ייתכן שעדיין לא הורץ SQL 048 במסד הנתונים.");
+    } else {
+      await supabase.from("admin_audit_log").insert({
+        admin_profile_id: currentAdmin.id,
+        action: nextValue ? "mark_test_account" : "unmark_test_account",
+        target_type: "profile",
+        target_id: profileId,
+      });
+      await load();
+    }
+    setSaving(false);
+  }
+
   if (state === null) return <p className="text-muted">טוען...</p>;
   if (state === "not_found") return <p className="text-muted">משתמש לא נמצא.</p>;
 
@@ -86,27 +106,43 @@ export default function AdminUserDetail({ profileId }: { profileId: string }) {
           <h2 className="text-xl font-bold">
             {profile.display_name}
             {profile.is_admin && <span className="ms-2 text-sm text-accent-hover font-bold">מנהל</span>}
+            {profile.is_test_account && <span className="ms-2 text-sm text-muted font-bold">חשבון בדיקה</span>}
           </h2>
           <p className="mt-1 text-sm text-muted">
             גיל {profile.age} · {AGE_BAND_LABELS[profile.age_band]} · נרשם/ה ב-
             {new Date(profile.created_at).toLocaleDateString("he-IL")}
           </p>
         </div>
-        <button
-          onClick={toggleAdmin}
-          disabled={saving || profile.id === currentAdmin?.id}
-          title={profile.id === currentAdmin?.id ? "לא ניתן להסיר הרשאות ניהול מעצמך" : undefined}
-          className="px-4 py-2 rounded-lg text-sm font-medium border border-card-border hover:bg-background-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {profile.is_admin ? "הסרת הרשאות ניהול" : "הענקת הרשאות ניהול"}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={toggleTestAccount}
+            disabled={saving}
+            title="חשבון בדיקה לא נספר במשתמשים, בפעילות ובהכנסה של לוח הניהול"
+            className="px-4 py-2 rounded-lg text-sm font-medium border border-card-border hover:bg-background-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {profile.is_test_account ? "להחזיר לספירה" : "סימון כחשבון בדיקה"}
+          </button>
+          <button
+            onClick={toggleAdmin}
+            disabled={saving || profile.id === currentAdmin?.id}
+            title={profile.id === currentAdmin?.id ? "לא ניתן להסיר הרשאות ניהול מעצמך" : undefined}
+            className="px-4 py-2 rounded-lg text-sm font-medium border border-card-border hover:bg-background-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {profile.is_admin ? "הסרת הרשאות ניהול" : "הענקת הרשאות ניהול"}
+          </button>
+        </div>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-4">
         <div className="bg-card border border-card-border rounded-lg p-5">
           <p className="text-sm text-muted">מנוי</p>
-          <p className="mt-2">{subscription ? <StatusBadge status={subscription.status} /> : "אין"}</p>
-          {subscription?.trial_ends_at && (
+          <p className="mt-2">{subscription ? <StatusBadge status={subscriptionLabel(subscription)} /> : "אין"}</p>
+          {subscription?.status === "active" && subscription.current_period_end && (
+            <p className="mt-2 text-xs text-muted">
+              בתוקף עד {new Date(subscription.current_period_end).toLocaleDateString("he-IL")}
+            </p>
+          )}
+          {subscription?.status === "trialing" && subscription.trial_ends_at && (
             <p className="mt-2 text-xs text-muted">
               ניסיון עד {new Date(subscription.trial_ends_at).toLocaleDateString("he-IL")}
             </p>

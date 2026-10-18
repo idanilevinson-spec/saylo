@@ -10,6 +10,9 @@ export interface Profile {
   native_language: string;
   parental_consent_status: ParentalConsentStatus;
   is_admin: boolean;
+  // Owner's own test/demo accounts, left out of the admin dashboard's
+  // counts. Optional until migration 048 has run.
+  is_test_account?: boolean;
   email_reminders_enabled: boolean;
   push_reminders_enabled: boolean;
   weekly_report_enabled: boolean;
