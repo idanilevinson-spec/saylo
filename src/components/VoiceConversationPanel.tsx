@@ -11,6 +11,7 @@ import type { SpeechRecognizer } from "microsoft-cognitiveservices-speech-sdk";
 import { isMicPermissionDeniedError } from "@/lib/speech/micPermission";
 import ChatMessageText from "@/components/speaking/ChatMessageText";
 import CorrectionCard from "@/components/speaking/CorrectionCard";
+import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
 import type { ConversationFix } from "@/lib/ai/conversationFix";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
@@ -25,6 +26,7 @@ interface VoiceConversationPanelProps {
   // captions under the teacher so a call isn't audio only.
   lastUserText?: string | null;
   lastFix?: ConversationFix | null;
+  conversationId: string;
 }
 
 const MAX_SILENT_RETRIES = 3;
@@ -44,7 +46,16 @@ const TOKEN_REUSE_MS = 4 * 60 * 1000;
 // is already live the instant playback ends — otherwise that fetch+
 // import gap after "מקשיבים לכם..." appears is enough to clip the very
 // start of what the user says.
-export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, canEnd, lastUserText, lastFix }: VoiceConversationPanelProps) {
+export default function VoiceConversationPanel({
+  onSend,
+  onExit,
+  onEnd,
+  ending,
+  canEnd,
+  lastUserText,
+  lastFix,
+  conversationId,
+}: VoiceConversationPanelProps) {
   // The call doesn't auto-start: iOS Safari/WKWebView only allows
   // audio.play() when it's traceable to a real, synchronous tap. Every
   // reply plays several async hops after the user's last tap (recognized
@@ -93,6 +104,11 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
   // which could take Israeli-accented English for Hebrew.
   const hebrewNextRef = useRef(false);
   const [hebrewTurn, setHebrewTurn] = useState(false);
+  // Ideas answer the line the teacher just said (or open the call); they
+  // clear as soon as the learner's turn is sent.
+  const ideasTurn =
+    !ending && (state === "listening" || state === "speaking" || state === "paused") ? (caption ?? (lastUserText ? null : "start")) : null;
+  const replyIdeas = useReplyIdeas(conversationId, ideasTurn);
   const [voicePref, setVoicePref] = useState<VoicePref>(() => loadVoicePref());
   const [viseme, setViseme] = useState<number | undefined>(undefined);
   const [rate, setRate] = useState(1);
@@ -606,6 +622,8 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
             <ChatMessageText text={caption} className="text-[1.05rem]" />
           </div>
         )}
+        {replyIdeas.ideas && <ReplyIdeasList ideas={replyIdeas.ideas} hint="אפשר להגיד אחד מהם בקול, או משהו משלכם" />}
+        {replyIdeas.failed && <p className="text-center text-sm text-muted">לא הצלחנו להביא רעיונות כרגע. נסו שוב.</p>}
       </div>
 
       {!ending && state === "paused" && (
@@ -642,6 +660,13 @@ export default function VoiceConversationPanel({ onSend, onExit, onEnd, ending, 
         >
           <Languages size={15} aria-hidden="true" /> לשאול בעברית
         </button>
+        <ReplyIdeasButton
+          onClick={replyIdeas.request}
+          loading={replyIdeas.loading}
+          disabled={!replyIdeas.available || !!replyIdeas.ideas}
+          compact
+          className="flex-1 px-3 py-2.5"
+        />
         <button
           type="button"
           onClick={replayLastReply}
