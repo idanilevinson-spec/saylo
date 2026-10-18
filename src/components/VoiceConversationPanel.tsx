@@ -29,6 +29,9 @@ interface VoiceConversationPanelProps {
   lastUserText?: string | null;
   lastFix?: ConversationFix | null;
   conversationId: string;
+  // The teacher's opening line, when the teacher opened the conversation
+  // and the learner hasn't spoken yet: said first when the call starts.
+  openingLine?: string | null;
 }
 
 const MAX_SILENT_RETRIES = 3;
@@ -57,6 +60,7 @@ export default function VoiceConversationPanel({
   lastUserText,
   lastFix,
   conversationId,
+  openingLine,
 }: VoiceConversationPanelProps) {
   // The call doesn't auto-start: iOS Safari/WKWebView only allows
   // audio.play() when it's traceable to a real, synchronous tap. Every
@@ -106,6 +110,11 @@ export default function VoiceConversationPanel({
   // which could take Israeli-accented English for Hebrew.
   const hebrewNextRef = useRef(false);
   const [hebrewTurn, setHebrewTurn] = useState(false);
+  const openingLineRef = useRef<string | null>(null);
+  const openingSpokenRef = useRef(false);
+  useEffect(() => {
+    openingLineRef.current = openingLine ?? null;
+  }, [openingLine]);
   // Ideas answer the line the teacher just said (or open the call); they
   // clear as soon as the learner's turn is sent.
   const ideasTurn =
@@ -421,7 +430,15 @@ export default function VoiceConversationPanel({
         });
     }
 
-    listenOnce();
+    // The call's first moment: the teacher's opening line if there is one
+    // (once per call), otherwise straight to listening.
+    const opening = openingSpokenRef.current ? null : openingLineRef.current;
+    if (opening) {
+      openingSpokenRef.current = true;
+      speakReply(opening);
+    } else {
+      listenOnce();
+    }
 
     return () => {
       cancelled = true;

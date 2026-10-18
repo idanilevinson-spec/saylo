@@ -58,6 +58,34 @@ function SpeakingChatInner() {
   // the back button) can't take new messages: show it closed, with its
   // summary when there is one, instead of an input that silently fails.
   const [closed, setClosed] = useState(false);
+  // The teacher opens an empty conversation (unless the learner arrived
+  // with a starter to send). Asked once; until it lands, a "the teacher is
+  // starting" line shows, and the learner can still type first.
+  const [openerDone, setOpenerDone] = useState(false);
+  const openerAskedRef = useRef(false);
+  const awaitingOpener =
+    messages !== null && messages.length === 0 && !closed && !searchParams.get("starter") && !openerDone;
+  useEffect(() => {
+    if (!awaitingOpener || openerAskedRef.current) return;
+    openerAskedRef.current = true;
+    fetch("/api/ai/conversation-opener", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conversationId, voiceMode: startInVoiceMode }),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then(async (data: { opener: string | null } | null) => {
+        if (!data?.opener) return;
+        const { data: rows } = await supabase
+          .from("conversation_messages")
+          .select("*")
+          .eq("conversation_id", conversationId)
+          .order("created_at");
+        if (rows) setMessages(rows);
+      })
+      .catch(() => {})
+      .finally(() => setOpenerDone(true));
+  }, [awaitingOpener, conversationId, startInVoiceMode]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   // Reply ideas belong to the teacher's latest turn (or to the empty
@@ -376,6 +404,14 @@ function SpeakingChatInner() {
             </motion.div>
           ))}
         </AnimatePresence>
+        {awaitingOpener && (
+          <div className="flex items-end justify-end gap-2" aria-live="polite">
+            <p className="px-4 py-2.5 rounded-lg bg-card border border-card-border text-sm text-muted animate-pulse">
+              {teacherGender === "female" ? "המורה מתחילה את השיחה..." : "המורה מתחיל את השיחה..."}
+            </p>
+            <SayloAvatar expression="thinking" gender={teacherGender} size={28} className="shrink-0" />
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
 
@@ -406,6 +442,7 @@ function SpeakingChatInner() {
             canEnd={hasUserMessage}
             lastUserText={lastUser?.content ?? null}
             lastFix={lastUserFix}
+            openingLine={!hasUserMessage && messages?.[0]?.role === "assistant" ? messages[0].content : null}
             conversationId={conversationId}
           />
         </div>

@@ -30,7 +30,10 @@ export function formatLearnerMemory(m: LearnerMemory): string | null {
     );
   if (m.recentFixes.length)
     lines.push(`Corrections you gave them in recent conversations: ${m.recentFixes.map((f) => `"${f.original}" → "${f.better}"`).join("; ")}.`);
-  if (m.recentTopics.length) lines.push(`What you talked about recently: ${m.recentTopics.join("; ")}.`);
+  if (m.recentTopics.length)
+    lines.push(
+      `Practice conversations you had with them recently (scenarios they chose to practise, not events in their real life): ${m.recentTopics.join("; ")}.`,
+    );
   if (m.wordsLearning.length) lines.push(`English words they are learning right now: ${m.wordsLearning.join(", ")}.`);
   if (!lines.length) return null;
   return `What you remember about this learner from earlier lessons (true facts from their history; never invent anything beyond them):

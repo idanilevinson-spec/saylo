@@ -10,6 +10,7 @@ import { splitConversationReply, type ConversationFix } from "@/lib/ai/conversat
 import { getLearnerMemory } from "@/lib/ai/learnerMemory";
 import { buildPersonaNote, detectLearnerMood } from "@/lib/ai/prompts/teacherPersona";
 import type { AgeBand, ConversationTopicCategory } from "@/types/database";
+import { withOpenerCue } from "@/lib/ai/prompts/conversationOpener";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -108,7 +109,7 @@ export async function POST(request: Request) {
     thinking: { type: "disabled" },
     system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode, memory, personaNote),
     ...(voiceMode ? {} : { tools: [{ type: "web_search_20260318" as const, name: "web_search", max_uses: 2 }] }),
-    messages: history.map((m) => ({
+    messages: withOpenerCue(history).map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("assistant" as const),
       content: m.content,
     })),
