@@ -41,9 +41,7 @@ describe("conversation prompt", () => {
 
   it("ends a call's prompt with the length limit, stricter for beginners, and leaves text chat alone", () => {
     const call = buildConversationSystemPrompt(null, "B1", false);
-    expect(call.trimEnd().split("
-
-").pop()).toMatch(/^Length on this call.*at most about 30 words/);
+    expect(call.trimEnd().split(/\n\n/).pop()).toMatch(/^Length on this call.*at most about 30 words/);
     expect(buildConversationSystemPrompt(null, "A2", false)).toMatch(/about 20 words in total/);
     expect(buildConversationSystemPrompt(null, "B1", true)).not.toMatch(/Length on this call/);
   });
