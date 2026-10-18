@@ -48,6 +48,11 @@ function SpeakingChatInner() {
   const [score, setScore] = useState<ConversationScore | null>(null);
   const [showTranscript, setShowTranscript] = useState(false);
   const [teacherGender] = useState<VoicePref>(() => loadVoicePref());
+  const [sendError, setSendError] = useState(false);
+  // A conversation that was already ended (opened again from history or
+  // the back button) can't take new messages: show it closed, with its
+  // summary when there is one, instead of an input that silently fails.
+  const [closed, setClosed] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,6 +62,23 @@ function SpeakingChatInner() {
       .eq("conversation_id", conversationId)
       .order("created_at")
       .then(({ data }) => setMessages(data ?? []));
+    supabase
+      .from("conversations")
+      .select("status")
+      .eq("id", conversationId)
+      .maybeSingle()
+      .then(async ({ data }) => {
+        if (!data || data.status === "active") return;
+        setClosed(true);
+        const { data: saved } = await supabase
+          .from("conversation_scores")
+          .select("*")
+          .eq("conversation_id", conversationId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (saved) setScore(saved as ConversationScore);
+      });
   }, [conversationId]);
 
   useEffect(() => {
@@ -67,9 +89,11 @@ function SpeakingChatInner() {
     async (text: string): Promise<string | null> => {
       if (!text.trim() || !profile) return null;
 
+      const tempId = `temp-${Date.now()}`;
+      setSendError(false);
       setMessages((prev) => [
         ...(prev ?? []),
-        { id: `temp-${Date.now()}`, conversation_id: conversationId, role: "user", content: text, created_at: new Date().toISOString() },
+        { id: tempId, conversation_id: conversationId, role: "user", content: text, created_at: new Date().toISOString() },
       ]);
 
       try {
@@ -78,7 +102,11 @@ function SpeakingChatInner() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ conversationId, message: text, voiceMode }),
         });
-        if (!res.ok) throw new Error("failed");
+        if (!res.ok) {
+          const { error } = await res.json().catch(() => ({ error: null }));
+          if (error === "conversation already completed") setClosed(true);
+          throw new Error("failed");
+        }
         const { reply } = await res.json();
         const { data } = await supabase
           .from("conversation_messages")
@@ -88,6 +116,10 @@ function SpeakingChatInner() {
         setMessages(data ?? []);
         return reply as string;
       } catch {
+        // Take the unsent message back out so the screen doesn't pretend
+        // it went through.
+        setMessages((prev) => (prev ?? []).filter((m) => m.id !== tempId));
+        setSendError(true);
         return null;
       }
     },
@@ -99,7 +131,9 @@ function SpeakingChatInner() {
     const text = input.trim();
     setInput("");
     setSending(true);
-    await sendMessage(text);
+    const reply = await sendMessage(text);
+    // Give the text back so nothing typed is lost.
+    if (reply === null) setInput(text);
     setSending(false);
   }
 
@@ -243,7 +277,7 @@ function SpeakingChatInner() {
           ← לתרחישים
         </MotionLink>
         <div className="flex items-center gap-2">
-          {!voiceMode && (
+          {!voiceMode && !closed && (
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
@@ -257,7 +291,7 @@ function SpeakingChatInner() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleEnd}
-            disabled={ending || !hasUserMessage}
+            disabled={ending || !hasUserMessage || closed}
             className="text-sm px-4 py-2 rounded-lg border border-card-border hover:bg-background-2 transition-colors disabled:opacity-40"
           >
             {ending ? "מנתח..." : "סיימו שיחה"}
@@ -302,7 +336,24 @@ function SpeakingChatInner() {
         <div ref={bottomRef} />
       </div>
 
-      {voiceMode ? (
+      {sendError && !closed && (
+        <p role="alert" className="pb-2 text-center text-sm text-danger">
+          ההודעה לא נשלחה. בדקו את החיבור ונסו שוב.
+        </p>
+      )}
+
+      {closed ? (
+        <div className="border-t border-card-border pt-4 text-center">
+          <p className="text-sm text-muted">השיחה הזו כבר הסתיימה.</p>
+          <MotionLink
+            whileTap={{ scale: 0.97 }}
+            href={startInVoiceMode ? "/speaking/voice" : "/speaking"}
+            className="mt-3 inline-block px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors"
+          >
+            לשיחה חדשה
+          </MotionLink>
+        </div>
+      ) : voiceMode ? (
         <div className="flex-1 min-h-0">
           <VoiceConversationPanel
             onSend={sendMessage}
