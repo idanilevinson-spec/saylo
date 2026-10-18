@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/serverClient";
 import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
 import { buildConversationSystemPrompt } from "@/lib/ai/prompts/conversationPartner";
@@ -6,7 +7,7 @@ import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
 import { hasParentalClearance } from "@/lib/auth/consentServer";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
-import { splitConversationReply, type ConversationFix } from "@/lib/ai/conversationFix";
+import { splitConversationReply, streamableText, type ConversationFix } from "@/lib/ai/conversationFix";
 import { getLearnerMemory } from "@/lib/ai/learnerMemory";
 import { buildPersonaNote, detectLearnerMood } from "@/lib/ai/prompts/teacherPersona";
 import type { AgeBand, ConversationTopicCategory } from "@/types/database";
@@ -32,10 +33,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "parental consent required" }, { status: 403 });
   }
 
-  const { conversationId, message, voiceMode } = (await request.json()) as {
+  const { conversationId, message, voiceMode, stream } = (await request.json()) as {
     conversationId?: string;
     message?: string;
     voiceMode?: boolean;
+    // Text chat asks for the reply as it is written; a call needs it whole
+    // (it is read aloud), so it keeps the JSON answer.
+    stream?: boolean;
   };
   if (!conversationId || !message?.trim()) {
     return NextResponse.json({ error: "missing conversationId or message" }, { status: 400 });
@@ -97,7 +101,7 @@ export async function POST(request: Request) {
   // (up to two, per the tool's max_uses) is what turns a snappy back-and-forth
   // into a laggy one — text chat keeps the tool since a few extra seconds is
   // invisible there.
-  const claudeMessage = await anthropic.messages.create({
+  const params: Anthropic.MessageCreateParamsNonStreaming = {
     model: CLAUDE_MODEL,
     max_tokens: 550,
     // thinking disabled: on by default, and eats into both the token
@@ -106,33 +110,76 @@ export async function POST(request: Request) {
     // turn-by-turn and already had a separate latency fix (skipping web
     // search). See conversation-score route for how the truncation risk
     // was diagnosed.
-    thinking: { type: "disabled" },
+    thinking: { type: "disabled" as const },
     system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode, memory, personaNote),
-    ...(voiceMode ? {} : { tools: [{ type: "web_search_20260318" as const, name: "web_search", max_uses: 2 }] }),
+    ...(voiceMode ? {} : { tools: [{ type: "web_search_20260318" as const, name: "web_search" as const, max_uses: 2 }] }),
     messages: withOpenerCue(history).map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("assistant" as const),
       content: m.content,
     })),
-  });
+  };
+
   // The correction line (if any) comes off before the reply is stored, shown
-  // or read aloud; it travels separately and is kept on the reply row.
-  const { reply, fix } = splitConversationReply(extractText(claudeMessage));
-
-  // Both writes are independent; the user's message goes first only in the
+  // or read aloud; it travels separately and is kept on the reply row. Both
+  // writes are independent; the user's message goes first only in the
   // sense that it was already started, so created_at ordering is unchanged.
-  await userMessageStored;
-  await Promise.all([
-    storeReply(supabase, conversationId, reply, fix),
-    logAiUsage(
-      supabase,
-      user.id,
-      "conversation_turn",
-      claudeMessage.usage.input_tokens,
-      claudeMessage.usage.output_tokens,
-      claudeMessage.usage.server_tool_use?.web_search_requests ?? 0
-    ),
-  ]);
+  const finish = async (claudeMessage: Anthropic.Message) => {
+    const { reply, fix } = splitConversationReply(extractText(claudeMessage));
+    await userMessageStored;
+    await Promise.all([
+      storeReply(supabase, conversationId, reply, fix),
+      logAiUsage(
+        supabase,
+        user.id,
+        "conversation_turn",
+        claudeMessage.usage.input_tokens,
+        claudeMessage.usage.output_tokens,
+        claudeMessage.usage.server_tool_use?.web_search_requests ?? 0
+      ),
+    ]);
+    return { reply, fix };
+  };
 
+  if (stream && !voiceMode) {
+    // The reply appears as it is written instead of after a silent wait.
+    // Only plain text goes out, never the correction line (held back until
+    // it is certain a line isn't one); the stream closes after the reply is
+    // stored, so the page can then load it with its correction card.
+    const claudeStream = anthropic.messages.stream(params);
+    const encoder = new TextEncoder();
+    // If the learner leaves mid-reply, the reply is still finished and
+    // stored; it just stops being sent.
+    let listening = true;
+    const body = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        let raw = "";
+        let sent = "";
+        try {
+          for await (const event of claudeStream) {
+            if (event.type === "content_block_start" && event.content_block.type === "text" && raw) raw += "\n\n";
+            else if (event.type === "content_block_delta" && event.delta.type === "text_delta") raw += event.delta.text;
+            else continue;
+            const visible = streamableText(raw);
+            if (listening && visible.length > sent.length) {
+              controller.enqueue(encoder.encode(visible.slice(sent.length)));
+              sent = visible;
+            }
+          }
+          await finish(await claudeStream.finalMessage());
+        } catch (err) {
+          console.error("conversation stream failed", err);
+        } finally {
+          if (listening) controller.close();
+        }
+      },
+      cancel() {
+        listening = false;
+      },
+    });
+    return new Response(body, { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
+  }
+
+  const { reply, fix } = await finish(await anthropic.messages.create(params));
   return NextResponse.json({ reply, correction: fix });
 }
 

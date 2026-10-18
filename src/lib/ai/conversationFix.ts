@@ -57,3 +57,27 @@ function tidy(text: string): string {
     .replace(/\s*—\s*/g, ", ")
     .trim();
 }
+
+// While a reply streams in, what may already be sent: everything before a
+// FIX line, holding back a last line that could still turn into one ("F",
+// "FI"...). The cut only ever moves forward, so the streamed text is
+// always a prefix of what was sent before plus new text.
+export function streamableText(raw: string): string {
+  const lines = raw.split("\n");
+  const out: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const start = lines[i].trimStart();
+    if (start.startsWith(FIX_MARKER)) break;
+    if (i === lines.length - 1 && start && FIX_MARKER.startsWith(start)) break;
+    out.push(lines[i]);
+  }
+  // Trailing whitespace waits for what follows it, so a sent line break
+  // can never be taken back.
+  return out.join("\n").trimEnd();
+}
+
+// The same clean-up as a finished reply, for text that is still arriving
+// (a "**" may not have its pair yet).
+export function tidyStreaming(text: string): string {
+  return text.replace(/\*\*/g, "").replace(/\s*—\s*/g, ", ").trimEnd();
+}
