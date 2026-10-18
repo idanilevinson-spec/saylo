@@ -15,6 +15,7 @@ import SayloAvatar from "@/components/SayloAvatar";
 import ChatMessageText from "@/components/speaking/ChatMessageText";
 import CorrectionCard from "@/components/speaking/CorrectionCard";
 import CorrectionsPractice from "@/components/speaking/CorrectionsPractice";
+import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
@@ -54,6 +55,20 @@ function SpeakingChatInner() {
   // summary when there is one, instead of an input that silently fails.
   const [closed, setClosed] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Reply ideas belong to the teacher's latest turn (or to the empty
+  // conversation, for an opener); never while the learner's message is
+  // still on its way.
+  const lastMessage = messages?.[messages.length - 1];
+  const ideasTurn =
+    messages === null || sending || closed
+      ? null
+      : !lastMessage
+        ? "start"
+        : lastMessage.role === "assistant"
+          ? lastMessage.id
+          : null;
+  const replyIdeas = useReplyIdeas(conversationId, ideasTurn);
 
   useEffect(() => {
     supabase
@@ -363,35 +378,56 @@ function SpeakingChatInner() {
             canEnd={hasUserMessage}
             lastUserText={lastUser?.content ?? null}
             lastFix={lastUserFix}
+            conversationId={conversationId}
           />
         </div>
       ) : (
-        <div className="flex gap-2 pt-2 border-t border-card-border">
-          <input
-            type="text"
-            {...ENGLISH_TEXT_INPUT}
-            // Hebrew is welcome too ("איך אומרים...?"), so the field follows
-            // whatever is typed instead of being fixed left to right.
-            dir="auto"
-            lang={undefined}
-            enterKeyHint="send"
-            aria-label="הקלידו הודעה באנגלית, או שאלה בעברית"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            disabled={sending}
-            placeholder="כתבו באנגלית. אפשר גם לשאול בעברית"
-            className="flex-1 px-4 py-2.5 rounded-lg border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
-          />
-          <motion.button
-            whileHover={input.trim() && !sending ? { scale: 1.05 } : undefined}
-            whileTap={input.trim() && !sending ? { scale: 0.95 } : undefined}
-            onClick={handleSend}
-            disabled={!input.trim() || sending}
-            className="px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
-          >
-            שליחה
-          </motion.button>
+        <div className="pt-2 border-t border-card-border">
+          {replyIdeas.ideas && (
+            <div className="mb-2 max-h-56 overflow-y-auto">
+              <ReplyIdeasList
+                ideas={replyIdeas.ideas}
+                hint="הקישו על רעיון כדי להתחיל ממנו, ושנו אותו כך שיתאים לכם"
+                onPick={(en) => {
+                  setInput(en);
+                  replyIdeas.dismiss();
+                  inputRef.current?.focus();
+                }}
+              />
+            </div>
+          )}
+          {replyIdeas.failed && <p className="mb-2 text-center text-sm text-muted">לא הצלחנו להביא רעיונות כרגע. נסו שוב.</p>}
+          {replyIdeas.available && !replyIdeas.ideas && (
+            <ReplyIdeasButton onClick={replyIdeas.request} loading={replyIdeas.loading} className="mb-2 px-3 py-1.5" />
+          )}
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              {...ENGLISH_TEXT_INPUT}
+              // Hebrew is welcome too ("איך אומרים...?"), so the field follows
+              // whatever is typed instead of being fixed left to right.
+              dir="auto"
+              lang={undefined}
+              enterKeyHint="send"
+              aria-label="הקלידו הודעה באנגלית, או שאלה בעברית"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              disabled={sending}
+              placeholder="כתבו באנגלית. אפשר גם לשאול בעברית"
+              className="flex-1 px-4 py-2.5 rounded-lg border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
+            />
+            <motion.button
+              whileHover={input.trim() && !sending ? { scale: 1.05 } : undefined}
+              whileTap={input.trim() && !sending ? { scale: 0.95 } : undefined}
+              onClick={handleSend}
+              disabled={!input.trim() || sending}
+              className="px-5 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors"
+            >
+              שליחה
+            </motion.button>
+          </div>
         </div>
       )}
     </div>
