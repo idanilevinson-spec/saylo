@@ -39,6 +39,15 @@ describe("conversation prompt", () => {
     expect(buildConversationSystemPrompt("You are a waiter.", "B1", false)).toMatch(/live voice call/);
   });
 
+  it("ends a call's prompt with the length limit, stricter for beginners, and leaves text chat alone", () => {
+    const call = buildConversationSystemPrompt(null, "B1", false);
+    expect(call.trimEnd().split("
+
+").pop()).toMatch(/^Length on this call.*at most about 30 words/);
+    expect(buildConversationSystemPrompt(null, "A2", false)).toMatch(/about 20 words in total/);
+    expect(buildConversationSystemPrompt(null, "B1", true)).not.toMatch(/Length on this call/);
+  });
+
   it("answers real distress in Hebrew with Israeli help lines, in every mode", () => {
     for (const prompt of [buildConversationSystemPrompt(null, "C1"), buildConversationSystemPrompt("You are a waiter.", "A1", false)]) {
       expect(prompt).toMatch(/simple Hebrew \(not English\)/);

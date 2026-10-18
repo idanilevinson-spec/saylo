@@ -63,6 +63,14 @@ ${FIX_MARKER}{"original":"<their exact words that were wrong>","better":"<the co
 const VOICE_NOTE =
   "This is a live voice call and your reply is read aloud. Keep it to 1-3 short spoken sentences. No lists, no emojis, no stage directions.";
 
+// Said last on a call, so it wins over everything above that invites
+// detail (sharing a view, memory, persona): measured, call replies ran
+// 44-64 words, 20-27 seconds of listening before the learner could speak.
+const buildVoiceLengthNote = (level: string | null) =>
+  `Length on this call (this overrides anything above about adding detail or sharing your view): ${
+    level && /^A/.test(level) ? "about 20 words in total, everyday words only" : "at most about 30 words in total"
+  }, roughly 10 seconds of speech: one short reaction, at most one short correction sentence (only one mistake) that names the right form and a plain reason, like 'It's "I agree", because "agree" is already the verb.', then one simple question. Then stop and let them talk.`;
+
 const TEXT_NOTE = "Keep replies short (1-4 sentences) and conversational, like a real chat.";
 
 // The chat shows plain text and the call reads it aloud, so formatting marks
@@ -103,6 +111,7 @@ export function buildConversationSystemPrompt(
     SAFETY_NOTE,
     DISTRESS_NOTE,
     GENDER_NEUTRAL_NOTE,
+    voice ? buildVoiceLengthNote(startingLevel) : "",
   ];
   return parts.filter(Boolean).join("\n\n");
 }
