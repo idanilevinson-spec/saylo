@@ -5,6 +5,7 @@ import { buildTeacherSuggestionPrompt } from "@/lib/ai/prompts/teacherSuggestion
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPremiumServer } from "@/lib/subscriptions/requirePremium";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
+import { buildTeacherActions } from "@/lib/teacher/teacherActions";
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -21,40 +22,56 @@ export async function GET() {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
   }
 
-  const { data: cached } = await supabase
-    .from("teacher_suggestion_cache")
-    .select("suggestion, created_at")
-    .eq("profile_id", user.id)
-    .maybeSingle();
+  // The steps under the recommendation are rebuilt on every visit (the
+  // counts change during the day); only the AI sentence is cached.
+  const [{ data: cached }, { data: wrongAttempts }, { count: wordsToReview }, { data: lastConversation }] =
+    await Promise.all([
+      supabase.from("teacher_suggestion_cache").select("suggestion, created_at").eq("profile_id", user.id).maybeSingle(),
+      supabase
+        .from("exercise_attempts")
+        .select("exercises(grammar_topics(name_he, slug))")
+        .eq("profile_id", user.id)
+        .eq("is_correct", false)
+        .order("created_at", { ascending: false })
+        .limit(50),
+      supabase
+        .from("srs_items")
+        .select("id", { count: "exact", head: true })
+        .eq("profile_id", user.id)
+        .lte("due_at", new Date().toISOString()),
+      supabase
+        .from("conversations")
+        .select("created_at")
+        .eq("profile_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+  const topicCounts = new Map<string, { nameHe: string; slug: string; count: number }>();
+  for (const attempt of wrongAttempts ?? []) {
+    const topic = (
+      attempt.exercises as unknown as { grammar_topics: { name_he: string; slug: string } | null } | null
+    )?.grammar_topics;
+    if (!topic) continue;
+    const entry = topicCounts.get(topic.slug) ?? { nameHe: topic.name_he, slug: topic.slug, count: 0 };
+    entry.count += 1;
+    topicCounts.set(topic.slug, entry);
+  }
+  const weakTopics = [...topicCounts.values()].sort((a, b) => b.count - a.count).slice(0, 2);
+  const weakGrammarTopics = weakTopics.map((t) => t.nameHe);
+
+  const actions = buildTeacherActions({
+    weakTopics,
+    dueWords: wordsToReview ?? 0,
+    daysSinceConversation: lastConversation
+      ? Math.floor((Date.now() - new Date(lastConversation.created_at).getTime()) / 86_400_000)
+      : null,
+  });
 
   if (cached && Date.now() - new Date(cached.created_at).getTime() < CACHE_TTL_MS) {
-    return NextResponse.json({ suggestion: cached.suggestion });
+    return NextResponse.json({ suggestion: cached.suggestion, actions });
   }
-
-  const { data: wrongAttempts } = await supabase
-    .from("exercise_attempts")
-    .select("exercises(grammar_topics(name_he))")
-    .eq("profile_id", user.id)
-    .eq("is_correct", false)
-    .limit(50);
-
-  const topicCounts = new Map<string, number>();
-  for (const attempt of wrongAttempts ?? []) {
-    const name = (
-      attempt.exercises as unknown as { grammar_topics: { name_he: string } | null } | null
-    )?.grammar_topics?.name_he;
-    if (name) topicCounts.set(name, (topicCounts.get(name) ?? 0) + 1);
-  }
-  const weakGrammarTopics = [...topicCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 2)
-    .map(([name]) => name);
-
-  const { count: wordsToReview } = await supabase
-    .from("srs_items")
-    .select("id", { count: "exact", head: true })
-    .eq("profile_id", user.id)
-    .lte("due_at", new Date().toISOString());
 
   const { data: streak } = await supabase
     .from("streaks")
@@ -89,5 +106,5 @@ export async function GET() {
     .from("teacher_suggestion_cache")
     .upsert({ profile_id: user.id, suggestion, created_at: new Date().toISOString() });
 
-  return NextResponse.json({ suggestion });
+  return NextResponse.json({ suggestion, actions });
 }

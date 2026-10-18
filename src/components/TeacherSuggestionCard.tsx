@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Lightbulb } from "lucide-react";
+import Link from "next/link";
+import { ChevronLeft, Lightbulb } from "lucide-react";
+import type { TeacherAction } from "@/lib/teacher/teacherActions";
 import { useAiConsent } from "@/components/AiConsentGate";
 
 import { EASE_OUT } from "@/lib/motion/easing";
 export default function TeacherSuggestionCard() {
   const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [actions, setActions] = useState<TeacherAction[]>([]);
   const [failed, setFailed] = useState(false);
   // The suggestion is written by the AI from the learner's practice stats, so
   // it is only requested once they have agreed to that sharing.
@@ -20,7 +23,10 @@ export default function TeacherSuggestionCard() {
         if (!res.ok) throw new Error("failed");
         return res.json();
       })
-      .then((data) => setSuggestion(data.suggestion))
+      .then((data) => {
+        setSuggestion(data.suggestion);
+        setActions(data.actions ?? []);
+      })
       .catch(() => setFailed(true));
   }, [consented]);
 
@@ -39,6 +45,20 @@ export default function TeacherSuggestionCard() {
       <div>
         <p className="text-sm font-bold text-primary">המורה AI שלכם ממליץ</p>
         <p className="mt-1 leading-relaxed">{suggestion}</p>
+        {actions.length > 0 && (
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {actions.map((a) => (
+              <li key={a.kind}>
+                <Link
+                  href={a.href}
+                  className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-primary/30 bg-background px-3 text-sm font-medium hover:bg-primary/10 transition-colors"
+                >
+                  {a.label} <ChevronLeft size={15} aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </motion.div>
   );

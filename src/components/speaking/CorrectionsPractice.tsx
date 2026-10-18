@@ -14,7 +14,13 @@ import { isCorrectRewrite, sayableFix } from "@/lib/speaking/correctionDrill";
 // fix once in a card is easy to forget, producing it yourself is what
 // makes it stick. Checked on the spot, nothing is sent anywhere.
 
-function CorrectionDrill({ fix, index }: { fix: ConversationFix; index: number }) {
+function CorrectionDrill({
+  fix,
+  index,
+}: {
+  fix: ConversationFix;
+  index: number;
+}) {
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState<"right" | "wrong" | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -29,7 +35,10 @@ function CorrectionDrill({ fix, index }: { fix: ConversationFix; index: number }
   return (
     <li className="rounded-lg border border-card-border bg-card p-4">
       <p className="text-xs font-bold text-muted">משפט {index + 1}</p>
-      <EnglishText as="p" className="mt-1 text-danger line-through decoration-danger/60">
+      <EnglishText
+        as="p"
+        className="mt-1 text-danger line-through decoration-danger/60"
+      >
         {fix.original}
       </EnglishText>
       {fix.why && <p className="mt-1 text-sm text-muted">{fix.why}</p>}
@@ -67,16 +76,20 @@ function CorrectionDrill({ fix, index }: { fix: ConversationFix; index: number }
         )}
         {result === "wrong" && !revealed && (
           <p className="mt-2 flex items-center gap-1.5 text-sm text-danger">
-            <XCircle size={15} aria-hidden="true" /> עוד לא. נסו שוב, או הציגו את התשובה.
+            <XCircle size={15} aria-hidden="true" /> עוד לא. נסו שוב, או הציגו
+            את התשובה.
           </p>
         )}
       </div>
 
       {result !== "right" &&
         (revealed ? (
-          <EnglishText as="p" className="mt-2 font-bold text-success">
-            {fix.better}
-          </EnglishText>
+          // Once practising aloud, the sentence shows there (with audio) instead.
+          !aloud && (
+            <EnglishText as="p" className="mt-2 font-bold text-success">
+              {fix.better}
+            </EnglishText>
+          )
         ) : (
           <button
             type="button"
@@ -113,14 +126,20 @@ function CorrectionDrill({ fix, index }: { fix: ConversationFix; index: number }
   );
 }
 
-export default function CorrectionsPractice({ fixes }: { fixes: ConversationFix[] }) {
+export default function CorrectionsPractice({
+  fixes,
+}: {
+  fixes: ConversationFix[];
+}) {
   if (!fixes.length) return null;
   return (
     <section aria-labelledby="corrections-title" className="mt-6">
       <h2 id="corrections-title" className="font-bold">
         התיקונים מהשיחה ({fixes.length})
       </h2>
-      <p className="mt-0.5 text-sm text-muted">כתבו כל משפט מחדש, בצורה הנכונה. ככה התיקון נשאר.</p>
+      <p className="mt-0.5 text-sm text-muted">
+        כתבו כל משפט מחדש, בצורה הנכונה. ככה התיקון נשאר.
+      </p>
       <ol className="mt-3 space-y-3">
         {fixes.map((fix, i) => (
           <CorrectionDrill key={i} fix={fix} index={i} />
