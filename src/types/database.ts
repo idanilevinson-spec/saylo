@@ -1,3 +1,4 @@
+import type { UsefulPhrase } from "@/lib/ai/prompts/usefulPhrases";
 export type AgeBand = "child" | "teen" | "adult";
 
 export type ParentalConsentStatus = "not_required" | "pending" | "granted" | "denied";
@@ -431,6 +432,9 @@ export interface ConversationFeedback {
   overusedWords: string[];
   suggestedVocabulary: string[];
   generalSuggestionsHe: string;
+  // Words and expressions from the conversation worth taking away, ready
+  // to go into reviews. Absent on summaries saved before they existed.
+  usefulPhrases?: UsefulPhrase[];
 }
 
 export interface ConversationScore {

@@ -1,5 +1,6 @@
 import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
 import { buildPatternDetectionInstructions } from "@/lib/ai/prompts/patternDetection";
+import { USEFUL_PHRASES_INSTRUCTIONS } from "@/lib/ai/prompts/usefulPhrases";
 
 export interface TranscriptTurn {
   role: "user" | "assistant";
@@ -28,8 +29,11 @@ Respond with ONLY valid JSON, no markdown code fences, in exactly this shape:
   "overusedWords": ["<word or phrase the student repeated too much>", ...],
   "suggestedVocabulary": ["<English word/phrase the student could have used instead>", ...],
   "generalSuggestionsHe": "<2-3 sentences in Hebrew with specific, practical advice for next time>",
+  "usefulPhrases": [{"en": "...", "he": "...", "pos": "...", "level": "...", "distractors": ["...", "...", "..."], "example": "..."}, ...],
   "patterns": [...]
 }
+
+${USEFUL_PHRASES_INSTRUCTIONS}
 
 If there isn't enough student text to judge something, use an empty array or a reasonable middle score rather than inventing detail. Base every item strictly on what the student actually wrote.
 
