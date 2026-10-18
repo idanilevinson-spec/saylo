@@ -8,6 +8,8 @@ import { hasParentalClearance } from "@/lib/auth/consentServer";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 import { splitConversationReply, type ConversationFix } from "@/lib/ai/conversationFix";
 import { getLearnerMemory } from "@/lib/ai/learnerMemory";
+import { buildPersonaNote, detectLearnerMood } from "@/lib/ai/prompts/teacherPersona";
+import type { AgeBand, ConversationTopicCategory } from "@/types/database";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
 
   const { data: conversation } = await supabase
     .from("conversations")
-    .select("*, conversation_scenarios(system_prompt)")
+    .select("*, conversation_scenarios(system_prompt, category)")
     .eq("id", conversationId)
     .eq("profile_id", user.id)
     .maybeSingle();
@@ -49,13 +51,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "conversation already completed" }, { status: 400 });
   }
 
-  const scenarioPrompt =
-    (conversation.conversation_scenarios as unknown as { system_prompt: string } | null)?.system_prompt ?? null;
+  const scenario = conversation.conversation_scenarios as unknown as {
+    system_prompt: string;
+    category: ConversationTopicCategory;
+  } | null;
+  const scenarioPrompt = scenario?.system_prompt ?? null;
 
   // The conversation is confirmed to be this user's, so the remaining reads
   // are independent of each other and share one round trip. History is read
   // before the new message is stored; the message is appended by hand below.
-  const [{ data: priorMessages }, { data: latestPlacement }, memory] = await Promise.all([
+  const [{ data: priorMessages }, { data: latestPlacement }, memory, { data: learner }] = await Promise.all([
     supabase
       .from("conversation_messages")
       .select("role, content")
@@ -70,8 +75,16 @@ export async function POST(request: Request) {
       .limit(1)
       .maybeSingle(),
     getLearnerMemory(supabase, user.id, conversationId),
+    supabase.from("profiles").select("age_band").eq("id", user.id).maybeSingle(),
   ]);
   const history = [...(priorMessages ?? []), { role: "user", content: message }];
+  // The teacher's register for this turn: the situation, the learner's age,
+  // and how they are doing right now.
+  const personaNote = buildPersonaNote({
+    category: scenario?.category ?? null,
+    ageBand: (learner?.age_band as AgeBand | undefined) ?? null,
+    mood: detectLearnerMood(history.filter((m) => m.role === "user").map((m) => m.content)),
+  });
 
   // Stored while Claude is thinking rather than before it: the reply is what
   // the learner is waiting for, and this write doesn't feed into it.
@@ -93,7 +106,7 @@ export async function POST(request: Request) {
     // search). See conversation-score route for how the truncation risk
     // was diagnosed.
     thinking: { type: "disabled" },
-    system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode, memory),
+    system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode, memory, personaNote),
     ...(voiceMode ? {} : { tools: [{ type: "web_search_20260318" as const, name: "web_search", max_uses: 2 }] }),
     messages: history.map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("assistant" as const),

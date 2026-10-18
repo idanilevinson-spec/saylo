@@ -76,6 +76,9 @@ export function buildConversationSystemPrompt(
   // What the teacher knows about this learner from earlier lessons
   // (lib/ai/learnerMemory). Null for a first-time learner.
   learnerMemory: string | null = null,
+  // How to sound right now (prompts/teacherPersona): register for the
+  // situation, the learner's age, and whether they are stuck or flying.
+  personaNote: string | null = null,
 ): string {
   const voice = !allowWebSearch;
   const parts = [
@@ -85,6 +88,7 @@ export function buildConversationSystemPrompt(
     voice ? VOICE_NOTE : TEXT_NOTE,
     FORMAT_NOTE,
     TEACHER_NOTE,
+    personaNote ?? "",
     buildHebrewBridgeNote(startingLevel),
     CORRECTION_NOTE,
     buildAdaptiveLevelNote(startingLevel),
