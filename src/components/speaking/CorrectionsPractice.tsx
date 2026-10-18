@@ -1,33 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Eye, XCircle } from "lucide-react";
+import { CheckCircle2, Eye, Mic, XCircle } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import SpeakButton from "@/components/SpeakButton";
+import PronunciationRecorder from "@/components/PronunciationRecorder";
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
-import { normalizeAnswer } from "@/lib/exercises/grade";
 import type { ConversationFix } from "@/lib/ai/conversationFix";
+import { isCorrectRewrite, sayableFix } from "@/lib/speaking/correctionDrill";
 
 // After a conversation: every correction the teacher made, as a short
 // drill. The learner writes the sentence again the right way; seeing the
 // fix once in a card is easy to forget, producing it yourself is what
 // makes it stick. Checked on the spot, nothing is sent anywhere.
 
-// "I went to the beach... we ate ice cream": the teacher shortens long
-// sentences with "...", which nobody types back.
-const comparable = (s: string) => normalizeAnswer(s.replace(/\.{3}|…/g, " "));
-
-export function isCorrectRewrite(answer: string, fix: ConversationFix): boolean {
-  // The fix is often a fragment ("I went to the beach") and the learner
-  // writes the whole sentence ("Yesterday I went to the beach"): right if
-  // the corrected words are all there, in order.
-  const given = ` ${comparable(answer)} `;
-  return given.includes(` ${comparable(fix.better)} `);
-}
-
 function CorrectionDrill({ fix, index }: { fix: ConversationFix; index: number }) {
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState<"right" | "wrong" | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const [aloud, setAloud] = useState(false);
+  const sayable = sayableFix(fix.better);
 
   function check() {
     if (!answer.trim()) return;
@@ -92,6 +84,29 @@ function CorrectionDrill({ fix, index }: { fix: ConversationFix; index: number }
             className="mt-2 flex items-center gap-1 text-xs text-muted hover:text-foreground"
           >
             <Eye size={13} aria-hidden="true" /> הציגו את התשובה
+          </button>
+        ))}
+
+      {/* Written right; now said right. Scored against this exact
+          sentence, so the feedback is about how it sounded. */}
+      {(result === "right" || revealed) &&
+        (aloud ? (
+          <div className="mt-3 border-t border-card-border pt-3">
+            <div dir="ltr" className="flex items-center justify-end gap-2">
+              <EnglishText className="font-medium">{sayable}</EnglishText>
+              <SpeakButton text={sayable} className="p-1" />
+            </div>
+            <div className="mt-2">
+              <PronunciationRecorder targetPhrase={sayable} hidePhrase />
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setAloud(true)}
+            className="mt-2 flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+          >
+            <Mic size={14} aria-hidden="true" /> ועכשיו בקול
           </button>
         ))}
     </li>

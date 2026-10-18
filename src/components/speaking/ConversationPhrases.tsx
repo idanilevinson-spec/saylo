@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Plus } from "lucide-react";
+import { Check, Mic, Plus } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import SpeakButton from "@/components/SpeakButton";
+import PronunciationRecorder from "@/components/PronunciationRecorder";
 import type { UsefulPhrase } from "@/lib/ai/prompts/usefulPhrases";
 
 // On the conversation summary: the words and expressions worth taking
@@ -11,6 +12,8 @@ import type { UsefulPhrase } from "@/lib/ai/prompts/usefulPhrases";
 // from, and one button that puts them all into the learner's reviews.
 export default function ConversationPhrases({ conversationId, phrases }: { conversationId: string; phrases: UsefulPhrase[] }) {
   const [state, setState] = useState<"idle" | "adding" | "added" | "failed">("idle");
+  // The one phrase whose sentence is being practised out loud.
+  const [aloud, setAloud] = useState<string | null>(null);
 
   if (!phrases.length) return null;
 
@@ -41,9 +44,25 @@ export default function ConversationPhrases({ conversationId, phrases }: { conve
               <SpeakButton text={p.lemma} className="p-1" />
             </div>
             <p className="mt-0.5 font-medium">{p.he}</p>
-            <EnglishText as="p" className="mt-1 text-sm text-muted">
-              {p.example}
-            </EnglishText>
+            <div dir="ltr" className="mt-1 flex items-start justify-end gap-2">
+              <EnglishText as="p" className="text-sm text-muted">
+                {p.example}
+              </EnglishText>
+              <SpeakButton text={p.example} className="mt-0.5 p-1 -m-1" />
+            </div>
+            {aloud === p.lemma ? (
+              <div className="mt-2">
+                <PronunciationRecorder targetPhrase={p.example} hidePhrase />
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setAloud(p.lemma)}
+                className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              >
+                <Mic size={14} aria-hidden="true" /> לומר את המשפט בקול
+              </button>
+            )}
           </li>
         ))}
       </ul>
