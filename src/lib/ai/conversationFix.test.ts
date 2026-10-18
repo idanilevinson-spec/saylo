@@ -39,6 +39,16 @@ describe("conversation prompt", () => {
     expect(buildConversationSystemPrompt("You are a waiter.", "B1", false)).toMatch(/live voice call/);
   });
 
+  it("answers real distress in Hebrew with Israeli help lines, in every mode", () => {
+    for (const prompt of [buildConversationSystemPrompt(null, "C1"), buildConversationSystemPrompt("You are a waiter.", "A1", false)]) {
+      expect(prompt).toMatch(/simple Hebrew \(not English\)/);
+      expect(prompt).toContain("1201");
+      expect(prompt).toContain("101");
+      expect(prompt).toMatch(/never mention children or teens to an adult/);
+      expect(prompt).toMatch(/Everyday exaggeration is not distress/);
+    }
+  });
+
   it("keeps a beginner's Hebrew glosses but not an advanced learner's", () => {
     expect(buildConversationSystemPrompt(null, "A1")).toMatch(/short Hebrew gloss is welcome/);
     expect(buildConversationSystemPrompt(null, "C1")).toMatch(/keep your own replies in English/);
