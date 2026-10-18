@@ -20,6 +20,7 @@ import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
 import ConversationPhrases from "@/components/speaking/ConversationPhrases";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
+import { tidyStreaming } from "@/lib/ai/conversationFix";
 import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
 import type { ConversationMessage, ConversationScore } from "@/types/database";
 
@@ -54,6 +55,9 @@ function SpeakingChatInner() {
   const [showTranscript, setShowTranscript] = useState(false);
   const [teacherGender] = useState<VoicePref>(() => loadVoicePref());
   const [sendError, setSendError] = useState(false);
+  // The bubble a reply streamed into keeps its key once the stored message
+  // replaces it, so it isn't animated in a second time.
+  const [streamKey, setStreamKey] = useState<{ id: string; key: string } | null>(null);
   // A conversation that was already ended (opened again from history or
   // the back button) can't take new messages: show it closed, with its
   // summary when there is one, instead of an input that silently fails.
@@ -163,25 +167,58 @@ function SpeakingChatInner() {
         { id: tempId, conversation_id: conversationId, role: "user", content: text, created_at: new Date().toISOString() },
       ]);
 
+      const streamId = `stream-${Date.now()}`;
       try {
         const res = await fetch("/api/ai/conversation", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ conversationId, message: text, voiceMode }),
+          // In the chat the reply streams in as it is written; a call needs
+          // it whole, to read it aloud.
+          body: JSON.stringify({ conversationId, message: text, voiceMode, stream: !voiceMode }),
         });
         if (!res.ok) {
           const { error } = await res.json().catch(() => ({ error: null }));
           if (error === "conversation already completed") setClosed(true);
           throw new Error("failed");
         }
-        const { reply } = await res.json();
+        let reply = "";
+        if (res.body && (res.headers.get("content-type") ?? "").startsWith("text/plain")) {
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let raw = "";
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            raw += decoder.decode(value, { stream: true });
+            reply = tidyStreaming(raw);
+            const bubble: ConversationMessage = {
+              id: streamId,
+              conversation_id: conversationId,
+              role: "assistant",
+              content: reply,
+              created_at: new Date().toISOString(),
+            };
+            setMessages((prev) => [...(prev ?? []).filter((m) => m.id !== streamId), bubble]);
+          }
+        } else {
+          ({ reply } = await res.json());
+        }
+        // The stored reply (with its correction card) replaces the streamed
+        // one, keeping the streamed bubble's key so it doesn't animate in twice.
         const { data } = await supabase
           .from("conversation_messages")
           .select("*")
           .eq("conversation_id", conversationId)
           .order("created_at");
+        const last = data?.[data.length - 1];
+        if (last?.role === "assistant") setStreamKey({ id: last.id, key: streamId });
         setMessages(data ?? []);
-        return reply as string;
+        if (!reply || last?.role !== "assistant") {
+          // The message went through but no reply came back.
+          setSendError(true);
+          return null;
+        }
+        return reply;
       } catch {
         // Take the unsent message back out so the screen doesn't pretend
         // it went through.
@@ -377,7 +414,7 @@ function SpeakingChatInner() {
         <AnimatePresence initial={false}>
           {messages?.map((m, i) => (
             <motion.div
-              key={m.id}
+              key={streamKey?.id === m.id ? streamKey.key : m.id}
               initial={{ opacity: 0, y: 10, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.25, ease: EASE_OUT }}
@@ -404,6 +441,14 @@ function SpeakingChatInner() {
             </motion.div>
           ))}
         </AnimatePresence>
+        {sending && !voiceMode && messages?.[messages.length - 1]?.role === "user" && (
+          <div className="flex items-end justify-end gap-2" aria-live="polite">
+            <p className="px-4 py-2.5 rounded-lg bg-card border border-card-border text-sm text-muted animate-pulse">
+              {teacherGender === "female" ? "המורה כותבת..." : "המורה כותב..."}
+            </p>
+            <SayloAvatar expression="thinking" gender={teacherGender} size={28} className="shrink-0" />
+          </div>
+        )}
         {awaitingOpener && (
           <div className="flex items-end justify-end gap-2" aria-live="polite">
             <p className="px-4 py-2.5 rounded-lg bg-card border border-card-border text-sm text-muted animate-pulse">
