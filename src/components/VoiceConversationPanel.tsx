@@ -622,7 +622,7 @@ export default function VoiceConversationPanel({
             <ChatMessageText text={caption} className="text-[1.05rem]" />
           </div>
         )}
-        {replyIdeas.ideas && <ReplyIdeasList ideas={replyIdeas.ideas} hint="אפשר להגיד אחד מהם בקול, או משהו משלכם" />}
+        {replyIdeas.ideas && <ReplyIdeasList ideas={replyIdeas.ideas} hint="אפשר להגיד אחד מהם בקול, או משהו משלכם" onClose={replyIdeas.dismiss} />}
         {replyIdeas.failed && <p className="text-center text-sm text-muted">לא הצלחנו להביא רעיונות כרגע. נסו שוב.</p>}
       </div>
 

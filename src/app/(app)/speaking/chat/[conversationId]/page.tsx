@@ -388,6 +388,7 @@ function SpeakingChatInner() {
               <ReplyIdeasList
                 ideas={replyIdeas.ideas}
                 hint="הקישו על רעיון כדי להתחיל ממנו, ושנו אותו כך שיתאים לכם"
+                onClose={replyIdeas.dismiss}
                 onPick={(en) => {
                   setInput(en);
                   replyIdeas.dismiss();

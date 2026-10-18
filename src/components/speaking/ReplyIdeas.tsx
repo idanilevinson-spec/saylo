@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb, X } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import type { ReplyIdea } from "@/lib/ai/prompts/replyIdeas";
 
@@ -12,17 +12,30 @@ import type { ReplyIdea } from "@/lib/ai/prompts/replyIdeas";
 export function useReplyIdeas(conversationId: string, turnKey: string | null) {
   // Everything is tagged with the turn it belongs to; anything from an
   // older turn simply reads as empty, and a late answer for it is dropped.
-  const [entry, setEntry] = useState<{ key: string; ideas: ReplyIdea[] | null; loading: boolean; failed: boolean } | null>(null);
+  // Ideas that were picked from or closed stay cached (hidden) for the
+  // turn, so asking again reopens them instead of paying for a new call.
+  const [entry, setEntry] = useState<{
+    key: string;
+    ideas: ReplyIdea[] | null;
+    loading: boolean;
+    failed: boolean;
+    hidden: boolean;
+  } | null>(null);
   const current = entry && entry.key === turnKey ? entry : null;
-  const ideas = current?.ideas ?? null;
+  const ideas = current && !current.hidden ? current.ideas : null;
+  const cached = !!current?.ideas;
   const loading = !!current?.loading;
 
   const request = useCallback(async () => {
     if (!turnKey || loading || ideas) return;
+    if (cached) {
+      setEntry((prev) => (prev ? { ...prev, hidden: false } : prev));
+      return;
+    }
     const key = turnKey;
-    setEntry({ key, ideas: null, loading: true, failed: false });
+    setEntry({ key, ideas: null, loading: true, failed: false, hidden: false });
     const settle = (next: ReplyIdea[] | null) =>
-      setEntry((prev) => (prev?.key === key ? { key, ideas: next, loading: false, failed: !next } : prev));
+      setEntry((prev) => (prev?.key === key ? { key, ideas: next, loading: false, failed: !next, hidden: false } : prev));
     try {
       const res = await fetch("/api/ai/conversation-ideas", {
         method: "POST",
@@ -34,9 +47,9 @@ export function useReplyIdeas(conversationId: string, turnKey: string | null) {
     } catch {
       settle(null);
     }
-  }, [conversationId, turnKey, loading, ideas]);
+  }, [conversationId, turnKey, loading, ideas, cached]);
 
-  const dismiss = useCallback(() => setEntry(null), []);
+  const dismiss = useCallback(() => setEntry((prev) => (prev ? { ...prev, hidden: true } : prev)), []);
 
   return { ideas, loading, failed: !!current?.failed, request, dismiss, available: !!turnKey };
 }
@@ -71,9 +84,11 @@ export function ReplyIdeasButton({
 export function ReplyIdeasList({
   ideas,
   onPick,
+  onClose,
   hint,
 }: {
   ideas: ReplyIdea[];
+  onClose: () => void;
   // In the chat a tap puts the answer in the box to edit and send. On a
   // call there is nothing to tap into: the learner reads one out loud.
   onPick?: (en: string) => void;
@@ -81,7 +96,17 @@ export function ReplyIdeasList({
 }) {
   return (
     <div className="rounded-lg border border-card-border bg-card px-3.5 py-2.5">
-      <p className="text-xs font-bold text-muted">{hint}</p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-xs font-bold text-muted">{hint}</p>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="סגירת הרעיונות"
+          className="-m-1.5 shrink-0 rounded-md p-1.5 text-muted hover:bg-background-2 hover:text-foreground transition-colors"
+        >
+          <X size={15} aria-hidden="true" />
+        </button>
+      </div>
       <ul className="mt-1.5 space-y-1.5">
         {ideas.map((idea, i) => {
           const body = (
