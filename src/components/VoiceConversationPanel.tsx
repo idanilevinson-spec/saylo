@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PhoneOff, Keyboard, RotateCcw, Languages } from "lucide-react";
+import { PhoneOff, Keyboard, RotateCcw, Languages, Snail } from "lucide-react";
 import { speak as browserSpeak } from "@/lib/speech/browserTts";
 import SayloAvatar, { type AvatarExpression } from "@/components/SayloAvatar";
 import { loadVoicePref, saveVoicePref, CONVERSATION_VOICE, type VoicePref } from "@/lib/speech/voicePref";
@@ -13,6 +13,7 @@ import ChatMessageText from "@/components/speaking/ChatMessageText";
 import CorrectionCard from "@/components/speaking/CorrectionCard";
 import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
 import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
+import { activeChunkAt, buildSlowSsml, splitIntoChunks } from "@/lib/speech/slowChunks";
 import type { ConversationFix } from "@/lib/ai/conversationFix";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
@@ -139,6 +140,16 @@ export default function VoiceConversationPanel({
   // background until Azure's own callback eventually fires.
   const activeRecognizerRef = useRef<SpeechRecognizer | null>(null);
   const tokenCacheRef = useRef<{ token: string; region: string; at: number } | null>(null);
+  // "Say it slowly": the pieces of the teacher's last line, which one is
+  // being heard, and the slow recording kept for an instant second listen.
+  const [slow, setSlow] = useState<{ text: string; chunks: string[]; active: number } | null>(null);
+  const slowCacheRef = useRef<{ text: string; url: string; starts: number[] } | null>(null);
+  const slowRunRef = useRef(0);
+  useEffect(() => {
+    return () => {
+      if (slowCacheRef.current) URL.revokeObjectURL(slowCacheRef.current.url);
+    };
+  }, []);
 
   // Azure throws if close() runs twice on the same recognizer (e.g. the
   // effect's cleanup and recognizeOnceAsync's own callback both racing to
@@ -160,8 +171,10 @@ export default function VoiceConversationPanel({
     if (audio) {
       audio.onended = null;
       audio.onerror = null;
+      audio.ontimeupdate = null;
       audio.pause();
     }
+    slowRunRef.current++;
     window.speechSynthesis?.cancel();
   }
 
@@ -464,6 +477,107 @@ export default function VoiceConversationPanel({
     }
   }
 
+  // Re-reads the teacher's last line slower (prosody -25%), in short pieces
+  // with a pause after each, lighting up each piece in the caption as it is
+  // heard. One Azure synthesis with a bookmark before every piece gives the
+  // exact moment each one starts; the result is kept, so asking again plays
+  // at once. Without Azure, the browser voice reads the pieces one by one.
+  async function sayItSlowly() {
+    const text = lastReplyRef.current.text || caption;
+    if (!text || ending || state === "speaking" || state === "thinking" || state === "connecting") return;
+
+    if (activeRecognizerRef.current) safeClose(activeRecognizerRef.current);
+    activeRecognizerRef.current = null;
+    window.speechSynthesis?.cancel();
+    silentTurnsRef.current = 0;
+    setState("speaking");
+    const run = ++slowRunRef.current;
+    const chunks = splitIntoChunks(text);
+    setSlow({ text, chunks, active: 0 });
+
+    const done = () => {
+      if (run !== slowRunRef.current) return;
+      setSlow(null);
+      setRestartTick((t) => t + 1);
+    };
+    const browserSlow = () => {
+      let i = 0;
+      const next = () => {
+        if (run !== slowRunRef.current) return;
+        if (i >= chunks.length) return done();
+        const index = i++;
+        setSlow((prev) => (prev ? { ...prev, active: index } : prev));
+        browserSpeak(chunks[index], 0.7, () => setTimeout(next, 500));
+      };
+      next();
+    };
+    const play = (recording: { url: string; starts: number[] }) => {
+      const audio = audioElRef.current ?? new Audio();
+      audioElRef.current = audio;
+      const finish = () => {
+        audio.ontimeupdate = null;
+        done();
+      };
+      audio.ontimeupdate = () => {
+        const index = activeChunkAt(recording.starts, audio.currentTime);
+        setSlow((prev) => (prev && prev.active !== index ? { ...prev, active: index } : prev));
+      };
+      audio.onended = finish;
+      audio.onerror = finish;
+      audio.src = recording.url;
+      audio.playbackRate = 1;
+      audio.currentTime = 0;
+      audio.play().catch(() => {
+        audio.ontimeupdate = null;
+        browserSlow();
+      });
+    };
+
+    if (slowCacheRef.current?.text === text) return play(slowCacheRef.current);
+
+    try {
+      let cached = tokenCacheRef.current;
+      if (!cached || Date.now() - cached.at >= TOKEN_REUSE_MS) {
+        const res = await fetch("/api/speech/token");
+        if (!res.ok) throw new Error("no speech token");
+        const { token, region } = await res.json();
+        cached = { token, region, at: Date.now() };
+        tokenCacheRef.current = cached;
+      }
+      const sdk = await import("microsoft-cognitiveservices-speech-sdk");
+      if (run !== slowRunRef.current) return;
+      const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(cached.token, cached.region);
+      speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
+      const synthesizer = new sdk.SpeechSynthesizer(speechConfig, null);
+      const starts = chunks.map(() => 0);
+      // Offsets come in 100-nanosecond ticks.
+      synthesizer.bookmarkReached = (_sender, e) => {
+        const index = Number(e.text);
+        if (Number.isInteger(index) && index >= 0 && index < starts.length) starts[index] = e.audioOffset / 1e7;
+      };
+      const audioData = await new Promise<ArrayBuffer | null>((resolve) => {
+        synthesizer.speakSsmlAsync(
+          buildSlowSsml(chunks, CONVERSATION_VOICE[voicePrefRef.current]),
+          (result) => {
+            synthesizer.close();
+            resolve(result.reason === sdk.ResultReason.SynthesizingAudioCompleted && result.audioData?.byteLength ? result.audioData : null);
+          },
+          () => {
+            synthesizer.close();
+            resolve(null);
+          },
+        );
+      });
+      if (run !== slowRunRef.current) return;
+      if (!audioData) return browserSlow();
+      if (slowCacheRef.current) URL.revokeObjectURL(slowCacheRef.current.url);
+      slowCacheRef.current = { text, url: URL.createObjectURL(new Blob([audioData], { type: "audio/mpeg" })), starts };
+      play(slowCacheRef.current);
+    } catch {
+      if (run === slowRunRef.current) browserSlow();
+    }
+  }
+
   // "ending" (scoring the call) reuses the "thinking" expression — it's the
   // same "processing" moment, just for the whole conversation instead of
   // one turn. "connecting"/"paused" fall back to "idle" — the orb is
@@ -620,8 +734,31 @@ export default function VoiceConversationPanel({
               state === "speaking" ? "opacity-100" : "opacity-75"
             }`}
           >
-            <p className="text-xs text-muted">המורה</p>
-            <ChatMessageText text={caption} className="text-[1.05rem]" onTapWord={wordLookup.lookup} />
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted">המורה</p>
+              <button
+                type="button"
+                onClick={sayItSlowly}
+                disabled={ending || state === "speaking" || state === "thinking" || state === "connecting"}
+                className="-my-1 flex items-center gap-1 rounded-md px-1.5 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors disabled:opacity-40"
+              >
+                <Snail size={14} aria-hidden="true" /> לאט ובחלקים
+              </button>
+            </div>
+            {slow && slow.text === caption ? (
+              <p dir="auto" className="font-content leading-relaxed text-[1.05rem]" style={{ unicodeBidi: "plaintext" }}>
+                {slow.chunks.map((chunk, i) => (
+                  <span
+                    key={i}
+                    className={`rounded px-0.5 transition-colors duration-200 ${i === slow.active ? "bg-primary/15 text-foreground" : "text-muted"}`}
+                  >
+                    {chunk}{" "}
+                  </span>
+                ))}
+              </p>
+            ) : (
+              <ChatMessageText text={caption} className="text-[1.05rem]" onTapWord={wordLookup.lookup} />
+            )}
           </div>
         )}
         {wordLookup.state && <WordCard state={wordLookup.state} onAdd={wordLookup.addToMyWords} onClose={wordLookup.close} />}
