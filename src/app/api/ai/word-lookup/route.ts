@@ -5,11 +5,13 @@ import {
   LOOKUP_WORD,
   buildWordLookupPrompt,
   cleanWordMeaning,
+  isStorableMeaning,
   normalizeTappedWord,
   type WordLookupResult,
   type WordMeaning,
 } from "@/lib/ai/prompts/wordLookup";
 import { logAiUsage } from "@/lib/ai/usageLog";
+import { findLearnerWord, saveLearnerWord } from "@/lib/vocabulary/learnerWords";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
 import { hasParentalClearance } from "@/lib/auth/consentServer";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
@@ -17,8 +19,9 @@ import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 // Tap a word in the teacher's message, see what it means. A word that is
 // in Saylo's own vocabulary comes straight from there (instant, written
 // by a person) and can be added to the learner's reviews; any other word
-// is explained in the context of its sentence by the model, and still
-// offered for review if its base form is in the catalog.
+// is explained in the context of its sentence by the model and joins the
+// shared pool of learner-added words (lib/vocabulary/learnerWords), so it
+// can go into reviews too.
 
 // The same word in the same sentence always means the same thing.
 const aiCache = new Map<string, WordMeaning | null>();
@@ -53,7 +56,8 @@ export async function POST(request: Request) {
   };
 
   const tapped = normalizeTappedWord(word);
-  let catalog = await findInCatalog(tapped);
+  const catalog = await findInCatalog(tapped);
+  let itemId: string | null = catalog?.id ?? null;
   let meaning: WordMeaning | null = null;
 
   if (!catalog) {
@@ -63,7 +67,7 @@ export async function POST(request: Request) {
     } else {
       const claudeMessage = await anthropic.messages.create({
         model: CLAUDE_MODEL,
-        max_tokens: 120,
+        max_tokens: 200,
         thinking: { type: "disabled" },
         messages: [{ role: "user", content: buildWordLookupPrompt(word, sentence) }],
       });
@@ -73,16 +77,20 @@ export async function POST(request: Request) {
       await logAiUsage(supabase, user.id, "word_lookup", claudeMessage.usage.input_tokens, claudeMessage.usage.output_tokens);
     }
     if (!meaning) return NextResponse.json({ error: "not found" }, { status: 404 });
-    if (meaning.lemma !== tapped) catalog = await findInCatalog(meaning.lemma);
+    // Its base form in the catalog, else in the words learners already
+    // added, else it joins them now, so it can always go into reviews.
+    if (meaning.lemma !== tapped) itemId = (await findInCatalog(meaning.lemma))?.id ?? null;
+    if (!itemId) itemId = await findLearnerWord(meaning.lemma);
+    if (!itemId && isStorableMeaning(meaning)) itemId = await saveLearnerWord(meaning, sentence);
   }
 
   let inMyWords = false;
-  if (catalog) {
+  if (itemId) {
     const { data: srs } = await supabase
       .from("srs_items")
       .select("id")
       .eq("profile_id", user.id)
-      .eq("vocabulary_item_id", catalog.id)
+      .eq("vocabulary_item_id", itemId)
       .maybeSingle();
     inMyWords = !!srs;
   }
@@ -94,7 +102,7 @@ export async function POST(request: Request) {
     headword: meaning?.lemma ?? catalog!.headword,
     translationHe: meaning?.he ?? catalog!.translation_he,
     partOfSpeech: meaning?.pos ?? catalog?.part_of_speech ?? null,
-    vocabularyItemId: catalog?.id ?? null,
+    vocabularyItemId: itemId,
     inMyWords,
   };
   return NextResponse.json(result);

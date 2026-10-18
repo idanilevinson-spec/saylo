@@ -65,6 +65,17 @@ export interface DueReviewItem {
   exercise: Exercise;
 }
 
+// The review question for each word: the curated ones, plus the ones made
+// for words learners added from a conversation (seed 051). Until that
+// seed runs the learner_added column doesn't exist, so the query falls
+// back to curated questions only rather than breaking reviews.
+async function reviewExercises(ids: string[]) {
+  const base = () => supabase.from("exercises").select("*").eq("type", "mcq").in("vocabulary_item_id", ids);
+  const withLearnerWords = await base().or("status.eq.published,learner_added.eq.true");
+  if (!withLearnerWords.error) return withLearnerWords;
+  return base().eq("status", "published");
+}
+
 // Today's review queue: SRS-due words first, topped up with never-reviewed
 // words up to `limit` — matches the spec's "N due + M new" daily review.
 export async function getDailyReview(profileId: string, limit = 20): Promise<DueReviewItem[]> {
@@ -109,12 +120,7 @@ export async function getDailyReview(profileId: string, limit = 20): Promise<Due
       .from("vocabulary_items")
       .select("id, headword, translation_he, example_en, ipa, part_of_speech")
       .in("id", allIds),
-    supabase
-      .from("exercises")
-      .select("*")
-      .eq("type", "mcq")
-      .eq("status", "published")
-      .in("vocabulary_item_id", allIds),
+    reviewExercises(allIds),
   ]);
 
   const exerciseByItem = new Map((exercises ?? []).map((e) => [e.vocabulary_item_id as string, e]));

@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getUser, maybeSingle, from, isPaidServer, create, extractText, ilike } = vi.hoisted(() => ({
+const { getUser, maybeSingle, from, isPaidServer, create, extractText, ilike, findLearnerWord, saveLearnerWord } = vi.hoisted(() => ({
+  findLearnerWord: vi.fn(),
+  saveLearnerWord: vi.fn(),
   getUser: vi.fn(),
   maybeSingle: vi.fn(),
   from: vi.fn(),
@@ -21,6 +23,7 @@ vi.mock("@/lib/ai/claudeClient", () => ({
   parseJsonResponse: (raw: string) => JSON.parse(raw),
 }));
 vi.mock("@/lib/ai/usageLog", () => ({ logAiUsage: vi.fn() }));
+vi.mock("@/lib/vocabulary/learnerWords", () => ({ findLearnerWord, saveLearnerWord }));
 
 import { POST } from "./route";
 
@@ -41,6 +44,8 @@ beforeEach(() => {
   mySrs = [];
   getUser.mockResolvedValue({ data: { user: { id: "user-1", user_metadata: { ai_consent_at: "2026-09-21T09:00:00.000Z" } } } });
   isPaidServer.mockResolvedValue(true);
+  findLearnerWord.mockResolvedValue(null);
+  saveLearnerWord.mockResolvedValue(null);
   create.mockResolvedValue({ usage: { input_tokens: 1, output_tokens: 1 } });
   from.mockImplementation((table: string) => {
     let headword = "";
@@ -94,10 +99,31 @@ describe("POST /api/ai/word-lookup", () => {
     expect(body).toMatchObject({ word: "arrived", headword: "arrive", translationHe: "להגיע", vocabularyItemId: "v2", inMyWords: false });
   });
 
-  it("explains a word that is not in the catalog, with nothing to add", async () => {
-    extractText.mockReturnValue(JSON.stringify({ lemma: "pursue", he: "לעסוק ב", pos: "verb" }));
+  it("adds a word that is nowhere yet to the learner words, so it can be reviewed", async () => {
+    extractText.mockReturnValue(
+      JSON.stringify({ lemma: "pursue", he: "לעסוק ב", pos: "verb", level: "B2", distractors: ["avoid", "borrow", "repair"] }),
+    );
+    saveLearnerWord.mockResolvedValue("lw1");
     const body = await (await POST(request("pursue", "I want to pursue marketing."))).json();
-    expect(body).toMatchObject({ headword: "pursue", translationHe: "לעסוק ב", vocabularyItemId: null });
+    expect(saveLearnerWord).toHaveBeenCalledWith(expect.objectContaining({ lemma: "pursue", level: "B2" }), "I want to pursue marketing.");
+    expect(body).toMatchObject({ headword: "pursue", translationHe: "לעסוק ב", vocabularyItemId: "lw1" });
+  });
+
+  it("reuses a word another learner already added", async () => {
+    extractText.mockReturnValue(
+      JSON.stringify({ lemma: "tacit", he: "משתמע", pos: "adjective", level: "C1", distractors: ["loud", "brief", "eager"] }),
+    );
+    findLearnerWord.mockResolvedValue("lw2");
+    const body = await (await POST(request("tacit", "It is tacit."))).json();
+    expect(saveLearnerWord).not.toHaveBeenCalled();
+    expect(body.vocabularyItemId).toBe("lw2");
+  });
+
+  it("explains a name without storing it", async () => {
+    extractText.mockReturnValue(JSON.stringify({ lemma: "dana", he: "דנה (שם)", pos: "name", level: "A1", distractors: ["a", "b", "c"] }));
+    const body = await (await POST(request("Dana", "Nice to meet you, Dana."))).json();
+    expect(saveLearnerWord).not.toHaveBeenCalled();
+    expect(body).toMatchObject({ translationHe: "דנה (שם)", vocabularyItemId: null });
   });
 
   it("never lets a % or _ in the word act as a wildcard", async () => {
