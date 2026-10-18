@@ -16,12 +16,15 @@ import ChatMessageText from "@/components/speaking/ChatMessageText";
 import CorrectionCard from "@/components/speaking/CorrectionCard";
 import CorrectionsPractice from "@/components/speaking/CorrectionsPractice";
 import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
+import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
 import type { ConversationMessage, ConversationScore } from "@/types/database";
 
 import { EASE_OUT } from "@/lib/motion/easing";
+
+const TAP_HINT_KEY = "saylo.wordTapHintSeen";
 export default function SpeakingChatPage() {
   return (
     <PremiumGate featureName="שיחה עם מורה AI" requirePaid>
@@ -69,6 +72,26 @@ function SpeakingChatInner() {
           ? lastMessage.id
           : null;
   const replyIdeas = useReplyIdeas(conversationId, ideasTurn);
+  const wordLookup = useWordLookup();
+  const hasTeacherMessage = !!messages?.some((m) => m.role === "assistant");
+  // The "tap a word" hint shows until the learner has tapped one once.
+  const [tapHintSeen, setTapHintSeen] = useState(() => {
+    try {
+      return localStorage.getItem(TAP_HINT_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const lookUpWord = (word: string, sentence: string) => {
+    wordLookup.lookup(word, sentence);
+    if (tapHintSeen) return;
+    setTapHintSeen(true);
+    try {
+      localStorage.setItem(TAP_HINT_KEY, "1");
+    } catch {
+      // Private mode: the hint just shows again next time.
+    }
+  };
 
   useEffect(() => {
     supabase
@@ -340,7 +363,7 @@ function SpeakingChatInner() {
               ) : (
                 <>
                   <div className="max-w-[80%] px-4 py-2.5 rounded-lg bg-card border border-card-border">
-                    <ChatMessageText text={m.content} />
+                    <ChatMessageText text={m.content} onTapWord={lookUpWord} />
                   </div>
                   <SayloAvatar expression="idle" gender={teacherGender} size={28} className="shrink-0" />
                 </>
@@ -383,6 +406,15 @@ function SpeakingChatInner() {
         </div>
       ) : (
         <div className="pt-2 border-t border-card-border">
+          {wordLookup.state ? (
+            <div className="mb-2">
+              <WordCard state={wordLookup.state} onAdd={wordLookup.addToMyWords} onClose={wordLookup.close} />
+            </div>
+          ) : (
+            hasTeacherMessage &&
+            !tapHintSeen &&
+            !replyIdeas.ideas && <p className="mb-1.5 text-xs text-muted">הקישו על מילה בהודעה של המורה כדי לראות מה היא אומרת.</p>
+          )}
           {replyIdeas.ideas && (
             <div className="mb-2 max-h-56 overflow-y-auto">
               <ReplyIdeasList

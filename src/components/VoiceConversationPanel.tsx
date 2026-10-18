@@ -12,6 +12,7 @@ import { isMicPermissionDeniedError } from "@/lib/speech/micPermission";
 import ChatMessageText from "@/components/speaking/ChatMessageText";
 import CorrectionCard from "@/components/speaking/CorrectionCard";
 import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
+import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
 import type { ConversationFix } from "@/lib/ai/conversationFix";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
@@ -109,6 +110,7 @@ export default function VoiceConversationPanel({
   const ideasTurn =
     !ending && (state === "listening" || state === "speaking" || state === "paused") ? (caption ?? (lastUserText ? null : "start")) : null;
   const replyIdeas = useReplyIdeas(conversationId, ideasTurn);
+  const wordLookup = useWordLookup();
   const [voicePref, setVoicePref] = useState<VoicePref>(() => loadVoicePref());
   const [viseme, setViseme] = useState<number | undefined>(undefined);
   const [rate, setRate] = useState(1);
@@ -619,9 +621,10 @@ export default function VoiceConversationPanel({
             }`}
           >
             <p className="text-xs text-muted">המורה</p>
-            <ChatMessageText text={caption} className="text-[1.05rem]" />
+            <ChatMessageText text={caption} className="text-[1.05rem]" onTapWord={wordLookup.lookup} />
           </div>
         )}
+        {wordLookup.state && <WordCard state={wordLookup.state} onAdd={wordLookup.addToMyWords} onClose={wordLookup.close} />}
         {replyIdeas.ideas && <ReplyIdeasList ideas={replyIdeas.ideas} hint="אפשר להגיד אחד מהם בקול, או משהו משלכם" onClose={replyIdeas.dismiss} />}
         {replyIdeas.failed && <p className="text-center text-sm text-muted">לא הצלחנו להביא רעיונות כרגע. נסו שוב.</p>}
       </div>
