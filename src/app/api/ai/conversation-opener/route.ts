@@ -1,5 +1,6 @@
 import { NextResponse, after } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
+import { DAILY_LIMIT_ERROR, underDailyAiLimit } from "@/lib/ai/dailyLimit";
 import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
 import { buildConversationSystemPrompt } from "@/lib/ai/prompts/conversationPartner";
 import { logAiUsage } from "@/lib/ai/usageLog";
@@ -30,6 +31,10 @@ export async function POST(request: Request) {
   const [paid, cleared] = await Promise.all([isPaidServer(supabase, user.id), hasParentalClearance(supabase, user.id)]);
   if (!paid) return NextResponse.json({ error: "premium required" }, { status: 403 });
   if (!cleared) return NextResponse.json({ error: "parental consent required" }, { status: 403 });
+
+  if (!(await underDailyAiLimit(supabase, user.id, "conversation_opener"))) {
+    return NextResponse.json({ error: DAILY_LIMIT_ERROR }, { status: 429 });
+  }
 
   const { conversationId, voiceMode } = (await request.json()) as { conversationId?: string; voiceMode?: boolean };
   if (!conversationId) return NextResponse.json({ error: "missing conversationId" }, { status: 400 });

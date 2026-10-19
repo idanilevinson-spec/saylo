@@ -23,6 +23,7 @@ import type { UsefulPhrase } from "@/lib/ai/prompts/usefulPhrases";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { tidyStreaming } from "@/lib/ai/conversationFix";
+import { DAILY_LIMIT_ERROR } from "@/lib/ai/dailyLimit";
 import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
 import type { ConversationMessage, ConversationScore } from "@/types/database";
 
@@ -60,6 +61,8 @@ function SpeakingChatInner() {
   const [showTranscript, setShowTranscript] = useState(false);
   const [teacherGender] = useState<VoicePref>(() => loadVoicePref());
   const [sendError, setSendError] = useState(false);
+  // Today's cap on teacher replies was reached (lib/ai/dailyLimit).
+  const [limitReached, setLimitReached] = useState(false);
   // The bubble a reply streamed into keeps its key once the stored message
   // replaces it, so it isn't animated in a second time.
   const [streamKey, setStreamKey] = useState<{ id: string; key: string } | null>(null);
@@ -184,6 +187,7 @@ function SpeakingChatInner() {
         if (!res.ok) {
           const { error } = await res.json().catch(() => ({ error: null }));
           if (error === "conversation already completed") setClosed(true);
+          if (error === DAILY_LIMIT_ERROR) setLimitReached(true);
           throw new Error("failed");
         }
         let reply = "";
@@ -470,7 +474,9 @@ function SpeakingChatInner() {
 
       {sendError && !closed && (
         <p role="alert" className="pb-2 text-center text-sm text-danger">
-          ההודעה לא נשלחה. בדקו את החיבור ונסו שוב.
+          {limitReached
+            ? "הגעתם למכסה היומית של שיחות עם המורה. אפשר להמשיך מחר."
+            : "ההודעה לא נשלחה. בדקו את החיבור ונסו שוב."}
         </p>
       )}
 
