@@ -27,6 +27,7 @@ import { requiresParentalConsent } from "@/lib/auth/consentGate";
 import type { CefrLevel, ConversationScenario, ConversationTopicCategory } from "@/types/database";
 import { shelveByLevel } from "@/lib/content/levelOrder";
 
+import { TrialTeacherStrip, trialConversationsLeft, useTeacherAccess } from "@/components/speaking/TrialTeacher";
 import { EASE_OUT } from "@/lib/motion/easing";
 const CATEGORIES: Record<
   ConversationTopicCategory,
@@ -59,6 +60,8 @@ export default function VoiceConversationHubPage() {
   const [scenarios, setScenarios] = useState<ConversationScenario[] | null>(null);
   const [starting, setStarting] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
+  // Trial learners get a taste of the teacher (lib/subscriptions/teacherTrial).
+  const teacherAccess = useTeacherAccess();
 
   // Within each topic, scenarios at the learner's level come first, then
   // one step around it, then the rest: a C2 learner no longer scrolls past
@@ -94,6 +97,7 @@ export default function VoiceConversationHubPage() {
 
   async function startConversation(scenarioId: string | null) {
     if (!profile || starting) return;
+    if (teacherAccess.mode === "trial" && trialConversationsLeft(teacherAccess) === 0) return;
     setStarting(true);
     setLimitReached(false);
     const { data, error } = await supabase
@@ -115,7 +119,7 @@ export default function VoiceConversationHubPage() {
   })).filter((group) => group.items.length > 0);
 
   return (
-    <PremiumGate featureName="שיחה קולית עם המורה" requirePaid>
+    <PremiumGate featureName="שיחה קולית עם המורה">
       <AiConsentGate declineHref="/speaking">
         <div className="max-w-3xl mx-auto px-4 py-12">
           <div className="animate-fade-up">
@@ -124,6 +128,8 @@ export default function VoiceConversationHubPage() {
               שיחה קולית עם המורה, כמו בטלפון. בחרו נושא, או פתחו שיחה חופשית על מה שבא לכם.
             </p>
           </div>
+
+          <TrialTeacherStrip access={teacherAccess} />
 
           {limitReached && (
             <div className="mt-6 p-4 rounded-lg bg-danger-ink text-danger text-sm">

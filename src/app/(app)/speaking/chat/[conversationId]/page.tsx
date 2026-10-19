@@ -19,6 +19,8 @@ import CorrectionsPractice from "@/components/speaking/CorrectionsPractice";
 import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
 import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
 import ConversationPhrases from "@/components/speaking/ConversationPhrases";
+import { TrialConversationNote, TrialTeacherUpsell, useTeacherAccess } from "@/components/speaking/TrialTeacher";
+import { TRIAL_TEACHER_LIMIT_ERROR, TRIAL_TEACHER_MESSAGES } from "@/lib/subscriptions/teacherTrial";
 import type { UsefulPhrase } from "@/lib/ai/prompts/usefulPhrases";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -36,7 +38,7 @@ const TAP_HINT_KEY = "saylo.wordTapHintSeen";
 const NO_PHRASES: UsefulPhrase[] = [];
 export default function SpeakingChatPage() {
   return (
-    <PremiumGate featureName="שיחה עם מורה AI" requirePaid>
+    <PremiumGate featureName="שיחה עם מורה AI">
       <ParentalConsentGuard title="שיחה עם מורה AI">
         <AiConsentGate declineHref="/speaking">
           <SpeakingChatInner />
@@ -64,6 +66,13 @@ function SpeakingChatInner() {
   const [sendError, setSendError] = useState(false);
   // Today's cap on teacher replies was reached (lib/ai/dailyLimit).
   const [limitReached, setLimitReached] = useState(false);
+  // The free trial's taste of the teacher: which trial conversation this is
+  // and whether its messages are used up (the route enforces the same).
+  const teacherAccess = useTeacherAccess();
+  const isTrial = teacherAccess.mode === "trial";
+  const trialIndex = isTrial ? teacherAccess.conversationIds.indexOf(conversationId) : -1;
+  const trialBlocked = isTrial && trialIndex < 0;
+  const [trialEnded, setTrialEnded] = useState(false);
   // The bubble a reply streamed into keeps its key once the stored message
   // replaces it, so it isn't animated in a second time.
   const [streamKey, setStreamKey] = useState<{ id: string; key: string } | null>(null);
@@ -77,7 +86,13 @@ function SpeakingChatInner() {
   const [openerDone, setOpenerDone] = useState(false);
   const openerAskedRef = useRef(false);
   const awaitingOpener =
-    messages !== null && messages.length === 0 && !closed && !searchParams.get("starter") && !openerDone;
+    messages !== null &&
+    messages.length === 0 &&
+    !closed &&
+    !searchParams.get("starter") &&
+    !openerDone &&
+    teacherAccess.mode !== "loading" &&
+    !trialBlocked;
   useEffect(() => {
     if (!awaitingOpener || openerAskedRef.current) return;
     openerAskedRef.current = true;
@@ -189,6 +204,7 @@ function SpeakingChatInner() {
           const { error } = await res.json().catch(() => ({ error: null }));
           if (error === "conversation already completed") setClosed(true);
           if (error === DAILY_LIMIT_ERROR) setLimitReached(true);
+          if (error === TRIAL_TEACHER_LIMIT_ERROR) setTrialEnded(true);
           throw new Error("failed");
         }
         let reply = "";
@@ -379,6 +395,8 @@ function SpeakingChatInner() {
   }
 
   const hasUserMessage = !!messages?.some((m) => m.role === "user");
+  const userMessageCount = messages?.filter((m) => m.role === "user").length ?? 0;
+  const trialOut = isTrial && (trialBlocked || trialEnded || userMessageCount >= TRIAL_TEACHER_MESSAGES);
   const lastUserIndex = messages ? messages.map((m) => m.role).lastIndexOf("user") : -1;
   const lastUser = lastUserIndex >= 0 ? messages![lastUserIndex] : null;
   const lastUserFix = lastUserIndex >= 0 ? (messages![lastUserIndex + 1]?.correction ?? null) : null;
@@ -481,6 +499,8 @@ function SpeakingChatInner() {
         </p>
       )}
 
+      {isTrial && !trialOut && !closed && <TrialConversationNote index={trialIndex} userMessages={userMessageCount} />}
+
       {closed ? (
         <div className="border-t border-card-border pt-4 text-center">
           <p className="text-sm text-muted">השיחה הזו כבר הסתיימה.</p>
@@ -491,6 +511,10 @@ function SpeakingChatInner() {
           >
             לשיחה חדשה
           </MotionLink>
+        </div>
+      ) : trialOut ? (
+        <div className="border-t border-card-border pt-2">
+          <TrialTeacherUpsell conversationEnded={!trialBlocked} />
         </div>
       ) : voiceMode ? (
         <div className="flex-1 min-h-0">

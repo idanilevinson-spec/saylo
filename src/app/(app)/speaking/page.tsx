@@ -35,6 +35,7 @@ import ConsentRequestForm from "@/components/ConsentRequestForm";
 import PremiumGate from "@/components/PremiumGate";
 import AiConsentGate from "@/components/AiConsentGate";
 import TeacherNotebook from "@/components/speaking/TeacherNotebook";
+import { TrialTeacherStrip, trialConversationsLeft, useTeacherAccess } from "@/components/speaking/TrialTeacher";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { requiresParentalConsent } from "@/lib/auth/consentGate";
@@ -138,6 +139,8 @@ export default function SpeakingPage() {
   const [streak, setStreak] = useState<number | null>(null);
   const [starting, setStarting] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
+  // Trial learners get a taste of the teacher (lib/subscriptions/teacherTrial).
+  const teacherAccess = useTeacherAccess();
 
   // Scenarios at the learner's level first within each topic (speaking
   // level, else vocabulary), as on the voice-call page.
@@ -196,6 +199,8 @@ export default function SpeakingPage() {
 
   async function startConversation(scenarioId: string | null, opts: { voice?: boolean; starter?: string } = {}) {
     if (!profile || starting) return;
+    // The trial's conversations are used up: the strip above says so.
+    if (teacherAccess.mode === "trial" && trialConversationsLeft(teacherAccess) === 0) return;
     setStarting(true);
     setLimitReached(false);
     const { data, error } = await supabase
@@ -224,7 +229,7 @@ export default function SpeakingPage() {
     .filter((g) => g.items.length > 0);
 
   return (
-    <PremiumGate featureName="מורה AI" requirePaid>
+    <PremiumGate featureName="מורה AI">
       <AiConsentGate>
         <div className="max-w-4xl mx-auto px-4 pt-8 pb-16">
           {/* Daily goal strip */}
@@ -252,6 +257,8 @@ export default function SpeakingPage() {
               </div>
             )}
           </div>
+
+          <TrialTeacherStrip access={teacherAccess} />
 
           {limitReached && (
             <div role="alert" className="mt-5 p-4 rounded-lg bg-danger-ink text-danger text-sm">

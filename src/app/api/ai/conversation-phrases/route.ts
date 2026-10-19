@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
+import { TRIAL_TEACHER_LIMIT_ERROR, trialTeacherConversationIds } from "@/lib/subscriptions/teacherTrial";
 import { findLearnerWord, saveLearnerWord } from "@/lib/vocabulary/learnerWords";
 import type { ConversationFeedback } from "@/types/database";
 
@@ -16,12 +17,16 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  if (!(await isPaidServer(supabase, user.id))) {
-    return NextResponse.json({ error: "premium required" }, { status: 403 });
-  }
+  const paid = await isPaidServer(supabase, user.id);
+  // Not paying: a trial learner's first conversations still get the teacher.
+  const trialConversations = paid ? null : await trialTeacherConversationIds(supabase, user.id);
+  if (!paid && !trialConversations) return NextResponse.json({ error: "premium required" }, { status: 403 });
 
   const { conversationId } = (await request.json()) as { conversationId?: string };
   if (!conversationId) return NextResponse.json({ error: "missing conversationId" }, { status: 400 });
+  if (trialConversations && !trialConversations.includes(conversationId)) {
+    return NextResponse.json({ error: TRIAL_TEACHER_LIMIT_ERROR }, { status: 403 });
+  }
 
   const { data: conversation } = await supabase
     .from("conversations")

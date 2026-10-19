@@ -14,6 +14,7 @@ import {
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { findLearnerWord, saveLearnerWord } from "@/lib/vocabulary/learnerWords";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
+import { trialTeacherConversationIds } from "@/lib/subscriptions/teacherTrial";
 import { hasParentalClearance } from "@/lib/auth/consentServer";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 
@@ -37,7 +38,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: AI_CONSENT_REQUIRED_ERROR }, { status: 403 });
   }
   const [paid, cleared] = await Promise.all([isPaidServer(supabase, user.id), hasParentalClearance(supabase, user.id)]);
-  if (!paid) return NextResponse.json({ error: "premium required" }, { status: 403 });
+  // Not paying: a trial learner uses it inside their trial conversations.
+  if (!paid && !(await trialTeacherConversationIds(supabase, user.id))) {
+    return NextResponse.json({ error: "premium required" }, { status: 403 });
+  }
   if (!cleared) return NextResponse.json({ error: "parental consent required" }, { status: 403 });
 
   if (!(await underDailyAiLimit(supabase, user.id, "word_lookup"))) {

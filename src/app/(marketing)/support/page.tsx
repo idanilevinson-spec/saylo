@@ -59,8 +59,8 @@ export default function SupportPage() {
           .
         </p>
         <p>
-          <strong className="text-foreground">השיחה עם מורה ה-AI לא זמינה לי.</strong> שיחה עם המורה, בטקסט ובקול,
-          זמינה רק במנוי בתשלום, ולא בתקופת הניסיון החינם. יש גם מגבלת שימוש הוגן, כמפורט ב
+          <strong className="text-foreground">השיחה עם מורה ה-AI לא זמינה לי.</strong> בתקופת הניסיון אפשר
+          לנסות את המורה ב-2 שיחות, עד 12 הודעות בכל אחת, ואחר כך השיחה זמינה במנוי בתשלום. יש גם מגבלת שימוש הוגן, כמפורט ב
           <Link href="/terms" className={linkClass}>
             תנאי השימוש
           </Link>

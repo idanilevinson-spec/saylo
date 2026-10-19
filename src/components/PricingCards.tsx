@@ -254,7 +254,7 @@ export default function PricingCards() {
           )}
           <p className="mt-3 text-xs text-muted leading-relaxed">
             שימוש הוגן: עד {DAILY_CONVERSATION_LIMIT} שיחות חדשות עם המורה ועד {DAILY_WRITING_LIMIT} הגשות כתיבה בכל 24 שעות.
-            שיחה עם המורה זמינה במנוי בתשלום בלבד, ולא בניסיון החינם.
+            בניסיון החינם אפשר לנסות את המורה ב-2 שיחות, עד 12 הודעות בכל אחת. שיחה בלי הגבלה זמינה במנוי בתשלום.
           </p>
         </motion.div>
       </div>
