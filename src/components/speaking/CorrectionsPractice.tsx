@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CheckCircle2, Eye, Mic, XCircle } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import MixedText from "@/components/MixedText";
 import SpeakButton from "@/components/SpeakButton";
 import PronunciationRecorder from "@/components/PronunciationRecorder";
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
@@ -41,7 +42,11 @@ function CorrectionDrill({
       >
         {fix.original}
       </EnglishText>
-      {fix.why && <p className="mt-1 text-sm text-muted">{fix.why}</p>}
+      {fix.why && (
+        <p className="mt-1 text-sm text-muted">
+          <MixedText>{fix.why}</MixedText>
+        </p>
+      )}
 
       <div className="mt-3 flex gap-2">
         <input
