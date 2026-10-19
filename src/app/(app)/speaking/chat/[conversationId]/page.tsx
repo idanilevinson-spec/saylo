@@ -372,10 +372,11 @@ function SpeakingChatInner() {
   const lastUserFix = lastUserIndex >= 0 ? (messages![lastUserIndex + 1]?.correction ?? null) : null;
 
   return (
-    <div
-      className="max-w-xl mx-auto px-4 py-6 flex flex-col"
-      style={{ height: "calc(100dvh - var(--navbar-h, 6rem) - env(safe-area-inset-bottom))" }}
-    >
+    // The page layout keeps room under every page for the floating help and
+    // accessibility buttons (main's pb-20 / sm:pb-28); the chat stops above
+    // it, so the page itself never scrolls and those buttons never cover
+    // the send button.
+    <div className="max-w-xl mx-auto px-4 py-6 flex flex-col h-[calc(100dvh-var(--navbar-h,6rem)-env(safe-area-inset-bottom)-5rem)] sm:h-[calc(100dvh-var(--navbar-h,6rem)-env(safe-area-inset-bottom)-7rem)]">
       <div className="flex items-center justify-between mb-4">
         <MotionLink
           whileTap={{ scale: 0.97 }}
@@ -535,7 +536,7 @@ function SpeakingChatInner() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               disabled={sending}
-              placeholder="כתבו באנגלית. אפשר גם לשאול בעברית"
+              placeholder="באנגלית, או שאלה בעברית"
               className="flex-1 px-4 py-2.5 rounded-lg border border-card-border bg-card font-content focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-70"
             />
             <motion.button
