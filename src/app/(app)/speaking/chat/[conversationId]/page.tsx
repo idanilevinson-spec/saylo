@@ -24,6 +24,7 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { tidyStreaming } from "@/lib/ai/conversationFix";
 import { DAILY_LIMIT_ERROR } from "@/lib/ai/dailyLimit";
+import { MAX_MESSAGE_CHARS } from "@/lib/ai/conversationHistory";
 import { loadVoicePref, type VoicePref } from "@/lib/speech/voicePref";
 import type { ConversationMessage, ConversationScore } from "@/types/database";
 
@@ -544,6 +545,7 @@ function SpeakingChatInner() {
               dir="auto"
               lang={undefined}
               enterKeyHint="send"
+            maxLength={MAX_MESSAGE_CHARS}
               aria-label="הקלידו הודעה באנגלית, או שאלה בעברית"
               value={input}
               onChange={(e) => setInput(e.target.value)}
