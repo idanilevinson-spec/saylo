@@ -6,6 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Phone } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import MixedText from "@/components/MixedText";
 import MotionLink from "@/components/MotionLink";
 import PremiumGate from "@/components/PremiumGate";
 import ParentalConsentGuard from "@/components/ParentalConsentGuard";
@@ -18,6 +19,7 @@ import CorrectionsPractice from "@/components/speaking/CorrectionsPractice";
 import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
 import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
 import ConversationPhrases from "@/components/speaking/ConversationPhrases";
+import type { UsefulPhrase } from "@/lib/ai/prompts/usefulPhrases";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import { tidyStreaming } from "@/lib/ai/conversationFix";
@@ -27,6 +29,9 @@ import type { ConversationMessage, ConversationScore } from "@/types/database";
 import { EASE_OUT } from "@/lib/motion/easing";
 
 const TAP_HINT_KEY = "saylo.wordTapHintSeen";
+// One shared empty list, so the phrases section's effect doesn't rerun on
+// every render of an older summary that has none.
+const NO_PHRASES: UsefulPhrase[] = [];
 export default function SpeakingChatPage() {
   return (
     <PremiumGate featureName="שיחה עם מורה AI" requirePaid>
@@ -284,7 +289,9 @@ function SpeakingChatInner() {
           transition={{ duration: 0.25, delay: 0.3, ease: EASE_OUT }}
           className="mt-6 bg-card border border-card-border rounded-lg p-6"
         >
-          <p className="leading-relaxed">{score.feedback.generalSuggestionsHe}</p>
+          <p className="leading-relaxed">
+            <MixedText>{score.feedback.generalSuggestionsHe}</MixedText>
+          </p>
         </motion.div>
 
         {/* The corrections the teacher made during the call, as a short
@@ -299,7 +306,7 @@ function SpeakingChatInner() {
         {score.feedback.overusedWords.length > 0 && (
           <FeedbackList title="מילים שחזרו יותר מדי" items={score.feedback.overusedWords} english />
         )}
-        <ConversationPhrases conversationId={conversationId} phrases={score.feedback.usefulPhrases ?? []} />
+        <ConversationPhrases conversationId={conversationId} phrases={score.feedback.usefulPhrases ?? NO_PHRASES} />
 
         {/* Older summaries, saved before the phrases above existed, keep
             their plain word list. */}
@@ -586,7 +593,7 @@ function FeedbackList({ title, items, english }: { title: string; items: string[
       <ul className="mt-2 space-y-1.5">
         {items.map((item, i) => (
           <li key={i} className="text-sm">
-            {english ? <EnglishText>{item}</EnglishText> : item}
+            {english ? <EnglishText>{item}</EnglishText> : <MixedText>{item}</MixedText>}
           </li>
         ))}
       </ul>

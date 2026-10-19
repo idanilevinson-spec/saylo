@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase/browserClient";
+import { useAuth } from "@/context/AuthProvider";
 import { Check, Mic, Plus } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import SpeakButton from "@/components/SpeakButton";
@@ -12,6 +14,29 @@ import type { UsefulPhrase } from "@/lib/ai/prompts/usefulPhrases";
 // from, and one button that puts them all into the learner's reviews.
 export default function ConversationPhrases({ conversationId, phrases }: { conversationId: string; phrases: UsefulPhrase[] }) {
   const [state, setState] = useState<"idle" | "adding" | "added" | "failed">("idle");
+  const { profile } = useAuth();
+
+  // Coming back to a summary: if every phrase is already in their reviews,
+  // say so instead of offering to add them again.
+  useEffect(() => {
+    if (!profile || !phrases.length) return;
+    supabase
+      .from("srs_items")
+      .select("vocabulary_items!inner(headword)")
+      .eq("profile_id", profile.id)
+      .in(
+        "vocabulary_items.headword",
+        phrases.map((p) => p.lemma),
+      )
+      .then(({ data }) => {
+        const have = new Set(
+          ((data ?? []) as unknown as { vocabulary_items: { headword: string } }[]).map((r) =>
+            r.vocabulary_items.headword.toLowerCase(),
+          ),
+        );
+        if (phrases.every((p) => have.has(p.lemma))) setState((s) => (s === "idle" ? "added" : s));
+      });
+  }, [profile, phrases]);
   // The one phrase whose sentence is being practised out loud.
   const [aloud, setAloud] = useState<string | null>(null);
 
