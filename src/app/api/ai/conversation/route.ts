@@ -12,7 +12,7 @@ import { splitConversationReply, streamableText, type ConversationFix } from "@/
 import { getLearnerMemory } from "@/lib/ai/learnerMemory";
 import { buildPersonaNote, detectLearnerMood } from "@/lib/ai/prompts/teacherPersona";
 import type { AgeBand, ConversationTopicCategory } from "@/types/database";
-import { withOpenerCue } from "@/lib/ai/prompts/conversationOpener";
+import { MAX_MESSAGE_CHARS, historyForModel } from "@/lib/ai/conversationHistory";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -48,6 +48,9 @@ export async function POST(request: Request) {
   };
   if (!conversationId || !message?.trim()) {
     return NextResponse.json({ error: "missing conversationId or message" }, { status: 400 });
+  }
+  if (message.length > MAX_MESSAGE_CHARS) {
+    return NextResponse.json({ error: "message too long" }, { status: 400 });
   }
 
   const { data: conversation } = await supabase
@@ -119,7 +122,7 @@ export async function POST(request: Request) {
     thinking: { type: "disabled" as const },
     system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode, memory, personaNote),
     ...(voiceMode ? {} : { tools: [{ type: "web_search_20260318" as const, name: "web_search" as const, max_uses: 2 }] }),
-    messages: withOpenerCue(history).map((m) => ({
+    messages: historyForModel(history).map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("assistant" as const),
       content: m.content,
     })),
