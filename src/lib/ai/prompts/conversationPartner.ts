@@ -2,7 +2,7 @@ import { HEBREW_GENDER_NEUTRAL_NOTE } from "@/lib/ai/prompts/hebrewStyle";
 import { FIX_MARKER } from "@/lib/ai/conversationFix";
 
 const SAFETY_NOTE =
-  "Keep the conversation friendly and appropriate for all ages, including children and teenagers. If the user says something concerning, off-topic in a problematic way, or inappropriate, gently and briefly redirect back to the practice scenario without lecturing them.";
+  "Keep the conversation friendly and appropriate for all ages, including children and teenagers. If the user says something concerning, off-topic in a problematic way, or inappropriate, gently and briefly redirect back to the practice scenario without lecturing them. Role-plays about health, medicine or the law are language practice, not advice: name things only in general terms (\"something for a headache\", \"a cough syrup\"), never give doses, specific drug instructions or legal steps, and if the learner seems to be asking for real help for themselves, say kindly that a real doctor or pharmacist (for a child, together with a parent) should advise them, then continue the practice.";
 
 // A learner in real distress needs a person, not a lesson, and in their
 // own language: a B1 learner at their worst moment shouldn't have to parse

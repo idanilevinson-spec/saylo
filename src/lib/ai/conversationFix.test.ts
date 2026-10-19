@@ -46,6 +46,12 @@ describe("conversation prompt", () => {
     expect(buildConversationSystemPrompt(null, "B1", true)).not.toMatch(/Length on this call/);
   });
 
+  it("keeps health and legal role-plays general: no doses, real questions go to a professional", () => {
+    const prompt = buildConversationSystemPrompt("You are a pharmacist.", "A2");
+    expect(prompt).toMatch(/never give doses/);
+    expect(prompt).toMatch(/real doctor or pharmacist/);
+  });
+
   it("answers real distress in Hebrew with Israeli help lines, in every mode", () => {
     for (const prompt of [buildConversationSystemPrompt(null, "C1"), buildConversationSystemPrompt("You are a waiter.", "A1", false)]) {
       expect(prompt).toMatch(/simple Hebrew \(not English\)/);
