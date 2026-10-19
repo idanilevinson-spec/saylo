@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/serverClient";
+import { DAILY_LIMIT_ERROR, underDailyAiLimit } from "@/lib/ai/dailyLimit";
 import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
 import { buildConversationSystemPrompt } from "@/lib/ai/prompts/conversationPartner";
 import { logAiUsage } from "@/lib/ai/usageLog";
@@ -31,6 +32,10 @@ export async function POST(request: Request) {
   }
   if (!cleared) {
     return NextResponse.json({ error: "parental consent required" }, { status: 403 });
+  }
+
+  if (!(await underDailyAiLimit(supabase, user.id, "conversation_turn"))) {
+    return NextResponse.json({ error: DAILY_LIMIT_ERROR }, { status: 429 });
   }
 
   const { conversationId, message, voiceMode, stream } = (await request.json()) as {

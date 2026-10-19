@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
+import { DAILY_LIMIT_ERROR, underDailyAiLimit } from "@/lib/ai/dailyLimit";
 import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/ai/claudeClient";
 import { buildSpeakingTestResponsePrompt } from "@/lib/ai/prompts/speakingTestResponse";
 import { logAiUsage } from "@/lib/ai/usageLog";
@@ -28,6 +29,10 @@ export async function POST(request: Request) {
   }
   if (!(await isPremiumServer(supabase, user.id))) {
     return NextResponse.json({ error: "premium required" }, { status: 403 });
+  }
+
+  if (!(await underDailyAiLimit(supabase, user.id, "speaking_test_response"))) {
+    return NextResponse.json({ error: DAILY_LIMIT_ERROR }, { status: 429 });
   }
 
   const { questionEn, transcript } = (await request.json()) as { questionEn?: string; transcript?: string };

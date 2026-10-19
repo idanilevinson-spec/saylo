@@ -1,5 +1,6 @@
 import { NextResponse, after } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
+import { DAILY_LIMIT_ERROR, underDailyAiLimit } from "@/lib/ai/dailyLimit";
 import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/ai/claudeClient";
 import {
   LOOKUP_WORD,
@@ -38,6 +39,10 @@ export async function POST(request: Request) {
   const [paid, cleared] = await Promise.all([isPaidServer(supabase, user.id), hasParentalClearance(supabase, user.id)]);
   if (!paid) return NextResponse.json({ error: "premium required" }, { status: 403 });
   if (!cleared) return NextResponse.json({ error: "parental consent required" }, { status: 403 });
+
+  if (!(await underDailyAiLimit(supabase, user.id, "word_lookup"))) {
+    return NextResponse.json({ error: DAILY_LIMIT_ERROR }, { status: 429 });
+  }
 
   const { word, sentence } = (await request.json()) as { word?: string; sentence?: string };
   if (!word || !LOOKUP_WORD.test(word) || !sentence || sentence.length > 600) {
