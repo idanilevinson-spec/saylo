@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
-import LandingCorrectionDemo from "@/components/LandingCorrectionDemo";
+import LandingNotebook from "@/components/LandingNotebook";
 import AppStoreButton from "@/components/AppStoreButton";
 import { useAuth } from "@/context/AuthProvider";
 
@@ -56,7 +56,7 @@ export default function LandingHero() {
             </EnglishText>
           </div>
 
-          <div className="grid lg:grid-cols-[1.3fr_1fr] gap-8 lg:gap-10 items-start">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div className="rise-in relative bg-card rounded-lg shadow-2xl p-6 sm:p-9">
               {/* The card's edge, a broadcast-graphic detail. */}
               <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-primary" />
@@ -104,12 +104,12 @@ export default function LandingHero() {
               <AppStoreButton className="mt-4" />
             </div>
 
-            {/* The signature moment: not a screenshot of the product but
-                the product's real mechanism, playing live and looping
-                through a handful of real mistakes — inside the first
-                viewport on desktop, not scrolled past. */}
+            {/* The signature moment: the mistakes notebook, filling itself
+                in. Not a screenshot of the product but its real mechanism
+                (a mistake corrected, explained and saved), one page per
+                mistake, inside the first viewport on desktop. */}
             <div className="rise-in" style={{ animationDelay: "0.15s" }}>
-              <LandingCorrectionDemo />
+              <LandingNotebook />
             </div>
           </div>
         </div>
