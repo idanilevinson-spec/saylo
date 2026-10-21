@@ -186,7 +186,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
       <>
         <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
         <div className="mt-3">
-          <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} label="הבנת הנקרא" titleEn={text.title_en} />
+          <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} label="הבנת הנקרא" storyTitle={text.title_en} />
         </div>
       </>
     );
@@ -197,7 +197,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
       <>
         <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
         <div className="mt-3">
-          <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} label="הבנת הנקרא" titleEn={text.title_en} />
+          <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} label="הבנת הנקרא" storyTitle={text.title_en} />
         </div>
 
         <h2 className="mt-8 text-lg font-bold text-muted">מבחן הבנה</h2>

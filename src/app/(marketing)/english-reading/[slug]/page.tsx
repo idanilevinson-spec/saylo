@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronRight, Target } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import PracticeLink from "@/components/PracticeLink";
-import PrintedPage from "@/components/PrintedPage";
+import PrintedPage, { DropCap, splitDropCap } from "@/components/PrintedPage";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
@@ -76,12 +76,26 @@ export default async function EnglishReadingText({ params }: { params: Promise<{
           <h1 className="mt-2 text-3xl sm:text-4xl font-black tracking-tight">{text.title_he}</h1>
         </header>
 
-        <PrintedPage label="קטע קריאה" className="mt-6">
-          <h2 className="text-xl sm:text-2xl font-bold">{text.title_en}</h2>
-          <div className="mt-4 space-y-4 text-lg leading-relaxed">
-            {paragraphs.map((p, i) => (
-              <p key={i}>{p.trim()}</p>
-            ))}
+        <PrintedPage label="קטע קריאה" variant="story" storyTitle={text.title_en} className="mt-6">
+          <div className="space-y-4 text-lg leading-relaxed">
+            {paragraphs.map((p, i) => {
+              const opening = i === 0 ? splitDropCap(p.trim()) : null;
+              return (
+                <p key={i} className="story-para">
+                  <span aria-hidden="true" className="story-para-num story-para-num-static">
+                    <span className="story-para-num-label">{i + 1}</span>
+                  </span>
+                  {opening ? (
+                    <>
+                      <DropCap letter={opening[0]} />
+                      {opening[1] + opening[2]}
+                    </>
+                  ) : (
+                    p.trim()
+                  )}
+                </p>
+              );
+            })}
           </div>
         </PrintedPage>
 
