@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronRight, Target } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import PracticeLink from "@/components/PracticeLink";
+import PrintedPage from "@/components/PrintedPage";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
@@ -75,19 +76,14 @@ export default async function EnglishReadingText({ params }: { params: Promise<{
           <h1 className="mt-2 text-3xl sm:text-4xl font-black tracking-tight">{text.title_he}</h1>
         </header>
 
-        <article
-          lang="en"
-          dir="ltr"
-          className="relative mt-6 overflow-hidden rounded-lg border border-card-border bg-card px-5 py-6 sm:px-9 sm:py-8 text-left font-content"
-        >
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
+        <PrintedPage label="קטע קריאה" className="mt-6">
           <h2 className="text-xl sm:text-2xl font-bold">{text.title_en}</h2>
           <div className="mt-4 space-y-4 text-lg leading-relaxed">
             {paragraphs.map((p, i) => (
               <p key={i}>{p.trim()}</p>
             ))}
           </div>
-        </article>
+        </PrintedPage>
 
         {text.questions.length > 0 && (
           <section aria-labelledby="questions" className="mt-10">

@@ -1003,3 +1003,120 @@ textarea::placeholder {
 :root[data-a11y-motion="reduced"][data-intro] .app-intro {
   display: none;
 }
+
+/* A long English text set as a printed page (PrintedPage.tsx): the reading
+   texts and the Bagrut passages. Paper follows the theme here, unlike the
+   hero's notebook: a learner reads these for minutes at a time, and a bright
+   sheet in dark mode would glare. Muted text on the paper: 5.6:1 light,
+   6.4:1 dark. */
+.printed-page {
+  --page-paper: #fffdf8;
+  --page-edge: #e6ddca;
+  --page-margin: rgba(180, 35, 24, 0.22);
+  position: relative;
+  padding: 1.5rem 1.25rem 2.25rem 2.75rem;
+  border-radius: 6px;
+  background: var(--page-paper);
+  color: var(--foreground);
+  counter-reset: page-para;
+  /* A few sheets under the page, and its shadow on the desk. */
+  box-shadow:
+    0 0 0 1px var(--page-edge),
+    0 4px 0 -1px var(--page-paper),
+    0 4px 0 0 var(--page-edge),
+    0 8px 0 -2px var(--page-paper),
+    0 8px 0 -1px var(--page-edge),
+    0 22px 30px -22px rgba(33, 28, 20, 0.45);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .printed-page {
+    --page-paper: #1c1b18;
+    --page-edge: #34312b;
+    --page-margin: rgba(248, 113, 113, 0.22);
+  }
+}
+:root[data-theme="dark"] .printed-page {
+  --page-paper: #1c1b18;
+  --page-edge: #34312b;
+  --page-margin: rgba(248, 113, 113, 0.22);
+}
+:root[data-a11y-contrast="high"] .printed-page {
+  --page-paper: #ffffff;
+  --page-edge: #000000;
+  --page-margin: #cc0000;
+}
+@media (min-width: 640px) {
+  .printed-page {
+    padding: 2rem 2.5rem 2.75rem 4rem;
+  }
+}
+/* The margin rule, on the English text's reading-start side. */
+.printed-page::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 2rem;
+  width: 1px;
+  background: var(--page-margin);
+}
+@media (min-width: 640px) {
+  .printed-page::before {
+    left: 3rem;
+  }
+}
+.printed-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--page-edge);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+.printed-page-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.printed-page-body {
+  max-width: 68ch;
+  text-align: left;
+}
+/* Numbered paragraphs in the margin: questions point at them. A zero-width
+   inline-block at the start of the first line, so the number sits on that
+   line's baseline whatever the text size or leading; rtl makes it grow
+   leftward, into the margin. */
+.printed-page-body p {
+  counter-increment: page-para;
+}
+.printed-page-body p::before {
+  content: counter(page-para) / "";
+  display: inline-block;
+  position: relative;
+  left: -1.1rem;
+  width: 0;
+  direction: rtl;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 640px) {
+  .printed-page-body p::before {
+    left: -1.4rem;
+  }
+}
+/* The end of the text: a short rule, the way a printed passage closes. */
+.printed-page-end {
+  display: block;
+  width: 2.5rem;
+  height: 2px;
+  margin: 1.75rem auto 0;
+  border-radius: 1px;
+  background: var(--page-edge);
+}

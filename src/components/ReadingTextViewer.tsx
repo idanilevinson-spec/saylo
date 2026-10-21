@@ -5,6 +5,7 @@ import { Volume2, Play, Pause, Loader2, X } from "lucide-react";
 import { speak } from "@/lib/speech/browserTts";
 import { useNeuralSpeech, NEURAL_SPEECH_RATES } from "@/lib/speech/useNeuralSpeech";
 import EnglishText from "@/components/EnglishText";
+import PrintedPage from "@/components/PrintedPage";
 import type { VocabularyLookupEntry } from "@/lib/content/vocabulary";
 import { CEFR_ORDER } from "@/lib/assessment/cefrScoring";
 import type { CefrLevel } from "@/types/database";
@@ -14,6 +15,9 @@ interface ReadingTextViewerProps {
   vocabByWord: Record<string, VocabularyLookupEntry>;
   // The text's level: the glossary leaves out words well below it.
   textLevel?: CefrLevel;
+  // The printed page's running head.
+  label?: string;
+  titleEn?: string;
 }
 
 function normalizeWord(word: string): string {
@@ -62,7 +66,7 @@ function tokenizeWords(
 // pause/resume at the exact point playback was at, and adjusting speed
 // without losing your place — none of which are achievable once several
 // paragraphs are baked into a single audio clip.
-export default function ReadingTextViewer({ bodyEn, vocabByWord, textLevel }: ReadingTextViewerProps) {
+export default function ReadingTextViewer({ bodyEn, vocabByWord, textLevel, label, titleEn }: ReadingTextViewerProps) {
   // Blank lines between paragraphs come through as \r\n\r\n when the
   // source SQL was saved/pasted with Windows line endings, not just \n\n
   // — matching (\r\n|\n) as one unit before requiring 2+ of them handles
@@ -124,28 +128,30 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord, textLevel }: Re
         </div>
       </div>
 
-      <div dir="ltr" lang="en" className="font-content text-lg leading-loose text-left space-y-4">
-        {paragraphs.map((paragraph, pIdx) => (
-          <p
-            key={pIdx}
-            className={`rounded-lg transition-colors ${activeParagraph === pIdx ? "bg-primary/5" : ""}`}
-          >
-            <button
-              onClick={() => play(pIdx)}
-              aria-label={`הקראת פסקה ${pIdx + 1}`}
-              title="הקראה מכאן"
-              className="inline-flex items-center justify-center w-6 h-6 mr-1.5 align-middle rounded-full text-muted hover:text-primary hover:bg-primary/10 transition-colors"
+      <PrintedPage label={label} titleEn={titleEn}>
+        <div className="text-lg leading-loose text-left space-y-4">
+          {paragraphs.map((paragraph, pIdx) => (
+            <p
+              key={pIdx}
+              className={`rounded-lg transition-colors ${activeParagraph === pIdx ? "bg-primary/5" : ""}`}
             >
-              {activeParagraph === pIdx && playback === "loading" ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <Play size={11} />
-              )}
-            </button>
-            {tokenizeWords(paragraph, vocabByWord, minLevel, (word, entry) => setPopover({ word, entry }))}
-          </p>
-        ))}
-      </div>
+              <button
+                onClick={() => play(pIdx)}
+                aria-label={`הקראת פסקה ${pIdx + 1}`}
+                title="הקראה מכאן"
+                className="inline-flex items-center justify-center w-6 h-6 mr-1.5 align-middle rounded-full text-muted hover:text-primary hover:bg-primary/10 transition-colors"
+              >
+                {activeParagraph === pIdx && playback === "loading" ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : (
+                  <Play size={11} />
+                )}
+              </button>
+              {tokenizeWords(paragraph, vocabByWord, minLevel, (word, entry) => setPopover({ word, entry }))}
+            </p>
+          ))}
+        </div>
+      </PrintedPage>
 
       {glossary.length > 0 && (
         <section aria-labelledby="glossary-title" className="mt-8">
