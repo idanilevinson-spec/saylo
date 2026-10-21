@@ -1298,6 +1298,7 @@ textarea::placeholder {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 8px), 0 100%);
   box-shadow: inset -3px 0 0 rgba(0, 0, 0, 0.18);
   pointer-events: none;
+}
 
 /* The hero notebook (LandingNotebook.tsx). Paper is paper in both themes:
    a cream page with dark ink, a navy cover, the teacher's blue and red pens.
