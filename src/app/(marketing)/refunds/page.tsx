@@ -5,6 +5,7 @@ import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 export const metadata: Metadata = {
   title: "ביטולים והחזרים | Saylo",
+  description: "ביטול מנוי ב-Saylo: איך עובד החידוש, ביטול החידוש האוטומטי, ביטול עסקה והחזר בתוך 14 ימים, ומנוי שנרכש באפליקציה.",
   alternates: { canonical: "/refunds" },
 };
 

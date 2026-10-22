@@ -4,6 +4,7 @@ import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 
 export const metadata: Metadata = {
   title: "מדיניות פרטיות | Saylo",
+  description: "איזה מידע Saylo אוספת ולמה, איך המידע משמש את מורה ה-AI, עם מי הוא משותף, כמה זמן הוא נשמר ומה הזכויות שלכם.",
   alternates: { canonical: "/privacy" },
 };
 

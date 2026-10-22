@@ -6,6 +6,7 @@ import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 export const metadata: Metadata = {
   title: "תנאי שימוש | Saylo",
+  description: "תנאי השימוש ב-Saylo: החשבון, ניסיון חינם, מנוי ותשלום, שימוש הוגן במורה ה-AI, גיל וקטינים, וזכויות ואחריות.",
   alternates: { canonical: "/terms" },
 };
 
