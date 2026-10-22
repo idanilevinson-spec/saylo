@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Rubik, Plus_Jakarta_Sans, Anton } from "next/font/google";
+import { Rubik, Plus_Jakarta_Sans, Anton, Literata } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
@@ -32,6 +32,15 @@ const chyron = Anton({
   variable: "--font-chyron",
   subsets: ["latin"],
   weight: "400",
+});
+
+// The book face for reading texts set as a story (PrintedPage "story"): a
+// serif drawn for long reading on screens. Not preloaded on every page; it
+// loads where a story page uses it.
+const book = Literata({
+  variable: "--font-book",
+  subsets: ["latin"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -87,7 +96,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="he"
       dir="rtl"
-      className={`${rubik.variable} ${jakarta.variable} ${chyron.variable} h-full antialiased`}
+      className={`${rubik.variable} ${jakarta.variable} ${chyron.variable} ${book.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

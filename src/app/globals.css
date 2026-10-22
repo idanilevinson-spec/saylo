@@ -1003,3 +1003,587 @@ textarea::placeholder {
 :root[data-a11y-motion="reduced"][data-intro] .app-intro {
   display: none;
 }
+
+/* A long English text set as a printed page (PrintedPage.tsx): the reading
+   texts and the Bagrut passages. Paper follows the theme here, unlike the
+   hero's notebook: a learner reads these for minutes at a time, and a bright
+   sheet in dark mode would glare. Muted text on the paper: 5.6:1 light,
+   6.4:1 dark. */
+.printed-page {
+  --page-paper: #fffdf8;
+  --page-edge: #e6ddca;
+  --page-margin: rgba(180, 35, 24, 0.22);
+  position: relative;
+  padding: 1.5rem 1.25rem 2.25rem 2.75rem;
+  border-radius: 6px;
+  background: var(--page-paper);
+  color: var(--foreground);
+  counter-reset: page-para;
+  /* A few sheets under the page, and its shadow on the desk. */
+  box-shadow:
+    0 0 0 1px var(--page-edge),
+    0 4px 0 -1px var(--page-paper),
+    0 4px 0 0 var(--page-edge),
+    0 8px 0 -2px var(--page-paper),
+    0 8px 0 -1px var(--page-edge),
+    0 22px 30px -22px rgba(33, 28, 20, 0.45);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .printed-page {
+    --page-paper: #1c1b18;
+    --page-edge: #34312b;
+    --page-margin: rgba(248, 113, 113, 0.22);
+  }
+}
+:root[data-theme="dark"] .printed-page {
+  --page-paper: #1c1b18;
+  --page-edge: #34312b;
+  --page-margin: rgba(248, 113, 113, 0.22);
+}
+:root[data-a11y-contrast="high"] .printed-page {
+  --page-paper: #ffffff;
+  --page-edge: #000000;
+  --page-margin: #cc0000;
+}
+@media (min-width: 640px) {
+  .printed-page {
+    padding: 2rem 2.5rem 2.75rem 4rem;
+  }
+}
+/* The margin rule, on the English text's reading-start side. */
+.printed-page::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 2rem;
+  width: 1px;
+  background: var(--page-margin);
+}
+@media (min-width: 640px) {
+  .printed-page::before {
+    left: 3rem;
+  }
+}
+.printed-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--page-edge);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+.printed-page-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.printed-page-body {
+  max-width: 68ch;
+  text-align: left;
+}
+/* Numbered paragraphs in the margin: questions point at them. A zero-width
+   inline-block at the start of the first line, so the number sits on that
+   line's baseline whatever the text size or leading; rtl makes it grow
+   leftward, into the margin. */
+.printed-page-body p {
+  counter-increment: page-para;
+}
+.printed-page-body p::before {
+  content: counter(page-para) / "";
+  display: inline-block;
+  position: relative;
+  left: -1.1rem;
+  width: 0;
+  direction: rtl;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 640px) {
+  .printed-page-body p::before {
+    left: -1.4rem;
+  }
+}
+/* The end of the text: a short rule, the way a printed passage closes. */
+.printed-page-end {
+  display: block;
+  width: 2.5rem;
+  height: 2px;
+  margin: 1.75rem auto 0;
+  border-radius: 1px;
+  background: var(--page-edge);
+}
+
+/* The story variant (PrintedPage variant="story"): the reading texts, bound
+   into a hardcover book. A cover around the page, the binding's shadow on
+   the spine side, sheets stacked at the fore-edge, a book face (Literata),
+   an opening title, a drop cap and paragraph numbers that read aloud.
+   Paper stays theme-aware, as above. Drop cap on the paper: 6.9:1 light,
+   7.6:1 dark. */
+.story-book {
+  --story-cover: #13233d;
+  position: relative;
+  /* Room for the ribbon hanging out below. */
+  margin-bottom: 1.5rem;
+  padding: 10px 16px 14px 10px;
+  border-radius: 10px;
+  background: var(--story-cover);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 26px 40px -26px rgba(4, 18, 43, 0.6);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .story-book {
+    --story-cover: #1b2c49;
+  }
+}
+:root[data-theme="dark"] .story-book {
+  --story-cover: #1b2c49;
+}
+:root[data-a11y-contrast="high"] .story-book {
+  --story-cover: #000000;
+}
+.printed-page-story {
+  --page-paper: #fbf6ea;
+  --page-edge: #ddd0b4;
+  border-radius: 3px 6px 6px 3px;
+  /* Sheets stacked at the fore-edge and the foot, then a soft inner shade. */
+  box-shadow:
+    1px 1px 0 var(--page-edge),
+    3px 2px 0 var(--page-paper),
+    4px 3px 0 var(--page-edge),
+    6px 4px 0 var(--page-paper),
+    7px 5px 0 var(--page-edge),
+    inset 0 0 60px rgba(120, 90, 40, 0.07);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .printed-page-story {
+    --page-paper: #1e1b16;
+    --page-edge: #3a352c;
+  }
+}
+:root[data-theme="dark"] .printed-page-story {
+  --page-paper: #1e1b16;
+  --page-edge: #3a352c;
+}
+:root[data-a11y-contrast="high"] .printed-page-story {
+  --page-paper: #ffffff;
+  --page-edge: #000000;
+}
+/* The binding: the page curving down into the spine. Takes the place of
+   the booklet's red margin rule. */
+.printed-page-story::before {
+  left: 0;
+  width: 2.5rem;
+  background: linear-gradient(to right, rgba(31, 26, 18, 0.16), rgba(31, 26, 18, 0.05) 45%, transparent);
+}
+@media (min-width: 640px) {
+  .printed-page-story::before {
+    left: 0;
+    width: 3.25rem;
+  }
+}
+.printed-page-story .printed-page-body {
+  font-family: var(--font-book), Georgia, "Times New Roman", serif;
+}
+.printed-page-story .printed-page-body > div {
+  font-size: 1.125rem;
+  line-height: 1.85;
+}
+.story-opening {
+  margin: 0.5rem 0 1.75rem;
+  text-align: center;
+}
+.story-title {
+  font-family: var(--font-book), Georgia, "Times New Roman", serif;
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+/* Three small dots: under the title, and again where the story ends. */
+.story-ornament,
+.printed-page-story .printed-page-end {
+  display: block;
+  width: 4.5rem;
+  height: 6px;
+  margin: 0.9rem auto 0;
+  border-radius: 0;
+  background: radial-gradient(circle, var(--muted) 1.6px, transparent 2.2px) center / 1.5rem 6px repeat-x;
+}
+.printed-page-story .printed-page-end {
+  margin-top: 1.75rem;
+}
+.story-dropcap {
+  float: left;
+  margin: 0.06em 0.1em 0 -0.02em;
+  font-family: var(--font-book), Georgia, "Times New Roman", serif;
+  font-size: 3.6em;
+  font-weight: 600;
+  line-height: 0.82;
+  color: var(--primary-hover);
+}
+/* Paragraph numbers that read the paragraph aloud: in the margin, on the
+   first line's baseline (same font size and line height as the text, the
+   small number inside it). */
+.story-para {
+  position: relative;
+}
+.printed-page-body p.story-para::before {
+  content: none;
+}
+.story-para-active {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  box-shadow: 0 0 0 0.35rem color-mix(in srgb, var(--primary) 8%, transparent);
+}
+.story-para-num {
+  position: absolute;
+  top: 0;
+  left: -2.55rem;
+  width: 2.1rem;
+  padding: 0;
+  border-radius: 4px;
+  font: inherit;
+  line-height: inherit;
+  text-align: right;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 160ms var(--ease-out);
+}
+@media (min-width: 640px) {
+  .story-para-num {
+    left: -3.3rem;
+    width: 2.4rem;
+  }
+}
+.story-para-num-static {
+  cursor: default;
+}
+.story-para-num:not(.story-para-num-static):hover,
+.story-para-active .story-para-num {
+  color: var(--primary-hover);
+}
+.story-para-num:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.story-para-num-label {
+  font-family: var(--font-jakarta), Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.story-para-num-label svg {
+  display: inline;
+  margin-right: 3px;
+  vertical-align: 0.05em;
+}
+/* A ribbon bookmark hanging out at the foot of the book. */
+.story-ribbon {
+  position: absolute;
+  z-index: 1;
+  top: calc(100% - 26px);
+  right: 16%;
+  width: 14px;
+  height: 50px;
+  background: var(--primary);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 8px), 0 100%);
+  box-shadow: inset -3px 0 0 rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+/* The hero notebook (LandingNotebook.tsx). Paper is paper in both themes:
+   a cream page with dark ink, a navy cover, the teacher's blue and red pens.
+   Measured on --nb-paper: ink 14.9:1, muted 5.6:1, pen blue 7.2:1,
+   pen red 6.0:1. High contrast swaps in the site's own extremes below. */
+.notebook-float {
+  --nb-paper: #f6f1e6;
+  --nb-paper-edge: #ddd3bf;
+  --nb-rule: #d3dcea;
+  --nb-margin: rgba(180, 35, 24, 0.32);
+  --nb-ink: #1f1a12;
+  --nb-muted: #635a4a;
+  --nb-pen: #0052ad;
+  --nb-red: #b42318;
+  --nb-cover: #0f1b2e;
+  --nb-line: 30px;
+  position: relative;
+  perspective: 1600px;
+  animation: notebook-float 7s var(--ease-in-out) infinite;
+}
+/* Leans toward the pointer (LandingNotebook sets rotateX/rotateY). */
+.notebook-tilt {
+  transform-origin: 50% 60%;
+}
+/* The book's shadow on the blue field, sliding against the tilt. */
+.notebook-ground {
+  position: absolute;
+  inset-inline: 6%;
+  bottom: -22px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(4, 18, 43, 0.38);
+  filter: blur(16px);
+  pointer-events: none;
+}
+@media (min-width: 1024px) {
+  .notebook-float {
+    --nb-line: 34px;
+  }
+}
+:root[data-a11y-contrast="high"] .notebook-float {
+  --nb-paper: #ffffff;
+  --nb-paper-edge: #000000;
+  --nb-rule: #767676;
+  --nb-margin: #cc0000;
+  --nb-ink: #000000;
+  --nb-muted: #000000;
+  --nb-pen: #0000cc;
+  --nb-red: #cc0000;
+  --nb-cover: #000000;
+}
+@keyframes notebook-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.notebook {
+  position: relative;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--nb-cover);
+  box-shadow:
+    0 30px 50px -20px rgba(4, 18, 43, 0.55),
+    0 10px 18px -8px rgba(4, 18, 43, 0.35);
+}
+.notebook-spread {
+  position: relative;
+  perspective: 1300px;
+  border-radius: 4px;
+  /* The page block's edge, a few sheets thick under the open spread. */
+  box-shadow:
+    0 2px 0 var(--nb-paper-edge),
+    0 4px 0 var(--nb-paper),
+    0 5px 0 var(--nb-paper-edge),
+    -2px 2px 0 var(--nb-paper-edge),
+    2px 2px 0 var(--nb-paper-edge),
+    -4px 4px 0 var(--nb-paper),
+    4px 4px 0 var(--nb-paper),
+    -5px 5px 0 var(--nb-paper-edge),
+    5px 5px 0 var(--nb-paper-edge);
+  cursor: grab;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.notebook-spread:active {
+  cursor: grabbing;
+}
+@media (min-width: 640px) {
+  /* Side by side the page is dragged sideways; vertical scrolling stays the page's. */
+  .notebook-spread {
+    touch-action: pan-y;
+  }
+}
+/* The ribbon bookmark: tucked in under the writing, hanging out below. */
+.notebook-ribbon {
+  position: absolute;
+  z-index: 1;
+  top: calc(100% - 4px);
+  bottom: -44px;
+  right: 22%;
+  width: 13px;
+  background: var(--nb-pen);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 8px), 0 100%);
+  box-shadow: inset -3px 0 0 rgba(0, 0, 0, 0.18);
+  transform-origin: 50% 0;
+  pointer-events: none;
+}
+@media (min-width: 640px) {
+  .notebook-ribbon {
+    top: 74%;
+  }
+}
+.notebook-page {
+  position: relative;
+  min-height: calc(var(--nb-line) * 6);
+  padding: calc(var(--nb-line) * 0.5) 22px calc(var(--nb-line) * 1.4);
+  background-color: var(--nb-paper);
+  /* Ruled lines under the writing, one per text line. */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(var(--nb-line) - 1px),
+    var(--nb-rule) calc(var(--nb-line) - 1px) var(--nb-line)
+  );
+  background-position: 0 calc(var(--nb-line) * 0.5 - 5px);
+  color: var(--nb-ink);
+  overflow: hidden;
+}
+@media (min-width: 1024px) {
+  .notebook-page {
+    min-height: calc(var(--nb-line) * 10);
+  }
+}
+/* The paper curving down into the spine, and catching light at the edge. */
+.notebook-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent 82%, rgba(31, 26, 18, 0.07));
+}
+.notebook-page-he::after {
+  background: linear-gradient(to top, transparent 82%, rgba(31, 26, 18, 0.07));
+}
+@media (min-width: 640px) {
+  .notebook-page-en::after {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.35), transparent 12%, transparent 78%, rgba(31, 26, 18, 0.09));
+  }
+  .notebook-page-he::after {
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.35), transparent 12%, transparent 78%, rgba(31, 26, 18, 0.09));
+  }
+}
+/* The red margin, on the reading-start side of each page. */
+.notebook-page::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: 1px;
+  background: var(--nb-margin);
+}
+.notebook-page-en::before {
+  left: 14px;
+}
+.notebook-page-he::before {
+  right: 14px;
+}
+.notebook-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: var(--nb-line);
+}
+.notebook-page-en .notebook-head {
+  justify-content: flex-start;
+}
+.notebook-line {
+  line-height: var(--nb-line);
+  /* Room above the first line for the teacher's correction. */
+  margin-top: calc(var(--nb-line) * 0.5);
+}
+.notebook-muted {
+  color: var(--nb-muted);
+}
+.notebook-pen {
+  color: var(--nb-pen);
+}
+.notebook-strike {
+  background: var(--nb-red);
+}
+.notebook-stamp {
+  color: var(--nb-pen);
+  box-shadow: inset 0 0 0 1.5px var(--nb-pen);
+}
+.notebook-folio {
+  position: absolute;
+  bottom: calc(var(--nb-line) * 0.45);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--nb-muted);
+  font-variant-numeric: tabular-nums;
+}
+.notebook-spine {
+  position: absolute;
+  pointer-events: none;
+  inset-inline: 0;
+  top: 50%;
+  height: 36px;
+  translate: 0 -50%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(31, 26, 18, 0.1) 45%,
+    rgba(31, 26, 18, 0.2) 50%,
+    rgba(31, 26, 18, 0.1) 55%,
+    transparent
+  );
+}
+@media (min-width: 640px) {
+  .notebook-spine {
+    inset-inline: auto;
+    inset-block: 0;
+    left: 50%;
+    top: 0;
+    width: 44px;
+    height: auto;
+    translate: -50% 0;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(31, 26, 18, 0.1) 45%,
+      rgba(31, 26, 18, 0.2) 50%,
+      rgba(31, 26, 18, 0.1) 55%,
+      transparent
+    );
+  }
+}
+/* The turning leaf: a two-faced sheet hinged on the spine. */
+.notebook-leaf {
+  position: absolute;
+  z-index: 2;
+  transform-style: preserve-3d;
+}
+.notebook-leaf-side {
+  inset-block: 0;
+  left: 0;
+  width: 50%;
+  transform-origin: right center;
+}
+.notebook-leaf-bottom {
+  inset-inline: 0;
+  bottom: 0;
+  height: 50%;
+  transform-origin: center top;
+}
+.notebook-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.notebook-face > .notebook-page {
+  height: 100%;
+}
+.notebook-face-back-y {
+  transform: rotateY(180deg);
+}
+.notebook-face-back-x {
+  transform: rotateX(180deg);
+}
+.notebook-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: #1f1a12;
+}
+@media (prefers-reduced-motion: reduce) {
+  .notebook-float {
+    animation: none;
+  }
+}
+:root[data-a11y-motion="reduced"] .notebook-float {
+  animation: none;
+}

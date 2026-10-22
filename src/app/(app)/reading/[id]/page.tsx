@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Clock } from "lucide-react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ReadingExam from "@/components/ReadingExam";
 import ReportContentError from "@/components/ReportContentError";
@@ -53,10 +52,8 @@ export default async function ReadingTextPage({ params }: PageProps) {
       </Link>
 
       <header className="mt-4">
-        <EnglishText as="h1" className="text-right text-3xl sm:text-4xl font-bold leading-tight">
-          {text.title_en}
-        </EnglishText>
-        <p className="mt-1.5 text-lg text-muted">{text.title_he}</p>
+        {/* The English title opens the story inside the book, below. */}
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">{text.title_he}</h1>
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
           <CefrBadge level={text.cefr_level} />
           <span className="inline-flex items-center gap-1 tabular-nums">

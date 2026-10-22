@@ -6,6 +6,7 @@ import { CheckCircle2, XCircle, Eye, Headphones, BookOpenText, PenLine, Timer, T
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import EnglishText from "@/components/EnglishText";
+import PrintedPage from "@/components/PrintedPage";
 import ListeningPlayer from "@/components/ListeningPlayer";
 import type { BagrutSampleUnit, BagrutReadingQuestion, BagrutVocabularyQuestion } from "@/lib/content/bagrut/sampleUnits";
 import BagrutCredit from "@/components/BagrutCredit";
@@ -128,15 +129,26 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
       )}
 
       {unit.readingPassages.map((passage, passageIndex) => (
-        <section key={passageIndex} className="relative overflow-hidden mt-6 bg-card border border-card-border rounded-lg p-6">
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
-          <h2 className="flex items-center gap-2 font-bold text-sm text-muted">
-            <BookOpenText size={16} />
-            הבנת הנקרא{unit.readingPassages.length > 1 ? ` · קטע ${passageIndex + 1}` : ""}
-          </h2>
-          <EnglishText as="div" className="mt-3 leading-relaxed whitespace-pre-line">
-            {passage}
-          </EnglishText>
+        <section key={passageIndex} className="mt-6">
+          <PrintedPage
+            label={
+              <h2 className="inline-flex items-center gap-2 text-sm">
+                <BookOpenText size={16} aria-hidden="true" />
+                הבנת הנקרא{unit.readingPassages.length > 1 ? ` · קטע ${passageIndex + 1}` : ""}
+              </h2>
+            }
+          >
+            <div className="text-lg leading-relaxed space-y-4">
+              {passage
+                .split(/(?:\r?\n){2,}/)
+                .filter((p) => p.trim())
+                .map((paragraph, i) => (
+                  <p key={i} className="whitespace-pre-line">
+                    {paragraph.trim()}
+                  </p>
+                ))}
+            </div>
+          </PrintedPage>
         </section>
       ))}
 

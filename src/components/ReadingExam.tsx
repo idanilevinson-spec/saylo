@@ -185,8 +185,8 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
     return (
       <>
         <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
-        <div className="mt-3 bg-card border border-card-border rounded-lg p-6 sm:p-8">
-          <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} />
+        <div className="mt-3">
+          <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} label="הבנת הנקרא" storyTitle={text.title_en} />
         </div>
       </>
     );
@@ -196,8 +196,8 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
     return (
       <>
         <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
-        <div className="mt-3 bg-card border border-card-border rounded-lg p-6 sm:p-8">
-          <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} />
+        <div className="mt-3">
+          <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} label="הבנת הנקרא" storyTitle={text.title_en} />
         </div>
 
         <h2 className="mt-8 text-lg font-bold text-muted">מבחן הבנה</h2>
@@ -350,8 +350,8 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
               transition={{ duration: 0.25, ease: EASE_OUT }}
               className="overflow-hidden"
             >
-              <div className="mt-3 bg-background-2 border border-card-border rounded-lg p-5 sm:p-6 max-h-72 overflow-y-auto">
-                <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} />
+              <div className="mt-3 max-h-80 overflow-y-auto rounded-lg p-1 pb-3">
+                <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} titleEn={text.title_en} />
               </div>
             </motion.div>
           )}
