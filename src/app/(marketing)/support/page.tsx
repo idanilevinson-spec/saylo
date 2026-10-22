@@ -5,7 +5,7 @@ import OpenSupportButton from "@/components/support/OpenSupportButton";
 
 export const metadata: Metadata = {
   title: "תמיכה | Saylo",
-  description: "יצירת קשר, ביטול מנוי, מחיקת חשבון ותשובות לשאלות נפוצות על Saylo.",
+  description: "עזרה ב-Saylo: יצירת קשר, ביטול מנוי, מחיקת חשבון, ותשובות לשאלות נפוצות על המורה, הניסיון והחשבון.",
   alternates: { canonical: "/support" },
 };
 

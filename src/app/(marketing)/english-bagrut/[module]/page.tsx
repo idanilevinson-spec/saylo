@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { fittingTitle } from "@/lib/content/seoTitles";
 import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
 import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
@@ -30,8 +31,12 @@ export async function generateMetadata({ params }: { params: Promise<{ module: s
   const code = codeFrom((await params).module);
   if (!code) return {};
   const f = BAGRUT_MODULE_FORMATS[code];
-  const tracks = f.studyUnitTracks.map((u) => `${u} יח״ל`).join(" ו-");
-  const title = `שאלון ${code} בבגרות באנגלית (${tracks}): מבנה, מיומנויות ותרגול`;
+  const tracks = `${f.studyUnitTracks.join(" ו-")} יח״ל`;
+  const title = fittingTitle([
+    `שאלון ${code} בבגרות באנגלית (${tracks}): מבנה, מיומנויות ותרגול`,
+    `שאלון ${code} בבגרות באנגלית (${tracks}): מבנה ותרגול`,
+    `שאלון ${code} בבגרות באנגלית: מבנה ותרגול`,
+  ]);
   const description = `איך בנוי שאלון ${code} בבגרות באנגלית: ${f.sections.map((s) => `${s.nameHe} (${s.points} נק׳)`).join(", ")}${f.timeMinutes ? `, ${f.timeMinutes} דקות` : ""}. מיומנויות עם דוגמה פתורה וערכות תרגול באותו מבנה.`;
   const path = `/english-bagrut/${code.toLowerCase()}`;
   return {

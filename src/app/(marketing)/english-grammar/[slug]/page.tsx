@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { grammarTopicTitle } from "@/lib/content/seoTitles";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, Target } from "lucide-react";
@@ -26,9 +27,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const topic = await getPublicGrammar((await params).slug);
   if (!topic) return {};
-  const title = hasHebrew(topic.name_he)
-    ? `${topic.name_en} באנגלית: ${topic.name_he}, הסבר בעברית ודוגמאות`
-    : `${topic.name_en} באנגלית: הסבר בעברית ודוגמאות`;
+  const title = grammarTopicTitle(topic.name_en, topic.name_he);
   const description = `הסבר בעברית ל-${topic.name_en} (רמה ${topic.cefr_level}): מתי משתמשים, איך בונים משפט, דוגמאות, והטעויות הנפוצות של דוברי עברית.`;
   const path = `/english-grammar/${topic.slug}`;
   return {
