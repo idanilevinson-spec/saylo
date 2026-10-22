@@ -93,6 +93,8 @@ export function buildConversationSystemPrompt(
   // How to sound right now (prompts/teacherPersona): register for the
   // situation, the learner's age, and whether they are stuck or flying.
   personaNote: string | null = null,
+  // The role-play's missions and which are done (lib/ai/conversationGoals).
+  goalsNote: string | null = null,
 ): string {
   const voice = !allowWebSearch;
   const parts = [
@@ -103,6 +105,7 @@ export function buildConversationSystemPrompt(
     FORMAT_NOTE,
     TEACHER_NOTE,
     personaNote ?? "",
+    goalsNote ?? "",
     buildHebrewBridgeNote(startingLevel),
     CORRECTION_NOTE,
     buildAdaptiveLevelNote(startingLevel),
