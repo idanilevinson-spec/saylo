@@ -113,7 +113,7 @@ export default function MistakesPage() {
         <p className="mt-2 text-muted">
           כאן יופיעו מילים שממתינות לחזרה ונושאי דקדוק שטעיתם בהם. כרגע אין מה לחזור עליו, אז אפשר להמשיך לתרגל.
         </p>
-        <Link href="/dashboard" className="mt-6 inline-block text-primary font-medium">
+        <Link href="/dashboard" className="mt-6 inline-block py-3 -my-3 text-primary font-medium">
           ללוח הבקרה ←
         </Link>
       </div>
@@ -127,7 +127,7 @@ export default function MistakesPage() {
           <IconBadge icon={PartyPopper} tone="accent" />
         </motion.div>
         <h1 className="text-2xl font-bold">סיימתם את החזרה של היום</h1>
-        <Link href="/dashboard" className="mt-6 inline-block text-primary font-medium">
+        <Link href="/dashboard" className="mt-6 inline-block py-3 -my-3 text-primary font-medium">
           ללוח הבקרה ←
         </Link>
       </div>
@@ -143,7 +143,7 @@ export default function MistakesPage() {
       <div className="max-w-xl mx-auto px-4 py-12">
         <h1 className="sr-only">חזרה: פריט {index + 1} מתוך {items.length}</h1>
         <div className="flex items-center justify-between gap-3">
-          <Link href="/dashboard" className="text-sm text-primary">
+          <Link href="/dashboard" className="py-3 text-sm text-primary">
             ← ללוח הבקרה
           </Link>
           <p className="text-sm text-muted">
