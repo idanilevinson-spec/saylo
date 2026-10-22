@@ -29,19 +29,25 @@ export default async function EnglishGrammarIndex() {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto px-4 pt-12 pb-16">
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">דקדוק באנגלית, בעברית</h1>
-        <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
-          {topics.length} נושאים, מהבסיס ועד הרמה הגבוהה. כל הסבר כולל מבנה, דוגמאות, ואת הטעויות שדוברי עברית עושים הכי
-          הרבה.
-        </p>
+      {/* The page opens on the same lit horizon as the home page's tour. */}
+      <div className="relative isolate overflow-hidden bg-background-2 px-4 pt-12 pb-28 sm:pb-36 [--horizon-top:68%] [--horizon-width:84rem]">
+        <span aria-hidden="true" className="horizon" />
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">דקדוק באנגלית, בעברית</h1>
+          <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
+            {topics.length} נושאים, מהבסיס ועד הרמה הגבוהה. כל הסבר כולל מבנה, דוגמאות, ואת הטעויות שדוברי עברית עושים
+            הכי הרבה.
+          </p>
+        </div>
+      </div>
 
-        <div className="mt-10 space-y-10">
+      <div className="max-w-4xl mx-auto px-4 pb-16">
+        <div className="-mt-12 sm:-mt-16 space-y-10">
           {LEVELS.map((level) => {
             const list = topics.filter((t) => t.cefr_level === level);
             if (list.length === 0) return null;
             return (
-              <section key={level} aria-labelledby={`level-${level}`}>
+              <section key={level} aria-labelledby={`level-${level}`} className="reveal">
                 <h2 id={`level-${level}`} className="flex items-baseline gap-3">
                   <span className="chyron text-3xl text-primary" dir="ltr">
                     {level}
@@ -53,7 +59,7 @@ export default async function EnglishGrammarIndex() {
                     <li key={t.slug}>
                       <Link
                         href={`/english-grammar/${t.slug}`}
-                        className="flex items-center justify-between gap-3 rounded-lg border border-card-border bg-card px-4 py-3 hover:border-primary/50 transition-colors"
+                        className="lit-plate lit-hover flex items-center justify-between gap-3 rounded-lg border border-card-border px-4 py-3 hover:border-primary/50"
                       >
                         <span className="min-w-0">
                           <span className="block font-bold">{t.name_he}</span>

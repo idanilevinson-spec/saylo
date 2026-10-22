@@ -116,7 +116,7 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
 
       {/* Today's plan */}
       {plan.items.length > 0 && (
-        <section aria-labelledby="plan-title" className="rounded-lg border border-card-border bg-card">
+        <section aria-labelledby="plan-title" className="lit-plate rounded-lg border border-card-border">
           <div className="flex flex-wrap items-center justify-between gap-2 px-5 pt-5">
             <h2 id="plan-title" className="text-xl font-black tracking-tight">
               התוכנית של היום
@@ -199,7 +199,7 @@ export function MoreAtLevel({ plan }: { plan: LevelPlan }) {
             <li key={k}>
               <Link
                 href={meta.area}
-                className="game-press group flex h-full items-center gap-3 rounded-lg border border-card-border bg-card p-4 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className="game-press lit-plate lit-hover group flex h-full items-center gap-3 rounded-lg border border-card-border p-4 duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 <span className="inline-flex w-10 h-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                   <meta.icon size={19} aria-hidden="true" />

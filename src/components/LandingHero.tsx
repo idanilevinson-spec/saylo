@@ -57,7 +57,7 @@ export default function LandingHero() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
-            <div className="rise-in relative bg-card rounded-lg shadow-2xl p-6 sm:p-9">
+            <div className="rise-in lit-plate relative rounded-lg p-6 sm:p-9">
               {/* The card's edge, a broadcast-graphic detail. */}
               <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-primary" />
 
