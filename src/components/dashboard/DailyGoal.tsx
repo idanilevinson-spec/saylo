@@ -42,7 +42,7 @@ export default function DailyGoal({ profileId, todayXp }: { profileId: string; t
   const done = goalPct >= 100;
 
   return (
-    <div className="rounded-lg border border-card-border bg-card p-5 flex flex-col justify-between">
+    <div className="lit-plate rounded-lg border border-card-border p-5 flex flex-col justify-between">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-bold text-muted">היעד היומי</p>

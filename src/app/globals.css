@@ -1587,3 +1587,134 @@ textarea::placeholder {
 :root[data-a11y-motion="reduced"] .notebook-float {
   animation: none;
 }
+
+/* Studio lighting (pilot, 2026-10-22). The On Air set gets lit: plates
+   catch a key light from above and a rim along their top edge, and the
+   product tour's phone stands on a horizon of blue light. Same palette,
+   no new colours: every light here is the logo blue or the foreground.
+   --rim: the 1px highlight on a plate's top edge.
+   --key: how much blue the key light puts on a plate's upper half.
+   --bloom: the blue in the light a plate throws below itself.
+   --shade: the plain shadow under it. */
+:root {
+  --rim: rgb(255 255 255 / 0.9);
+  --key: 5%;
+  --bloom: 14%;
+  --shade: rgb(60 45 20 / 0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --rim: rgb(255 255 255 / 0.08);
+    --key: 10%;
+    --bloom: 38%;
+    --shade: rgb(0 0 0 / 0.45);
+  }
+}
+:root[data-theme="dark"] {
+  --rim: rgb(255 255 255 / 0.08);
+  --key: 10%;
+  --bloom: 38%;
+  --shade: rgb(0 0 0 / 0.45);
+}
+
+.lit-plate {
+  background-color: var(--card);
+  background-image: radial-gradient(
+    130% 80% at 50% 0%,
+    color-mix(in srgb, var(--primary) var(--key), transparent),
+    transparent 70%
+  );
+  box-shadow:
+    inset 0 1px 0 var(--rim),
+    0 1px 2px var(--shade),
+    0 24px 48px -28px color-mix(in srgb, var(--primary) var(--bloom), transparent);
+}
+/* A plate that is also a link rises toward the light on hover. Pointer
+   devices only: on touch, hover sticks after the tap. */
+.lit-hover {
+  transition-property: box-shadow, border-color, translate, transform;
+}
+@media (hover: hover) {
+  .lit-hover:hover {
+    translate: 0 -2px;
+    box-shadow:
+      inset 0 1px 0 var(--rim),
+      0 2px 4px var(--shade),
+      0 30px 56px -26px color-mix(in srgb, var(--primary) calc(var(--bloom) * 1.6), transparent);
+  }
+}
+
+/* The horizon: a planet-sized ellipse whose top edge is lit from behind.
+   Sits behind whatever stands on it (the tour phone, a page header);
+   the section around it clips the overflow. Its body is the page
+   background, so on the lighter background-2 it reads as a dark world
+   rising, and its rim is the logo blue. */
+.horizon {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: var(--horizon-top, 60%);
+  width: var(--horizon-width, 72rem);
+  aspect-ratio: 2.2;
+  translate: -50% 0;
+  border-radius: 50%;
+  pointer-events: none;
+  /* Atmosphere: the light pooling just under the rim, brightest at the
+     crest, fading into the planet's dark body. */
+  background:
+    radial-gradient(42% 6% at 50% 0%, color-mix(in srgb, var(--primary-hover) 55%, transparent), transparent),
+    radial-gradient(70% 13% at 50% 0%, color-mix(in srgb, var(--primary) 30%, transparent), transparent),
+    var(--background);
+  /* Rim, then the light it throws up into the sky behind the subject. */
+  box-shadow:
+    0 -2px 0 color-mix(in srgb, var(--primary-hover) 95%, transparent),
+    0 -6px 18px -2px color-mix(in srgb, var(--primary) 70%, transparent),
+    0 -40px 120px -10px color-mix(in srgb, var(--primary) calc(var(--bloom) * 1.5), transparent),
+    0 -120px 260px -40px color-mix(in srgb, var(--primary) var(--bloom), transparent);
+}
+
+/* Scroll-linked, CSS only: browsers without scroll timelines (and anyone
+   who asked for less motion) get the finished frame. Nothing waits on a
+   script, so content is never hidden at load. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* The tour: as the section comes up, the phone rises onto the
+       horizon and the horizon's light comes up with it. */
+    .tour-stage {
+      animation: tour-stage-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+    .tour-stage > .horizon {
+      animation: horizon-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 50%;
+    }
+    /* Public pages: a block settles in as it enters. */
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+@keyframes tour-stage-rise {
+  from { transform: translateY(48px) scale(0.94); }
+  to { transform: none; }
+}
+@keyframes horizon-up {
+  from { opacity: 0.35; translate: -50% 18%; }
+  to { opacity: 1; translate: -50% 0; }
+}
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+:root[data-a11y-motion="reduced"] .tour-stage,
+:root[data-a11y-motion="reduced"] .tour-stage > .horizon,
+:root[data-a11y-motion="reduced"] .reveal {
+  animation: none !important;
+}
+:root[data-a11y-motion="reduced"] .lit-hover:hover {
+  translate: none;
+}

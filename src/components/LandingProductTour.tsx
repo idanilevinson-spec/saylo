@@ -153,7 +153,9 @@ export default function LandingProductTour() {
 
 function Phone({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto w-[19.5rem] shrink-0">
+    <div className="tour-stage relative isolate mx-auto w-[19.5rem] shrink-0">
+      {/* The phone stands on a horizon of light (see .horizon). */}
+      <span aria-hidden="true" className="horizon" />
       <div className="relative rounded-[2.75rem] bg-[#0d0f14] p-2.5 ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgb(0_0_0/0.55)]">
         <div className="relative h-[37rem] overflow-hidden rounded-[2.2rem] bg-background">
           {/* Status bar + island */}

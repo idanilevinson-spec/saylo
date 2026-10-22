@@ -194,7 +194,7 @@ export default function DashboardPage() {
           primary-colored top edge as every other plate on the site
           (hero, correction demo, auth forms) — one recurring detail
           instead of a device invented per surface. */}
-      <div className="relative bg-card border border-card-border rounded-lg overflow-hidden sm:flex sm:items-stretch">
+      <div className="lit-plate relative border border-card-border rounded-lg overflow-hidden sm:flex sm:items-stretch">
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="p-6 sm:p-7 sm:flex-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -280,7 +280,7 @@ export default function DashboardPage() {
             <div key={m.title}>
               <Link
                 href={m.href}
-                className="game-press group h-full flex items-center gap-4 rounded-lg border border-card-border bg-card p-4 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className="game-press lit-plate lit-hover group h-full flex items-center gap-4 rounded-lg border border-card-border p-4 duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 <span
                   className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
@@ -307,7 +307,7 @@ export default function DashboardPage() {
         {MODULE_GROUPS.map((group) => (
           <div key={group.title}>
             <h2 className="text-sm font-bold text-muted mb-3">{group.title}</h2>
-            <div className="rounded-lg border border-card-border bg-card overflow-hidden divide-y divide-card-border">
+            <div className="lit-plate rounded-lg border border-card-border overflow-hidden divide-y divide-card-border">
               {group.items.map((m) => (
                 <Link
                   key={m.title}

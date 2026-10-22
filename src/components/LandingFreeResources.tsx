@@ -24,7 +24,7 @@ export default function LandingFreeResources({ grammarTopics, words }: { grammar
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="flex items-center justify-between gap-3 rounded-lg border border-card-border bg-card px-4 py-3.5 hover:border-primary/50 transition-colors"
+                className="lit-plate lit-hover flex items-center justify-between gap-3 rounded-lg border border-card-border px-4 py-3.5 hover:border-primary/50"
               >
                 <span className="min-w-0">
                   <span className="block font-bold">{item.title}</span>
