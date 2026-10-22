@@ -249,7 +249,7 @@ export default function SpeakingPage() {
               </p>
             </div>
             {streak !== null && (
-              <div className="flex items-center gap-1 rounded-lg border border-card-border bg-card px-3 py-2" aria-label={streakLabel(streak)}>
+              <div role="img" className="flex items-center gap-1 rounded-lg border border-card-border bg-card px-3 py-2" aria-label={streakLabel(streak)}>
                 <Flame size={18} aria-hidden="true" className={streak > 0 ? "text-accent-hover fill-current" : "text-muted"} />
                 <span className="chyron text-2xl tabular-nums" aria-hidden="true">
                   {streak}
