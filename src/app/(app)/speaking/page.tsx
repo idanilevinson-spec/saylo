@@ -129,6 +129,23 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
   );
 }
 
+// "/speaking?scenario=<slug>", from a course unit: starts that scenario's
+// conversation straight away. Rendered inside the gates, so it only runs
+// for a learner who may talk with the teacher. The query is dropped first,
+// so going back from the chat lands on this page, not on a new call.
+function StartFromLink({ scenarios, onStart }: { scenarios: ConversationScenario[]; onStart: (id: string) => void }) {
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("scenario");
+    if (!slug) return;
+    window.history.replaceState(null, "", "/speaking");
+    const scenario = scenarios.find((s) => s.slug === slug);
+    if (scenario) onStart(scenario.id);
+    // Once, when the scenarios arrive.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+}
+
 export default function SpeakingPage() {
   const { profile, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -226,6 +243,7 @@ export default function SpeakingPage() {
   return (
     <PremiumGate featureName="מורה AI" requirePaid>
       <AiConsentGate>
+        {scenarios && <StartFromLink scenarios={scenarios} onStart={(id) => startConversation(id)} />}
         <div className="max-w-4xl mx-auto px-4 pt-8 pb-16">
           {/* Daily goal strip */}
           <div className="flex items-center gap-4">

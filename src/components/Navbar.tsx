@@ -53,7 +53,7 @@ function getServerMountedSnapshot() {
 const AUTHED_LINKS: { href: string; label: string; icon: LucideIcon; mobileOnly?: boolean }[] = [
   { href: "/dashboard", label: "לוח בקרה", icon: LayoutDashboard },
   { href: "/placement", label: "מבחן רמה", icon: Target, mobileOnly: true },
-  { href: "/learn", label: "מסלול לימוד", icon: Map },
+  { href: "/course", label: "המסלול שלי", icon: Map },
   // Its own area (sub-navigation in bagrut/layout.tsx): for the many
   // learners whose real goal is the matriculation exam, not general English.
   { href: "/bagrut", label: "בגרות", icon: GraduationCap },
