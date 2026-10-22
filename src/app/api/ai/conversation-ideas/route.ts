@@ -5,6 +5,7 @@ import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/a
 import { buildReplyIdeasPrompt, cleanReplyIdeas } from "@/lib/ai/prompts/replyIdeas";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
+import { TRIAL_TEACHER_LIMIT_ERROR, trialTeacherConversationIds } from "@/lib/subscriptions/teacherTrial";
 import { hasParentalClearance } from "@/lib/auth/consentServer";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 
@@ -21,7 +22,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: AI_CONSENT_REQUIRED_ERROR }, { status: 403 });
   }
   const [paid, cleared] = await Promise.all([isPaidServer(supabase, user.id), hasParentalClearance(supabase, user.id)]);
-  if (!paid) return NextResponse.json({ error: "premium required" }, { status: 403 });
+  // Not paying: a trial learner's first conversations still get the teacher.
+  const trialConversations = paid ? null : await trialTeacherConversationIds(supabase, user.id);
+  if (!paid && !trialConversations) return NextResponse.json({ error: "premium required" }, { status: 403 });
   if (!cleared) return NextResponse.json({ error: "parental consent required" }, { status: 403 });
 
   if (!(await underDailyAiLimit(supabase, user.id, "conversation_ideas"))) {
@@ -30,6 +33,9 @@ export async function POST(request: Request) {
 
   const { conversationId } = (await request.json()) as { conversationId?: string };
   if (!conversationId) return NextResponse.json({ error: "missing conversationId" }, { status: 400 });
+  if (trialConversations && !trialConversations.includes(conversationId)) {
+    return NextResponse.json({ error: TRIAL_TEACHER_LIMIT_ERROR }, { status: 403 });
+  }
 
   const { data: conversation } = await supabase
     .from("conversations")

@@ -6,6 +6,7 @@ import { anthropic, CLAUDE_MODEL, extractText } from "@/lib/ai/claudeClient";
 import { buildConversationSystemPrompt } from "@/lib/ai/prompts/conversationPartner";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { isPaidServer } from "@/lib/subscriptions/requirePremium";
+import { TRIAL_TEACHER_LIMIT_ERROR, TRIAL_TEACHER_MESSAGES, trialTeacherConversationIds } from "@/lib/subscriptions/teacherTrial";
 import { hasParentalClearance } from "@/lib/auth/consentServer";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 import { splitConversationReply, streamableText, type ConversationFix } from "@/lib/ai/conversationFix";
@@ -27,9 +28,9 @@ export async function POST(request: Request) {
   // the other's answer — one round trip instead of two. Paid status is still
   // reported first when both fail.
   const [paid, cleared] = await Promise.all([isPaidServer(supabase, user.id), hasParentalClearance(supabase, user.id)]);
-  if (!paid) {
-    return NextResponse.json({ error: "premium required" }, { status: 403 });
-  }
+  // Not paying: a trial learner's first conversations still get the teacher.
+  const trialConversations = paid ? null : await trialTeacherConversationIds(supabase, user.id);
+  if (!paid && !trialConversations) return NextResponse.json({ error: "premium required" }, { status: 403 });
   if (!cleared) {
     return NextResponse.json({ error: "parental consent required" }, { status: 403 });
   }
@@ -51,6 +52,9 @@ export async function POST(request: Request) {
   }
   if (message.length > MAX_MESSAGE_CHARS) {
     return NextResponse.json({ error: "message too long" }, { status: 400 });
+  }
+  if (trialConversations && !trialConversations.includes(conversationId)) {
+    return NextResponse.json({ error: TRIAL_TEACHER_LIMIT_ERROR }, { status: 403 });
   }
 
   const { data: conversation } = await supabase
@@ -90,6 +94,11 @@ export async function POST(request: Request) {
     getLearnerMemory(supabase, user.id, conversationId),
     supabase.from("profiles").select("age_band, bagrut_units").eq("id", user.id).maybeSingle(),
   ]);
+  // The trial taste is a few messages per conversation, enough to reach the
+  // corrections and the summary.
+  if (trialConversations && (priorMessages ?? []).filter((m) => m.role === "user").length >= TRIAL_TEACHER_MESSAGES) {
+    return NextResponse.json({ error: TRIAL_TEACHER_LIMIT_ERROR }, { status: 403 });
+  }
   const history = [...(priorMessages ?? []), { role: "user", content: message }];
   // The teacher's register for this turn: the situation, the learner's age,
   // and how they are doing right now.

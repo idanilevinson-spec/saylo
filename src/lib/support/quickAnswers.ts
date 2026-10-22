@@ -59,7 +59,7 @@ function subscriptionAnswer(account: AccountStatus): string {
 
   if (sub.status === "trialing" && sub.has_premium_features_now) {
     const ends = sub.trial_ends_at ? ` עד ${formatDateHe(sub.trial_ends_at)}` : "";
-    return `אתם בתקופת הניסיון${ends}. היא כוללת את כל תכונות המנוי חוץ משיחה עם מורה ה-AI, ובסופה אין חיוב אוטומטי. כדי להמשיך אחריה בוחרים מסלול ב[מסלולים ומחירים](/pricing).`;
+    return `אתם בתקופת הניסיון${ends}. היא כוללת את כל תכונות המנוי, ואת המורה AI ב-2 שיחות ניסיון (עד 12 הודעות בכל אחת), ובסופה אין חיוב אוטומטי. כדי להמשיך אחריה בוחרים מסלול ב[מסלולים ומחירים](/pricing).`;
   }
 
   if (sub.status === "active" && sub.has_premium_features_now) {
@@ -94,7 +94,7 @@ function teacherAnswer(account: AccountStatus): string {
   const sub = account.subscription;
   if (!sub.has_ai_teacher_conversation_now) {
     if (sub.status === "trialing" && sub.has_premium_features_now) {
-      return "שיחה עם מורה ה-AI, בטקסט ובקול, זמינה רק במנוי בתשלום ולא בתקופת הניסיון. אפשר לבחור מסלול ב[מסלולים ומחירים](/pricing).";
+      return "בתקופת הניסיון אפשר לנסות את מורה ה-AI, בטקסט ובקול, ב-2 שיחות של עד 12 הודעות. אחריהן השיחה זמינה במנוי בתשלום, ואפשר לבחור מסלול ב[מסלולים ומחירים](/pricing).";
     }
     return "שיחה עם מורה ה-AI, בטקסט ובקול, זמינה במנוי בתשלום, ואין כרגע מנוי פעיל בחשבון. אפשר לבחור מסלול ב[מסלולים ומחירים](/pricing).";
   }
@@ -125,7 +125,7 @@ export function buildQuickAnswer(id: Exclude<QuickReplyId, "talk_to_person">, ct
     case "how_to_cancel":
       return ctx.isNativeApp ? `${APPLE_CANCEL}\n\nמנוי שנרכש באתר: ${WEB_CANCEL}` : `${WEB_CANCEL}\n\n${APPLE_CANCEL}`;
     case "trial":
-      return `כל חשבון חדש מקבל ${TRIAL_DAYS} ימי ניסיון חינם, בלי כרטיס אשראי ובלי חיוב אוטומטי בסופם. הניסיון כולל את כל תכונות המנוי, חוץ משיחה עם מורה ה-AI בטקסט ובקול, שזמינה רק במנוי בתשלום.`;
+      return `כל חשבון חדש מקבל ${TRIAL_DAYS} ימי ניסיון חינם, בלי כרטיס אשראי ובלי חיוב אוטומטי בסופם. הניסיון כולל את כל תכונות המנוי, וגם 2 שיחות ניסיון עם מורה ה-AI, בטקסט ובקול, עד 12 הודעות בכל אחת.`;
     case "emails_off":
       return 'ב[פרופיל](/profile), בחלק "התראות", אפשר לכבות כל אחד בנפרד: תזכורות, דוח שבועי ודוח חודשי. מיילי שירות, כמו איפוס סיסמה, ממשיכים להישלח.';
     case "delete_account":
