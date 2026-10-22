@@ -74,7 +74,7 @@ export default function ReviewPage() {
           <IconBadge icon={CheckCircle2} tone="success" />
         </motion.div>
         <h1 className="text-2xl font-bold">סיימתם את החזרה היומית</h1>
-        <Link href="/dashboard" className="mt-6 inline-block text-primary font-medium">
+        <Link href="/dashboard" className="mt-6 inline-block py-3 -my-3 text-primary font-medium">
           ללוח הבקרה ←
         </Link>
       </div>

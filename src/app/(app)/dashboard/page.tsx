@@ -202,7 +202,7 @@ export default function DashboardPage() {
           </h1>
           <Link
             href="/progress"
-            className="mt-2 inline-block text-sm text-primary hover:underline rounded focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="mt-2 inline-block py-3 -my-3 text-sm text-primary hover:underline rounded focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             כל ההתקדמות שלי ←
           </Link>
