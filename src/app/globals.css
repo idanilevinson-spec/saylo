@@ -1633,6 +1633,8 @@ textarea::placeholder {
    devices only: on touch, hover sticks after the tap. */
 .lit-hover {
   transition-property: box-shadow, border-color, translate, transform;
+  transition-duration: 160ms;
+  transition-timing-function: var(--ease-out);
 }
 @media (hover: hover) {
   .lit-hover:hover {
@@ -1717,4 +1719,12 @@ textarea::placeholder {
 }
 :root[data-a11y-motion="reduced"] .lit-hover:hover {
   translate: none;
+}
+/* High contrast asked for the extremes: no washes, glows or horizon. */
+:root[data-a11y-contrast="high"] .lit-plate {
+  background-image: none;
+  box-shadow: none;
+}
+:root[data-a11y-contrast="high"] .horizon {
+  display: none;
 }
