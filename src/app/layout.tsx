@@ -15,6 +15,7 @@ import { appIntroScript } from "@/lib/intro/appIntroScript";
 import SupportChat from "@/components/support/SupportChatLazy";
 import SiteAnalytics from "@/components/SiteAnalytics";
 import CourseReturnBar from "@/components/course/CourseReturnBar";
+import PointerLight from "@/components/PointerLight";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -134,6 +135,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <PageTransition>{children}</PageTransition>
             </main>
             <SupportChat />
+            <PointerLight />
           </AuthProvider>
           <CookieNotice />
         </AccessibilityProvider>

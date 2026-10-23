@@ -101,7 +101,7 @@ export default function LandingLevels({ catalog }: { catalog: Record<CefrLevel, 
               animate={{ opacity: 1, transform: "translateY(0px)" }}
               exit={{ opacity: 0, transform: "translateY(-4px)" }}
               transition={{ duration: 0.2, ease: EASE_OUT }}
-              className="relative overflow-hidden rounded-lg border border-card-border bg-card p-6"
+              className="lit-plate relative overflow-hidden rounded-lg border border-card-border p-6"
             >
               <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 bg-primary" />
               <p className="flex items-baseline gap-3">
