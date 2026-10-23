@@ -12,6 +12,8 @@ import { splitConversationReply } from "@/lib/ai/conversationFix";
 import { getLearnerMemory } from "@/lib/ai/learnerMemory";
 import { buildPersonaNote } from "@/lib/ai/prompts/teacherPersona";
 import { CONVERSATION_OPENER_CUE } from "@/lib/ai/prompts/conversationOpener";
+import { buildGoalsNote, splitGoalsLine } from "@/lib/ai/conversationGoals";
+import { loadScenarioObjectives } from "@/lib/ai/scenarioObjectives";
 import type { AgeBand, ConversationTopicCategory } from "@/types/database";
 
 // The teacher speaks first. An empty screen waiting for the learner is the
@@ -47,7 +49,7 @@ export async function POST(request: Request) {
 
   const { data: conversation } = await supabase
     .from("conversations")
-    .select("id, status, conversation_scenarios(system_prompt, category)")
+    .select("id, status, scenario_id, conversation_scenarios(system_prompt, category)")
     .eq("id", conversationId)
     .eq("profile_id", user.id)
     .maybeSingle();
@@ -68,7 +70,7 @@ export async function POST(request: Request) {
     category: ConversationTopicCategory;
   } | null;
 
-  const [{ data: latestPlacement }, memory, { data: learner }] = await Promise.all([
+  const [{ data: latestPlacement }, memory, { data: learner }, objectives] = await Promise.all([
     supabase
       .from("placement_tests")
       .select("result_cefr_overall")
@@ -79,6 +81,7 @@ export async function POST(request: Request) {
       .maybeSingle(),
     getLearnerMemory(supabase, user.id, conversationId),
     supabase.from("profiles").select("age_band, bagrut_units").eq("id", user.id).maybeSingle(),
+    loadScenarioObjectives(supabase, (conversation as { scenario_id?: string | null }).scenario_id ?? null),
   ]);
   const personaNote = buildPersonaNote({
     category: scenario?.category ?? null,
@@ -98,6 +101,8 @@ export async function POST(request: Request) {
       !voiceMode,
       memory,
       personaNote,
+      // The scene opens towards the first mission; none is done yet.
+      objectives.length ? buildGoalsNote(objectives, []) : null,
     ),
     messages: [{ role: "user", content: CONVERSATION_OPENER_CUE(!!voiceMode) }],
   });
@@ -105,7 +110,7 @@ export async function POST(request: Request) {
   after(() => logAiUsage(supabase, user.id, "conversation_opener", input_tokens, output_tokens));
 
   // An opener corrects nothing; any stray correction line is dropped.
-  const { reply } = splitConversationReply(extractText(claudeMessage));
+  const { reply } = splitConversationReply(splitGoalsLine(extractText(claudeMessage), objectives.length).text);
   if (!reply.trim()) return NextResponse.json({ opener: null });
 
   // The learner may have typed while this was being written: theirs wins.
