@@ -86,7 +86,7 @@ export default async function EnglishGrammarTopic({ params }: { params: Promise<
           {topic.lessons.map((lesson) => (
             <article
               key={lesson.title_he}
-              className="relative overflow-hidden rounded-lg border border-card-border bg-card px-5 py-6 sm:px-9 sm:py-8"
+              className="lit-plate relative overflow-hidden rounded-lg border border-card-border bg-card px-5 py-6 sm:px-9 sm:py-8"
             >
               <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
               <h2 className="text-xl sm:text-2xl font-black tracking-tight">{lesson.title_he}</h2>
@@ -104,7 +104,7 @@ export default async function EnglishGrammarTopic({ params }: { params: Promise<
             </h2>
             <ol className="mt-3 space-y-3">
               {topic.samples.map((s) => (
-                <li key={s.sentence} className="rounded-lg border border-card-border bg-card px-4 py-3">
+                <li key={s.sentence} className="lit-plate rounded-lg border border-card-border bg-card px-4 py-3">
                   <p dir="ltr" lang="en" className="text-left font-content text-lg">
                     {s.sentence}
                   </p>

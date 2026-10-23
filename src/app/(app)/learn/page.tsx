@@ -66,7 +66,7 @@ export default function LearnPage() {
 
       <Link
         href="/learn/today"
-        className="game-press group mt-8 flex items-center gap-4 rounded-lg border border-card-border bg-card p-4 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        className="lit-plate lit-hover game-press group mt-8 flex items-center gap-4 rounded-lg border border-card-border bg-card p-4 duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
       >
         <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-ink">
           <CalendarCheck size={20} aria-hidden="true" />

@@ -53,7 +53,7 @@ export default function ResetPasswordForm() {
         <p className="mt-2 text-center text-muted">נשלח לכם קישור לאיפוס לכתובת המייל שלכם</p>
       </div>
 
-      <div className="rise-in relative mt-8 bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7" style={{ animationDelay: "0.1s" }}>
+      <div className="lit-plate rise-in relative mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-7" style={{ animationDelay: "0.1s" }}>
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

@@ -41,7 +41,7 @@ function highlight(example: string, headword: string): ReactNode {
 export default function WordCard({ item, withRecorder = true }: { item: VocabularyItem; withRecorder?: boolean }) {
   const pos = item.part_of_speech ? (POS_HE[item.part_of_speech] ?? item.part_of_speech) : null;
   return (
-    <article className="flex h-full flex-col rounded-lg border border-card-border bg-card p-4 sm:p-5">
+    <article className="lit-plate flex h-full flex-col rounded-lg border border-card-border bg-card p-4 sm:p-5">
       <header className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-lg font-black leading-tight">{item.translation_he}</p>

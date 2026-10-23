@@ -268,7 +268,7 @@ export default function SpeakingPage() {
               </p>
             </div>
             {streak !== null && (
-              <div role="img" className="flex items-center gap-1 rounded-lg border border-card-border bg-card px-3 py-2" aria-label={streakLabel(streak)}>
+              <div role="img" className="lit-plate flex items-center gap-1 rounded-lg border border-card-border bg-card px-3 py-2" aria-label={streakLabel(streak)}>
                 <Flame size={18} aria-hidden="true" className={streak > 0 ? "text-accent-hover fill-current" : "text-muted"} />
                 <span className="chyron text-2xl tabular-nums" aria-hidden="true">
                   {streak}
@@ -385,7 +385,7 @@ export default function SpeakingPage() {
                     type="button"
                     onClick={() => startConversation(null, { starter: s.en })}
                     disabled={starting}
-                    className="game-press group flex w-full items-center gap-3.5 rounded-lg border border-card-border bg-card p-4 text-start transition-[border-color,transform,box-shadow] duration-150 hover:border-primary/50 hover:shadow-[0_10px_28px_-16px_rgb(0_0_0/0.5)] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                    className="lit-plate lit-hover game-press group flex w-full items-center gap-3.5 rounded-lg border border-card-border bg-card p-4 text-start duration-150 hover:border-primary/50 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   >
                     <span
                       className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
@@ -436,7 +436,7 @@ export default function SpeakingPage() {
                               type="button"
                               onClick={() => startConversation(s.id)}
                               disabled={starting}
-                              className="game-press relative flex h-full w-full flex-col overflow-hidden rounded-lg border border-card-border bg-card p-4 text-start transition-[border-color,transform] duration-150 hover:border-primary/50 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                              className="lit-plate lit-hover game-press relative flex h-full w-full flex-col overflow-hidden rounded-lg border border-card-border bg-card p-4 text-start duration-150 hover:border-primary/50 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                             >
                               <span className="flex items-start justify-between gap-2">
                                 <span className="font-bold leading-snug">{s.title_he}</span>
@@ -462,7 +462,7 @@ export default function SpeakingPage() {
               <h2 id="recent-title" className="text-xl font-black tracking-tight">
                 השיחות האחרונות
               </h2>
-              <ul className="mt-3 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
+              <ul className="lit-plate mt-3 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
                 {recent.map((c) => (
                   <li key={c.id}>
                     <Link

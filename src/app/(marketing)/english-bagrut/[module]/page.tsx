@@ -79,7 +79,7 @@ export default async function BagrutModulePage({ params }: { params: Promise<{ m
           </h2>
           <ul className="mt-4 space-y-3">
             {f.sections.map((s) => (
-              <li key={s.nameHe} className="rounded-lg border border-card-border bg-card p-4">
+              <li key={s.nameHe} className="lit-plate rounded-lg border border-card-border bg-card p-4">
                 <p className="flex items-baseline justify-between gap-3">
                   <span className="text-lg font-black">{s.nameHe}</span>
                   <span className="chyron text-2xl text-primary tabular-nums">{s.points} נק׳</span>
@@ -124,7 +124,7 @@ export default async function BagrutModulePage({ params }: { params: Promise<{ m
             <h2 id="example" className="text-2xl font-black tracking-tight">
               דוגמה פתורה: {sample.titleHe}
             </h2>
-            <div className="mt-4 rounded-lg border border-card-border bg-card p-5">
+            <div className="lit-plate mt-4 rounded-lg border border-card-border bg-card p-5">
               {sample.example.passageEn && (
                 <p dir="ltr" lang="en" className="text-left font-content leading-relaxed text-foreground/90">
                   {sample.example.passageEn}

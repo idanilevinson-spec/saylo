@@ -207,7 +207,7 @@ export default function GamesHubPage() {
           due for review, with its once-a-day bonus. */}
       <section
         aria-labelledby="daily-title"
-        className="relative overflow-hidden mt-8 bg-card border border-card-border rounded-lg p-5 sm:p-6"
+        className="lit-plate relative overflow-hidden mt-8 bg-card border border-card-border rounded-lg p-5 sm:p-6"
       >
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -251,7 +251,7 @@ export default function GamesHubPage() {
             </h2>
             <p className="text-sm text-muted">{group.note}</p>
           </div>
-          <ul className="mt-3 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
+          <ul className="lit-plate mt-3 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
             {group.games.map((game) => {
               const stat = sessions ? summarize(sessions, game) : null;
               return (
@@ -328,7 +328,7 @@ function StudyLink({ href, icon: Icon, title, body }: { href: string; icon: Luci
   return (
     <Link
       href={href}
-      className="group flex gap-3 rounded-lg bg-card border border-card-border p-4 hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+      className="lit-plate lit-hover group flex gap-3 rounded-lg bg-card border border-card-border p-4 hover:border-primary/40 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
     >
       <Icon size={20} aria-hidden="true" className="text-primary shrink-0 mt-0.5" />
       <span className="min-w-0">

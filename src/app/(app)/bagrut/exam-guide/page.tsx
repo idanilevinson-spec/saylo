@@ -85,7 +85,7 @@ export default function BagrutExamGuidePage() {
         </h2>
         <ol className="mt-4 space-y-3">
           {PREP_STEPS.map((step, i) => (
-            <li key={step.title} className="relative flex gap-4 rounded-lg border border-card-border bg-card p-4">
+            <li key={step.title} className="lit-plate relative flex gap-4 rounded-lg border border-card-border bg-card p-4">
               <span className="chyron inline-flex w-10 h-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-ink text-2xl tabular-nums">
                 {i + 1}
               </span>
@@ -125,7 +125,7 @@ export default function BagrutExamGuidePage() {
                   const f = BAGRUT_MODULE_FORMATS[code];
                   const plan = timePlan(code);
                   return (
-                    <li key={code} className="rounded-lg border border-card-border bg-card p-4">
+                    <li key={code} className="lit-plate rounded-lg border border-card-border bg-card p-4">
                       <p className="flex items-baseline justify-between gap-2">
                         <span className="chyron text-3xl">{code}</span>
                         <span className="text-sm text-muted tabular-nums">{f.timeMinutes ? `${f.timeMinutes} דק׳` : "זמן לא אומת"}</span>

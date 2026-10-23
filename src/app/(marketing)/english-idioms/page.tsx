@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SiteFooter from "@/components/SiteFooter";
+import HubHeader from "@/components/HubHeader";
 import PracticeLink from "@/components/PracticeLink";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
@@ -40,10 +41,7 @@ export default async function EnglishIdiomsPage() {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto px-4 pt-12 pb-16">
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
-          ביטויים באנגלית ופירושם
-        </h1>
+      <HubHeader title="ביטויים באנגלית ופירושם">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           {counts.idioms} ביטויים ו-{counts.phrasal} פעלים מורכבים (
           <bdi lang="en" className="whitespace-nowrap">
@@ -52,6 +50,9 @@ export default async function EnglishIdiomsPage() {
           ), מהנפוצים ביותר ועד אלה שבעיתונות ובאקדמיה. לכל אחד: פירוש בעברית
           ומשפט לדוגמה.
         </p>
+      </HubHeader>
+
+      <div className="max-w-4xl mx-auto px-4 pb-16">
         <nav aria-label="קפיצה לרמה" className="mt-5 flex flex-wrap gap-2">
           {LEVELS.map((l) => (
             <a
@@ -73,7 +74,7 @@ export default async function EnglishIdiomsPage() {
               <section
                 key={level}
                 aria-labelledby={`level-${level}`}
-                className="scroll-mt-24"
+                className="reveal scroll-mt-24"
               >
                 <h2 id={`level-${level}`} className="flex items-baseline gap-3">
                   <span className="chyron text-3xl text-primary" dir="ltr">
@@ -87,7 +88,7 @@ export default async function EnglishIdiomsPage() {
                   {list.map((i) => (
                     <div
                       key={i.phrase}
-                      className="rounded-lg border border-card-border bg-card px-4 py-3.5"
+                      className="lit-plate rounded-lg border border-card-border bg-card px-4 py-3.5"
                     >
                       <dt className="flex items-baseline justify-between gap-3">
                         <span className="text-xs text-muted">

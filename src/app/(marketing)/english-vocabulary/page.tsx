@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
+import HubHeader from "@/components/HubHeader";
 import PracticeLink from "@/components/PracticeLink";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
@@ -29,18 +30,19 @@ export default async function EnglishVocabularyIndex() {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto px-4 pt-12 pb-16">
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">אוצר מילים באנגלית לפי נושא</h1>
+      <HubHeader title="אוצר מילים באנגלית לפי נושא">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           {words} מילים ב-{topics.length} נושאים. לכל מילה: תרגום, הגייה, משפט לדוגמה והגדרה פשוטה באנגלית.
         </p>
+      </HubHeader>
 
+      <div className="max-w-4xl mx-auto px-4 pb-16">
         <div className="mt-10 space-y-10">
           {LEVELS.map((level) => {
             const list = topics.filter((t) => t.cefr_level === level);
             if (list.length === 0) return null;
             return (
-              <section key={level} aria-labelledby={`level-${level}`}>
+              <section key={level} aria-labelledby={`level-${level}`} className="reveal">
                 <h2 id={`level-${level}`} className="flex items-baseline gap-3">
                   <span className="chyron text-3xl text-primary" dir="ltr">
                     {level}
@@ -52,7 +54,7 @@ export default async function EnglishVocabularyIndex() {
                     <li key={t.slug}>
                       <Link
                         href={`/english-vocabulary/${t.slug}`}
-                        className="flex items-center justify-between gap-3 rounded-lg border border-card-border bg-card px-4 py-3 hover:border-primary/50 transition-colors"
+                        className="lit-plate lit-hover flex items-center justify-between gap-3 rounded-lg border border-card-border bg-card px-4 py-3 hover:border-primary/50"
                       >
                         <span className="min-w-0">
                           <span className="block font-bold">{t.name_he}</span>

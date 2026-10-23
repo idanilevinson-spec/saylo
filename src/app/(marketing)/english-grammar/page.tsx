@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
+import HubHeader from "@/components/HubHeader";
 import PracticeLink from "@/components/PracticeLink";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
@@ -29,20 +30,15 @@ export default async function EnglishGrammarIndex() {
 
   return (
     <>
-      {/* The page opens on the same lit horizon as the home page's tour. */}
-      <div className="relative isolate overflow-hidden bg-background-2 px-4 pt-12 pb-28 sm:pb-36 [--horizon-top:68%] [--horizon-width:84rem]">
-        <span aria-hidden="true" className="horizon" />
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">דקדוק באנגלית, בעברית</h1>
-          <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
-            {topics.length} נושאים, מהבסיס ועד הרמה הגבוהה. כל הסבר כולל מבנה, דוגמאות, ואת הטעויות שדוברי עברית עושים
-            הכי הרבה.
-          </p>
-        </div>
-      </div>
+      <HubHeader title="דקדוק באנגלית, בעברית">
+        <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
+          {topics.length} נושאים, מהבסיס ועד הרמה הגבוהה. כל הסבר כולל מבנה, דוגמאות, ואת הטעויות שדוברי עברית עושים
+          הכי הרבה.
+        </p>
+      </HubHeader>
 
       <div className="max-w-4xl mx-auto px-4 pb-16">
-        <div className="-mt-12 sm:-mt-16 space-y-10">
+        <div className="mt-10 space-y-10">
           {LEVELS.map((level) => {
             const list = topics.filter((t) => t.cefr_level === level);
             if (list.length === 0) return null;

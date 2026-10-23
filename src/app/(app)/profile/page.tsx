@@ -176,7 +176,7 @@ export default function ProfilePage() {
     <div className="max-w-xl mx-auto px-4 pt-10 pb-16">
       {/* Who you are and where you stand, in one row — not a centered
           avatar badge with a separate stats strip under it. */}
-      <header className="relative overflow-hidden rounded-lg border border-card-border bg-card p-5">
+      <header className="lit-plate relative overflow-hidden rounded-lg border border-card-border bg-card p-5">
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="flex items-center gap-4">
           <div className="chyron flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary text-3xl text-primary-ink">
@@ -215,7 +215,7 @@ export default function ProfilePage() {
       </MotionLink>
 
       {subscription && (
-        <div className="mt-4 bg-card border border-card-border rounded-lg p-6 space-y-3">
+        <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg p-6 space-y-3">
           <h2 className="font-bold text-sm text-muted flex items-center gap-1.5">
             <CreditCard size={14} /> המנוי שלי
           </h2>
@@ -368,7 +368,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <div className="mt-4 bg-card border border-card-border rounded-lg p-6 space-y-3">
+      <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg p-6 space-y-3">
         <h2 className="font-bold text-sm text-muted">התראות</h2>
         <label className="flex items-center justify-between cursor-pointer">
           <span className="text-sm">תזכורות רצף במייל</span>

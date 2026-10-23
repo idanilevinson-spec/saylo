@@ -111,7 +111,7 @@ function ModuleBlock({ code, progress }: { code: BagrutModuleCode; progress: Awa
       </div>
 
       {/* 1. How the questionnaire is built */}
-      <div className="mt-4 bg-card border border-card-border rounded-lg overflow-hidden">
+      <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg overflow-hidden">
         <h3 className="px-4 pt-3 text-sm font-bold text-muted">מבנה השאלון</h3>
         <ul className="divide-y divide-card-border">
           {format.sections.map((section) => {
@@ -176,7 +176,7 @@ function ModuleBlock({ code, progress }: { code: BagrutModuleCode; progress: Awa
         {sets.length === 0 ? (
           <p className="mt-2 text-sm text-muted">עוד אין ערכות תרגול לשאלון הזה.</p>
         ) : (
-          <ul className="mt-2 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
+          <ul className="lit-plate mt-2 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
             {sets.map((set) => {
               const best = bestScore(progress, code, set.unitSlug);
               return (

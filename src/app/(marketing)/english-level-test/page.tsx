@@ -3,6 +3,7 @@ import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
 import { BookOpen, PenLine, BookOpenText, Headphones, NotebookPen, ChevronLeft, type LucideIcon } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
+import HubHeader from "@/components/HubHeader";
 import { getCanDoStatement } from "@/lib/content/canDoStatements";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { getLevelCatalog } from "@/lib/content/levelCatalog";
@@ -38,12 +39,14 @@ export default async function EnglishLevelTestPage() {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto px-4 pt-12 pb-16">
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">מבחן רמה באנגלית</h1>
+      <HubHeader title="מבחן רמה באנגלית">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           כ-10 דקות. בסוף מקבלים רמה לפי הסולם הבינלאומי (CEFR) לכל מיומנות בנפרד, כי קריאה ודיבור לא תמיד באותה רמה,
           ותוכנית תרגול יומית שבנויה על התוצאה.
         </p>
+      </HubHeader>
+
+      <div className="max-w-4xl mx-auto px-4 pb-16">
         <Link
           href="/signup"
           className="game-press mt-6 inline-flex items-center gap-2 min-h-12 px-6 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-[background-color,transform] duration-150"
@@ -75,7 +78,7 @@ export default async function EnglishLevelTestPage() {
             {LEVELS.map((l) => {
               const c = catalog[l];
               return (
-                <li key={l} className="grid gap-3 rounded-lg border border-card-border bg-card p-4 sm:grid-cols-[7rem_1fr_auto] sm:items-center">
+                <li key={l} className="lit-plate grid gap-3 rounded-lg border border-card-border bg-card p-4 sm:grid-cols-[7rem_1fr_auto] sm:items-center">
                   <p className="flex items-baseline gap-2">
                     <Link href={`/english-level/${l.toLowerCase()}`} className="chyron text-4xl leading-none text-primary hover:underline" dir="ltr">
                       {l}

@@ -1588,6 +1588,11 @@ textarea::placeholder {
   animation: none;
 }
 
+/* The whole lighting layer sits in the components layer, under Tailwind's
+   utilities: a state colour on the same element (bg-success/12 on a right
+   answer, a selected plan's bg-primary, a shadow-* class) always wins over
+   the lighting, so adding lit-plate to a plate can never repaint it. */
+@layer components {
 /* Studio lighting (pilot, 2026-10-22). The On Air set gets lit: plates
    catch a key light from above and a rim along their top edge, and the
    product tour's phone stands on a horizon of blue light. Same palette,
@@ -1666,19 +1671,20 @@ textarea::placeholder {
     transparent 75%
   );
 }
-/* ...and the plate's edge catches it: the border lights up nearest the
-   pointer. A ring cut out with a mask, laid exactly over the 1px border. */
+/* ...and the plate's edge catches it: the edge lights up nearest the
+   pointer. A 1px ring cut out with a mask, just inside the border, so a
+   plate with overflow-hidden (ContentCard, TopicTile) doesn't clip it. */
 .lit-hover::before {
   content: "";
   position: absolute;
-  inset: -1px;
+  inset: 0;
   padding: 1px;
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
   transition: opacity 200ms var(--ease-out);
   background: radial-gradient(
-    10rem circle at calc(var(--mx, 50%) + 1px) calc(var(--my, 0%) + 1px),
+    10rem circle at var(--mx, 50%) var(--my, 0%),
     color-mix(in srgb, var(--primary-hover) var(--edge-glint), transparent),
     transparent 80%
   );
@@ -1786,3 +1792,4 @@ textarea::placeholder {
 :root[data-a11y-contrast="high"] .lit-row::after {
   display: none;
 }
+} /* @layer components */

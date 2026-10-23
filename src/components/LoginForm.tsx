@@ -84,7 +84,7 @@ export default function LoginForm() {
 
       {/* The same plate language as the rest of the site: a card with a
           primary-colored edge, not bare inputs floating on the page. */}
-      <div className="rise-in relative mt-8 bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7" style={{ animationDelay: "0.1s" }}>
+      <div className="lit-plate rise-in relative mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-7" style={{ animationDelay: "0.1s" }}>
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
 
         <div className="space-y-2.5">

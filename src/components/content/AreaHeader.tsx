@@ -36,7 +36,7 @@ export default function AreaHeader({
         {actions && <div className="mt-4 flex flex-wrap gap-2">{actions}</div>}
       </div>
       {level ? (
-        <div className="flex items-center gap-3 rounded-lg border border-card-border bg-card px-4 py-3">
+        <div className="lit-plate flex items-center gap-3 rounded-lg border border-card-border bg-card px-4 py-3">
           <span className="chyron text-4xl leading-none text-primary" dir="ltr">
             {level}
           </span>

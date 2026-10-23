@@ -157,3 +157,12 @@ A pilot for the owner to judge on a preview build, not yet a site-wide rule. The
 - **Scroll-linked motion, CSS only** (`animation-timeline: view()`): the tour phone rises onto the horizon as the section enters, and grammar level groups settle in. No script, so nothing is hidden at load; browsers without scroll timelines, the OS reduced-motion setting and the site's own switch all get the finished frame.
 - **The dashboard gets light, not motion.** The Operate rule above (no entrance choreography) still holds there.
 - **Hand-held light** (`.lit-hover::after` + `PointerLight`, mounted once in the root layout): under a mouse, a linked plate brightens where the pointer is. One page-wide pointermove listener, one style write per frame, mouse only (a finger has no hover), off in high contrast.
+
+### Site-wide rollout (2026-10-24)
+
+The lighting left pilot status at the owner's request ("continue it across the site, keep it uniform").
+
+- **Layering.** All lighting rules live in `@layer components`, under Tailwind's utilities. A state colour on the same element (a right answer's `bg-success/12`, a chosen plan's `bg-primary`, a `shadow-*`) always beats the lighting, so adding `lit-plate` can never repaint a state.
+- **Where it goes.** Navigation and reading surfaces: every public hub opens with `HubHeader` (title + intro on the horizon); topic/text/level cards and info plates are `lit-plate`, the clickable ones also `lit-hover`; rows inside a lit list are `lit-row`. In the app: `ContentCard`, `TopicTile`, `WordCard`, `AreaHeader`, the games/speaking/progress/profile/Bagrut/course/learn screens, the dashboard, and the auth forms. The pricing summary card is lit; the plan options are not (they carry selected state).
+- **Where it doesn't.** Inside an exercise, a game round, a test or a chat (nothing new runs while the learner is answering), the admin back-office, overlays (cookie notice, accessibility panel, support chat), small chips and buttons, and the legal pages.
+- **Detail pages** (a grammar topic, a text, a level, a Bagrut module) get lit plates but no horizon: they open quietly on their content.

@@ -227,7 +227,7 @@ export default async function BagrutHubPage() {
             if (skills.length === 0) return null;
             const Icon = KIND_ICON[kind];
             return (
-              <li key={kind} className="mb-3 break-inside-avoid rounded-lg border border-card-border bg-card p-4">
+              <li key={kind} className="lit-plate mb-3 break-inside-avoid rounded-lg border border-card-border bg-card p-4">
                 <p className="flex items-center gap-2.5">
                   <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                     <Icon size={18} aria-hidden="true" />

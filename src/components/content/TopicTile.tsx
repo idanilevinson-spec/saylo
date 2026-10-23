@@ -47,11 +47,11 @@ export default function TopicTile({
   );
 
   const cls =
-    "group relative flex h-full flex-col overflow-hidden rounded-lg border border-card-border bg-card p-4 text-start";
+    "lit-plate group relative flex h-full flex-col overflow-hidden rounded-lg border border-card-border bg-card p-4 text-start";
   return href ? (
     <Link
       href={href}
-      className={`game-press ${cls} transition-[border-color,transform,box-shadow] duration-150 hover:border-primary/50 hover:shadow-[0_12px_30px_-18px_rgb(0_0_0/0.5)] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2`}
+      className={`game-press lit-hover ${cls} hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2`}
     >
       {body}
     </Link>
