@@ -1632,11 +1632,34 @@ textarea::placeholder {
 /* A plate that is also a link rises toward the light on hover. Pointer
    devices only: on touch, hover sticks after the tap. */
 .lit-hover {
+  position: relative;
+  isolation: isolate;
   transition-property: box-shadow, border-color, translate, transform;
   transition-duration: 160ms;
   transition-timing-function: var(--ease-out);
 }
+/* A hand-held light: under a mouse, the plate brightens where the
+   pointer is (PointerLight writes --mx/--my). Behind the content, above
+   the plate's own fill. */
+.lit-hover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+  background: radial-gradient(
+    18rem circle at var(--mx, 50%) var(--my, 0%),
+    color-mix(in srgb, var(--primary) calc(var(--key) * 1.8), transparent),
+    transparent 70%
+  );
+}
 @media (hover: hover) {
+  .lit-hover:hover::after {
+    opacity: 1;
+  }
   .lit-hover:hover {
     translate: 0 -2px;
     box-shadow:
@@ -1725,6 +1748,7 @@ textarea::placeholder {
   background-image: none;
   box-shadow: none;
 }
-:root[data-a11y-contrast="high"] .horizon {
+:root[data-a11y-contrast="high"] .horizon,
+:root[data-a11y-contrast="high"] .lit-hover::after {
   display: none;
 }
