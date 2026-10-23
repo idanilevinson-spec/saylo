@@ -59,8 +59,10 @@ export default async function EnglishLevelTestPage() {
             מה המבחן בודק
           </h2>
           <ul className="mt-5 grid grid-cols-2 sm:grid-cols-5 gap-px overflow-hidden rounded-lg border border-card-border bg-card-border">
+            {/* Five parts in two columns on a phone: the last one spans the
+                row instead of leaving an empty grey cell beside it. */}
             {PARTS.map((p) => (
-              <li key={p.title} className="bg-card p-4">
+              <li key={p.title} className="bg-card p-4 max-sm:odd:last:col-span-2">
                 <p.icon size={18} aria-hidden="true" className="text-primary" />
                 <p className="mt-2 font-bold">{p.title}</p>
                 <p className="mt-1 text-sm text-muted leading-snug">{p.body}</p>
