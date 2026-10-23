@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import LegalPage, { ContactDetails, LegalSection, LegalList } from "@/components/LegalPage";
 import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
+import { siteOpenGraph } from "@/lib/og/meta";
+
+const DESCRIPTION = "איזה מידע Saylo אוספת ולמה, איך המידע משמש את מורה ה-AI, עם מי הוא משותף, כמה זמן הוא נשמר ומה הזכויות שלכם.";
 
 export const metadata: Metadata = {
   title: "מדיניות פרטיות | Saylo",
-  description: "איזה מידע Saylo אוספת ולמה, איך המידע משמש את מורה ה-AI, עם מי הוא משותף, כמה זמן הוא נשמר ומה הזכויות שלכם.",
+  description: DESCRIPTION,
   alternates: { canonical: "/privacy" },
+  openGraph: siteOpenGraph("מדיניות פרטיות", DESCRIPTION, "/privacy"),
 };
 
 function MailLink() {

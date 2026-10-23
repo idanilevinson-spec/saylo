@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage, { EmailLink, LegalSection } from "@/components/LegalPage";
 import OpenSupportButton from "@/components/support/OpenSupportButton";
+import { siteOpenGraph } from "@/lib/og/meta";
+
+const DESCRIPTION = "עזרה ב-Saylo: יצירת קשר, ביטול מנוי, מחיקת חשבון, ותשובות לשאלות נפוצות על המורה, הניסיון והחשבון.";
 
 export const metadata: Metadata = {
   title: "תמיכה | Saylo",
-  description: "עזרה ב-Saylo: יצירת קשר, ביטול מנוי, מחיקת חשבון, ותשובות לשאלות נפוצות על המורה, הניסיון והחשבון.",
+  description: DESCRIPTION,
   alternates: { canonical: "/support" },
+  openGraph: siteOpenGraph("תמיכה", DESCRIPTION, "/support"),
 };
 
 const linkClass = "text-primary hover:underline";
