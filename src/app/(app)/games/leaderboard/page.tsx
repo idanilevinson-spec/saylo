@@ -62,7 +62,7 @@ export default function LeaderboardPage() {
                   >
                     {entry.rank === 1 && <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />}
                     <Crown size={entry.rank === 1 ? 22 : 16} aria-hidden="true" className={MEDAL_COLOR[entry.rank - 1]} />
-                    <span className="chyron text-4xl leading-none mt-1 tabular-nums" aria-label={`מקום ${entry.rank}`}>
+                    <span role="img" className="chyron text-4xl leading-none mt-1 tabular-nums" aria-label={`מקום ${entry.rank}`}>
                       {entry.rank}
                     </span>
                     <p className="mt-1.5 text-sm font-bold truncate max-w-full">

@@ -3,10 +3,15 @@ import Link from "next/link";
 import LegalPage, { BusinessDetails, LegalSection, LegalList } from "@/components/LegalPage";
 import { BUSINESS_NAME, BUSINESS_TYPE, DAILY_CONVERSATION_LIMIT, DAILY_WRITING_LIMIT } from "@/lib/legal/siteInfo";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
+import { siteOpenGraph } from "@/lib/og/meta";
+
+const DESCRIPTION = "תנאי השימוש ב-Saylo: החשבון, ניסיון חינם, מנוי ותשלום, שימוש הוגן במורה ה-AI, גיל וקטינים, וזכויות ואחריות.";
 
 export const metadata: Metadata = {
   title: "תנאי שימוש | Saylo",
+  description: DESCRIPTION,
   alternates: { canonical: "/terms" },
+  openGraph: siteOpenGraph("תנאי שימוש", DESCRIPTION, "/terms"),
 };
 
 const linkClass = "text-primary hover:underline";

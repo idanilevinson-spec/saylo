@@ -16,6 +16,7 @@ import {
   Scale,
   Clapperboard,
 } from "lucide-react";
+import { MissionsPreview } from "@/components/speaking/ScenarioMissions";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ConsentRequestForm from "@/components/ConsentRequestForm";
@@ -190,6 +191,7 @@ export default function VoiceConversationHubPage() {
                       <EnglishText as="p" className="mt-1 text-xs text-muted">
                         {s.title_en}
                       </EnglishText>
+                      <MissionsPreview objectives={s.objectives} />
                     </motion.button>
                   ))}
                 </div>

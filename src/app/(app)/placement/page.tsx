@@ -44,7 +44,7 @@ const WRITING_SAMPLE_PROMPT_HE =
 function renderPromptWithUniformBlanks(prompt: string): ReactNode[] {
   return prompt.split(/(_{2,})/g).map((part, i) =>
     /^_{2,}$/.test(part) ? (
-      <span key={i} className="inline-block w-14 align-middle border-b-2 border-current mx-1" aria-label="מילה חסרה">
+      <span key={i} role="img" className="inline-block w-14 align-middle border-b-2 border-current mx-1" aria-label="מילה חסרה">
         &nbsp;
       </span>
     ) : (

@@ -19,7 +19,7 @@ import {
   Flame,
   Star,
   Heart,
-  CalendarCheck,
+  Route,
   Gamepad2,
   Mic,
   ChevronLeft,
@@ -30,7 +30,9 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import DailyGoal from "@/components/dashboard/DailyGoal";
 import TeacherSuggestionCard from "@/components/TeacherSuggestionCard";
-import TodayAtLevel, { MoreAtLevel } from "@/components/dashboard/TodayAtLevel";
+import { MoreAtLevel } from "@/components/dashboard/TodayAtLevel";
+import CourseLead from "@/components/dashboard/CourseLead";
+import { useCourseProgress } from "@/components/course/useCourseProgress";
 import { getLevelPlan, type LevelPlan } from "@/lib/content/levelPlan";
 import SubscriptionBanner from "@/components/SubscriptionBanner";
 import { isPremiumActive } from "@/lib/subscriptions/entitlements";
@@ -69,8 +71,8 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
   {
     title: "מסלול הלימוד",
     items: [
-      { icon: CalendarCheck, title: "שיעור יומי", body: "נושא אחד, נבחר בשבילכם להיום", href: "/learn/today" },
-      { icon: Map, title: "מסלול לימוד", body: "כל הנושאים מ-A1 עד C2", href: "/learn" },
+      { icon: Route, title: "המסלול שלי", body: "יחידה אחר יחידה, מ-A1 עד C2", href: "/course" },
+      { icon: Map, title: "כל הנושאים", body: "נושאי המילים והדקדוק לפי רמה", href: "/learn" },
       { icon: Target, title: "מבחן רמה", body: "גלו את רמת האנגלית שלכם", href: "/placement" },
       { icon: Brain, title: "חזרה חכמה", body: "מילים ונושאי דקדוק שהגיע זמנם", href: "/mistakes" },
     ],
@@ -118,6 +120,7 @@ export default function DashboardPage() {
   const [hearts, setHearts] = useState<{ current: number; max: number } | null>(null);
   const [placementDone, setPlacementDone] = useState<boolean | null>(null);
   const [plan, setPlan] = useState<LevelPlan | null>(null);
+  const course = useCourseProgress();
 
   // Same session guard as profile/page.tsx: without it, this effect also
   // fires right after sign-out (session and profile clear together) and
@@ -202,7 +205,7 @@ export default function DashboardPage() {
           </h1>
           <Link
             href="/progress"
-            className="mt-2 inline-block text-sm text-primary hover:underline rounded focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="mt-2 inline-block py-3 -my-3 text-sm text-primary hover:underline rounded focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             כל ההתקדמות שלי ←
           </Link>
@@ -239,10 +242,15 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* The lead: the learner's level and today's plan at it — or, before
-          the placement test, the one thing to do first. */}
+      {/* The lead: where the learner is in the course and the next thing
+          to do there — or, before the placement test, the one thing to do
+          first. */}
       {plan?.overall ? (
-        <TodayAtLevel plan={plan} level={plan.overall} />
+        course ? (
+          <CourseLead course={course} level={plan.overall} bySkill={plan.bySkill} />
+        ) : (
+          <div className="mt-6 h-64 rounded-lg bg-background-2 animate-pulse" aria-hidden="true" />
+        )
       ) : (
         placementDone === false && (
           <div className="mt-6">

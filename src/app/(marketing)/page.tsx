@@ -17,10 +17,15 @@ import { listPublicGrammar } from "@/lib/content/publicGrammar";
 import { listPublicVocabulary } from "@/lib/content/publicVocabulary";
 import { APP_STORE_URL, INSTAGRAM_URL } from "@/lib/site/links";
 import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
+import { siteOpenGraph } from "@/lib/og/meta";
+
+const DESCRIPTION = "לומדים אנגלית בקצב שלכם: מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם";
 
 export const metadata: Metadata = {
   title: "Saylo | לומדים אנגלית בקצב שלכם",
+  description: DESCRIPTION,
   alternates: { canonical: "/" },
+  openGraph: siteOpenGraph("Saylo: לומדים אנגלית בקצב שלכם", DESCRIPTION, "/"),
 };
 
 // Who we are, for search engines: the organization, the site, and the

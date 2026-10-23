@@ -14,6 +14,8 @@ import { getLearnerMemory } from "@/lib/ai/learnerMemory";
 import { buildPersonaNote, detectLearnerMood } from "@/lib/ai/prompts/teacherPersona";
 import type { AgeBand, ConversationTopicCategory } from "@/types/database";
 import { MAX_MESSAGE_CHARS, historyForModel } from "@/lib/ai/conversationHistory";
+import { buildGoalsNote, mergeDone, splitGoalsLine } from "@/lib/ai/conversationGoals";
+import { doneFrom, loadScenarioObjectives } from "@/lib/ai/scenarioObjectives";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -77,7 +79,7 @@ export async function POST(request: Request) {
   // The conversation is confirmed to be this user's, so the remaining reads
   // are independent of each other and share one round trip. History is read
   // before the new message is stored; the message is appended by hand below.
-  const [{ data: priorMessages }, { data: latestPlacement }, memory, { data: learner }] = await Promise.all([
+  const [{ data: priorMessages }, { data: latestPlacement }, memory, { data: learner }, objectives] = await Promise.all([
     supabase
       .from("conversation_messages")
       .select("role, content")
@@ -93,7 +95,9 @@ export async function POST(request: Request) {
       .maybeSingle(),
     getLearnerMemory(supabase, user.id, conversationId),
     supabase.from("profiles").select("age_band, bagrut_units").eq("id", user.id).maybeSingle(),
+    loadScenarioObjectives(supabase, conversation.scenario_id ?? null),
   ]);
+  const doneBefore = doneFrom((conversation as { objectives_done?: unknown }).objectives_done);
   // The trial taste is a few messages per conversation, enough to reach the
   // corrections and the summary.
   if (trialConversations && (priorMessages ?? []).filter((m) => m.role === "user").length >= TRIAL_TEACHER_MESSAGES) {
@@ -129,7 +133,14 @@ export async function POST(request: Request) {
     // search). See conversation-score route for how the truncation risk
     // was diagnosed.
     thinking: { type: "disabled" as const },
-    system: buildConversationSystemPrompt(scenarioPrompt, latestPlacement?.result_cefr_overall ?? null, !voiceMode, memory, personaNote),
+    system: buildConversationSystemPrompt(
+      scenarioPrompt,
+      latestPlacement?.result_cefr_overall ?? null,
+      !voiceMode,
+      memory,
+      personaNote,
+      objectives.length ? buildGoalsNote(objectives, doneBefore) : null,
+    ),
     ...(voiceMode ? {} : { tools: [{ type: "web_search_20260318" as const, name: "web_search" as const, max_uses: 2 }] }),
     messages: historyForModel(history).map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("assistant" as const),
@@ -142,10 +153,16 @@ export async function POST(request: Request) {
   // writes are independent; the user's message goes first only in the
   // sense that it was already started, so created_at ordering is unchanged.
   const finish = async (claudeMessage: Anthropic.Message) => {
-    const { reply, fix } = splitConversationReply(extractText(claudeMessage));
+    // The missions line comes off first; a mission once done stays done.
+    const { text, goals } = splitGoalsLine(extractText(claudeMessage), objectives.length);
+    const goalsDone = mergeDone(doneBefore, goals);
+    const { reply, fix } = splitConversationReply(text);
     await userMessageStored;
     await Promise.all([
       storeReply(supabase, conversationId, reply, fix),
+      goalsDone.length !== doneBefore.length
+        ? Promise.resolve(supabase.from("conversations").update({ objectives_done: goalsDone }).eq("id", conversationId))
+        : null,
       logAiUsage(
         supabase,
         user.id,
@@ -155,7 +172,7 @@ export async function POST(request: Request) {
         claudeMessage.usage.server_tool_use?.web_search_requests ?? 0
       ),
     ]);
-    return { reply, fix };
+    return { reply, fix, goalsDone };
   };
 
   if (stream && !voiceMode) {
@@ -197,8 +214,8 @@ export async function POST(request: Request) {
     return new Response(body, { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
   }
 
-  const { reply, fix } = await finish(await anthropic.messages.create(params));
-  return NextResponse.json({ reply, correction: fix });
+  const { reply, fix, goalsDone } = await finish(await anthropic.messages.create(params));
+  return NextResponse.json({ reply, correction: fix, goalsDone });
 }
 
 // The correction column comes with seed 050. Until it exists the reply is

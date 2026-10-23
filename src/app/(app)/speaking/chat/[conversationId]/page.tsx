@@ -19,6 +19,7 @@ import CorrectionsPractice from "@/components/speaking/CorrectionsPractice";
 import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
 import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
 import ConversationPhrases from "@/components/speaking/ConversationPhrases";
+import ScenarioMissions, { MissionsResult, useScenarioMissions } from "@/components/speaking/ScenarioMissions";
 import { TrialConversationNote, TrialTeacherUpsell, useTeacherAccess } from "@/components/speaking/TrialTeacher";
 import { TRIAL_TEACHER_LIMIT_ERROR, TRIAL_TEACHER_MESSAGES } from "@/lib/subscriptions/teacherTrial";
 import type { UsefulPhrase } from "@/lib/ai/prompts/usefulPhrases";
@@ -131,6 +132,11 @@ function SpeakingChatInner() {
   const replyIdeas = useReplyIdeas(conversationId, ideasTurn);
   const wordLookup = useWordLookup();
   const hasTeacherMessage = !!messages?.some((m) => m.role === "assistant");
+  // Re-read the missions once each stored teacher reply lands.
+  const missions = useScenarioMissions(
+    conversationId,
+    messages?.filter((m) => m.role === "assistant" && !m.id.startsWith("stream-")).length ?? 0
+  );
   // The "tap a word" hint shows until the learner has tapped one once.
   const [tapHintSeen, setTapHintSeen] = useState(() => {
     try {
@@ -315,6 +321,8 @@ function SpeakingChatInner() {
           </p>
         </motion.div>
 
+        <MissionsResult objectives={missions.objectives} done={missions.done} />
+
         {/* The corrections the teacher made during the call, as a short
             rewrite drill: the moment the fix actually sticks. */}
         <CorrectionsPractice
@@ -437,6 +445,8 @@ function SpeakingChatInner() {
           </motion.button>
         </div>
       </div>
+
+      {!closed && <ScenarioMissions objectives={missions.objectives} done={missions.done} />}
 
       {/* On a call the panel shows the latest exchange as captions, so the
           scrolling transcript would only push the teacher off the screen. */}

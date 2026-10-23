@@ -209,7 +209,7 @@ export default function ProfilePage() {
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         href="/progress"
-        className="mt-3 block text-center text-sm text-primary font-medium py-2"
+        className="mt-3 block text-center text-sm text-primary font-medium py-3"
       >
         כל ההתקדמות שלי ←
       </MotionLink>
@@ -258,12 +258,18 @@ export default function ProfilePage() {
           {subscription.status === "active" && subscription.billing_provider !== "apple" && !subscription.cancel_at_period_end && (
             <>
               <p className="text-sm">
-                {planLabel ?? "מנוי פעיל"} · מתחדש ב-<strong>{formatDate(subscription.current_period_end)}</strong>
+                {planLabel ?? "מנוי פעיל"}
+                {subscription.current_period_end && (
+                  <>
+                    {" "}
+                    · מתחדש ב-<strong>{formatDate(subscription.current_period_end)}</strong>
+                  </>
+                )}
               </p>
               {!confirmingCancel ? (
                 <button
                   onClick={() => setConfirmingCancel(true)}
-                  className="text-sm text-danger font-medium hover:underline"
+                  className="py-3 -my-3 text-sm text-danger font-medium hover:underline"
                 >
                   ביטול המנוי
                 </button>
@@ -417,7 +423,7 @@ export default function ProfilePage() {
         {!confirmingDelete ? (
           <button
             onClick={() => setConfirmingDelete(true)}
-            className="text-sm text-muted hover:text-danger hover:underline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="py-3 -my-3 text-sm text-muted hover:text-danger hover:underline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             מחיקת החשבון
           </button>
