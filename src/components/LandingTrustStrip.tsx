@@ -31,10 +31,15 @@ export default function LandingTrustStrip() {
         >
           Now
         </EnglishText>
-        <div className="flex-1 overflow-hidden py-2.5">
+        {/* The window is LTR on purpose: in an RTL box the track anchors to
+            the right edge, so translateX(-50%) carried every item out of
+            view and the strip sat empty after the first second (found
+            2026-10-24). Anchored left, the same animation brings new items
+            in from the right, and each item keeps its own RTL text. */}
+        <div className="flex-1 overflow-hidden py-2.5" dir="ltr">
           <div className="ticker-track flex w-max gap-12 whitespace-nowrap">
             {[...GROUP, ...GROUP].map((item, i) => (
-              <span key={i} className="text-sm font-bold text-primary-ink">
+              <span key={i} dir="rtl" className="text-sm font-bold text-primary-ink">
                 {item}
               </span>
             ))}
