@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/supabase/browserClient", () => ({ supabase: {} }));
 
 import { summarizeWordProgress, withWordProgress } from "./vocabWordProgress";
-import { summarizeUnit, type ResolvedStep } from "./courseProgress";
+import { pickCurrent, summarizeUnit, type ResolvedStep, type UnitProgress } from "./courseProgress";
 import { findUnit, COURSE_UNITS } from "./course";
 
 const words = [
@@ -16,11 +16,11 @@ const words = [
 describe("word progress per topic", () => {
   it("counts practised and mastered words per topic", () => {
     const p = summarizeWordProgress(words, [
-      { vocabulary_item_id: "w1", repetitions: 4 },
-      { vocabulary_item_id: "w2", repetitions: 1 },
+      { vocabulary_item_id: "w1", repetitions: 4, updated_at: "2026-10-20T10:00:00Z" },
+      { vocabulary_item_id: "w2", repetitions: 1, updated_at: "2026-10-22T10:00:00Z" },
     ]);
-    expect(p.get("food")).toEqual({ words: 3, practised: 2, mastered: 1 });
-    expect(p.get("travel")).toEqual({ words: 1, practised: 0, mastered: 0 });
+    expect(p.get("food")).toEqual({ words: 3, practised: 2, mastered: 1, lastPractised: "2026-10-22T10:00:00Z" });
+    expect(p.get("travel")).toEqual({ words: 1, practised: 0, mastered: 0, lastPractised: null });
   });
 
   it("ignores reviews of words outside the published list", () => {
@@ -75,5 +75,39 @@ describe("unit counters", () => {
     expect(p.done).toBe(0);
     expect(p.inProgress).toBe(1);
     expect(p.status).toBe("started");
+  });
+});
+
+describe("the continue card", () => {
+  const unitAt = (i: number, status: UnitProgress["status"], lastActive: string | null = null): UnitProgress => ({
+    unit: COURSE_UNITS[i],
+    number: i + 1,
+    steps: [],
+    checkPassed: status === "done",
+    status,
+    done: 0,
+    total: 1,
+    inProgress: 0,
+    lastActive,
+  });
+
+  it("returns to the started unit practised most recently, not the first unfinished one", () => {
+    const units = [
+      unitAt(0, "todo"),
+      unitAt(1, "started", "2026-10-20T10:00:00Z"),
+      unitAt(2, "todo"),
+      unitAt(3, "started", "2026-10-23T09:00:00Z"),
+    ];
+    expect(pickCurrent(units, null)?.unit.id).toBe(COURSE_UNITS[3].id);
+  });
+
+  it("falls back to the first unfinished unit when nothing is under way", () => {
+    const units = [unitAt(0, "done"), unitAt(1, "todo"), unitAt(2, "todo")];
+    expect(pickCurrent(units, null)?.unit.id).toBe(COURSE_UNITS[1].id);
+  });
+
+  it("keeps course order between started units with no timestamps", () => {
+    const units = [unitAt(0, "todo"), unitAt(1, "started"), unitAt(2, "started")];
+    expect(pickCurrent(units, null)?.unit.id).toBe(COURSE_UNITS[1].id);
   });
 });

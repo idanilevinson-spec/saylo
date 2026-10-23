@@ -42,6 +42,8 @@ export interface UnitProgress {
   // counters show them next to "done", so a practised step never reads as
   // "0 of 6" while the track shows it in progress.
   inProgress: number;
+  // When the learner last practised anything in this unit (ISO), if ever.
+  lastActive?: string | null;
 }
 
 export interface CourseProgress {
@@ -86,6 +88,13 @@ export function summarizeUnit(unit: CourseUnit, steps: ResolvedStep[], checkPass
 }
 
 export function pickCurrent(units: UnitProgress[], level: CefrLevel | null): UnitProgress | null {
+  // "Continue" means continue: a unit the learner is in the middle of comes
+  // first, the one practised most recently (owner, 2026-10-24: it used to
+  // send a learner with units 6 and 8 under way back to unit 1).
+  const underway = units.filter((u) => u.status === "started");
+  if (underway.length > 0) {
+    return underway.reduce((best, u) => ((u.lastActive ?? "") > (best.lastActive ?? "") ? u : best));
+  }
   const from = level ? COURSE_LEVELS.indexOf(level) : 0;
   const ahead = units.filter((u) => COURSE_LEVELS.indexOf(u.unit.level) >= from);
   return ahead.find((u) => u.status !== "done") ?? null;
@@ -178,7 +187,7 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
     fetchAll((from, to) =>
       supabase
         .from("exercise_attempts")
-        .select("exercise_id, is_correct, exercises(topic_id, grammar_topic_id, reading_text_id, listening_clip_id)")
+        .select("exercise_id, is_correct, created_at, exercises(topic_id, grammar_topic_id, reading_text_id, listening_clip_id)")
         .eq("profile_id", profileId)
         .order("id")
         .range(from, to),
@@ -192,8 +201,8 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
         .order("id")
         .range(from, to),
     ),
-    supabase.from("writing_submissions").select("writing_prompt_id").eq("profile_id", profileId),
-    supabase.from("conversations").select("scenario_id, status").eq("profile_id", profileId).not("scenario_id", "is", null),
+    supabase.from("writing_submissions").select("writing_prompt_id, created_at").eq("profile_id", profileId),
+    supabase.from("conversations").select("scenario_id, status, created_at").eq("profile_id", profileId).not("scenario_id", "is", null),
     supabase.from("xp_events").select("source").eq("profile_id", profileId).like("source", `${UNIT_CHECK_XP_PREFIX}%`),
     loadTopicWordProgress(profileId),
   ]);
@@ -205,6 +214,11 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
   // Topic accuracy, and distinct questions answered per text or clip.
   const topicStats = new Map<string, { correct: number; total: number }>();
   const answered = new Map<string, Set<string>>();
+  // Latest practice per piece of content, to find the unit worked on last.
+  const lastActive = new Map<string, string>();
+  const touch = (id: string | null, at: string | null | undefined) => {
+    if (id && at && at > (lastActive.get(id) ?? "")) lastActive.set(id, at);
+  };
   for (const a of attempts.data) {
     const ex = a.exercises as unknown as {
       topic_id: string | null;
@@ -213,6 +227,7 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
       listening_clip_id: string | null;
     } | null;
     if (!ex) continue;
+    for (const id of [ex.topic_id, ex.grammar_topic_id, ex.reading_text_id, ex.listening_clip_id]) touch(id, a.created_at);
     for (const topicId of [ex.topic_id, ex.grammar_topic_id]) {
       if (!topicId) continue;
       const stat = topicStats.get(topicId) ?? { correct: 0, total: 0 };
@@ -233,9 +248,11 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
     if (textId) questionCount.set(textId, (questionCount.get(textId) ?? 0) + 1);
   }
   const submitted = new Set((submissions.data ?? []).map((s) => s.writing_prompt_id));
+  for (const s of submissions.data ?? []) touch(s.writing_prompt_id, s.created_at);
   const talked = new Map<string, StepStatus>();
   for (const c of conversations.data ?? []) {
     if (!c.scenario_id) continue;
+    touch(c.scenario_id, c.created_at);
     if (c.status === "completed") talked.set(c.scenario_id, "done");
     else if (!talked.has(c.scenario_id)) talked.set(c.scenario_id, "started");
   }
@@ -278,7 +295,11 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
         status: statusOf(step.kind, row.id),
       });
     }
-    return summarizeUnit(unit, steps, passed.has(unit.id));
+    const unitActive = steps.reduce<string | null>((latest, s) => {
+      const at = lastActive.get(s.contentId) ?? wordProgress.get(s.contentId)?.lastPractised ?? null;
+      return at && at > (latest ?? "") ? at : latest;
+    }, null);
+    return { ...summarizeUnit(unit, steps, passed.has(unit.id)), lastActive: unitActive };
   });
 
   return { level, units, current: pickCurrent(units, level) };
