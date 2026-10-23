@@ -29,6 +29,7 @@ import {
   Clapperboard,
   History,
 } from "lucide-react";
+import { MissionsPreview } from "@/components/speaking/ScenarioMissions";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ConsentRequestForm from "@/components/ConsentRequestForm";
@@ -444,6 +445,7 @@ export default function SpeakingPage() {
                               <EnglishText as="span" className="mt-1 block text-right text-sm text-muted">
                                 {s.title_en}
                               </EnglishText>
+                              <MissionsPreview objectives={s.objectives} />
                             </button>
                           </li>
                         ))}

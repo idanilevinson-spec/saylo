@@ -50,6 +50,53 @@ export function useScenarioMissions(conversationId: string, turn: number) {
   return { objectives, done };
 }
 
+// On a scenario card: what the learner will set out to do, before starting.
+export function MissionsPreview({ objectives }: { objectives: unknown }) {
+  const list = cleanObjectives(objectives);
+  if (!list.length) return null;
+  return (
+    <ul aria-label="המשימות בתרחיש" className="mt-2.5 space-y-0.5 text-xs text-muted">
+      {list.map((o, i) => (
+        <li key={i} className="flex items-center gap-1.5">
+          <Circle size={11} aria-hidden="true" className="shrink-0" />
+          <span>{o.he}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// On the summary: which missions were done, and what to try next time.
+export function MissionsResult({ objectives, done }: { objectives: ScenarioObjective[]; done: number[] }) {
+  if (!objectives.length) return null;
+  const count = objectives.filter((_, i) => done.includes(i)).length;
+  return (
+    <section aria-labelledby="missions-result-title" className="mt-6 bg-card border border-card-border rounded-lg p-5">
+      <h2 id="missions-result-title" className="font-bold">
+        משימות: {count} מתוך {objectives.length}
+      </h2>
+      <ul className="mt-3 space-y-2 text-sm">
+        {objectives.map((o, i) => {
+          const isDone = done.includes(i);
+          return (
+            <li key={i} className="flex items-start gap-2">
+              {isDone ? (
+                <CheckCircle2 size={17} aria-hidden="true" className="mt-0.5 shrink-0 text-success" />
+              ) : (
+                <Circle size={17} aria-hidden="true" className="mt-0.5 shrink-0 text-muted" />
+              )}
+              <span>
+                {o.he}
+                {!isDone && <span className="text-muted"> (לפעם הבאה)</span>}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 export default function ScenarioMissions({ objectives, done }: { objectives: ScenarioObjective[]; done: number[] }) {
   if (!objectives.length) return null;
   const allDone = objectives.every((_, i) => done.includes(i));
