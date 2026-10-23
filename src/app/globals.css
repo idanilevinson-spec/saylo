@@ -1601,6 +1601,8 @@ textarea::placeholder {
   --key: 5%;
   --bloom: 14%;
   --shade: rgb(60 45 20 / 0.08);
+  --glint: 22%;
+  --edge-glint: 80%;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -1608,6 +1610,8 @@ textarea::placeholder {
     --key: 10%;
     --bloom: 38%;
     --shade: rgb(0 0 0 / 0.45);
+    --glint: 42%;
+    --edge-glint: 95%;
   }
 }
 :root[data-theme="dark"] {
@@ -1615,6 +1619,8 @@ textarea::placeholder {
   --key: 10%;
   --bloom: 38%;
   --shade: rgb(0 0 0 / 0.45);
+  --glint: 42%;
+  --edge-glint: 95%;
 }
 
 .lit-plate {
@@ -1630,18 +1636,22 @@ textarea::placeholder {
     0 24px 48px -28px color-mix(in srgb, var(--primary) var(--bloom), transparent);
 }
 /* A plate that is also a link rises toward the light on hover. Pointer
-   devices only: on touch, hover sticks after the tap. */
-.lit-hover {
+   devices only: on touch, hover sticks after the tap. A .lit-row (a row
+   inside a lit list) gets the same hand-held light but doesn't lift. */
+.lit-hover,
+.lit-row {
   position: relative;
   isolation: isolate;
-  transition-property: box-shadow, border-color, translate, transform;
+  transition-property: box-shadow, border-color, background-color, translate, transform;
   transition-duration: 160ms;
   transition-timing-function: var(--ease-out);
 }
 /* A hand-held light: under a mouse, the plate brightens where the
    pointer is (PointerLight writes --mx/--my). Behind the content, above
-   the plate's own fill. */
-.lit-hover::after {
+   the plate's own fill. The first version was a 9-18% wash and nobody
+   could see it (owner, 2026-10-24); this one is meant to be noticed. */
+.lit-hover::after,
+.lit-row::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -1651,21 +1661,43 @@ textarea::placeholder {
   opacity: 0;
   transition: opacity 200ms var(--ease-out);
   background: radial-gradient(
-    18rem circle at var(--mx, 50%) var(--my, 0%),
-    color-mix(in srgb, var(--primary) calc(var(--key) * 1.8), transparent),
-    transparent 70%
+    12rem circle at var(--mx, 50%) var(--my, 0%),
+    color-mix(in srgb, var(--primary) var(--glint), transparent),
+    transparent 75%
   );
 }
+/* ...and the plate's edge catches it: the border lights up nearest the
+   pointer. A ring cut out with a mask, laid exactly over the 1px border. */
+.lit-hover::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+  background: radial-gradient(
+    10rem circle at calc(var(--mx, 50%) + 1px) calc(var(--my, 0%) + 1px),
+    color-mix(in srgb, var(--primary-hover) var(--edge-glint), transparent),
+    transparent 80%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
 @media (hover: hover) {
-  .lit-hover:hover::after {
+  .lit-hover:hover::after,
+  .lit-hover:hover::before,
+  .lit-row:hover::after {
     opacity: 1;
   }
   .lit-hover:hover {
-    translate: 0 -2px;
+    translate: 0 -3px;
     box-shadow:
       inset 0 1px 0 var(--rim),
-      0 2px 4px var(--shade),
-      0 30px 56px -26px color-mix(in srgb, var(--primary) calc(var(--bloom) * 1.6), transparent);
+      0 4px 8px var(--shade),
+      0 30px 56px -24px color-mix(in srgb, var(--primary) calc(var(--bloom) * 1.8), transparent);
   }
 }
 
@@ -1749,6 +1781,8 @@ textarea::placeholder {
   box-shadow: none;
 }
 :root[data-a11y-contrast="high"] .horizon,
-:root[data-a11y-contrast="high"] .lit-hover::after {
+:root[data-a11y-contrast="high"] .lit-hover::after,
+:root[data-a11y-contrast="high"] .lit-hover::before,
+:root[data-a11y-contrast="high"] .lit-row::after {
   display: none;
 }

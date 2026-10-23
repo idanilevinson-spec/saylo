@@ -320,7 +320,7 @@ export default function DashboardPage() {
                 <Link
                   key={m.title}
                   href={m.href}
-                  className="group flex items-center gap-3 px-4 py-3.5 hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+                  className="lit-row group flex items-center gap-3 px-4 py-3.5 hover:bg-background-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
                 >
                   <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                     <m.icon size={18} strokeWidth={2} />

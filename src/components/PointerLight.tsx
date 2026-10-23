@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-// Feeds the pointer's position to whichever .lit-hover plate it is over,
+// Feeds the pointer's position to whichever .lit-hover plate (or .lit-row) it is over,
 // as --mx/--my, so the plate's hand-held light (globals.css) follows it.
 // Mouse only: a finger has no hover. One listener for the whole page,
 // at most one style write per frame.
@@ -14,7 +14,7 @@ export default function PointerLight() {
       frame = 0;
       const e = last;
       if (!e) return;
-      const plate = (e.target as Element | null)?.closest?.(".lit-hover") as HTMLElement | null;
+      const plate = (e.target as Element | null)?.closest?.(".lit-hover, .lit-row") as HTMLElement | null;
       if (!plate) return;
       const r = plate.getBoundingClientRect();
       plate.style.setProperty("--mx", `${e.clientX - r.left}px`);
