@@ -165,7 +165,7 @@ export default async function BagrutHubPage() {
               <li key={units}>
                 <Link
                   href={`/bagrut/track/${units}`}
-                  className={`game-press group relative flex h-full flex-col overflow-hidden rounded-lg border bg-card p-5 transition-[border-color,transform,box-shadow] duration-150 hover:border-primary/50 hover:shadow-[0_12px_30px_-18px_rgb(0_0_0/0.5)] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                  className={`game-press lit-plate lit-hover group relative flex h-full flex-col overflow-hidden rounded-lg border bg-card p-5 duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                     isMine ? "border-primary/60" : "border-card-border"
                   }`}
                 >

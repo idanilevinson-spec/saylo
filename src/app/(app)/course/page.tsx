@@ -127,7 +127,7 @@ function UnitRow({ progress, current }: { progress: UnitProgress; current: boole
   return (
     <Link
       href={`/course/${unit.id}`}
-      className={`game-press group relative flex items-start gap-4 rounded-lg p-3 sm:p-4 transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+      className={`game-press lit-row group relative flex items-start gap-4 rounded-lg p-3 sm:p-4 duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
         current ? "border border-primary/60 bg-card" : "border border-transparent hover:bg-card hover:border-card-border"
       }`}
     >

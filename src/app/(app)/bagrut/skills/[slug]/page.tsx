@@ -81,7 +81,7 @@ export default async function BagrutSkillPage({ params, searchParams }: PageProp
         </ul>
       </section>
 
-      <section aria-labelledby="example-title" className="relative overflow-hidden mt-10 bg-card border border-card-border rounded-lg p-5 sm:p-7">
+      <section aria-labelledby="example-title" className="lit-plate relative overflow-hidden mt-10 bg-card border border-card-border rounded-lg p-5 sm:p-7">
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
         <h2 id="example-title" className="mb-4 text-lg font-bold">
           דוגמה פתורה

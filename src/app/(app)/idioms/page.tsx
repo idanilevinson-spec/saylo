@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 function PhraseCard({ item }: { item: IdiomPhrasalVerb }) {
   return (
-    <div className="flex h-full flex-col rounded-lg border border-card-border bg-card p-4">
+    <div className="lit-plate flex h-full flex-col rounded-lg border border-card-border bg-card p-4">
       <span className="flex items-start justify-between gap-3">
         <EnglishText as="span" className="block text-right text-lg font-bold text-primary leading-snug">
           {item.phrase}

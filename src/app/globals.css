@@ -1693,12 +1693,12 @@ textarea::placeholder {
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
 @media (hover: hover) {
-  .lit-hover:hover::after,
-  .lit-hover:hover::before,
-  .lit-row:hover::after {
+  .lit-hover:not(:disabled):hover::after,
+  .lit-hover:not(:disabled):hover::before,
+  .lit-row:not(:disabled):hover::after {
     opacity: 1;
   }
-  .lit-hover:hover {
+  .lit-hover:not(:disabled):hover {
     translate: 0 -3px;
     box-shadow:
       inset 0 1px 0 var(--rim),

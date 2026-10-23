@@ -258,7 +258,7 @@ export default function GamesHubPage() {
                 <li key={game.type}>
                   <Link
                     href={game.href}
-                    className="game-press group flex items-center gap-4 p-4 hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
+                    className="game-press lit-row group flex items-center gap-4 p-4 hover:bg-background-2 duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
                   >
                     <span className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${TONES[group.tone]}`}>
                       <game.icon size={20} aria-hidden="true" />
@@ -311,7 +311,7 @@ export default function GamesHubPage() {
 
       <Link
         href="/games/leaderboard"
-        className="group mt-10 flex items-center gap-4 rounded-lg border border-card-border p-4 hover:border-primary/40 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        className="lit-plate lit-hover group mt-10 flex items-center gap-4 rounded-lg border border-card-border p-4 hover:border-primary/40 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
       >
         <Trophy size={20} aria-hidden="true" className="text-accent-hover shrink-0" />
         <span className="flex-1 min-w-0">
