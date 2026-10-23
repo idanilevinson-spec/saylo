@@ -14,6 +14,7 @@ import AppIntro from "@/components/AppIntro";
 import { appIntroScript } from "@/lib/intro/appIntroScript";
 import SupportChat from "@/components/support/SupportChatLazy";
 import SiteAnalytics from "@/components/SiteAnalytics";
+import CourseReturnBar from "@/components/course/CourseReturnBar";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -129,6 +130,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <AuthProvider>
             <Navbar />
             <main id="main-content" tabIndex={-1} className="flex-1 pb-20 sm:pb-28 focus:outline-none">
+              <CourseReturnBar />
               <PageTransition>{children}</PageTransition>
             </main>
             <SupportChat />

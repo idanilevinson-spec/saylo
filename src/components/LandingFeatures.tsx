@@ -102,7 +102,7 @@ export default function LandingFeatures() {
                 whileHover={{ x: -3 }}
                 whileTap={{ scale: 0.985 }}
                 transition={{ duration: 0.16, ease: EASE_OUT }}
-                className="relative bg-card border border-card-border shadow-sm rounded-lg px-5 py-5 sm:px-6 sm:py-6 flex items-start gap-4"
+                className="lit-plate relative border border-card-border rounded-lg px-5 py-5 sm:px-6 sm:py-6 flex items-start gap-4"
               >
                 <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 rounded-s-lg bg-primary" />
                 <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-ink">

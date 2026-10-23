@@ -19,7 +19,7 @@ import {
   Flame,
   Star,
   Heart,
-  CalendarCheck,
+  Route,
   Gamepad2,
   Mic,
   ChevronLeft,
@@ -30,7 +30,9 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import DailyGoal from "@/components/dashboard/DailyGoal";
 import TeacherSuggestionCard from "@/components/TeacherSuggestionCard";
-import TodayAtLevel, { MoreAtLevel } from "@/components/dashboard/TodayAtLevel";
+import { MoreAtLevel } from "@/components/dashboard/TodayAtLevel";
+import CourseLead from "@/components/dashboard/CourseLead";
+import { useCourseProgress } from "@/components/course/useCourseProgress";
 import { getLevelPlan, type LevelPlan } from "@/lib/content/levelPlan";
 import SubscriptionBanner from "@/components/SubscriptionBanner";
 import { isPremiumActive } from "@/lib/subscriptions/entitlements";
@@ -69,8 +71,8 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
   {
     title: "מסלול הלימוד",
     items: [
-      { icon: CalendarCheck, title: "שיעור יומי", body: "נושא אחד, נבחר בשבילכם להיום", href: "/learn/today" },
-      { icon: Map, title: "מסלול לימוד", body: "כל הנושאים מ-A1 עד C2", href: "/learn" },
+      { icon: Route, title: "המסלול שלי", body: "יחידה אחר יחידה, מ-A1 עד C2", href: "/course" },
+      { icon: Map, title: "כל הנושאים", body: "נושאי המילים והדקדוק לפי רמה", href: "/learn" },
       { icon: Target, title: "מבחן רמה", body: "גלו את רמת האנגלית שלכם", href: "/placement" },
       { icon: Brain, title: "חזרה חכמה", body: "מילים ונושאי דקדוק שהגיע זמנם", href: "/mistakes" },
     ],
@@ -118,6 +120,7 @@ export default function DashboardPage() {
   const [hearts, setHearts] = useState<{ current: number; max: number } | null>(null);
   const [placementDone, setPlacementDone] = useState<boolean | null>(null);
   const [plan, setPlan] = useState<LevelPlan | null>(null);
+  const course = useCourseProgress();
 
   // Same session guard as profile/page.tsx: without it, this effect also
   // fires right after sign-out (session and profile clear together) and
@@ -194,7 +197,7 @@ export default function DashboardPage() {
           primary-colored top edge as every other plate on the site
           (hero, correction demo, auth forms) — one recurring detail
           instead of a device invented per surface. */}
-      <div className="relative bg-card border border-card-border rounded-lg overflow-hidden sm:flex sm:items-stretch">
+      <div className="lit-plate relative border border-card-border rounded-lg overflow-hidden sm:flex sm:items-stretch">
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="p-6 sm:p-7 sm:flex-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -239,10 +242,15 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* The lead: the learner's level and today's plan at it — or, before
-          the placement test, the one thing to do first. */}
+      {/* The lead: where the learner is in the course and the next thing
+          to do there — or, before the placement test, the one thing to do
+          first. */}
       {plan?.overall ? (
-        <TodayAtLevel plan={plan} level={plan.overall} />
+        course ? (
+          <CourseLead course={course} level={plan.overall} bySkill={plan.bySkill} />
+        ) : (
+          <div className="mt-6 h-64 rounded-lg bg-background-2 animate-pulse" aria-hidden="true" />
+        )
       ) : (
         placementDone === false && (
           <div className="mt-6">
@@ -280,7 +288,7 @@ export default function DashboardPage() {
             <div key={m.title}>
               <Link
                 href={m.href}
-                className="game-press group h-full flex items-center gap-4 rounded-lg border border-card-border bg-card p-4 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className="game-press lit-plate lit-hover group h-full flex items-center gap-4 rounded-lg border border-card-border p-4 duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 <span
                   className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
@@ -307,7 +315,7 @@ export default function DashboardPage() {
         {MODULE_GROUPS.map((group) => (
           <div key={group.title}>
             <h2 className="text-sm font-bold text-muted mb-3">{group.title}</h2>
-            <div className="rounded-lg border border-card-border bg-card overflow-hidden divide-y divide-card-border">
+            <div className="lit-plate rounded-lg border border-card-border overflow-hidden divide-y divide-card-border">
               {group.items.map((m) => (
                 <Link
                   key={m.title}
