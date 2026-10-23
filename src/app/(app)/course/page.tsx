@@ -142,11 +142,16 @@ function UnitRow({ progress, current }: { progress: UnitProgress; current: boole
           <span className="sr-only">יחידה {number}:</span>
           <span className="font-bold text-lg leading-snug">{unit.titleHe}</span>
           {status === "done" && <span className="text-xs font-bold text-success-hover">הושלמה</span>}
+          {/* Says what the blue marker means, so a blue unit never reads as unexplained. */}
+          {status === "started" && <span className="text-xs font-bold text-primary-hover">בתהליך</span>}
         </span>
         <span className="mt-0.5 block text-sm text-muted leading-relaxed">{unit.goalHe}</span>
         <span className="mt-2.5 flex items-center gap-2.5 text-xs text-muted tabular-nums">
           <StepTrack progress={progress} />
-          {progress.done} מתוך {progress.total}
+          <span>
+            {progress.done} מתוך {progress.total} הושלמו
+            {progress.inProgress > 0 && <span className="text-primary-hover"> · {progress.inProgress} בתהליך</span>}
+          </span>
         </span>
       </span>
       {current ? (

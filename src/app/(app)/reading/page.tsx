@@ -183,7 +183,11 @@ export default async function ReadingPage() {
             renderItem={(text) => {
               const { words, minutes } = readingMinutes(text);
               const p = byText.get(text.id);
-              const done = !!p && p.answered > 0;
+              // Done means every question answered, the same rule as the
+              // course (questionsStatus), so a text can't be done here and
+              // "in progress" there.
+              const started = !!p && p.answered > 0;
+              const done = started && p.answered >= Math.max(1, p.total);
               return (
                 <TopicTile
                   href={`/reading/${text.id}`}
@@ -201,6 +205,10 @@ export default async function ReadingPage() {
                         <span className="inline-flex items-center gap-1 font-medium text-success">
                           <CheckCircle2 size={12} aria-hidden="true" />
                           {p.correct} מתוך {p.total} נכונות
+                        </span>
+                      ) : started && p ? (
+                        <span className="font-medium text-primary-hover">
+                          עניתם על {p.answered} מתוך {p.total} שאלות
                         </span>
                       ) : (
                         <span>עוד לא נקרא</span>

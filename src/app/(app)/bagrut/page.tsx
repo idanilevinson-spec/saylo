@@ -20,7 +20,7 @@ import {
 } from "@/lib/content/bagrut/moduleFormats";
 import { getPublishableSampleUnits, getSampleUnit } from "@/lib/content/bagrut/sampleUnits";
 import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/lib/content/bagrut/skills";
-import { getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
+import { bestScore, getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
 import type { BagrutUnitProgress } from "@/types/database";
 import BagrutCredit from "@/components/BagrutCredit";
 
@@ -48,9 +48,12 @@ const KIND_ICON: Record<BagrutSkillKind, LucideIcon> = {
 
 function trackProgress(units: BagrutStudyUnits, progress: BagrutUnitProgress[]) {
   const codes = modulesForUnits(units);
-  const total = codes.reduce((n, c) => n + getPublishableSampleUnits(c).length, 0);
-  const done = Math.min(total, progress.filter((p) => codes.includes(p.module_code as BagrutModuleCode)).length);
-  return { codes, total, done };
+  const sets = codes.flatMap((c) => getPublishableSampleUnits(c).map((s) => ({ code: c, slug: s.unitSlug })));
+  // The same count as each questionnaire on the track page: a set is done
+  // once it has a score. Counting raw progress rows let an old or unscored
+  // row make this number differ from the track page's.
+  const done = sets.filter((s) => bestScore(progress, s.code, s.slug) !== null).length;
+  return { codes, total: sets.length, done };
 }
 
 export default async function BagrutHubPage() {

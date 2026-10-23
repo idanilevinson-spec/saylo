@@ -72,7 +72,10 @@ export default function CourseLead({
 
               <p className="mt-4 flex items-center gap-2.5 text-sm font-bold text-primary-ink/90 tabular-nums">
                 <StepTrack progress={current} onField />
-                {current.done} מתוך {current.total}
+                <span>
+                  {current.done} מתוך {current.total} הושלמו
+                  {current.inProgress > 0 && <> · {current.inProgress} בתהליך</>}
+                </span>
               </p>
 
               {next && next !== "check" && (
