@@ -405,6 +405,8 @@ export interface ConversationScenario {
   status: ContentStatus;
   sort_order: number;
   created_at: string;
+  // Role-play missions (seed 053): [{ he, en }], read with cleanObjectives.
+  objectives?: unknown;
 }
 
 export interface Conversation {

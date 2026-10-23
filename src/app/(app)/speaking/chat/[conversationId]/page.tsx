@@ -19,7 +19,7 @@ import CorrectionsPractice from "@/components/speaking/CorrectionsPractice";
 import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/speaking/ReplyIdeas";
 import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
 import ConversationPhrases from "@/components/speaking/ConversationPhrases";
-import ScenarioMissions, { useScenarioMissions } from "@/components/speaking/ScenarioMissions";
+import ScenarioMissions, { MissionsResult, useScenarioMissions } from "@/components/speaking/ScenarioMissions";
 import { TrialConversationNote, TrialTeacherUpsell, useTeacherAccess } from "@/components/speaking/TrialTeacher";
 import { TRIAL_TEACHER_LIMIT_ERROR, TRIAL_TEACHER_MESSAGES } from "@/lib/subscriptions/teacherTrial";
 import type { UsefulPhrase } from "@/lib/ai/prompts/usefulPhrases";
@@ -320,6 +320,8 @@ function SpeakingChatInner() {
             <MixedText>{score.feedback.generalSuggestionsHe}</MixedText>
           </p>
         </motion.div>
+
+        <MissionsResult objectives={missions.objectives} done={missions.done} />
 
         {/* The corrections the teacher made during the call, as a short
             rewrite drill: the moment the fix actually sticks. */}
