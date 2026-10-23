@@ -15,21 +15,24 @@ export interface TopicWordProgress {
   // Words at the learn game's "mastered" tier (the same count it shows as
   // "X of Y words mastered").
   mastered: number;
+  // Latest review of any of its words (ISO), if ever.
+  lastPractised: string | null;
 }
 
 export function summarizeWordProgress(
   words: { id: string; topic_id: string }[],
-  reviews: { vocabulary_item_id: string; repetitions: number }[],
+  reviews: { vocabulary_item_id: string; repetitions: number; updated_at?: string | null }[],
 ): Map<string, TopicWordProgress> {
-  const repsByWord = new Map(reviews.map((r) => [r.vocabulary_item_id, r.repetitions]));
+  const byWord = new Map(reviews.map((r) => [r.vocabulary_item_id, r]));
   const byTopic = new Map<string, TopicWordProgress>();
   for (const w of words) {
-    const p = byTopic.get(w.topic_id) ?? { words: 0, practised: 0, mastered: 0 };
+    const p = byTopic.get(w.topic_id) ?? { words: 0, practised: 0, mastered: 0, lastPractised: null };
     p.words += 1;
-    const reps = repsByWord.get(w.id);
-    if (reps !== undefined) {
+    const review = byWord.get(w.id);
+    if (review) {
       p.practised += 1;
-      if (masteryTier(reps) === "mastered") p.mastered += 1;
+      if (masteryTier(review.repetitions) === "mastered") p.mastered += 1;
+      if (review.updated_at && review.updated_at > (p.lastPractised ?? "")) p.lastPractised = review.updated_at;
     }
     byTopic.set(w.topic_id, p);
   }
@@ -41,7 +44,7 @@ export function summarizeWordProgress(
 // learner got there. Exercise mastery alone still finishes it too.
 export function withWordProgress(
   status: "todo" | "started" | "done",
-  words: TopicWordProgress | undefined,
+  words: Pick<TopicWordProgress, "words" | "practised" | "mastered"> | undefined,
 ): "todo" | "started" | "done" {
   if (status === "done" || !words || words.practised === 0) return status;
   return words.words > 0 && words.mastered >= words.words ? "done" : "started";
@@ -55,7 +58,7 @@ export async function loadTopicWordProgress(profileId: string): Promise<Map<stri
     fetchAll((from, to) =>
       supabase
         .from("srs_items")
-        .select("vocabulary_item_id, repetitions")
+        .select("vocabulary_item_id, repetitions, updated_at")
         .eq("profile_id", profileId)
         .order("vocabulary_item_id")
         .range(from, to),
