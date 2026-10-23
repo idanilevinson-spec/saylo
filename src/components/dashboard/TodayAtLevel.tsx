@@ -95,22 +95,7 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
           </div>
 
           {/* Level per skill */}
-          <dl className="grid grid-cols-3 gap-1.5 sm:gap-2">
-            {SKILLS.map(({ skill, label, icon: Icon }) => {
-              const l = plan.bySkill[skill] ?? null;
-              return (
-                <div key={skill} className="rounded-lg bg-primary-ink/10 ring-1 ring-primary-ink/15 px-3 py-2 min-w-[5.5rem]">
-                  <dt className="flex items-center gap-1 text-[0.7rem] font-bold text-primary-ink/90">
-                    <Icon size={12} aria-hidden="true" />
-                    {label}
-                  </dt>
-                  <dd className="chyron mt-0.5 text-2xl leading-none" dir="ltr">
-                    {l ?? "–"}
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
+          <SkillLevelGrid bySkill={plan.bySkill} />
         </div>
       </section>
 
@@ -178,6 +163,28 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
         </section>
       )}
     </div>
+  );
+}
+
+// The learner's level in each skill, on the blue level plate.
+export function SkillLevelGrid({ bySkill }: { bySkill: LevelPlan["bySkill"] }) {
+  return (
+    <dl className="grid grid-cols-3 gap-1.5 sm:gap-2">
+      {SKILLS.map(({ skill, label, icon: Icon }) => {
+        const l = bySkill[skill] ?? null;
+        return (
+          <div key={skill} className="rounded-lg bg-primary-ink/10 ring-1 ring-primary-ink/15 px-3 py-2 min-w-[5.5rem]">
+            <dt className="flex items-center gap-1 text-[0.7rem] font-bold text-primary-ink/90">
+              <Icon size={12} aria-hidden="true" />
+              {label}
+            </dt>
+            <dd className="chyron mt-0.5 text-2xl leading-none" dir="ltr">
+              {l ?? "–"}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
   );
 }
 

@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage, { BusinessDetails, EmailLink, LegalSection, LegalList } from "@/components/LegalPage";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
+import { siteOpenGraph } from "@/lib/og/meta";
+
+const DESCRIPTION = "ביטול מנוי ב-Saylo: איך עובד החידוש, ביטול החידוש האוטומטי, ביטול עסקה והחזר בתוך 14 ימים, ומנוי שנרכש באפליקציה.";
 
 export const metadata: Metadata = {
   title: "ביטולים והחזרים | Saylo",
+  description: DESCRIPTION,
   alternates: { canonical: "/refunds" },
+  openGraph: siteOpenGraph("ביטולים והחזרים", DESCRIPTION, "/refunds"),
 };
 
 const linkClass = "text-primary hover:underline";

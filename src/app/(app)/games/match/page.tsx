@@ -349,7 +349,7 @@ function MatchGamePage({ onReplay }: { onReplay: () => void }) {
           results={pairs.map((p): RoundResult => (matchedIds.has(p.id) ? "correct" : null))}
           current={matchedIds.size}
           aside={
-            <div className="shrink-0 flex items-center gap-1.5" aria-label={`נותרו ${timeLeft} שניות`}>
+            <div role="timer" className="shrink-0 flex items-center gap-1.5" aria-label={`נותרו ${timeLeft} שניות`}>
               <Timer size={16} aria-hidden="true" className={timeLeft <= 10 ? "text-danger" : "text-muted"} />
               <span aria-hidden="true" className={`chyron text-3xl tabular-nums ${timeLeft <= 10 ? "text-danger" : "text-foreground"}`}>
                 {timeLeft}

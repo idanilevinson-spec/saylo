@@ -112,7 +112,7 @@ export default function TeacherNotebook({
           מה המורה זוכר עליכם
         </h2>
         {last && (
-          <Link href={`/speaking/chat/${last.conversation_id}`} className="text-sm font-bold text-primary hover:underline">
+          <Link href={`/speaking/chat/${last.conversation_id}`} className="py-3 text-sm font-bold text-primary hover:underline">
             למשוב המלא מהשיחה האחרונה
           </Link>
         )}

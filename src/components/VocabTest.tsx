@@ -303,7 +303,7 @@ export default function VocabTest({ steps, onRestart }: VocabTestProps) {
           current={stepIndex}
           aside={
             timedMode ? (
-              <div className="shrink-0 flex items-center gap-1.5" aria-label={`נותר ${formatTime(timeLeft)}`}>
+              <div role="timer" className="shrink-0 flex items-center gap-1.5" aria-label={`נותר ${formatTime(timeLeft)}`}>
                 <Timer size={16} aria-hidden="true" className={lowTime ? "text-danger" : "text-muted"} />
                 <span aria-hidden="true" className={`chyron text-3xl tabular-nums ${lowTime ? "text-danger" : "text-foreground"}`}>
                   {formatTime(timeLeft)}

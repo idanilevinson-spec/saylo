@@ -13,6 +13,7 @@ export default function robots(): MetadataRoute.Robots {
         "/dashboard",
         "/placement",
         "/learn",
+        "/course",
         "/vocabulary",
         "/grammar",
         "/reading",

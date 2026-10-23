@@ -103,3 +103,11 @@ describe("tidyStreaming", () => {
     expect(tidyStreaming("That's **great — really")).toBe("That's great, really");
   });
 });
+
+describe("streamableText with missions", () => {
+  it("never sends the missions line, even half-written", () => {
+    expect(streamableText("Coming right up!\nGOALS: 1")).toBe("Coming right up!");
+    expect(streamableText("Coming right up!\nGO")).toBe("Coming right up!");
+    expect(streamableText("Coming right up!\nGood choice")).toBe("Coming right up!\nGood choice");
+  });
+});

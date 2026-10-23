@@ -4,6 +4,8 @@
 // screen after the spoken reply is gone; the line itself is never shown,
 // stored in the reply text, or read aloud.
 
+import { GOALS_MARKER } from "@/lib/ai/conversationGoals";
+
 export const FIX_MARKER = "FIX:";
 
 export interface ConversationFix {
@@ -58,17 +60,21 @@ function tidy(text: string): string {
     .trim();
 }
 
+// Lines meant for the app, never for the learner: the correction card and
+// the role-play missions (lib/ai/conversationGoals).
+const MACHINE_MARKERS = [FIX_MARKER, GOALS_MARKER];
+
 // While a reply streams in, what may already be sent: everything before a
-// FIX line, holding back a last line that could still turn into one ("F",
-// "FI"...). The cut only ever moves forward, so the streamed text is
+// machine line, holding back a last line that could still turn into one
+// ("F", "GO"...). The cut only ever moves forward, so the streamed text is
 // always a prefix of what was sent before plus new text.
 export function streamableText(raw: string): string {
   const lines = raw.split("\n");
   const out: string[] = [];
   for (let i = 0; i < lines.length; i++) {
     const start = lines[i].trimStart();
-    if (start.startsWith(FIX_MARKER)) break;
-    if (i === lines.length - 1 && start && FIX_MARKER.startsWith(start)) break;
+    if (MACHINE_MARKERS.some((m) => start.startsWith(m))) break;
+    if (i === lines.length - 1 && start && MACHINE_MARKERS.some((m) => m.startsWith(start))) break;
     out.push(lines[i]);
   }
   // Trailing whitespace waits for what follows it, so a sent line break

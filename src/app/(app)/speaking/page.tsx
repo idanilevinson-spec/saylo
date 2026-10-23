@@ -29,6 +29,7 @@ import {
   Clapperboard,
   History,
 } from "lucide-react";
+import { MissionsPreview } from "@/components/speaking/ScenarioMissions";
 import EnglishText from "@/components/EnglishText";
 import CefrBadge from "@/components/CefrBadge";
 import ConsentRequestForm from "@/components/ConsentRequestForm";
@@ -128,6 +129,23 @@ function GoalRing({ value, goal }: { value: number; goal: number }) {
       <span className="absolute inset-0 flex items-center justify-center chyron text-2xl tabular-nums">{Math.min(value, 99)}</span>
     </div>
   );
+}
+
+// "/speaking?scenario=<slug>", from a course unit: starts that scenario's
+// conversation straight away. Rendered inside the gates, so it only runs
+// for a learner who may talk with the teacher. The query is dropped first,
+// so going back from the chat lands on this page, not on a new call.
+function StartFromLink({ scenarios, onStart }: { scenarios: ConversationScenario[]; onStart: (id: string) => void }) {
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("scenario");
+    if (!slug) return;
+    window.history.replaceState(null, "", "/speaking");
+    const scenario = scenarios.find((s) => s.slug === slug);
+    if (scenario) onStart(scenario.id);
+    // Once, when the scenarios arrive.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
 }
 
 export default function SpeakingPage() {
@@ -231,6 +249,7 @@ export default function SpeakingPage() {
   return (
     <PremiumGate featureName="מורה AI">
       <AiConsentGate>
+        {scenarios && <StartFromLink scenarios={scenarios} onStart={(id) => startConversation(id)} />}
         <div className="max-w-4xl mx-auto px-4 pt-8 pb-16">
           {/* Daily goal strip */}
           <div className="flex items-center gap-4">
@@ -249,7 +268,7 @@ export default function SpeakingPage() {
               </p>
             </div>
             {streak !== null && (
-              <div className="flex items-center gap-1 rounded-lg border border-card-border bg-card px-3 py-2" aria-label={streakLabel(streak)}>
+              <div role="img" className="flex items-center gap-1 rounded-lg border border-card-border bg-card px-3 py-2" aria-label={streakLabel(streak)}>
                 <Flame size={18} aria-hidden="true" className={streak > 0 ? "text-accent-hover fill-current" : "text-muted"} />
                 <span className="chyron text-2xl tabular-nums" aria-hidden="true">
                   {streak}
@@ -426,6 +445,7 @@ export default function SpeakingPage() {
                               <EnglishText as="span" className="mt-1 block text-right text-sm text-muted">
                                 {s.title_en}
                               </EnglishText>
+                              <MissionsPreview objectives={s.objectives} />
                             </button>
                           </li>
                         ))}

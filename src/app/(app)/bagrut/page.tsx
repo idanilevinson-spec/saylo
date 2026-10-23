@@ -214,7 +214,7 @@ export default async function BagrutHubPage() {
           <h2 id="skills-title" className="text-xl font-black tracking-tight">
             מיומנויות לבחינה
           </h2>
-          <Link href="/bagrut/skills" className="text-sm font-bold text-primary hover:underline">
+          <Link href="/bagrut/skills" className="py-3 text-sm font-bold text-primary hover:underline">
             לכל {BAGRUT_SKILLS.length} המיומנויות
           </Link>
         </div>
