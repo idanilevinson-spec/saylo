@@ -62,7 +62,7 @@ export default function DailyLessonPage() {
         <p className="mt-1 text-sm text-muted">{new Date().toLocaleDateString("he-IL", { weekday: "long", day: "numeric", month: "long" })}</p>
       </div>
 
-      <div className="mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-8">
+      <div className="lit-plate mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-8">
         <div className="flex items-center gap-4">
           <span className="w-12 h-12 shrink-0 rounded-xl bg-primary/10 text-primary-hover flex items-center justify-center">
             <Icon size={22} />

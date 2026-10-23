@@ -210,7 +210,7 @@ export default function PricingCards() {
           initial={planChanged ? { opacity: 0.6, transform: "translateY(4px)" } : false}
           animate={{ opacity: 1, transform: "translateY(0px)" }}
           transition={{ duration: 0.2, ease: EASE_OUT }}
-          className="relative overflow-hidden rounded-lg border border-primary bg-card p-6 sm:p-7 lg:sticky lg:top-24"
+          className="lit-plate relative overflow-hidden rounded-lg border border-primary bg-card p-6 sm:p-7 lg:sticky lg:top-24"
         >
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
           <h2 className="text-lg font-black">{selected.label}</h2>

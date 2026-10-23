@@ -37,7 +37,7 @@ export default function BagrutSkillsIndexPage() {
                 <Icon size={18} aria-hidden="true" className="text-primary" />
                 {BAGRUT_SKILL_KIND_LABEL[kind]}
               </h2>
-              <ul className="mt-3 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
+              <ul className="lit-plate mt-3 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
                 {skills.map((s) => (
                   <li key={s.slug}>
                     <Link

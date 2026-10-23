@@ -106,7 +106,7 @@ export default async function EnglishReadingText({ params }: { params: Promise<{
             </h2>
             <ol lang="en" dir="ltr" className="mt-3 space-y-4 text-left font-content">
               {text.questions.map((q, i) => (
-                <li key={i} className="rounded-lg border border-card-border bg-card px-4 py-3">
+                <li key={i} className="lit-plate rounded-lg border border-card-border bg-card px-4 py-3">
                   <p className="font-bold">
                     {i + 1}. {q.prompt}
                   </p>

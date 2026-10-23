@@ -4,6 +4,7 @@ import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
 import { Timer, ChevronLeft } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
+import HubHeader from "@/components/HubHeader";
 import BagrutCredit from "@/components/BagrutCredit";
 import { BAGRUT_MODULE_FORMATS, modulesForUnits, type BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_SAMPLE_UNITS } from "@/lib/content/bagrut/sampleUnits";
@@ -59,11 +60,13 @@ export default function EnglishBagrutPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
-      <div className="max-w-4xl mx-auto px-4 pt-12 pb-16">
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">הכנה לבגרות באנגלית</h1>
+      <HubHeader title="הכנה לבגרות באנגלית">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           לכל מסלול, 3, 4 או 5 יחידות לימוד: איך כל שאלון בנוי, אילו מיומנויות הוא בודק, וערכות תרגול באותו מבנה בדיוק.
         </p>
+      </HubHeader>
+
+      <div className="max-w-4xl mx-auto px-4 pb-16">
         <div className="mt-6 flex flex-wrap gap-2">
           <Link
             href="/signup"
@@ -86,7 +89,7 @@ export default function EnglishBagrutPage() {
           </h2>
           <div className="mt-5 space-y-4">
             {TRACKS.map((units) => (
-              <article key={units} className="rounded-lg border border-card-border bg-card p-5">
+              <article key={units} className="lit-plate rounded-lg border border-card-border bg-card p-5">
                 <h3 className="flex flex-wrap items-baseline gap-2">
                   <span className="chyron text-4xl leading-none text-primary">{units}</span>
                   <span className="text-xl font-black">יחידות לימוד</span>
@@ -155,7 +158,7 @@ export default function EnglishBagrutPage() {
           <h2 id="faq" className="text-2xl sm:text-3xl font-black tracking-tight">
             שאלות נפוצות
           </h2>
-          <div className="mt-5 divide-y divide-card-border rounded-lg border border-card-border bg-card">
+          <div className="lit-plate mt-5 divide-y divide-card-border rounded-lg border border-card-border bg-card">
             {FAQ.map((f) => (
               <details key={f.q} className="group px-5 py-4">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-bold [&::-webkit-details-marker]:hidden">

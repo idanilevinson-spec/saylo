@@ -12,7 +12,8 @@ interface ContentCardProps {
 // Used for grid/list items across content pages (vocabulary, grammar,
 // reading, listening, writing, idioms, learn) — hover/tap feedback only.
 // No entrance on mount: these are navigation screens a learner passes
-// through many times a day, so the content is simply there. The gradient top edge (invisible at
+// through many times a day, so the content is simply there. Hover lift and
+// light come from .lit-plate/.lit-hover (globals.css). The top edge (invisible at
 // rest, revealed on hover) is this component's one signature touch —
 // it's the cheapest way to keep dozens of otherwise-plain cards from
 // reading as a generic template grid, without coupling this generic
@@ -20,12 +21,9 @@ interface ContentCardProps {
 export default function ContentCard({ href, className = "", children }: ContentCardProps) {
   const card = (
     <motion.div
-      whileHover={href ? { y: -5 } : undefined}
       whileTap={href ? { scale: 0.98 } : undefined}
-      className={`group relative h-full overflow-hidden bg-card border border-card-border rounded-lg p-5 ${
-        href
-          ? "hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-[box-shadow,border-color]"
-          : ""
+      className={`lit-plate group relative h-full overflow-hidden bg-card border border-card-border rounded-lg p-5 ${
+        href ? "lit-hover hover:border-primary/40" : ""
       } ${className}`}
     >
       {href && (

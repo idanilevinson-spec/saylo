@@ -136,7 +136,7 @@ export default function LandingFeatures() {
               <motion.div
                 whileTap={{ scale: 0.985 }}
                 transition={{ duration: 0.16, ease: EASE_OUT }}
-                className="group flex items-center gap-4 px-5 py-4 bg-card hover:bg-background-2 transition-colors"
+                className="lit-row group flex items-center gap-4 px-5 py-4 bg-card hover:bg-background-2"
               >
                 <span className="inline-flex w-8 h-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
                   <f.icon size={16} strokeWidth={2} />

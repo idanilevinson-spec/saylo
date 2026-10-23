@@ -210,7 +210,7 @@ export default function SignupForm() {
       </aside>
 
       <div className="rise-in lg:order-1" style={{ animationDelay: "0.1s" }}>
-        <div className="relative bg-card border border-card-border rounded-lg shadow-sm p-6 sm:p-7">
+        <div className="lit-plate relative bg-card border border-card-border rounded-lg p-6 sm:p-7">
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
 
           {/* Consent first: it applies to every way of signing up below. */}

@@ -294,13 +294,13 @@ export default function ProgressPage() {
       </div>
 
       <div className="mt-3 grid sm:grid-cols-2 gap-4">
-        <div className="bg-card border border-card-border rounded-lg p-6">
+        <div className="lit-plate bg-card border border-card-border rounded-lg p-6">
           <h2 className="font-bold">XP לפי יום</h2>
           <p className="text-xs text-muted mt-0.5">{RANGE_CHART_DAYS[range]} הימים האחרונים</p>
           <XpBarChart buckets={chartData.buckets} values={chartData.dailyXp} />
         </div>
 
-        <div className="bg-card border border-card-border rounded-lg p-6">
+        <div className="lit-plate bg-card border border-card-border rounded-lg p-6">
           <h2 className="font-bold">אחוז הצלחה בתרגילים</h2>
           <p className="text-xs text-muted mt-0.5">{RANGE_CHART_DAYS[range]} הימים האחרונים</p>
           <AccuracyLineChart buckets={chartData.buckets} values={chartData.dailyAccuracy} />
@@ -311,7 +311,7 @@ export default function ProgressPage() {
 
       <SkillLevelsPanel skillLevels={data.skillLevels} />
 
-      <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
+      <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg p-6">
         <h2 className="font-bold">דיוק לפי תחום</h2>
         <p className="text-xs text-muted mt-0.5">מכל הזמנים</p>
         <div className="mt-5 space-y-4">
@@ -345,14 +345,14 @@ export default function ProgressPage() {
       </div>
 
       {data.conversationScores.length > 0 && (
-        <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
+        <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg p-6">
           <h2 className="font-bold">ציוני שיחות עם AI</h2>
           <p className="text-xs text-muted mt-0.5">10 השיחות האחרונות שסיימתם</p>
           <ScoreSparkline values={data.conversationScores} />
         </div>
       )}
 
-      <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
+      <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg p-6">
         <h2 className="font-bold">תגים שהרווחתם</h2>
         {data.badges.length === 0 ? (
           <div className="mt-4 text-center py-6">
@@ -384,7 +384,7 @@ export default function ProgressPage() {
 
 function ScoreHistoryPanel({ summary }: { summary: ScoreSummary | null }) {
   return (
-    <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
+    <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg p-6">
       <h2 className="font-bold">מה עשיתם</h2>
       <p className="text-xs text-muted mt-0.5">תרגולים, מבחנים ושיחות עם המורה בטווח שבחרתם למעלה</p>
 
@@ -453,7 +453,7 @@ function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillAr
   const weakestSkills = assessed.filter((s) => CEFR_ORDER.indexOf(skillLevels[s] as CefrLevel) === weakestRank);
 
   return (
-    <div className="mt-4 bg-card border border-card-border rounded-lg p-6">
+    <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg p-6">
       <h2 className="font-bold">חוזקות וחולשות</h2>
       <p className="text-xs text-muted mt-0.5">רמת CEFR נוכחית בכל תחום, מתעדכנת ככל שאתם מתרגלים</p>
 

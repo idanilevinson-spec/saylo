@@ -79,7 +79,7 @@ export default async function EnglishLevelPage({ params }: { params: Promise<{ l
           </h2>
           <dl className="mt-4 grid gap-3 sm:grid-cols-2">
             {SKILLS.map(({ skill, label }) => (
-              <div key={skill} className="rounded-lg border border-card-border bg-card p-4">
+              <div key={skill} className="lit-plate rounded-lg border border-card-border bg-card p-4">
                 <dt className="font-black">{label}</dt>
                 <dd className="mt-1 text-sm text-muted leading-relaxed">{getCanDoStatement(skill, level)}</dd>
               </div>

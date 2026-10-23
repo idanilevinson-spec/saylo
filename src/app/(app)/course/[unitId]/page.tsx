@@ -68,7 +68,7 @@ export default function CourseUnitPage() {
       </Link>
 
       {/* The unit */}
-      <header className="relative mt-4 overflow-hidden rounded-lg border border-card-border bg-card p-6 sm:p-7">
+      <header className="lit-plate relative mt-4 overflow-hidden rounded-lg border border-card-border bg-card p-6 sm:p-7">
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="flex items-start gap-4">
           <span className="chyron shrink-0 text-5xl leading-[0.85] text-primary" dir="ltr">
