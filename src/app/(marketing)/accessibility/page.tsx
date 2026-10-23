@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import LegalPage, { EmailLink, LegalSection, LegalList } from "@/components/LegalPage";
+import { siteOpenGraph } from "@/lib/og/meta";
+
+const DESCRIPTION = "הצהרת הנגישות של Saylo: התאמות הנגישות שבוצעו באתר ובאפליקציה, מגבלות ידועות, ואיך לפנות אלינו בנושא נגישות.";
 
 export const metadata: Metadata = {
   title: "הצהרת נגישות | Saylo",
-  description: "הצהרת הנגישות של Saylo: התאמות הנגישות שבוצעו באתר ובאפליקציה, מגבלות ידועות, ואיך לפנות אלינו בנושא נגישות.",
+  description: DESCRIPTION,
   alternates: { canonical: "/accessibility" },
+  openGraph: siteOpenGraph("הצהרת נגישות", DESCRIPTION, "/accessibility"),
 };
 
 export default function AccessibilityPage() {
