@@ -16,6 +16,8 @@ export const DAILY_AI_LIMITS = {
   conversation_scoring: 40,
   speaking_test_questions: 30,
   speaking_test_response: 100,
+  // Video-teacher sessions (each capped at 15 minutes) for voice calls.
+  teacher_video: 8,
 } as const;
 
 export type LimitedAiFeature = keyof typeof DAILY_AI_LIMITS;

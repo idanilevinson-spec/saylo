@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PhoneOff, Keyboard, RotateCcw, Languages, Snail } from "lucide-react";
+import { PhoneOff, Keyboard, RotateCcw, Languages, Snail, Video, VideoOff } from "lucide-react";
 import { speak as browserSpeak } from "@/lib/speech/browserTts";
 import SayloAvatar, { type AvatarExpression } from "@/components/SayloAvatar";
 import { loadVoicePref, saveVoicePref, CONVERSATION_VOICE, type VoicePref } from "@/lib/speech/voicePref";
@@ -15,6 +15,8 @@ import { ReplyIdeasButton, ReplyIdeasList, useReplyIdeas } from "@/components/sp
 import { WordCard, useWordLookup } from "@/components/speaking/WordLookup";
 import { activeChunkAt, buildSlowSsml, splitIntoChunks } from "@/lib/speech/slowChunks";
 import type { ConversationFix } from "@/lib/ai/conversationFix";
+import { loadVideoTeacherPref, saveVideoTeacherPref, useVideoTeacher } from "@/components/speaking/useVideoTeacher";
+import { pcmToWav, rateSsml } from "@/lib/speech/pcm";
 
 type CallState = "connecting" | "listening" | "thinking" | "speaking" | "paused" | "error";
 
@@ -123,6 +125,35 @@ export default function VoiceConversationPanel({
   const wordLookup = useWordLookup();
   const [voicePref, setVoicePref] = useState<VoicePref>(() => loadVoicePref());
   const [viseme, setViseme] = useState<number | undefined>(undefined);
+  // The teacher's face as video (no camera on the learner's side). Read
+  // from inside the call loop through a ref, like the voice choice.
+  const [videoOn, setVideoOn] = useState<boolean>(() => loadVideoTeacherPref());
+  const faceVideoRef = useRef<HTMLVideoElement | null>(null);
+  const faceAudioRef = useRef<HTMLAudioElement | null>(null);
+  const teacher = useVideoTeacher(faceVideoRef, faceAudioRef);
+  const { start: startFace, stop: stopFace, speak: faceSpeak, hush: faceHush } = teacher;
+  // hush never changes; kept in a ref so stopSpeaking stays dependency-free.
+  const faceHushRef = useRef(faceHush);
+  const videoLiveRef = useRef(false);
+  useEffect(() => {
+    videoLiveRef.current = teacher.status === "live";
+  }, [teacher.status]);
+  // The face joins when the call starts, follows the voice choice (a new
+  // face for the other voice) and leaves when the call is being summed up,
+  // so no video minutes run while nobody is talking.
+  useEffect(() => {
+    if (!started || !videoOn || ending) {
+      stopFace();
+      return;
+    }
+    startFace(voicePref);
+  }, [started, videoOn, ending, voicePref, startFace, stopFace]);
+  function toggleVideo() {
+    const next = !videoOn;
+    setVideoOn(next);
+    saveVideoTeacherPref(next);
+  }
+  const faceLive = teacher.status === "live";
   const [rate, setRate] = useState(1);
   const rateRef = useRef(rate);
   useEffect(() => {
@@ -134,7 +165,8 @@ export default function VoiceConversationPanel({
   // end, only released when superseded or on unmount) and `text` as the
   // browser-TTS-fallback path's replay source, which never has a blob url.
   const [hasLastReply, setHasLastReply] = useState(false);
-  const lastReplyRef = useRef<{ url: string | null; text: string }>({ url: null, text: "" });
+  // `pcm` is kept on the video path, so a replay moves the face too.
+  const lastReplyRef = useRef<{ url: string | null; text: string; pcm?: ArrayBuffer }>({ url: null, text: "" });
   useEffect(() => {
     return () => {
       if (lastReplyRef.current.url) URL.revokeObjectURL(lastReplyRef.current.url);
@@ -152,7 +184,7 @@ export default function VoiceConversationPanel({
   // "Say it slowly": the pieces of the teacher's last line, which one is
   // being heard, and the slow recording kept for an instant second listen.
   const [slow, setSlow] = useState<{ text: string; chunks: string[]; active: number } | null>(null);
-  const slowCacheRef = useRef<{ text: string; url: string; starts: number[] } | null>(null);
+  const slowCacheRef = useRef<{ text: string; url: string; starts: number[]; pcm?: ArrayBuffer } | null>(null);
   const slowRunRef = useRef(0);
   useEffect(() => {
     return () => {
@@ -185,6 +217,7 @@ export default function VoiceConversationPanel({
     }
     slowRunRef.current++;
     window.speechSynthesis?.cancel();
+    faceHushRef.current();
   }
 
   useEffect(() => stopSpeaking, []);
@@ -346,7 +379,13 @@ export default function VoiceConversationPanel({
           if (cancelled) return;
           const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(token, region);
           speechConfig.speechSynthesisVoiceName = CONVERSATION_VOICE[voicePrefRef.current];
-          speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
+          // With the video teacher on: raw PCM, which the face renderer
+          // takes and which plays locally as WAV, at the chosen speed baked
+          // into the synthesis (the face is drawn at the recorded pace).
+          const withFace = videoLiveRef.current;
+          speechConfig.speechSynthesisOutputFormat = withFace
+            ? sdk.SpeechSynthesisOutputFormat.Raw16Khz16BitMonoPcm
+            : sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
           // No AudioConfig (null) — deliberately NOT AudioConfig.fromDefaultSpeakerOutput().
           // That API drives Azure's own internal Web Audio playback, created fresh on
           // every turn from inside an async callback (after the network round-trip to
@@ -367,16 +406,15 @@ export default function VoiceConversationPanel({
             if (!cancelled) setViseme(e.visemeId);
           };
 
-          synthesizer.speakTextAsync(
-            replyText,
-            async (result) => {
+          const onSynthesized = async (result: import("microsoft-cognitiveservices-speech-sdk").SpeechSynthesisResult) => {
               synthesizer.close();
               if (cancelled) return;
               if (result.reason !== sdk.ResultReason.SynthesizingAudioCompleted || !result.audioData?.byteLength) {
                 fallbackToBrowser();
                 return;
               }
-              const blob = new Blob([result.audioData], { type: "audio/mpeg" });
+              const pcm = withFace ? result.audioData : undefined;
+              const blob = pcm ? pcmToWav(pcm) : new Blob([result.audioData], { type: "audio/mpeg" });
               const objectUrl = URL.createObjectURL(blob);
               // Reuse the single <audio> element blessed by the user's tap
               // in startCall() — a fresh `new Audio()` here would be exactly
@@ -397,7 +435,10 @@ export default function VoiceConversationPanel({
                 if (!cancelled) fallbackToBrowser();
               };
               audio.src = objectUrl;
-              audio.playbackRate = rateRef.current;
+              audio.playbackRate = pcm ? 1 : rateRef.current;
+              // The face gets the audio first; the reply starts when it starts moving.
+              if (pcm) await faceSpeak(pcm);
+              if (cancelled) return;
               audio
                 .play()
                 .then(() => {
@@ -406,22 +447,26 @@ export default function VoiceConversationPanel({
                   // cached clip (if any) is superseded, so it's safe to
                   // release now instead of waiting for unmount.
                   if (lastReplyRef.current.url) URL.revokeObjectURL(lastReplyRef.current.url);
-                  lastReplyRef.current = { url: objectUrl, text: replyText };
+                  lastReplyRef.current = { url: objectUrl, text: replyText, pcm };
                   setHasLastReply(true);
                 })
                 .catch(() => {
                   URL.revokeObjectURL(objectUrl);
                   if (!cancelled) fallbackToBrowser();
                 });
-            },
-            (err) => {
-              synthesizer.close();
-              console.error("speakTextAsync error", err);
-              // Azure TTS failed mid-flight — fall back to the free browser
-              // voice rather than breaking the call.
-              if (!cancelled) fallbackToBrowser();
-            }
-          );
+          };
+          const onFailed = (err: string) => {
+            synthesizer.close();
+            console.error("speakTextAsync error", err);
+            // Azure TTS failed mid-flight — fall back to the free browser
+            // voice rather than breaking the call.
+            if (!cancelled) fallbackToBrowser();
+          };
+          if (withFace) {
+            synthesizer.speakSsmlAsync(rateSsml(replyText, CONVERSATION_VOICE[voicePrefRef.current], rateRef.current), onSynthesized, onFailed);
+          } else {
+            synthesizer.speakTextAsync(replyText, onSynthesized, onFailed);
+          }
         })
         .catch((err) => {
           console.error("loadCredentials for TTS failed", err);
@@ -446,7 +491,7 @@ export default function VoiceConversationPanel({
       if (activeRecognizerRef.current) safeClose(activeRecognizerRef.current);
       activeRecognizerRef.current = null;
     };
-  }, [onSend, restartTick, ending, started]);
+  }, [onSend, restartTick, ending, started, faceSpeak]);
 
   function askInHebrew() {
     if (state !== "listening") return;
@@ -486,9 +531,12 @@ export default function VoiceConversationPanel({
       audio.onended = relisten;
       audio.onerror = relisten;
       audio.src = last.url;
-      audio.playbackRate = rate;
+      // A recording made for the face already has its speed in it.
+      audio.playbackRate = last.pcm ? 1 : rate;
       audio.currentTime = 0;
-      audio.play().catch(relisten);
+      const play = () => audio.play().catch(relisten);
+      if (last.pcm && videoLiveRef.current) faceSpeak(last.pcm).then(play);
+      else play();
     } else {
       browserSpeak(last.text, rate, relisten);
     }
@@ -528,7 +576,7 @@ export default function VoiceConversationPanel({
       };
       next();
     };
-    const play = (recording: { url: string; starts: number[] }) => {
+    const play = async (recording: { url: string; starts: number[]; pcm?: ArrayBuffer }) => {
       const audio = audioElRef.current ?? new Audio();
       audioElRef.current = audio;
       const finish = () => {
@@ -544,13 +592,16 @@ export default function VoiceConversationPanel({
       audio.src = recording.url;
       audio.playbackRate = 1;
       audio.currentTime = 0;
+      if (recording.pcm && videoLiveRef.current) await faceSpeak(recording.pcm);
+      if (run !== slowRunRef.current) return;
       audio.play().catch(() => {
         audio.ontimeupdate = null;
         browserSlow();
       });
     };
 
-    if (slowCacheRef.current?.text === text) return play(slowCacheRef.current);
+    const withFace = videoLiveRef.current;
+    if (slowCacheRef.current?.text === text && !!slowCacheRef.current.pcm === withFace) return play(slowCacheRef.current);
 
     try {
       let cached = tokenCacheRef.current;
@@ -564,7 +615,9 @@ export default function VoiceConversationPanel({
       const sdk = await import("microsoft-cognitiveservices-speech-sdk");
       if (run !== slowRunRef.current) return;
       const speechConfig = sdk.SpeechConfig.fromAuthorizationToken(cached.token, cached.region);
-      speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
+      speechConfig.speechSynthesisOutputFormat = withFace
+        ? sdk.SpeechSynthesisOutputFormat.Raw16Khz16BitMonoPcm
+        : sdk.SpeechSynthesisOutputFormat.Audio24Khz96KBitRateMonoMp3;
       const synthesizer = new sdk.SpeechSynthesizer(speechConfig, null);
       const starts = chunks.map(() => 0);
       // Offsets come in 100-nanosecond ticks.
@@ -588,7 +641,8 @@ export default function VoiceConversationPanel({
       if (run !== slowRunRef.current) return;
       if (!audioData) return browserSlow();
       if (slowCacheRef.current) URL.revokeObjectURL(slowCacheRef.current.url);
-      slowCacheRef.current = { text, url: URL.createObjectURL(new Blob([audioData], { type: "audio/mpeg" })), starts };
+      const blob = withFace ? pcmToWav(audioData) : new Blob([audioData], { type: "audio/mpeg" });
+      slowCacheRef.current = { text, url: URL.createObjectURL(blob), starts, pcm: withFace ? audioData : undefined };
       play(slowCacheRef.current);
     } catch {
       if (run === slowRunRef.current) browserSlow();
@@ -628,6 +682,19 @@ export default function VoiceConversationPanel({
         </div>
 
         <SayloAvatar expression="idle" gender={voicePref} size={224} />
+
+        {teacher.status !== "unavailable" && (
+          <label className="flex items-center gap-2.5 text-sm cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={videoOn}
+              onChange={toggleVideo}
+              className="w-4 h-4 accent-[var(--primary)]"
+            />
+            מורה בווידאו
+            <span className="text-xs text-muted">(בלי מצלמה מצדכם)</span>
+          </label>
+        )}
 
         <p className="text-xl sm:text-2xl font-semibold text-center px-4">מוכנים לשיחה?</p>
         <p className="text-sm text-muted text-center px-4 max-w-xs">
@@ -672,6 +739,20 @@ export default function VoiceConversationPanel({
             </button>
           ))}
         </div>
+        {teacher.status !== "unavailable" && (
+          <button
+            type="button"
+            onClick={toggleVideo}
+            aria-pressed={videoOn}
+            aria-label="מורה בווידאו"
+            title={videoOn ? "להסתיר את הווידאו של המורה" : "להציג את המורה בווידאו"}
+            className={`inline-flex shrink-0 w-9 h-9 items-center justify-center rounded-lg border border-card-border transition-colors ${
+              videoOn ? "bg-primary/10 text-primary-hover" : "bg-background-2 text-muted hover:text-foreground"
+            }`}
+          >
+            {videoOn ? <Video size={16} aria-hidden="true" /> : <VideoOff size={16} aria-hidden="true" />}
+          </button>
+        )}
         <div className="flex items-center gap-1 p-1 rounded-lg bg-background-2 border border-card-border text-xs" role="group" aria-label="מהירות הדיבור">
           {NEURAL_SPEECH_RATES.map((r) => (
             <button
@@ -687,7 +768,36 @@ export default function VoiceConversationPanel({
         </div>
       </div>
 
-      <div className="relative mt-3 flex shrink-0 items-center justify-center w-44 h-44 sm:w-52 sm:h-52">
+      {/* The face renderer's own sound is muted: the reply plays through
+          the call's audio element. Both stay mounted for the whole call so
+          the session can attach to them. */}
+      <audio ref={faceAudioRef} muted autoPlay className="hidden" />
+      <div
+        className={`relative mt-3 shrink-0 overflow-hidden rounded-lg border-2 bg-background-2 transition-colors duration-500 w-48 h-48 sm:w-56 sm:h-56 ${
+          faceLive ? "" : "hidden"
+        } ${
+          state === "listening"
+            ? "border-primary/60"
+            : state === "speaking"
+              ? "border-accent/60"
+              : state === "error"
+                ? "border-danger/50"
+                : "border-card-border"
+        }`}
+      >
+        <video
+          ref={faceVideoRef}
+          autoPlay
+          playsInline
+          muted
+          aria-label="המורה בווידאו"
+          className="h-full w-full object-cover"
+        />
+      </div>
+      <div className={`relative mt-3 flex shrink-0 items-center justify-center w-44 h-44 sm:w-52 sm:h-52 ${faceLive ? "hidden" : ""}`}>
+        {teacher.status === "connecting" && (
+          <span className="absolute -bottom-1 z-[1] rounded-md bg-background-2 px-2 py-0.5 text-[11px] text-muted">מחברים את הווידאו...</span>
+        )}
         <div
           aria-hidden="true"
           className={`absolute inset-[6%] rounded-full border-2 transition-colors duration-500 ${
