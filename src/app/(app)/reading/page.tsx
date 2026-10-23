@@ -214,7 +214,7 @@ export default async function ReadingPage() {
         )}
       </div>
 
-      <details className="group mt-12 rounded-lg border border-card-border bg-card">
+      <details className="lit-plate group mt-12 rounded-lg border border-card-border bg-card">
         <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3.5 font-bold [&::-webkit-details-marker]:hidden">
           <Lightbulb size={16} aria-hidden="true" className="text-accent-hover" />
           טיפים לקריאה ולמבחן

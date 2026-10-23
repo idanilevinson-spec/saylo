@@ -81,7 +81,7 @@ export default function LeaderboardPage() {
           )}
 
           {rest.length > 0 && (
-            <ol className="mt-6 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden" start={4}>
+            <ol className="lit-plate mt-6 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden" start={4}>
               {rest.map((entry) => (
                 <li
                   key={entry.rank}

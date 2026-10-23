@@ -266,7 +266,7 @@ export default function ProgressPage() {
       {profile.age_band === "adult" && (
         <Link
           href="/patterns"
-          className="mt-6 flex items-center justify-between gap-3 rounded-lg border border-card-border p-4 hover:bg-background-2 transition-colors"
+          className="lit-plate lit-hover mt-6 flex items-center justify-between gap-3 rounded-lg border border-card-border p-4 hover:bg-background-2"
         >
           <span>
             <span className="block font-bold">הדפוסים שלי</span>

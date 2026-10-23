@@ -122,7 +122,7 @@ export default function TodayAtLevel({ plan, level }: { plan: LevelPlan; level: 
                 <li key={item.kind}>
                   <Link
                     href={item.href}
-                    className="game-press group flex items-center gap-4 px-5 py-4 hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
+                    className="game-press lit-row group flex items-center gap-4 px-5 py-4 hover:bg-background-2 duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
                   >
                     <span
                       className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${

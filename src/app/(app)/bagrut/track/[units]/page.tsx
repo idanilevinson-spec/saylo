@@ -183,7 +183,7 @@ function ModuleBlock({ code, progress }: { code: BagrutModuleCode; progress: Awa
                 <li key={set.unitSlug}>
                   <Link
                     href={`/bagrut/${code}/${set.unitSlug}`}
-                    className="game-press group flex items-center gap-3 p-4 hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
+                    className="game-press lit-row group flex items-center gap-3 p-4 hover:bg-background-2 duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
                   >
                     <span className="chyron inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-md bg-background-2 text-xl tabular-nums">
                       {set.unitSlug}

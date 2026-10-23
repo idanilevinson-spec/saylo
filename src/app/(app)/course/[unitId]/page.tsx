@@ -124,7 +124,7 @@ export default function CourseUnitPage() {
         {prevUnit ? (
           <Link
             href={`/course/${prevUnit.unit.id}`}
-            className="flex items-center gap-2 rounded-lg border border-card-border p-3 hover:bg-card transition-colors focus-visible:outline-2 focus-visible:outline-primary"
+            className="lit-plate lit-hover flex items-center gap-2 rounded-lg border border-card-border p-3 hover:bg-card focus-visible:outline-2 focus-visible:outline-primary"
           >
             <ChevronRight size={16} aria-hidden="true" className="shrink-0 text-muted" />
             <span className="min-w-0">
@@ -138,7 +138,7 @@ export default function CourseUnitPage() {
         {nextUnit && (
           <Link
             href={`/course/${nextUnit.unit.id}`}
-            className="flex items-center justify-end gap-2 rounded-lg border border-card-border p-3 text-left hover:bg-card transition-colors focus-visible:outline-2 focus-visible:outline-primary"
+            className="lit-plate lit-hover flex items-center justify-end gap-2 rounded-lg border border-card-border p-3 text-left hover:bg-card focus-visible:outline-2 focus-visible:outline-primary"
           >
             <span className="min-w-0 text-right">
               <span className="block text-xs text-muted">
@@ -166,7 +166,7 @@ function StepRow({ step, index, isNext, onOpen }: { step: ResolvedStep; index: n
     <Link
       href={step.href}
       onClick={onOpen}
-      className={`game-press group flex items-center gap-4 rounded-lg border p-4 transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+      className={`game-press lit-plate lit-hover group flex items-center gap-4 rounded-lg border p-4 duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
         isNext ? "border-primary/60 bg-card" : "border-card-border bg-card hover:bg-background-2"
       }`}
     >
@@ -215,7 +215,7 @@ function CheckRow({ progress, isNext }: { progress: UnitProgress; isNext: boolea
   return (
     <Link
       href={`/course/${progress.unit.id}/check`}
-      className={`game-press group flex items-center gap-4 rounded-lg border border-dashed p-4 transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+      className={`game-press lit-row group flex items-center gap-4 rounded-lg border border-dashed p-4 duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
         isNext ? "border-primary bg-primary/[0.06]" : "border-card-border hover:bg-card"
       }`}
     >

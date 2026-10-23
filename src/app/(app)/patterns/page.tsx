@@ -76,7 +76,7 @@ export default function MyPatternsPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: i * 0.05, ease: EASE_OUT }}
-                className="rounded-lg border border-card-border p-5"
+                className="lit-plate rounded-lg border border-card-border p-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <h2 className="font-bold text-lg">{definition.labelHe}</h2>

@@ -182,7 +182,7 @@ export default function VoiceConversationHubPage() {
                       whileTap={{ scale: 0.98 }}
                       onClick={() => startConversation(s.id)}
                       disabled={starting}
-                      className="text-right bg-card border border-card-border rounded-lg p-4 hover:border-primary/40 hover:shadow-md transition-[box-shadow,border-color] disabled:opacity-60"
+                      className="lit-plate lit-hover text-right bg-card border border-card-border rounded-lg p-4 hover:border-primary/40 disabled:opacity-60"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <h3 className="font-bold text-sm">{s.title_he}</h3>

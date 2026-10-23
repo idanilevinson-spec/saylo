@@ -467,7 +467,7 @@ export default function SpeakingPage() {
                   <li key={c.id}>
                     <Link
                       href={`/speaking/chat/${c.id}`}
-                      className="game-press group flex items-center gap-3 p-4 hover:bg-background-2 transition-[background-color,transform] duration-150"
+                      className="game-press lit-row group flex items-center gap-3 p-4 hover:bg-background-2 duration-150"
                     >
                       <MessageSquareText size={17} aria-hidden="true" className="text-muted shrink-0" />
                       <span className="flex-1 min-w-0">

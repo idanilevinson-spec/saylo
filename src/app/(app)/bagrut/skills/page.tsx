@@ -42,7 +42,7 @@ export default function BagrutSkillsIndexPage() {
                   <li key={s.slug}>
                     <Link
                       href={`/bagrut/skills/${s.slug}`}
-                      className="game-press group flex items-center gap-4 p-4 hover:bg-background-2 transition-[background-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
+                      className="game-press lit-row group flex items-center gap-4 p-4 hover:bg-background-2 duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"
                     >
                       <span className="flex-1 min-w-0">
                         <span className="block font-bold">{s.titleHe}</span>

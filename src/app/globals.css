@@ -1598,47 +1598,71 @@ textarea::placeholder {
    product tour's phone stands on a horizon of blue light. Same palette,
    no new colours: every light here is the logo blue or the foreground.
    --rim: the 1px highlight on a plate's top edge.
-   --key: how much blue the key light puts on a plate's upper half.
-   --bloom: the blue in the light a plate throws below itself.
-   --shade: the plain shadow under it. */
+   --plate-wash: the key light on a plate's upper half.
+   --plate-glow(-hover): the light a plate throws below itself.
+   --shade: the plain shadow under it.
+   --glint / --edge-glint: the hand-held light and the lit edge.
+   --hz-*: the horizon's crest, atmosphere, rim, glow, haze and far sky. */
 :root {
   --rim: rgb(255 255 255 / 0.9);
-  --key: 5%;
-  --bloom: 14%;
   --shade: rgb(60 45 20 / 0.08);
-  --glint: 22%;
-  --edge-glint: 80%;
+  --glint: 10%;
+  --edge-glint: 75%;
+  /* Daylight translation (owner, 2026-10-24: light mode must be as good as
+     dark). Blue laid over the warm paper greys out, so in daylight the
+     plates get no blue wash and a warm paper shadow instead of a blue
+     bloom, and the horizon's light is mixed toward white: a sunrise,
+     not a smudge. Dark mode keeps the exact values it had. */
+  --plate-wash: transparent;
+  --plate-glow: rgb(70 55 30 / 0.14);
+  --plate-glow-hover: rgb(70 55 30 / 0.22);
+  --hz-crest: color-mix(in srgb, var(--primary) 12%, white);
+  --hz-atmos: rgb(255 255 255 / 0.7);
+  --hz-rim: color-mix(in srgb, var(--primary) 80%, transparent);
+  --hz-glow: color-mix(in srgb, var(--primary) 35%, white);
+  --hz-haze: color-mix(in srgb, var(--primary) 14%, white);
+  --hz-far: rgb(255 255 255 / 0.9);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --rim: rgb(255 255 255 / 0.08);
-    --key: 10%;
-    --bloom: 38%;
     --shade: rgb(0 0 0 / 0.45);
     --glint: 42%;
     --edge-glint: 95%;
+    --plate-wash: color-mix(in srgb, var(--primary) 10%, transparent);
+    --plate-glow: color-mix(in srgb, var(--primary) 38%, transparent);
+    --plate-glow-hover: color-mix(in srgb, var(--primary) 68%, transparent);
+    --hz-crest: color-mix(in srgb, var(--primary-hover) 55%, transparent);
+    --hz-atmos: color-mix(in srgb, var(--primary) 30%, transparent);
+    --hz-rim: color-mix(in srgb, var(--primary-hover) 95%, transparent);
+    --hz-glow: color-mix(in srgb, var(--primary) 70%, transparent);
+    --hz-haze: color-mix(in srgb, var(--primary) 57%, transparent);
+    --hz-far: color-mix(in srgb, var(--primary) 38%, transparent);
   }
 }
 :root[data-theme="dark"] {
   --rim: rgb(255 255 255 / 0.08);
-  --key: 10%;
-  --bloom: 38%;
   --shade: rgb(0 0 0 / 0.45);
   --glint: 42%;
   --edge-glint: 95%;
+  --plate-wash: color-mix(in srgb, var(--primary) 10%, transparent);
+  --plate-glow: color-mix(in srgb, var(--primary) 38%, transparent);
+  --plate-glow-hover: color-mix(in srgb, var(--primary) 68%, transparent);
+  --hz-crest: color-mix(in srgb, var(--primary-hover) 55%, transparent);
+  --hz-atmos: color-mix(in srgb, var(--primary) 30%, transparent);
+  --hz-rim: color-mix(in srgb, var(--primary-hover) 95%, transparent);
+  --hz-glow: color-mix(in srgb, var(--primary) 70%, transparent);
+  --hz-haze: color-mix(in srgb, var(--primary) 57%, transparent);
+  --hz-far: color-mix(in srgb, var(--primary) 38%, transparent);
 }
 
 .lit-plate {
   background-color: var(--card);
-  background-image: radial-gradient(
-    130% 80% at 50% 0%,
-    color-mix(in srgb, var(--primary) var(--key), transparent),
-    transparent 70%
-  );
+  background-image: radial-gradient(130% 80% at 50% 0%, var(--plate-wash), transparent 70%);
   box-shadow:
     inset 0 1px 0 var(--rim),
     0 1px 2px var(--shade),
-    0 24px 48px -28px color-mix(in srgb, var(--primary) var(--bloom), transparent);
+    0 24px 48px -28px var(--plate-glow);
 }
 /* A plate that is also a link rises toward the light on hover. Pointer
    devices only: on touch, hover sticks after the tap. A .lit-row (a row
@@ -1693,17 +1717,17 @@ textarea::placeholder {
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
 @media (hover: hover) {
-  .lit-hover:hover::after,
-  .lit-hover:hover::before,
-  .lit-row:hover::after {
+  .lit-hover:not(:disabled):hover::after,
+  .lit-hover:not(:disabled):hover::before,
+  .lit-row:not(:disabled):hover::after {
     opacity: 1;
   }
-  .lit-hover:hover {
+  .lit-hover:not(:disabled):hover {
     translate: 0 -3px;
     box-shadow:
       inset 0 1px 0 var(--rim),
       0 4px 8px var(--shade),
-      0 30px 56px -24px color-mix(in srgb, var(--primary) calc(var(--bloom) * 1.8), transparent);
+      0 30px 56px -24px var(--plate-glow-hover);
   }
 }
 
@@ -1725,15 +1749,15 @@ textarea::placeholder {
   /* Atmosphere: the light pooling just under the rim, brightest at the
      crest, fading into the planet's dark body. */
   background:
-    radial-gradient(42% 6% at 50% 0%, color-mix(in srgb, var(--primary-hover) 55%, transparent), transparent),
-    radial-gradient(70% 13% at 50% 0%, color-mix(in srgb, var(--primary) 30%, transparent), transparent),
+    radial-gradient(42% 6% at 50% 0%, var(--hz-crest), transparent),
+    radial-gradient(70% 13% at 50% 0%, var(--hz-atmos), transparent),
     var(--background);
   /* Rim, then the light it throws up into the sky behind the subject. */
   box-shadow:
-    0 -2px 0 color-mix(in srgb, var(--primary-hover) 95%, transparent),
-    0 -6px 18px -2px color-mix(in srgb, var(--primary) 70%, transparent),
-    0 -40px 120px -10px color-mix(in srgb, var(--primary) calc(var(--bloom) * 1.5), transparent),
-    0 -120px 260px -40px color-mix(in srgb, var(--primary) var(--bloom), transparent);
+    0 -2px 0 var(--hz-rim),
+    0 -6px 18px -2px var(--hz-glow),
+    0 -40px 120px -10px var(--hz-haze),
+    0 -120px 260px -40px var(--hz-far);
 }
 
 /* Scroll-linked, CSS only: browsers without scroll timelines (and anyone

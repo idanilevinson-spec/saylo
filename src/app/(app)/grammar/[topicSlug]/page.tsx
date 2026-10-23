@@ -78,7 +78,7 @@ export default async function GrammarTopicPage({ params }: PageProps) {
         <>
           <div className="mt-8 space-y-6">
             {lessons.map((lesson) => (
-              <article key={lesson.id} className="relative overflow-hidden rounded-lg border border-card-border bg-card px-5 py-6 sm:px-9 sm:py-8">
+              <article key={lesson.id} className="lit-plate relative overflow-hidden rounded-lg border border-card-border bg-card px-5 py-6 sm:px-9 sm:py-8">
                 <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
                 <h2 className="text-xl sm:text-2xl font-black tracking-tight">{lesson.title_he}</h2>
                 <div className="mt-4">

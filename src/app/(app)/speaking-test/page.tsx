@@ -160,7 +160,7 @@ function SpeakingTestPageInner() {
             transition={{ duration: 0.3, delay: i * 0.03, ease: EASE_OUT }}
             whileTap={{ scale: 0.98 }}
             onClick={() => generate(topic.id, topic.name_en)}
-            className="w-full flex items-center justify-between gap-3 bg-card border border-card-border rounded-lg p-4 hover:border-primary/40 transition-colors text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+            className="lit-plate lit-hover w-full flex items-center justify-between gap-3 bg-card border border-card-border rounded-lg p-4 hover:border-primary/40 text-right focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             <div>
               <p className="font-bold">{topic.name_he}</p>

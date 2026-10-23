@@ -120,7 +120,7 @@ export default function TeacherNotebook({
 
       <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         {/* This week, as a level meter: one bar per day. */}
-        <div className="rounded-lg border border-card-border bg-card p-5">
+        <div className="lit-plate rounded-lg border border-card-border bg-card p-5">
           <p className="flex items-baseline justify-between gap-2">
             <span className="font-bold">השבוע שלכם</span>
             <span className="text-sm text-muted tabular-nums">
@@ -157,7 +157,7 @@ export default function TeacherNotebook({
         </div>
 
         {/* The last scored conversation, and what to carry into the next. */}
-        <div className="rounded-lg border border-card-border bg-card p-5">
+        <div className="lit-plate rounded-lg border border-card-border bg-card p-5">
           {last ? (
             <>
               <div className="flex items-center gap-4">
@@ -244,7 +244,7 @@ export default function TeacherNotebook({
             <li key={def.code}>
               <Link
                 href="/patterns"
-                className="game-press group flex h-full flex-col rounded-lg border border-card-border bg-card p-4 transition-[border-color,transform] duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                className="game-press lit-plate lit-hover group flex h-full flex-col rounded-lg border border-card-border bg-card p-4 duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
                 <span className="flex items-center justify-between gap-2">
                   <span className="font-bold">{def.labelHe}</span>
