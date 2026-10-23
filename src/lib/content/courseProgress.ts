@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase/browserClient";
 import { fetchAll } from "@/lib/supabase/fetchAll";
 import { overallLevel } from "./levelOrder";
+import { loadTopicWordProgress, withWordProgress } from "./vocabWordProgress";
 import {
   COURSE_LEVELS,
   COURSE_UNITS,
@@ -37,6 +38,10 @@ export interface UnitProgress {
   // Steps plus the unit check.
   done: number;
   total: number;
+  // Steps practised but not finished: the blue segments of the track. The
+  // counters show them next to "done", so a practised step never reads as
+  // "0 of 6" while the track shows it in progress.
+  inProgress: number;
 }
 
 export interface CourseProgress {
@@ -76,6 +81,7 @@ export function summarizeUnit(unit: CourseUnit, steps: ResolvedStep[], checkPass
     status: checkPassed ? "done" : anything ? "started" : "todo",
     done,
     total,
+    inProgress: steps.filter((s) => s.status === "started").length,
   };
 }
 
@@ -158,7 +164,7 @@ export function stepHref(kind: CourseStepKind, row: { id: string; key: string })
 }
 
 export async function getCourseProgress(profileId: string): Promise<CourseProgress> {
-  const [content, placement, skills, attempts, questions, submissions, conversations, checks] = await Promise.all([
+  const [content, placement, skills, attempts, questions, submissions, conversations, checks, wordProgress] = await Promise.all([
     loadContent(),
     supabase
       .from("placement_tests")
@@ -189,6 +195,7 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
     supabase.from("writing_submissions").select("writing_prompt_id").eq("profile_id", profileId),
     supabase.from("conversations").select("scenario_id, status").eq("profile_id", profileId).not("scenario_id", "is", null),
     supabase.from("xp_events").select("source").eq("profile_id", profileId).like("source", `${UNIT_CHECK_XP_PREFIX}%`),
+    loadTopicWordProgress(profileId),
   ]);
 
   const bySkill: Partial<Record<SkillArea, CefrLevel>> = {};
@@ -236,7 +243,10 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
 
   function statusOf(kind: CourseStepKind, id: string): StepStatus {
     switch (kind) {
-      case "vocabulary":
+      case "vocabulary": {
+        const stat = topicStats.get(id);
+        return withWordProgress(topicStatus(stat?.correct ?? 0, stat?.total ?? 0), wordProgress.get(id));
+      }
       case "grammar": {
         const stat = topicStats.get(id);
         return topicStatus(stat?.correct ?? 0, stat?.total ?? 0);

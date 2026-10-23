@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase/browserClient";
 import type { CefrLevel } from "@/types/database";
 import { fetchAll } from "@/lib/supabase/fetchAll";
+import { loadTopicWordProgress, withWordProgress } from "./vocabWordProgress";
 
 export type TopicMasteryStatus = "not_started" | "in_progress" | "mastered";
 
@@ -15,6 +16,9 @@ export interface TopicWithMastery {
   status: TopicMasteryStatus;
   accuracy: number | null;
 }
+
+const FROM_MASTERY = { not_started: "todo", in_progress: "started", mastered: "done" } as const;
+const TO_MASTERY = { todo: "not_started", started: "in_progress", done: "mastered" } as const;
 
 const MASTERED_THRESHOLD = 80;
 const MIN_ATTEMPTS_FOR_MASTERY = 3;
@@ -33,7 +37,7 @@ function statusFor(correct: number, total: number): { status: TopicMasteryStatus
 // exercise_attempts — it can never drift out of sync with real content
 // because there is nothing to re-seed.
 export async function listTopicsWithMastery(profileId: string): Promise<TopicWithMastery[]> {
-  const [{ data: vocabTopics }, { data: grammarTopics }, { data: attempts }] = await Promise.all([
+  const [{ data: vocabTopics }, { data: grammarTopics }, { data: attempts }, wordProgress] = await Promise.all([
     supabase.from("topics").select("*").eq("status", "published").order("cefr_level").order("sort_order"),
     supabase.from("grammar_topics").select("*").eq("status", "published").order("cefr_level").order("sort_order"),
     fetchAll((from, to) =>
@@ -44,6 +48,7 @@ export async function listTopicsWithMastery(profileId: string): Promise<TopicWit
         .order("id")
         .range(from, to),
     ),
+    loadTopicWordProgress(profileId),
   ]);
 
   const vocabStats = new Map<string, { correct: number; total: number }>();
@@ -68,7 +73,10 @@ export async function listTopicsWithMastery(profileId: string): Promise<TopicWit
 
   const vocabEntries: TopicWithMastery[] = (vocabTopics ?? []).map((t) => {
     const s = vocabStats.get(t.id) ?? { correct: 0, total: 0 };
-    const { status, accuracy } = statusFor(s.correct, s.total);
+    const fromExercises = statusFor(s.correct, s.total);
+    // "Learn the words" and the topic test count too (vocabWordProgress.ts).
+    const status = TO_MASTERY[withWordProgress(FROM_MASTERY[fromExercises.status], wordProgress.get(t.id))];
+    const accuracy = fromExercises.accuracy;
     return {
       id: t.id,
       slug: t.slug,

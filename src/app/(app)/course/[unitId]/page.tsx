@@ -87,7 +87,10 @@ export default function CourseUnitPage() {
         </p>
         <p className="mt-4 flex items-center gap-2.5 text-sm text-muted tabular-nums">
           <StepTrack progress={progress} />
-          {progress.done} מתוך {progress.total} שלבים
+          <span>
+            {progress.done} מתוך {progress.total} שלבים הושלמו
+            {progress.inProgress > 0 && <span className="text-primary-hover"> · {progress.inProgress} בתהליך</span>}
+          </span>
         </p>
       </header>
 
