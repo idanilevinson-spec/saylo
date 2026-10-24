@@ -82,6 +82,37 @@ export async function sendStreakReminderEmail(to: string, displayName: string): 
   return !error;
 }
 
+// A "come back" email (see lib/notifications/comeback.ts for who gets
+// which). Same look and opt-out footer as the streak reminder.
+export async function sendComebackEmail(
+  to: string,
+  displayName: string,
+  message: { subject: string; heading: string; body: string; cta: string; href: string },
+): Promise<boolean> {
+  const resend = getClient();
+  if (!resend) return false;
+
+  const name = displayName.trim() ? `היי ${escapeHtml(displayName.trim())},` : "היי,";
+  const { error } = await resend.emails.send({
+    from: "Saylo <reminders@saylolearn.com>",
+    to,
+    subject: message.subject,
+    html: `
+      <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+        <p style="margin: 0 0 4px; color: #6b7280;">${name}</p>
+        <h1 style="color: #0066d6; margin-top: 0;">${escapeHtml(message.heading)}</h1>
+        <p>${escapeHtml(message.body)}</p>
+        <a href="${escapeHtml(message.href)}" style="display: inline-block; margin-top: 16px; padding: 12px 24px; background: #0066d6; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
+          ${escapeHtml(message.cta)}
+        </a>
+        ${OPT_OUT_FOOTER}
+      </div>
+    `,
+  });
+
+  return !error;
+}
+
 // Shared by sendWeeklyReportEmail/sendMonthlyReportEmail — same numbers
 // buildScoreSummary hands the progress page's own history panel, so the
 // email can never show something different from what a learner sees when

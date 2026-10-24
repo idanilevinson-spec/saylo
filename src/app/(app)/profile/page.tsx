@@ -371,7 +371,7 @@ export default function ProfilePage() {
       <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg p-6 space-y-3">
         <h2 className="font-bold text-sm text-muted">התראות</h2>
         <label className="flex items-center justify-between cursor-pointer">
-          <span className="text-sm">תזכורות רצף במייל</span>
+          <span className="text-sm">תזכורות במייל (רצף, וכשלא נכנסתם כמה ימים)</span>
           <input
             type="checkbox"
             checked={profile.email_reminders_enabled}

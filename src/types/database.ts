@@ -15,6 +15,9 @@ export interface Profile {
   // counts. Optional until migration 048 has run.
   is_test_account?: boolean;
   email_reminders_enabled: boolean;
+  // When the daily job last sent a come-back email. Optional until
+  // migration 049 has run.
+  last_comeback_email_at?: string | null;
   push_reminders_enabled: boolean;
   weekly_report_enabled: boolean;
   monthly_report_enabled: boolean;
