@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import HubHeader from "@/components/HubHeader";
 import PracticeLink from "@/components/PracticeLink";
@@ -74,9 +75,9 @@ export default async function EnglishIdiomsPage() {
               <section
                 key={level}
                 aria-labelledby={`level-${level}`}
-                className="reveal scroll-mt-24"
+                className="scroll-mt-24"
               >
-                <h2 id={`level-${level}`} className="flex items-baseline gap-3">
+                <h2 id={`level-${level}`} className="reveal-wipe flex items-baseline gap-3">
                   <span className="chyron text-3xl text-primary" dir="ltr">
                     {level}
                   </span>
@@ -85,10 +86,11 @@ export default async function EnglishIdiomsPage() {
                   </span>
                 </h2>
                 <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {list.map((i) => (
+                  {list.map((i, n) => (
                     <div
                       key={i.phrase}
-                      className="lit-plate rounded-lg border border-card-border bg-card px-4 py-3.5"
+                      style={{ "--col": n % 2 } as CSSProperties}
+                      className="reveal-item lit-plate rounded-lg border border-card-border bg-card px-4 py-3.5"
                     >
                       <dt className="flex items-baseline justify-between gap-3">
                         <span className="text-xs text-muted">

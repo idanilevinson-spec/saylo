@@ -81,14 +81,10 @@ export default function LandingFeatures() {
 
   return (
     <section className="px-4 py-24 bg-background-2">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, ease: EASE_OUT }}
-        className="max-w-4xl mx-auto"
-      >
-        <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
+      {/* Visible from the first frame; the heading cuts in and the rows
+          settle as they scroll in (CSS scroll timelines, globals.css). */}
+      <div className="max-w-4xl mx-auto">
+        <h2 className="reveal-wipe text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
           הכל בערוץ אחד
         </h2>
         <p className="mt-3 mb-10 max-w-xl text-lg text-muted leading-relaxed">
@@ -97,7 +93,7 @@ export default function LandingFeatures() {
 
         <div className="space-y-3 mb-3">
           {NOW_PLAYING.map((f) => (
-            <Link key={f.title} href={dest(f.href)} className="block rounded-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2">
+            <Link key={f.title} href={dest(f.href)} className="reveal-item block rounded-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2">
               <motion.div
                 whileHover={{ x: -3 }}
                 whileTap={{ scale: 0.985 }}
@@ -131,7 +127,7 @@ export default function LandingFeatures() {
             <Link
               key={f.title}
               href={dest(f.href)}
-              className="block focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+              className="reveal-item block focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
             >
               <motion.div
                 whileTap={{ scale: 0.985 }}
@@ -149,7 +145,7 @@ export default function LandingFeatures() {
             </Link>
           ))}
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

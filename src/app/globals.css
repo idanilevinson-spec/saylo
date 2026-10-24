@@ -1783,6 +1783,28 @@ textarea::placeholder {
       animation-timeline: view();
       animation-range: entry 0% entry 70%;
     }
+    /* Three scroll moments (2026-10-24), each for one kind of thing, so a
+       page never repeats the same entrance on every section:
+       .reveal-wipe: a section heading cuts in like a chyron, wiped from
+         the reading start (right) across.
+       .reveal-item: a card or row settles in; --col (0, 1, ...) delays the
+         second card of a row a touch, so a row doesn't land as one slab.
+       .reveal-glow: the pricing card comes up and its light rises. */
+    .reveal-wipe {
+      animation: wipe-in linear both;
+      animation-timeline: view();
+      animation-range: entry 15% entry 75%;
+    }
+    .reveal-item {
+      animation: item-in linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--col, 0) * 12%) entry calc(65% + var(--col, 0) * 12%);
+    }
+    .reveal-glow {
+      animation: glow-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
   }
 }
 @keyframes tour-stage-rise {
@@ -1792,6 +1814,18 @@ textarea::placeholder {
 @keyframes horizon-up {
   from { opacity: 0.35; translate: -50% 18%; }
   to { opacity: 1; translate: -50% 0; }
+}
+@keyframes wipe-in {
+  from { clip-path: inset(0 0 0 100%); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes item-in {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes glow-in {
+  from { transform: translateY(32px) scale(0.94); box-shadow: inset 0 1px 0 var(--rim), 0 1px 2px var(--shade), 0 10px 24px -20px var(--plate-glow); }
+  to { transform: none; box-shadow: inset 0 1px 0 var(--rim), 0 2px 4px var(--shade), 0 40px 80px -30px var(--plate-glow-hover); }
 }
 @keyframes reveal-in {
   from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
@@ -1808,7 +1842,10 @@ textarea::placeholder {
 :root[data-a11y-motion="reduced"] .hero-horizon,
 :root[data-a11y-motion="reduced"] .tour-stage,
 :root[data-a11y-motion="reduced"] .tour-stage > .horizon,
-:root[data-a11y-motion="reduced"] .reveal {
+:root[data-a11y-motion="reduced"] .reveal,
+:root[data-a11y-motion="reduced"] .reveal-wipe,
+:root[data-a11y-motion="reduced"] .reveal-item,
+:root[data-a11y-motion="reduced"] .reveal-glow {
   animation: none !important;
 }
 :root[data-a11y-motion="reduced"] .lit-hover:hover {

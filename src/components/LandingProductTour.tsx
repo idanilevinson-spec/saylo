@@ -68,7 +68,7 @@ export default function LandingProductTour() {
         {/* min-w-0: the tab row scrolls sideways on phones instead of
             stretching the column past the screen. */}
         <div className="min-w-0">
-          <h2 id="tour-title" className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
+          <h2 id="tour-title" className="reveal-wipe text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
             ככה זה נראה מבפנים
           </h2>
           <p className="mt-3 max-w-lg text-lg text-muted leading-relaxed">

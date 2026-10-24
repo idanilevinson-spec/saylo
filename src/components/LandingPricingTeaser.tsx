@@ -12,12 +12,8 @@ export default function LandingPricingTeaser() {
   return (
     <section className="px-4 py-24 bg-background-2">
       <div className="max-w-lg mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5, ease: EASE_OUT }}
-          className="lit-plate relative border border-card-border rounded-lg px-7 py-8 sm:px-10 sm:py-10 text-center"
+        <div
+          className="reveal-glow lit-plate relative border border-card-border rounded-lg px-7 py-8 sm:px-10 sm:py-10 text-center"
         >
           <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
           <span className="inline-block px-2.5 py-1 rounded-md bg-primary text-primary-ink text-xs font-bold tracking-[0.04em]">
@@ -51,7 +47,7 @@ export default function LandingPricingTeaser() {
               לכל המסלולים
             </Link>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { unstable_cache } from "next/cache";
 import SiteFooter from "@/components/SiteFooter";
 import HubHeader from "@/components/HubHeader";
@@ -56,16 +57,16 @@ export default async function EnglishWritingPage() {
             const list = prompts.filter((p) => p.cefr_level === level);
             if (list.length === 0) return null;
             return (
-              <section key={level} aria-labelledby={`level-${level}`} className="reveal">
-                <h2 id={`level-${level}`} className="flex items-baseline gap-3">
+              <section key={level} aria-labelledby={`level-${level}`}>
+                <h2 id={`level-${level}`} className="reveal-wipe flex items-baseline gap-3">
                   <span className="chyron text-3xl text-primary" dir="ltr">
                     {level}
                   </span>
                   <span className="text-lg font-black">{CEFR_NAME_HE[level]}</span>
                 </h2>
                 <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-                  {list.map((p) => (
-                    <li key={p.id} className="lit-plate flex flex-col rounded-lg border border-card-border bg-card px-4 py-3.5">
+                  {list.map((p, n) => (
+                    <li key={p.id} style={{ "--col": n % 2 } as CSSProperties} className="reveal-item lit-plate flex flex-col rounded-lg border border-card-border bg-card px-4 py-3.5">
                       <p className="font-bold">{p.title_he}</p>
                       <p dir="ltr" lang="en" className="mt-1 flex-1 text-left text-sm text-muted font-content leading-relaxed">
                         {p.prompt_en}
