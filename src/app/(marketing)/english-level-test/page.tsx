@@ -47,12 +47,21 @@ export default async function EnglishLevelTestPage() {
       </HubHeader>
 
       <div className="max-w-4xl mx-auto px-4 pb-16">
-        <Link
-          href="/signup"
-          className="game-press mt-6 inline-flex items-center gap-2 min-h-12 px-6 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-[background-color,transform] duration-150"
-        >
-          להתחיל את המבחן בחינם <ChevronLeft size={17} aria-hidden="true" />
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <Link
+            href="/signup"
+            className="game-press inline-flex items-center gap-2 min-h-12 px-6 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-[background-color,transform] duration-150"
+          >
+            להתחיל את המבחן בחינם <ChevronLeft size={17} aria-hidden="true" />
+          </Link>
+          {/* Not ready to sign up yet: a few minutes of the real thing first. */}
+          <Link
+            href="/try"
+            className="font-bold text-primary-hover underline underline-offset-4 decoration-primary/40 hover:decoration-primary rounded focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          >
+            לנסות קודם שיעור קצר, בלי הרשמה
+          </Link>
+        </div>
 
         <section aria-labelledby="parts" className="mt-14">
           <h2 id="parts" className="text-2xl sm:text-3xl font-black tracking-tight">
