@@ -7,6 +7,7 @@ import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
 import { getCanDoStatement } from "@/lib/content/canDoStatements";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
+import { COURSE_LEVELS, unitsForLevel } from "@/lib/content/course";
 import { modulesForUnits, type BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_READINESS_COPY, bagrutReadiness } from "@/lib/content/bagrut/placementItems";
 import { gsap, useGSAP } from "@/lib/motion/gsap";
@@ -110,6 +111,9 @@ export function PlacementFinishing({ withWriting }: { withWriting: boolean }) {
 // only plays toward it, so with reduced motion it's all simply there.
 export function PlacementResultView({ result }: { result: PlacementResult }) {
   const canDo = getCanDoStatement("speaking", result.overallCefr as CefrLevel);
+  // The course starts from the placed level (see courseProgress pickCurrent).
+  const placedLevel = COURSE_LEVELS.find((l) => l === result.overallCefr) ?? null;
+  const firstUnit = placedLevel ? (unitsForLevel(placedLevel)[0] ?? null) : null;
   const rootRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionPreference();
 
@@ -186,12 +190,24 @@ export function PlacementResultView({ result }: { result: PlacementResult }) {
             {canDo && <p className="mt-1 max-w-sm text-sm text-primary-ink/90 leading-relaxed">{canDo}</p>}
           </div>
         </div>
-        <Link
-          href="/dashboard"
-          className="game-press mt-6 inline-flex items-center gap-2 min-h-12 px-5 rounded-lg bg-background text-foreground font-bold transition-transform duration-150"
-        >
-          לתוכנית של היום <ChevronLeft size={17} aria-hidden="true" />
-        </Link>
+        {/* Straight into learning: the first unit at this level, not a
+            dashboard to find the way from. */}
+        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <Link
+            href={firstUnit ? `/course/${firstUnit.id}` : "/dashboard"}
+            className="game-press inline-flex items-center gap-2 min-h-12 px-5 rounded-lg bg-background text-foreground font-bold transition-transform duration-150 focus-visible:outline-2 focus-visible:outline-primary-ink focus-visible:outline-offset-2"
+          >
+            {firstUnit ? `להתחיל ביחידה הראשונה: ${firstUnit.titleHe}` : "ללוח הבקרה"} <ChevronLeft size={17} aria-hidden="true" />
+          </Link>
+          {firstUnit && (
+            <Link
+              href="/dashboard"
+              className="font-bold underline underline-offset-4 decoration-primary-ink/40 hover:decoration-primary-ink rounded focus-visible:outline-2 focus-visible:outline-primary-ink focus-visible:outline-offset-2"
+            >
+              ללוח הבקרה
+            </Link>
+          )}
+        </div>
       </section>
 
       <section data-skills className="mt-4 rounded-lg border border-card-border bg-card p-5 sm:p-6" aria-labelledby="by-skill">
