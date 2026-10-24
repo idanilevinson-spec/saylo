@@ -488,12 +488,12 @@ export default function LandingNotebook() {
         <button
           type="button"
           onClick={nextPage}
-          className="inline-flex items-center gap-2 rounded-lg border border-primary-ink/35 px-3.5 py-2 text-sm font-bold text-primary-ink transition-colors hover:bg-primary-ink/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-ink"
+          className="inline-flex items-center gap-2 rounded-lg border border-card-border bg-card px-3.5 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           לטעות הבאה
           <ArrowLeft size={16} aria-hidden="true" />
         </button>
-        <span className="hidden text-sm font-medium text-primary-ink/90 sm:inline">או גררו את הדף</span>
+        <span className="hidden text-sm font-medium text-muted sm:inline">או גררו את הדף</span>
       </div>
     </div>
   );

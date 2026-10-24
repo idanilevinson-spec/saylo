@@ -22,27 +22,12 @@ export default function LandingHero() {
   const ctaHref = session ? "/dashboard" : "/signup";
 
   return (
-    <section className="relative overflow-hidden bg-primary">
-      {/* One uniform blue field, the exact hue sampled from the real
-          Saylo logo — the same intensity as the button sitting on it,
-          not a softened variant. A field and its button in two different
-          blues read as mismatched, not restrained. */}
-
-      {/* The studio ground breathes — a slow, quiet ambient wash rather
-          than a flat digital field. Raised from the shader-portal
-          challenger's full-bleed commitment, translated to something this
-          budget can actually build: no WebGL, one soft animated glow. */}
-      <motion.div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        initial={{ opacity: 0.5 }}
-        animate={{ opacity: [0.5, 0.8, 0.5] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 50% at 15% 15%, color-mix(in srgb, var(--primary-ink) 16%, transparent) 0%, transparent 60%)",
-        }}
-      />
+    <section className="relative isolate overflow-hidden bg-background-2 [--horizon-top:58%] [--horizon-width:120rem] lg:[--horizon-top:70%]">
+      {/* Pilot (2026-10-24): the opening stands on the same lit horizon as
+          the hub headers and the product tour, instead of the flat blue
+          field. The headline card and the notebook sit in front of the
+          planet's rim; it rises once on load (.hero-horizon). */}
+      <span aria-hidden="true" className="horizon hero-horizon" />
 
       <div className="relative px-4 py-16 sm:py-20">
         <div className="relative max-w-6xl mx-auto">
@@ -50,8 +35,8 @@ export default function LandingHero() {
               element threaded through every section (that was the retired
               timecode mistake). */}
           <div className="flex items-center gap-2 mb-8">
-            <span aria-hidden="true" className="live-dot w-2 h-2 rounded-full bg-primary-ink" />
-            <EnglishText as="span" className="chyron text-xs text-primary-ink tracking-[0.15em]">
+            <span aria-hidden="true" className="live-dot w-2 h-2 rounded-full bg-primary" />
+            <EnglishText as="span" className="chyron text-xs text-primary-hover tracking-[0.15em]">
               Live
             </EnglishText>
           </div>

@@ -1797,6 +1797,15 @@ textarea::placeholder {
   from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
   to { opacity: 1; transform: none; filter: none; }
 }
+/* The home page's opening: the horizon comes up once as the page loads.
+   It starts lower and dimmer and settles; the content in front of it is
+   there from the first frame. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-horizon {
+    animation: horizon-up 1.4s var(--ease-out) 0.1s both;
+  }
+}
+:root[data-a11y-motion="reduced"] .hero-horizon,
 :root[data-a11y-motion="reduced"] .tour-stage,
 :root[data-a11y-motion="reduced"] .tour-stage > .horizon,
 :root[data-a11y-motion="reduced"] .reveal {
