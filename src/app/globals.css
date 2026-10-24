@@ -1863,3 +1863,17 @@ textarea::placeholder {
   display: none;
 }
 } /* @layer components */
+
+/* The help and accessibility launchers sit at the bottom corner. On a phone,
+   while a text field has focus the keyboard pushes them up over the field
+   being typed in, so they step aside until the field loses focus. Toggles,
+   checkboxes and radios don't count; the launchers stay for those. */
+.floating-launcher {
+  transition: opacity 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
+}
+@media (max-width: 639px) {
+  :root:has(:is(textarea, input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"])):focus) .floating-launcher {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
