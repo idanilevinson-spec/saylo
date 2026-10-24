@@ -15,14 +15,8 @@ export default function LandingFinalCta() {
 
   return (
     <section className="relative overflow-hidden bg-primary px-4 py-20 sm:py-24">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, ease: EASE_OUT }}
-        className="relative max-w-lg mx-auto text-center"
-      >
-        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-primary-ink">בעוד כעשר דקות תדעו את הרמה שלכם.</h2>
+      <div className="relative max-w-lg mx-auto text-center">
+        <h2 className="reveal-wipe text-3xl sm:text-4xl font-black tracking-tight text-primary-ink">בעוד כעשר דקות תדעו את הרמה שלכם.</h2>
         <p className="mt-4 text-primary-ink text-lg leading-relaxed">
           ומיד אחריהן תחכה לכם תוכנית יומית שבנויה עליה. שלושה ימים חינם, בלי כרטיס אשראי.
         </p>
@@ -46,7 +40,7 @@ export default function LandingFinalCta() {
             התחילו ללמוד בחינם
           </Link>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }

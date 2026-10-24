@@ -41,7 +41,7 @@ export default function LandingLevels({ catalog }: { catalog: Record<CefrLevel, 
   return (
     <section aria-labelledby="levels-title" className="px-4 py-20 sm:py-24">
       <div className="max-w-4xl mx-auto">
-        <h2 id="levels-title" className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
+        <h2 id="levels-title" className="reveal-wipe text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
           שש רמות. בכל אחת יש מה לעשות.
         </h2>
         <p className="mt-3 max-w-xl text-lg text-muted leading-relaxed">

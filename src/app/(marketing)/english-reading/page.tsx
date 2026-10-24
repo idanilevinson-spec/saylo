@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
@@ -40,16 +41,16 @@ export default async function EnglishReadingIndex() {
             const list = texts.filter((t) => t.cefr_level === level);
             if (list.length === 0) return null;
             return (
-              <section key={level} aria-labelledby={`level-${level}`} className="reveal">
-                <h2 id={`level-${level}`} className="flex items-baseline gap-3">
+              <section key={level} aria-labelledby={`level-${level}`}>
+                <h2 id={`level-${level}`} className="reveal-wipe flex items-baseline gap-3">
                   <span className="chyron text-3xl text-primary" dir="ltr">
                     {level}
                   </span>
                   <span className="text-lg font-black">{CEFR_NAME_HE[level]}</span>
                 </h2>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {list.map((t) => (
-                    <li key={t.slug}>
+                  {list.map((t, n) => (
+                    <li key={t.slug} className="reveal-item" style={{ "--col": n % 2 } as CSSProperties}>
                       <Link
                         href={`/english-reading/${t.slug}`}
                         className="lit-plate lit-hover flex items-center justify-between gap-3 rounded-lg border border-card-border bg-card px-4 py-3 hover:border-primary/50"
