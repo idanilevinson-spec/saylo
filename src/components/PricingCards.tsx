@@ -173,7 +173,7 @@ export default function PricingCards() {
                   setSelectedCode(plan.code);
                   setPlanChanged(true);
                 }}
-                className={`game-press flex w-full items-center gap-4 rounded-lg border px-4 py-3.5 text-start transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                className={`game-press lit-plate lit-hover flex w-full items-center gap-4 rounded-lg border px-4 py-3.5 text-start duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                   active ? "border-primary bg-primary/[0.07]" : "border-card-border bg-card hover:border-primary/40"
                 }`}
               >

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import PricingCards from "@/components/PricingCards";
 import SiteFooter from "@/components/SiteFooter";
+import HubHeader from "@/components/HubHeader";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { PRICING_PLANS, TRIAL_DAYS, monthlyEquivalent } from "@/lib/subscriptions/plans";
 
@@ -19,12 +20,11 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <>
-      <section className="px-4 pt-16 pb-8 text-center">
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight">מסלולים ומחירים</h1>
+      <HubHeader title="מסלולים ומחירים" center>
         <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
           3 ימים ראשונים על הבית, בלי כרטיס אשראי. שיחה עם מורה ה-AI זמינה במנוי בתשלום.
         </p>
-      </section>
+      </HubHeader>
       <PricingCards />
       <SiteFooter />
     </>
