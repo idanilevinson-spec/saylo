@@ -53,6 +53,12 @@ export default async function EnglishLevelTestPage() {
         >
           להתחיל את המבחן בחינם <ChevronLeft size={17} aria-hidden="true" />
         </Link>
+        <Link
+          href="/try"
+          className="mt-3 sm:mt-6 sm:ms-5 inline-flex items-center gap-1 font-bold text-primary-hover underline underline-offset-4 decoration-primary/40 hover:decoration-primary"
+        >
+          לנסות קודם שיעור קצר, בלי הרשמה
+        </Link>
 
         <section aria-labelledby="parts" className="mt-14">
           <h2 id="parts" className="text-2xl sm:text-3xl font-black tracking-tight">

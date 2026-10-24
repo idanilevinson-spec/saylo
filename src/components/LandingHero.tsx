@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Play } from "lucide-react";
+import { ChevronLeft, Play } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import LandingNotebook from "@/components/LandingNotebook";
 import AppStoreButton from "@/components/AppStoreButton";
@@ -86,6 +86,14 @@ export default function LandingHero() {
                   </Link>
                 </motion.div>
               </div>
+              {/* For whoever wants to feel it before signing up. */}
+              <Link
+                href="/try"
+                className="mt-4 inline-flex items-center gap-1 font-bold text-primary-hover underline underline-offset-4 decoration-primary/40 hover:decoration-primary rounded focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              >
+                או נסו שיעור קצר עכשיו, בלי הרשמה
+                <ChevronLeft size={16} aria-hidden="true" />
+              </Link>
               <AppStoreButton className="mt-4" />
             </div>
 
