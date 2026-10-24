@@ -147,10 +147,16 @@ export default function Navbar() {
     <header
       ref={headerRef}
       data-navbar=""
-      className="sticky top-0 z-40 border-b-2 border-accent bg-background/90 backdrop-blur relative"
+      // Phones: the header scrolls away with the page. Pinned under iOS
+      // Safari's own collapsing toolbar it trailed the content on every
+      // page and drifted when the toolbar resized. Desktop keeps it pinned.
+      className="relative md:sticky md:top-0 z-40 border-b-2 border-accent bg-background/90 backdrop-blur"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <ScrollProgress />
+      {/* Tracks the scroll, so it only makes sense while the header is pinned. */}
+      <div className="hidden md:block">
+        <ScrollProgress />
+      </div>
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 leading-tight shrink-0" onClick={() => setMenuOpen(false)}>
           <Image src="/logo-mark.png" alt="" width={32} height={32} className="rounded-lg" />
