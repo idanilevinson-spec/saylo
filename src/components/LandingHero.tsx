@@ -78,11 +78,13 @@ export default function LandingHero() {
                   whileTap={{ scale: 0.98 }}
                   transition={{ duration: 0.16, ease: EASE_OUT }}
                 >
+                  {/* A visitor can try a few minutes first (/try); someone
+                      already signed in gets the plans instead. */}
                   <Link
-                    href="/pricing"
+                    href={session ? "/pricing" : "/try"}
                     className="block text-center px-7 py-3.5 rounded-lg border border-card-border text-foreground font-medium text-lg hover:bg-background-2 transition-colors"
                   >
-                    לכל המסלולים
+                    {session ? "לכל המסלולים" : "שיעור ניסיון, בלי הרשמה"}
                   </Link>
                 </motion.div>
               </div>

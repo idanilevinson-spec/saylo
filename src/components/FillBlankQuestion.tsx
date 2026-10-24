@@ -56,6 +56,14 @@ export default function FillBlankQuestion({ content, disabled, onSubmit }: FillB
             aria-label={`השלימו את החלק החסר במשפט: ${c.sentence}`}
             value={text}
             onChange={(e) => setText(e.target.value)}
+            // Enter (or the phone keyboard's Go) checks, like the button and
+            // like Enter on a multiple-choice answer.
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.nativeEvent.isComposing && !disabled && text.trim()) {
+                e.preventDefault();
+                onSubmit({ text });
+              }
+            }}
             disabled={disabled}
             className="mx-1 w-32 px-2 py-1 border-b-2 border-primary bg-transparent text-center font-content focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-70"
           />

@@ -40,6 +40,14 @@ export default function LandingFinalCta() {
             התחילו ללמוד בחינם
           </Link>
         </motion.div>
+        {!session && (
+          <p className="mt-4 text-primary-ink/90">
+            רוצים קודם לנסות?{" "}
+            <Link href="/try" className="font-bold underline underline-offset-4 decoration-primary-ink/50 hover:decoration-primary-ink">
+              שיעור ניסיון של כ-3 דקות, בלי הרשמה
+            </Link>
+          </p>
+        )}
       </div>
     </section>
   );
