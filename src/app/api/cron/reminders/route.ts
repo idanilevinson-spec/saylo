@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { sendStreakReminderEmail } from "@/lib/notifications/resend";
 import { sendPushNotification } from "@/lib/notifications/webpush";
 import { sendApnsPush } from "@/lib/notifications/apns";
+import { runComebackEmails } from "@/lib/notifications/comebackJob";
 
 // Daily job (see vercel.json) — reminds anyone with an active streak who
 // hasn't practiced yet today, at most once per day. Runs with the
@@ -87,5 +88,9 @@ export async function GET(request: Request) {
       .eq("profile_id", streak.profile_id);
   }
 
-  return NextResponse.json({ candidates: candidates.length, remindedEmail, remindedPush });
+  // Then the come-back emails, for opted-in learners without a streak. A
+  // failure there never costs the streak reminders already sent above.
+  const comeback = await runComebackEmails().catch(() => ({ sent: 0, checked: 0, skipped: "failed" }));
+
+  return NextResponse.json({ candidates: candidates.length, remindedEmail, remindedPush, comeback });
 }

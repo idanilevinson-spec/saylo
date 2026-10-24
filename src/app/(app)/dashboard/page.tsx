@@ -32,6 +32,7 @@ import DailyGoal from "@/components/dashboard/DailyGoal";
 import TeacherSuggestionCard from "@/components/TeacherSuggestionCard";
 import { MoreAtLevel } from "@/components/dashboard/TodayAtLevel";
 import CourseLead from "@/components/dashboard/CourseLead";
+import ReminderOptIn from "@/components/dashboard/ReminderOptIn";
 import { useCourseProgress } from "@/components/course/useCourseProgress";
 import { getLevelPlan, type LevelPlan } from "@/lib/content/levelPlan";
 import SubscriptionBanner from "@/components/SubscriptionBanner";
@@ -274,6 +275,9 @@ export default function DashboardPage() {
           </div>
         )
       )}
+
+      {/* After placement, when there is a course to come back to. */}
+      {plan?.overall && <ReminderOptIn />}
 
       {stats !== null && <SubscriptionBanner subscription={subscription} />}
 
