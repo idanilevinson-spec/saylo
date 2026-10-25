@@ -44,3 +44,22 @@ export function maskWord(word: string): string {
 export function checkSpelling(userInput: string, correctWord: string): boolean {
   return userInput.trim().toLowerCase() === correctWord.trim().toLowerCase();
 }
+
+// The word's own example sentence with the word blanked, as a context cue
+// for recalling it ("Her _____ went up this year."). A single word that the
+// sentence inflects keeps its ending visible ("two hundred _____s",
+// "She _____ed"), so typing the headword still fits the sentence. Null when
+// the sentence doesn't contain the word (or a phrase as written), so the
+// round falls back to the translation alone.
+export function clozeSentence(example: string | null | undefined, headword: string): string | null {
+  if (!example) return null;
+  const word = headword.trim();
+  if (!word) return null;
+  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+  // Always one capture group for the ending (empty for a phrase), so the
+  // replacer's arguments line up either way.
+  const ending = /\s/.test(word) ? "()" : "(s|es|ed|d|ing)?";
+  const re = new RegExp(`(^|[^A-Za-z])${escaped}${ending}(?![A-Za-z])`, "i");
+  if (!re.test(example)) return null;
+  return example.replace(re, (_m, before: string, suffix?: string) => `${before}_____${suffix ?? ""}`);
+}

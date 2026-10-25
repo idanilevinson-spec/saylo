@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, RotateCcw, ChevronRight } from "lucide-react";
+import { CheckCircle2, RotateCcw, ChevronRight, Keyboard } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import { getActiveUnit, pathInUnit } from "@/lib/content/courseSession";
 import { startRetry, summarize, type PracticeRun } from "@/lib/exercises/practiceSession";
@@ -112,6 +112,17 @@ export default function PracticeSummary({
             <RotateCcw size={16} aria-hidden="true" />
             לתרגל שוב את הטעויות ({s.missed.length})
           </button>
+        )}
+        {/* A vocabulary set is recognition (pick the word); the next step
+            is recall, typing the words from memory. */}
+        {backHref.startsWith("/vocabulary/") && (
+          <Link
+            href={`/games/spelling?topic=${backHref.slice("/vocabulary/".length)}`}
+            className="game-press flex items-center justify-center gap-2 min-h-12 px-4 rounded-lg border border-card-border bg-card font-bold hover:border-primary/50 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          >
+            <Keyboard size={16} aria-hidden="true" />
+            עכשיו להקליד את המילים מהזיכרון
+          </Link>
         )}
         <Link
           href={back.href}

@@ -1,14 +1,16 @@
 "use client";
 
 import { ENGLISH_WORD_INPUT } from "@/lib/utils/inputProps";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PenTool, Star } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import GameResults, { withReplay, type MissedWord } from "@/components/games/GameResults";
 import { supabase } from "@/lib/supabase/browserClient";
 import { getDailyReview, type DueReviewItem } from "@/lib/srs/queue";
 import { recordGameAnswer } from "@/lib/games/recordGameAnswer";
-import { maskWord, checkSpelling } from "@/lib/games/spelling";
+import { maskWord, checkSpelling, clozeSentence } from "@/lib/games/spelling";
+import { shuffle } from "@/lib/utils/shuffle";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import HeartsGate from "@/components/HeartsGate";
 import IconBadge from "@/components/IconBadge";
@@ -16,11 +18,39 @@ import { GameHud, GameStage, LetterTiles, SpeakButton, WordReveal, type RoundRes
 
 const ROUND_SIZE = 10;
 
+type SpellingItem = Pick<DueReviewItem, "vocabularyItemId" | "headword" | "translationHe" | "exampleEn" | "ipa" | "partOfSpeech">;
+
+// One topic's words, for typing them from memory (?topic= from the topic
+// page): recall, after the recognition practice. Answers feed smart review
+// like every other round, and so the topic's course step too.
+async function topicWords(slug: string): Promise<{ nameHe: string; items: SpellingItem[] } | null> {
+  const { data: topic } = await supabase.from("topics").select("id, name_he").eq("slug", slug).eq("status", "published").maybeSingle();
+  if (!topic) return null;
+  const { data } = await supabase
+    .from("vocabulary_items")
+    .select("id, headword, translation_he, example_en, ipa, part_of_speech")
+    .eq("topic_id", topic.id)
+    .eq("status", "published");
+  const items = shuffle(data ?? [])
+    .slice(0, ROUND_SIZE)
+    .map((w) => ({
+      vocabularyItemId: w.id,
+      headword: w.headword,
+      translationHe: w.translation_he,
+      exampleEn: w.example_en,
+      ipa: w.ipa,
+      partOfSpeech: w.part_of_speech,
+    }));
+  return { nameHe: topic.name_he, items };
+}
+
 function SpellingChallengePage({ onReplay }: { onReplay: () => void }) {
   const { profile, loading } = useAuth();
+  const topicSlug = useSearchParams().get("topic");
+  const [topicName, setTopicName] = useState<string | null>(null);
   const [startedAt] = useState(() => Date.now());
   const [missed, setMissed] = useState<MissedWord[]>([]);
-  const [items, setItems] = useState<DueReviewItem[] | null>(null);
+  const [items, setItems] = useState<SpellingItem[] | null>(null);
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState("");
   const [locked, setLocked] = useState(false);
@@ -34,11 +64,19 @@ function SpellingChallengePage({ onReplay }: { onReplay: () => void }) {
 
   useEffect(() => {
     if (!profile) return;
+    if (topicSlug) {
+      topicWords(topicSlug).then((t) => {
+        setTopicName(t?.nameHe ?? null);
+        setResults((t?.items ?? []).map(() => null));
+        setItems(t?.items ?? []);
+      });
+      return;
+    }
     getDailyReview(profile.id, ROUND_SIZE).then((fetched) => {
       setResults(fetched.map(() => null));
       setItems(fetched);
     });
-  }, [profile]);
+  }, [profile, topicSlug]);
 
   // Auto-focus the input for every new word so the learner can keep
   // typing without having to click into the field each round.
@@ -121,13 +159,29 @@ function SpellingChallengePage({ onReplay }: { onReplay: () => void }) {
 
   const item = items[index];
   const hint = maskWord(item.headword);
+  // The sentence gives the word a context to come back from; it shows only
+  // until the answer, when the word card shows the full sentence.
+  const cloze = wasCorrect === null ? clozeSentence(item.exampleEn, item.headword) : null;
 
   return (
     <HeartsGate>
       <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
-        <GameHud title="אתגר איות" results={results} current={index} score={correctCount} scoreLabel="מילים נכונות" scoreIcon={Star} />
+        <GameHud
+          title={topicSlug ? `להקליד מהזיכרון${topicName ? ` · ${topicName}` : ""}` : "אתגר איות"}
+          results={results}
+          current={index}
+          score={correctCount}
+          scoreLabel="מילים נכונות"
+          scoreIcon={Star}
+          {...(topicSlug ? { exitHref: `/vocabulary/${topicSlug}`, exitLabel: "חזרה לנושא" } : {})}
+        />
 
         <GameStage stageKey={index} className="text-center">
+          {cloze && (
+            <p dir="ltr" lang="en" className="mb-4 rounded-lg bg-background-2 px-4 py-3 font-content text-lg leading-relaxed">
+              {cloze}
+            </p>
+          )}
           <p className="text-sm text-muted">איך כותבים באנגלית</p>
           <p className="mt-1 text-2xl sm:text-3xl font-bold">{item.translationHe}</p>
 
@@ -186,4 +240,14 @@ function SpellingChallengePage({ onReplay }: { onReplay: () => void }) {
   );
 }
 
-export default withReplay(SpellingChallengePage);
+const Replayable = withReplay(SpellingChallengePage);
+
+// useSearchParams() (the ?topic= deep link) needs a Suspense boundary on a
+// route with no dynamic segment of its own, like the topic test.
+export default function SpellingPage() {
+  return (
+    <Suspense fallback={<div className="max-w-xl mx-auto px-4 py-24 text-center text-muted">טוען מילים...</div>}>
+      <Replayable />
+    </Suspense>
+  );
+}

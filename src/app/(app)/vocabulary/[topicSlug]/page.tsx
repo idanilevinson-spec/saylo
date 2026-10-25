@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import EnglishText from "@/components/EnglishText";
-import { Target, GraduationCap, ClipboardCheck, ChevronRight } from "lucide-react";
+import { Target, GraduationCap, ClipboardCheck, ChevronRight, Keyboard } from "lucide-react";
 import WordCard from "@/components/content/WordCard";
 import TeacherExplanationCard from "@/components/TeacherExplanationCard";
 import { getVocabularyTopicBySlug, listVocabularyItems } from "@/lib/content/vocabulary";
@@ -71,6 +71,11 @@ export default async function VocabularyTopicPage({ params }: PageProps) {
               <Target size={17} aria-hidden="true" /> לתרגל
             </Link>
           )}
+          {/* Recall after recognition: type each word from its translation
+              and its sentence, with a letter hint. */}
+          <Link href={`/games/spelling?topic=${topic.slug}`} className={`${action} border border-card-border bg-card hover:border-primary/50`}>
+            <Keyboard size={17} aria-hidden="true" /> להקליד מהזיכרון
+          </Link>
           <Link href={`/games/learn?topic=${topic.slug}`} className={`${action} border border-card-border bg-card hover:border-primary/50`}>
             <GraduationCap size={17} aria-hidden="true" /> ללמוד בכרטיסיות
           </Link>
