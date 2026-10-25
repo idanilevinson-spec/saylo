@@ -177,3 +177,7 @@ Three CSS scroll-timeline moments, each for one kind of thing, so no page repeat
 ## Trial lesson (2026-10-25)
 
 `/try`: six questions (three vocabulary, three grammar) from the first course unit at the level the visitor picks (A1 / B1 / C1), before any signup. Built from the app's own practice parts (`GameHud`, `GameStage`, `McqQuestion`, `FillBlankQuestion`, the verdict panel), graded on the device, nothing recorded. The question stage renders only after hydration, because the question components shuffle on mount. Ends on the score, the mistakes with their right answers, and one primary action (signup, or the app when signed in). Linked from the hero's secondary button and the final CTA for signed-out visitors. Enter now checks a typed fill-in answer everywhere (`FillBlankQuestion`), as it already did for multiple choice.
+
+## Practice sets close the loop (2026-10-25)
+
+Each exercise is its own page, so the end of a set used to say only "done". A per-tab run (`practiceSession.ts`, sessionStorage) now remembers this run's answers: the HUD track shows real green/red for earlier questions, and the last page ends on `PracticeSummary`, the score, the mistakes with their right answers, "practise the mistakes again" (a `?retry=1` pass over just those, with its own short summary), and the way back to the course unit when the set was a step in one. Attempts are recorded exactly as before; the run never leaves the browser.

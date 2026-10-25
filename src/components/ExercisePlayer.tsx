@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, Heart, PartyPopper, Flame, CornerDownLeft } from "lucide-react";
@@ -22,6 +22,18 @@ import MotionLink from "@/components/MotionLink";
 import ReportContentError from "@/components/ReportContentError";
 import EnglishText from "@/components/EnglishText";
 import { GameHud, GameStage, WordReveal, type RoundResult, type WordInfo } from "@/components/games/GameKit";
+import PracticeSummary from "@/components/PracticeSummary";
+import {
+  beginRun,
+  historyOf,
+  parseRun,
+  promptLabel,
+  recordEntry,
+  recordRetry,
+  retryNext,
+  runSnapshot,
+  subscribeRun,
+} from "@/lib/exercises/practiceSession";
 
 interface ExercisePlayerProps {
   exercise: Exercise;
@@ -31,9 +43,20 @@ interface ExercisePlayerProps {
   progress?: { current: number; total: number } | null;
   // The vocabulary word this exercise practices, when it's tied to one.
   word?: WordInfo | null;
+  // A second pass over this run's mistakes (?retry=1): "next" walks the
+  // mistakes instead of the set.
+  retry?: boolean;
 }
 
-export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel, progress, word }: ExercisePlayerProps) {
+export default function ExercisePlayer({
+  exercise,
+  nextHref: setNextHref,
+  backHref,
+  backLabel,
+  progress,
+  word,
+  retry = false,
+}: ExercisePlayerProps) {
   const { profile } = useAuth();
   const router = useRouter();
   // The verdict is graded locally, so it shows the instant the learner
@@ -43,11 +66,36 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
   const [details, setDetails] = useState<AttemptResult | null>(null);
   const answeredRef = useRef(false);
 
+  // This run through the set (practiceSession.ts), keyed by the set's page.
+  const runRaw = useSyncExternalStore(subscribeRun, runSnapshot, () => null);
+  const run = useMemo(() => parseRun(runRaw), [runRaw]);
+  const retryQueue = retry && run?.setKey === backHref ? (run.retry?.queue ?? []) : [];
+  const retryIndex = retryQueue.indexOf(exercise.id);
+  const nextRetryId = retry ? retryNext(run, exercise.id) : null;
+  const nextHref = retry ? (nextRetryId ? `/practice/${nextRetryId}?retry=1` : null) : setNextHref;
+
+  // The set's first exercise starts a fresh run.
+  const startsSet = !retry && progress?.current === 1;
+  const setTotal = progress?.total ?? 1;
+  useEffect(() => {
+    if (startsSet) beginRun(backHref, setTotal);
+  }, [startsSet, backHref, setTotal]);
+
   function handleSubmit(response: Record<string, unknown>) {
     if (!profile || answeredRef.current) return;
     answeredRef.current = true;
     const attempt = startAttempt(profile.id, exercise, response);
     setResult({ isCorrect: attempt.isCorrect, xpAwarded: attempt.xpAwarded });
+    if (retry) recordRetry(backHref, exercise.id, attempt.isCorrect);
+    else
+      recordEntry(backHref, setTotal, {
+        id: exercise.id,
+        index: progress ? progress.current - 1 : 0,
+        ok: attempt.isCorrect,
+        prompt: promptLabel(exercise.type, exercise.content),
+        answer: correctAnswerLabel(exercise.type, exercise.content),
+        word: !!exercise.vocabulary_item_id,
+      });
     if (attempt.isCorrect) playCorrectSound();
     else playIncorrectSound();
     if (!nextHref) setTimeout(playCompleteSound, 350);
@@ -78,22 +126,36 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
     return () => window.removeEventListener("keydown", onKey);
   }, [result, nextHref, router]);
 
-  // Each exercise is its own page, so earlier ones only show as done; the
-  // current one fills in green/red once answered.
-  const results: RoundResult[] = progress
-    ? Array.from({ length: progress.total }, (_, i) =>
-        i < progress.current - 1 ? "done" : i === progress.current - 1 && result ? (result.isCorrect ? "correct" : "wrong") : null
-      )
-    : [result ? (result.isCorrect ? "correct" : "wrong") : null];
+  // Earlier exercises show how they went in this run (green/red), or just
+  // "done" if they were answered before it began; the current one fills in
+  // once answered. A retry pass tracks its own short list.
+  const verdict: RoundResult = result ? (result.isCorrect ? "correct" : "wrong") : null;
+  const history = historyOf(run?.setKey === backHref ? run : null, setTotal);
+  const results: RoundResult[] =
+    retry && retryIndex >= 0
+      ? retryQueue.map((id, i) =>
+          i === retryIndex ? verdict : run?.retry?.results[id] === undefined ? null : run.retry.results[id] ? "correct" : "wrong",
+        )
+      : progress
+        ? Array.from({ length: progress.total }, (_, i) =>
+            i < progress.current - 1 ? (history[i] ?? "done") : i === progress.current - 1 ? verdict : null,
+          )
+        : [verdict];
 
   return (
     <HeartsGate>
       <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
         <GameHud
           title={backLabel}
-          subtitle={progress ? `תרגול · ${progress.current} מתוך ${progress.total}` : "תרגול"}
+          subtitle={
+            retry && retryIndex >= 0
+              ? `חזרה על הטעויות · ${retryIndex + 1} מתוך ${retryQueue.length}`
+              : progress
+                ? `תרגול · ${progress.current} מתוך ${progress.total}`
+                : "תרגול"
+          }
           results={results}
-          current={progress ? progress.current - 1 : 0}
+          current={retry && retryIndex >= 0 ? retryIndex : progress ? progress.current - 1 : 0}
           exitHref={backHref}
           exitLabel={`חזרה ל${backLabel}`}
         />
@@ -177,17 +239,7 @@ export default function ExercisePlayer({ exercise, nextHref, backHref, backLabel
                 <CornerDownLeft size={15} aria-hidden="true" className="opacity-70 hidden sm:inline" />
               </MotionLink>
             ) : (
-              <div className="mt-6 border-t border-card-border pt-5 text-center">
-                <CheckCircle2 size={36} aria-hidden="true" className="mx-auto text-success" />
-                <p className="mt-2 text-lg font-bold">סיימתם את כל התרגילים ב{backLabel}</p>
-                <MotionLink
-                  whileTap={{ scale: 0.97 }}
-                  href={backHref}
-                  className="mt-4 flex items-center justify-center min-h-12 px-4 rounded-lg bg-primary text-primary-ink font-medium hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-                >
-                  חזרה לנושא
-                </MotionLink>
-              </div>
+              <PracticeSummary run={run?.setKey === backHref ? run : null} retry={retry} backHref={backHref} backLabel={backLabel} />
             ))}
         </GameStage>
 

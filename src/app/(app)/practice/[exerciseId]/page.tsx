@@ -6,6 +6,7 @@ import type { Exercise } from "@/types/database";
 
 interface PageProps {
   params: Promise<{ exerciseId: string }>;
+  searchParams: Promise<{ retry?: string }>;
 }
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -51,8 +52,9 @@ async function resolveParent(supabase: SupabaseClient, exercise: Exercise) {
   };
 }
 
-export default async function PracticePage({ params }: PageProps) {
+export default async function PracticePage({ params, searchParams }: PageProps) {
   const { exerciseId } = await params;
+  const retry = (await searchParams).retry === "1";
   const supabase = await createClient();
 
   const { data: exercise } = await supabase
@@ -89,6 +91,7 @@ export default async function PracticePage({ params }: PageProps) {
       backHref={backHref}
       backLabel={backLabel}
       progress={progress}
+      retry={retry}
       word={
         word
           ? {
