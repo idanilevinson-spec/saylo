@@ -30,11 +30,11 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import DailyGoal from "@/components/dashboard/DailyGoal";
 import TeacherSuggestionCard from "@/components/TeacherSuggestionCard";
-import { MoreAtLevel } from "@/components/dashboard/TodayAtLevel";
-import CourseLead from "@/components/dashboard/CourseLead";
+import { KIND_META } from "@/components/dashboard/TodayAtLevel";
+import CourseLead, { courseNextHref } from "@/components/dashboard/CourseLead";
 import ReminderOptIn from "@/components/dashboard/ReminderOptIn";
 import { useCourseProgress } from "@/components/course/useCourseProgress";
-import { getLevelPlan, type LevelPlan } from "@/lib/content/levelPlan";
+import { getLevelPlan, type LevelPlan, type PlanKind } from "@/lib/content/levelPlan";
 import SubscriptionBanner from "@/components/SubscriptionBanner";
 import { isPremiumActive } from "@/lib/subscriptions/entitlements";
 import { getCurrentHearts } from "@/lib/subscriptions/heartsService";
@@ -103,6 +103,17 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
     ],
   },
 ];
+
+// After placement, a skill area's row says how much of it fits the
+// learner instead of its generic blurb (this used to be a separate "more
+// at your level" grid listing the same areas a second time).
+function atLevel(plan: LevelPlan, href: string): string | null {
+  const kind = (Object.keys(KIND_META) as PlanKind[]).find((k) => KIND_META[k].area === href);
+  if (!kind || !plan.overall) return null;
+  const n = plan.countsAtLevel[kind];
+  if (n === 0) return null;
+  return `${n} ${n === 1 ? KIND_META[kind].noun[0] : KIND_META[kind].noun[1]} ברמה שלכם`;
+}
 
 function greeting() {
   const hour = new Date().getHours();
@@ -276,12 +287,14 @@ export default function DashboardPage() {
         )
       )}
 
+      {/* Under the lead, as its complement: a short review, never a
+          competing next step. */}
+      <TeacherSuggestionCard leadHref={plan?.overall && course ? courseNextHref(course) : null} />
+
       {/* After placement, when there is a course to come back to. */}
       {plan?.overall && <ReminderOptIn />}
 
       {stats !== null && <SubscriptionBanner subscription={subscription} />}
-
-      <TeacherSuggestionCard />
 
       {/* Today's XP goal beside the two ways to talk with the AI teacher. */}
       <div className="mt-10 grid lg:grid-cols-[1.1fr_1fr] gap-3">
@@ -312,8 +325,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {plan?.overall && <MoreAtLevel plan={plan} />}
-
       <h2 className="mt-12 text-xl font-black tracking-tight">כל האזורים</h2>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
         {MODULE_GROUPS.map((group) => (
@@ -331,7 +342,7 @@ export default function DashboardPage() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-sm">{m.title}</p>
-                    <p className="mt-0.5 text-xs text-muted truncate">{m.body}</p>
+                    <p className="mt-0.5 text-xs text-muted truncate tabular-nums">{(plan && atLevel(plan, m.href)) ?? m.body}</p>
                   </div>
                   <ChevronLeft
                     size={16}

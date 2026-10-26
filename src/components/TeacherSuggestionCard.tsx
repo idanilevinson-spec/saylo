@@ -4,11 +4,14 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ChevronLeft, Lightbulb } from "lucide-react";
-import type { TeacherAction } from "@/lib/teacher/teacherActions";
+import { withoutLeadStep, type TeacherAction } from "@/lib/teacher/teacherActions";
 import { useAiConsent } from "@/components/AiConsentGate";
 
 import { EASE_OUT } from "@/lib/motion/easing";
-export default function TeacherSuggestionCard() {
+// Sits under the course lead as its complement: a few minutes of review
+// beside the next step, never a second "do this first". leadHref is where
+// the lead already points, so no action here repeats it.
+export default function TeacherSuggestionCard({ leadHref = null }: { leadHref?: string | null }) {
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [actions, setActions] = useState<TeacherAction[]>([]);
   const [failed, setFailed] = useState(false);
@@ -31,23 +34,24 @@ export default function TeacherSuggestionCard() {
   }, [consented]);
 
   if (!consented || failed || !suggestion) return null;
+  const shown = withoutLeadStep(actions, leadHref);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: 0.15, ease: EASE_OUT }}
-      className="mt-6 bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start gap-3"
+      className="mt-3 bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start gap-3"
     >
       <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
         <Lightbulb size={18} />
       </span>
       <div>
-        <p className="text-sm font-bold text-primary">המורה AI שלכם ממליץ</p>
+        <p className="text-sm font-bold text-primary">{leadHref ? "בנוסף למסלול: חזרה קצרה מהמורה AI" : "המורה AI שלכם ממליץ"}</p>
         <p className="mt-1 leading-relaxed">{suggestion}</p>
-        {actions.length > 0 && (
+        {shown.length > 0 && (
           <ul className="mt-3 flex flex-wrap gap-2">
-            {actions.map((a) => (
+            {shown.map((a) => (
               <li key={a.kind}>
                 <Link
                   href={a.href}
