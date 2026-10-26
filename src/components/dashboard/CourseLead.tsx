@@ -12,6 +12,15 @@ import { stepGoal } from "@/lib/content/courseStepText";
 import type { LevelPlan } from "@/lib/content/levelPlan";
 import type { CefrLevel } from "@/types/database";
 
+// Where the lead's main button goes: the unit's next step, its check, or
+// the map once the course is done.
+export function courseNextHref(course: CourseProgress): string {
+  const current = course.current;
+  if (!current) return "/course";
+  const next = nextInUnit(current);
+  return next === "check" || next === null ? `/course/${current.unit.id}/check` : next.href;
+}
+
 // The home page's lead: where the learner is in the course and the one
 // next thing to do there, on the blue level plate.
 export default function CourseLead({
@@ -28,7 +37,7 @@ export default function CourseLead({
   const levelUnits = current ? course.units.filter((u) => u.unit.level === current.unit.level) : [];
   const levelDone = levelUnits.filter((u) => u.status === "done").length;
 
-  const nextHref = !current ? "/course" : next === "check" || next === null ? `/course/${current.unit.id}/check` : next.href;
+  const nextHref = courseNextHref(course);
   const remember = () => {
     if (!current) return;
     setActiveUnit({

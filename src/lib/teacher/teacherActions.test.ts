@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildTeacherActions } from "./teacherActions";
+import { buildTeacherActions, withoutLeadStep } from "./teacherActions";
 
 describe("buildTeacherActions", () => {
   it("turns real data into one-tap steps", () => {
@@ -25,5 +25,22 @@ describe("buildTeacherActions", () => {
   it("invents nothing for a quiet account except the first conversation", () => {
     expect(buildTeacherActions({ weakTopics: [], dueWords: 0, daysSinceConversation: 1 })).toEqual([]);
     expect(buildTeacherActions({ weakTopics: [], dueWords: 0, daysSinceConversation: null })).toHaveLength(1);
+  });
+});
+
+describe("withoutLeadStep", () => {
+  const actions = buildTeacherActions({
+    weakTopics: [{ nameHe: "Present Perfect", slug: "present-perfect" }],
+    dueWords: 7,
+    daysSinceConversation: 1,
+  });
+
+  it("drops the action that is already the course's next step", () => {
+    expect(withoutLeadStep(actions, "/grammar/present-perfect?from=course").map((a) => a.kind)).toEqual(["review"]);
+  });
+
+  it("keeps everything when the lead goes elsewhere or is unknown", () => {
+    expect(withoutLeadStep(actions, "/vocabulary/food")).toHaveLength(2);
+    expect(withoutLeadStep(actions, null)).toHaveLength(2);
   });
 });
