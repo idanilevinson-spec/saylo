@@ -27,6 +27,21 @@ export interface ResolvedStep extends CourseStep {
   href: string;
   minutes: number;
   status: StepStatus;
+  // The numbers behind the status, so the unit page can say how close a
+  // step is (courseStepText.ts). Only what applies to the step's kind.
+  detail?: StepDetail;
+}
+
+export interface StepDetail {
+  // Exercise answers on the topic, and how many were right.
+  answered?: number;
+  correct?: number;
+  // A text's or clip's questions, and how many have an answer.
+  questions?: number;
+  questionsAnswered?: number;
+  // A vocabulary topic's words, and how many are mastered in the games.
+  words?: number;
+  wordsMastered?: number;
 }
 
 export interface UnitProgress {
@@ -57,8 +72,8 @@ export interface CourseProgress {
 
 // Same bar as topicMastery.ts: a topic counts as learned at 80% over at
 // least three answers.
-const MASTERED_THRESHOLD = 80;
-const MIN_ATTEMPTS_FOR_MASTERY = 3;
+export const MASTERED_THRESHOLD = 80;
+export const MIN_ATTEMPTS_FOR_MASTERY = 3;
 
 export function topicStatus(correct: number, total: number): StepStatus {
   if (total === 0) return "todo";
@@ -278,6 +293,25 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
     }
   }
 
+  function detailOf(kind: CourseStepKind, id: string): StepDetail | undefined {
+    switch (kind) {
+      case "vocabulary": {
+        const stat = topicStats.get(id);
+        const words = wordProgress.get(id);
+        return { answered: stat?.total ?? 0, correct: stat?.correct ?? 0, words: words?.words ?? 0, wordsMastered: words?.mastered ?? 0 };
+      }
+      case "grammar": {
+        const stat = topicStats.get(id);
+        return { answered: stat?.total ?? 0, correct: stat?.correct ?? 0 };
+      }
+      case "reading":
+      case "listening":
+        return { questions: questionCount.get(id) ?? 0, questionsAnswered: answered.get(id)?.size ?? 0 };
+      default:
+        return undefined;
+    }
+  }
+
   const units = COURSE_UNITS.map((unit) => {
     const steps: ResolvedStep[] = [];
     for (const step of unit.steps) {
@@ -293,6 +327,7 @@ export async function getCourseProgress(profileId: string): Promise<CourseProgre
         href: stepHref(step.kind, row),
         minutes: row.minutes,
         status: statusOf(step.kind, row.id),
+        detail: detailOf(step.kind, row.id),
       });
     }
     const unitActive = steps.reduce<string | null>((latest, s) => {

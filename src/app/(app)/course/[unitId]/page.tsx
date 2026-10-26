@@ -10,6 +10,7 @@ import { useCourseProgress } from "@/components/course/useCourseProgress";
 import { UNIT_CHECK_PASS, UNIT_CHECK_QUESTIONS, unitsForLevel } from "@/lib/content/course";
 import { nextInUnit, type ResolvedStep, type UnitProgress } from "@/lib/content/courseProgress";
 import { setActiveUnit, stepPath } from "@/lib/content/courseSession";
+import { stepGoal, stepProgressText } from "@/lib/content/courseStepText";
 
 export default function CourseUnitPage() {
   const { unitId } = useParams<{ unitId: string }>();
@@ -55,6 +56,7 @@ export default function CourseUnitPage() {
       level: unit.level,
       titleHe: unit.titleHe,
       paths: progress.steps.map((s) => stepPath(s.href)),
+      goals: Object.fromEntries(progress.steps.map((s) => [stepPath(s.href), stepGoal(s.kind)])),
     });
 
   return (
@@ -165,6 +167,8 @@ function StatusIcon({ status }: { status: ResolvedStep["status"] }) {
 function StepRow({ step, index, isNext, onOpen }: { step: ResolvedStep; index: number; isNext: boolean; onOpen: () => void }) {
   const meta = KIND_META[step.kind];
   const statusLabel = step.status === "done" ? "הושלם" : step.status === "started" ? "בתהליך" : null;
+  // A step not done says what finishes it, or how close it is.
+  const progressText = stepProgressText(step);
   return (
     <Link
       href={step.href}
@@ -198,6 +202,11 @@ function StepRow({ step, index, isNext, onOpen }: { step: ResolvedStep; index: n
           <EnglishText as="span" className="block text-right text-sm text-muted truncate">
             {step.titleEn}
           </EnglishText>
+        )}
+        {step.status !== "done" && (
+          <span className={`mt-1.5 block text-xs leading-snug ${progressText ? "font-bold text-primary-hover" : "text-muted"}`}>
+            {progressText ?? `להשלמה: ${stepGoal(step.kind)}`}
+          </span>
         )}
       </span>
       {isNext ? (
