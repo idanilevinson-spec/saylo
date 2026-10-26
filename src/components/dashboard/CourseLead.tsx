@@ -8,6 +8,7 @@ import { KIND_META, SkillLevelGrid } from "@/components/dashboard/TodayAtLevel";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { nextInUnit, type CourseProgress } from "@/lib/content/courseProgress";
 import { setActiveUnit, stepPath } from "@/lib/content/courseSession";
+import { stepGoal } from "@/lib/content/courseStepText";
 import type { LevelPlan } from "@/lib/content/levelPlan";
 import type { CefrLevel } from "@/types/database";
 
@@ -36,6 +37,7 @@ export default function CourseLead({
       level: current.unit.level,
       titleHe: current.unit.titleHe,
       paths: current.steps.map((s) => stepPath(s.href)),
+      goals: Object.fromEntries(current.steps.map((s) => [stepPath(s.href), stepGoal(s.kind)])),
     });
   };
 

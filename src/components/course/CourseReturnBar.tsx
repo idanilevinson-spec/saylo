@@ -18,12 +18,15 @@ export default function CourseReturnBar() {
   const [, rerender] = useReducer((n: number) => n + 1, 0);
   const active = mounted ? getActiveUnit() : null;
   const unit = active && pathInUnit(pathname, active.paths) ? active : null;
+  // What finishes the step this page is, when the unit page stored it.
+  const goalPath = unit?.paths.find((p) => pathInUnit(pathname, [p]));
+  const goal = goalPath ? unit?.goals?.[goalPath] : undefined;
 
   if (!unit) return null;
 
   return (
     <div className="border-b border-card-border bg-background-2">
-      <div className="max-w-5xl mx-auto px-4 flex items-center gap-3 min-h-11">
+      <div className="max-w-5xl mx-auto px-4 flex flex-wrap items-center gap-x-3 min-h-11">
         <Link
           href={`/course/${unit.id}`}
           className="group flex min-w-0 flex-1 items-center gap-2 py-2 text-sm rounded focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
@@ -48,6 +51,11 @@ export default function CourseReturnBar() {
         >
           <X size={16} aria-hidden="true" />
         </button>
+        {goal && (
+          <p className="basis-full pb-2 -mt-1 ps-6 text-xs text-muted">
+            <span className="font-bold text-foreground">להשלמת השלב:</span> {goal}
+          </p>
+        )}
       </div>
     </div>
   );

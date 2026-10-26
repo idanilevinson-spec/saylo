@@ -9,6 +9,9 @@ export interface ActiveUnit {
   titleHe: string;
   // Paths of the unit's steps, without query strings.
   paths: string[];
+  // What finishes each step, by path (courseStepText.ts), for the return
+  // bar to state on the step's own page.
+  goals?: Record<string, string>;
 }
 
 const KEY = "saylo:course-unit";
