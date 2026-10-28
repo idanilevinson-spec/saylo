@@ -7,3 +7,11 @@ export function safeNext(value: string | null | undefined, fallback = "/dashboar
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return fallback;
   return value;
 }
+
+// Where a sign-up confirmation link returns: through /auth/callback, which
+// turns the link's code into a session, then on to the dashboard (which
+// sends a new learner to the profile step). Must be in Supabase's allowed
+// redirect URLs, like the OAuth callback that already uses it.
+export function signupRedirectUrl(origin: string): string {
+  return `${origin}/auth/callback?next=/dashboard`;
+}

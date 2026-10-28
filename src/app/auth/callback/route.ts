@@ -23,5 +23,8 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/login`);
+  // No code, an expired link, or a sign-up link opened in another browser
+  // than the one that asked for it (the code only works there). The email is
+  // confirmed by then in the last case, so the login page says to sign in.
+  return NextResponse.redirect(`${origin}/login?reason=link`);
 }

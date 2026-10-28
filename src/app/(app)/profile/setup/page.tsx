@@ -28,6 +28,10 @@ export default function ProfileSetupPage() {
 
   const fallbackName = (session?.user.user_metadata?.display_name as string | undefined) ?? "";
   const nameValue = displayName || fallbackName;
+  // Email sign-ups typed their age on the sign-up form already.
+  const metaAge = Number(session?.user.user_metadata?.age);
+  const fallbackAge = Number.isInteger(metaAge) && metaAge >= 4 && metaAge <= 119 ? String(metaAge) : "";
+  const ageValue = age || fallbackAge;
   // Email sign-ups already accepted the terms on the sign-up form.
   const alreadyAccepted = Boolean(session?.user.user_metadata?.terms_accepted_at);
 
@@ -36,7 +40,7 @@ export default function ProfileSetupPage() {
     setError(null);
 
     const finalName = nameValue.trim();
-    const ageNum = Number(age);
+    const ageNum = Number(ageValue);
     if (!session || !finalName || !ageNum || ageNum < 4 || ageNum > 119) {
       setError("בדקו שהכינוי והגיל תקינים");
       return;
@@ -118,7 +122,7 @@ export default function ProfileSetupPage() {
             autoComplete="off"
             min={4}
             max={119}
-            value={age}
+            value={ageValue}
             onChange={(e) => setAge(e.target.value)}
             required
             className="w-full px-4 py-2.5 rounded-lg border border-card-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/40"

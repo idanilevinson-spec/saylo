@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { deriveAgeBand } from "@/lib/auth/ageBand";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 import { signInWithOAuthNative } from "@/lib/auth/nativeOAuth";
+import { signupRedirectUrl } from "@/lib/auth/safeNext";
 import PasswordField from "@/components/PasswordField";
 import TermsConsent from "@/components/TermsConsent";
 import { TERMS_REQUIRED_MESSAGE, termsConsentMetadata } from "@/lib/legal/consent";
@@ -33,7 +34,11 @@ export default function SignupForm() {
   // "check your email". This is the way out.
   async function handleResend() {
     setResendStatus("sending");
-    const { error: resendError } = await supabase.auth.resend({ type: "signup", email });
+    const { error: resendError } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: signupRedirectUrl(window.location.origin) },
+    });
     setResendStatus(resendError ? "error" : "sent");
   }
 
@@ -58,7 +63,13 @@ export default function SignupForm() {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName, ...termsConsentMetadata() } },
+      options: {
+        // Back through /auth/callback, which signs the learner in; without
+        // it the link landed on the home page, confirmed but signed out.
+        emailRedirectTo: signupRedirectUrl(window.location.origin),
+        // Kept so the profile step after confirming doesn't ask again.
+        data: { display_name: displayName, age: ageNum, ...termsConsentMetadata() },
+      },
     });
 
     if (signUpError) {

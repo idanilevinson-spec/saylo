@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useSyncExternalStore, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -13,7 +13,14 @@ import PasswordField from "@/components/PasswordField";
 import { EMAIL_INPUT } from "@/lib/utils/inputProps";
 import { safeNext } from "@/lib/auth/safeNext";
 
+const subscribeNever = () => () => {};
+// Read in the browser only; the server pass has no query to read.
+const readReason = () => new URLSearchParams(window.location.search).get("reason");
+
 export default function LoginForm() {
+  // Set by /auth/callback when a link from an email couldn't sign the
+  // learner in here (expired, or opened in another browser).
+  const reason = useSyncExternalStore(subscribeNever, readReason, () => null);
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -125,6 +132,12 @@ export default function LoginForm() {
             />
           </div>
 
+          {reason === "link" && !error && (
+            <p role="status" className="rounded-lg border border-card-border bg-background-2 px-3.5 py-2.5 text-sm leading-relaxed">
+              הקישור מהמייל לא הצליח לחבר אתכם כאן. אם לחצתם על קישור אישור ההרשמה, החשבון כבר אושר: התחברו עם האימייל
+              והסיסמה שבחרתם.
+            </p>
+          )}
           {error && <p role="alert" className="text-sm text-danger">{error}</p>}
 
           <div className="text-left">
