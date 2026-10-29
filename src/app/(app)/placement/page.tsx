@@ -2,6 +2,7 @@
 
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
 import { useEffect, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, type LucideIcon } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
@@ -75,7 +76,8 @@ interface Resumable {
 }
 
 export default function PlacementPage() {
-  const { profile, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const { session, profile, loading: authLoading } = useAuth();
   const [questions, setQuestions] = useState<PlacementQuestion[] | null>(null);
   const [testId, setTestId] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
@@ -93,6 +95,17 @@ export default function PlacementPage() {
   const [bagrutAnswers, setBagrutAnswers] = useState<(number | null)[]>([]);
   // undefined while checking, null when there's nothing to resume.
   const [resumable, setResumable] = useState<Resumable | null | undefined>(undefined);
+
+  // A new Google/Apple sign-up, or an email sign-up back from the
+  // confirmation link, has no profile yet: proxy.ts sends every app page here
+  // first, and without a profile the questions never load, so the learner
+  // sat on "טוען..." forever (three real sign-ups in October). Nickname and
+  // age come first; setup then returns to the dashboard and so to this test.
+  useEffect(() => {
+    if (!authLoading && session && !profile) {
+      router.replace("/profile/setup");
+    }
+  }, [authLoading, session, profile, router]);
 
   useEffect(() => {
     if (!profile) return;
