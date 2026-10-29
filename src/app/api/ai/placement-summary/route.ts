@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/serverClient";
 import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/ai/claudeClient";
 import {
@@ -16,6 +17,27 @@ import type { SkillArea } from "@/types/database";
 
 const PLACEMENT_WRITING_PROMPT =
   "Write 2-4 sentences about yourself: your name, where you are from, and one thing you like doing.";
+
+// The level comes from the answers; the AI only adds the writing score and
+// the written summary. An AI call that fails or hangs must not stop the test
+// from completing: nothing in the app opens until it has, and the page gives
+// up after 30 seconds (the SDK's own default waits up to 10 minutes, with
+// retries). Both limits together stay under the page's.
+const WRITING_TIMEOUT_MS = 12_000;
+const SUMMARY_TIMEOUT_MS = 10_000;
+
+async function optionalAi(
+  label: string,
+  params: Anthropic.MessageCreateParamsNonStreaming,
+  timeout: number
+): Promise<Anthropic.Message | null> {
+  try {
+    return await anthropic.messages.create(params, { timeout, maxRetries: 0 });
+  } catch (err) {
+    console.error(`placement-summary ${label} skipped:`, err instanceof Error ? err.message : err);
+    return null;
+  }
+}
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -45,8 +67,12 @@ export async function POST(request: Request) {
     .select("is_correct, placement_questions(skill_area)")
     .eq("placement_test_id", placementTestId);
 
-  if (!responses || responses.length === 0) {
-    return NextResponse.json({ error: "no responses recorded" }, { status: 400 });
+  // No responses at all means every question was skipped, which is scored
+  // like guessing (see placementScore) rather than refused: refusing left
+  // the learner on an error with "try again" that could never succeed, and
+  // shut out of the app, since nothing opens until the test is completed.
+  if (!responses) {
+    return NextResponse.json({ error: "responses unavailable" }, { status: 500 });
   }
 
   // Every published question was on the learner's test (the page shows all
@@ -86,16 +112,23 @@ export async function POST(request: Request) {
   const aiAllowed = hasAiConsent(user);
 
   let writingUsage = { input_tokens: 0, output_tokens: 0 };
-  if (aiAllowed && writingSample?.trim()) {
-    const writingMessage = await anthropic.messages.create({
-      model: CLAUDE_MODEL,
-      // thinking disabled: on by default, and silently eats into max_tokens
-      // before any output text is written — see conversation-score route
-      // for how this was diagnosed as the real truncation cause.
-      max_tokens: 1024,
-      thinking: { type: "disabled" },
-      messages: [{ role: "user", content: buildWritingCoachPrompt(PLACEMENT_WRITING_PROMPT, writingSample) }],
-    });
+  const writingMessage =
+    aiAllowed && writingSample?.trim()
+      ? await optionalAi(
+          "writing",
+          {
+            model: CLAUDE_MODEL,
+            // thinking disabled: on by default, and silently eats into max_tokens
+            // before any output text is written — see conversation-score route
+            // for how this was diagnosed as the real truncation cause.
+            max_tokens: 1024,
+            thinking: { type: "disabled" },
+            messages: [{ role: "user", content: buildWritingCoachPrompt(PLACEMENT_WRITING_PROMPT, writingSample) }],
+          },
+          WRITING_TIMEOUT_MS
+        )
+      : null;
+  if (writingMessage) {
     writingUsage = writingMessage.usage;
     const writingRaw = extractText(writingMessage);
     const parsed = parseJsonResponse<{ overallScore?: number }>(writingRaw);
@@ -126,18 +159,22 @@ export async function POST(request: Request) {
       : null;
 
   const message = aiAllowed
-    ? await anthropic.messages.create({
-        model: CLAUDE_MODEL,
-        // thinking disabled: on by default, and would silently eat into this
-        // already-tight 300-token budget before any output text is written.
-        max_tokens: 300,
-        thinking: { type: "disabled" },
-        messages: [{ role: "user", content: buildPlacementSummaryPrompt(scores, overallCefr) }],
-      })
+    ? await optionalAi(
+        "summary",
+        {
+          model: CLAUDE_MODEL,
+          // thinking disabled: on by default, and would silently eat into this
+          // already-tight 300-token budget before any output text is written.
+          max_tokens: 300,
+          thinking: { type: "disabled" },
+          messages: [{ role: "user", content: buildPlacementSummaryPrompt(scores, overallCefr) }],
+        },
+        SUMMARY_TIMEOUT_MS
+      )
     : null;
   const summary = message ? extractText(message) : buildPlacementFallbackSummary(overallCefr);
 
-  await supabase
+  const { error: completeError } = await supabase
     .from("placement_tests")
     .update({
       status: "completed",
@@ -146,6 +183,13 @@ export async function POST(request: Request) {
       completed_at: new Date().toISOString(),
     })
     .eq("id", placementTestId);
+  // Showing a result that wasn't saved would send the learner from it
+  // straight back to the test (the app only opens for a completed one);
+  // an error keeps them on the page's "try again" instead.
+  if (completeError) {
+    console.error("placement completion not saved:", completeError.message);
+    return NextResponse.json({ error: "not saved" }, { status: 500 });
+  }
 
   // Separate write so a missing migration 045 can only lose the Bagrut
   // score, never the test's completion.
