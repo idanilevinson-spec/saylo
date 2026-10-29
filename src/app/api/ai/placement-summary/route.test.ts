@@ -37,7 +37,7 @@ const request = (body: object) =>
   });
 
 const published = [{ skill_area: "grammar" }, { skill_area: "grammar" }, { skill_area: "vocabulary" }, { skill_area: "vocabulary" }];
-let responses: { is_correct: boolean; placement_questions: { skill_area: string } }[];
+let responses: { question_id: string; is_correct: boolean; placement_questions: { skill_area: string } }[];
 
 const textMessage = (text: string) => ({ content: [{ type: "text", text }], usage: { input_tokens: 1, output_tokens: 1 } });
 
@@ -46,8 +46,8 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
   getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
   responses = [
-    { is_correct: true, placement_questions: { skill_area: "grammar" } },
-    { is_correct: true, placement_questions: { skill_area: "vocabulary" } },
+    { question_id: "q1", is_correct: true, placement_questions: { skill_area: "grammar" } },
+    { question_id: "q2", is_correct: true, placement_questions: { skill_area: "vocabulary" } },
   ];
   update.mockReturnValue({ eq: async () => ({ error: null }) });
   upsert.mockResolvedValue({ error: null });
@@ -105,6 +105,19 @@ describe("POST /api/ai/placement-summary", () => {
     const res = await POST(request({}));
     expect(res.status).toBe(200);
     expect(completed()).toMatchObject({ status: "completed" });
+  });
+
+  it("counts an answer saved twice (a fast double tap) once", async () => {
+    responses = [
+      { question_id: "q1", is_correct: true, placement_questions: { skill_area: "grammar" } },
+      { question_id: "q1", is_correct: true, placement_questions: { skill_area: "grammar" } },
+      { question_id: "q1", is_correct: true, placement_questions: { skill_area: "grammar" } },
+    ];
+    create.mockResolvedValue(textMessage("סיכום"));
+    const body = await (await POST(request({}))).json();
+    const grammar = body.scores.find((s: { skill: string }) => s.skill === "grammar");
+    // One of the two grammar questions right, not three of two.
+    expect(grammar.percentCorrect).toBe(50);
   });
 
   it("reports an error when the completion wasn't saved, so the page offers to try again", async () => {

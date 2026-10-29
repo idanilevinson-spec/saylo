@@ -62,18 +62,22 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (!test) return NextResponse.json({ error: "not found" }, { status: 404 });
 
-  const { data: responses } = await supabase
+  const { data: rawResponses } = await supabase
     .from("placement_test_responses")
-    .select("is_correct, placement_questions(skill_area)")
+    .select("question_id, is_correct, placement_questions(skill_area)")
     .eq("placement_test_id", placementTestId);
 
   // No responses at all means every question was skipped, which is scored
   // like guessing (see placementScore) rather than refused: refusing left
   // the learner on an error with "try again" that could never succeed, and
   // shut out of the app, since nothing opens until the test is completed.
-  if (!responses) {
+  if (!rawResponses) {
     return NextResponse.json({ error: "responses unavailable" }, { status: 500 });
   }
+  // One answer per question. A fast double tap on "הבא" used to save the
+  // same answer more than once, which counted it twice (or three times).
+  const seen = new Set<string>();
+  const responses = rawResponses.filter((r) => !seen.has(r.question_id) && seen.add(r.question_id));
 
   // Every published question was on the learner's test (the page shows all
   // of them), so whatever wasn't answered was skipped; see placementScore.
