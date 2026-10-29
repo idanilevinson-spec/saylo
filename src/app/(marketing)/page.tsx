@@ -12,6 +12,7 @@ import LandingFreeResources from "@/components/LandingFreeResources";
 import LandingFinalCta from "@/components/LandingFinalCta";
 import SiteFooter from "@/components/SiteFooter";
 import AccountDeletedNotice from "@/components/AccountDeletedNotice";
+import AuthCodeForward from "@/components/AuthCodeForward";
 import { getLevelCatalog } from "@/lib/content/levelCatalog";
 import { listPublicGrammar } from "@/lib/content/publicGrammar";
 import { listPublicVocabulary } from "@/lib/content/publicVocabulary";
@@ -71,6 +72,7 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(JSON_LD) }} />
       <Suspense fallback={null}>
         <AccountDeletedNotice />
+        <AuthCodeForward />
       </Suspense>
       <LandingHero />
       <LandingTrustStrip />
