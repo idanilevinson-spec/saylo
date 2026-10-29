@@ -37,6 +37,8 @@ interface GameHudProps {
   // Where the close button goes; the games hub unless set.
   exitHref?: string;
   exitLabel?: string;
+  // h2 when the page already has its own h1 (the /try page header).
+  titleAs?: "h1" | "h2";
 }
 
 export function GameHud({
@@ -51,6 +53,7 @@ export function GameHud({
   aside,
   exitHref = "/games",
   exitLabel = "יציאה מהמשחק",
+  titleAs: Title = "h1",
 }: GameHudProps) {
   const done = results.filter((r) => r !== null).length;
   return (
@@ -64,7 +67,7 @@ export function GameHud({
           <X size={20} aria-hidden="true" />
         </Link>
         <div className="flex-1 min-w-0">
-          <h1 className="font-bold leading-tight truncate">{title}</h1>
+          <Title className="font-bold leading-tight truncate">{title}</Title>
           {subtitle && <div className="text-sm text-muted leading-snug">{subtitle}</div>}
         </div>
         {aside}
@@ -91,6 +94,7 @@ export function GameHud({
       <div
         className="mt-3 flex gap-[3px]"
         role="progressbar"
+        aria-label="התקדמות"
         aria-valuemin={0}
         aria-valuemax={results.length}
         aria-valuenow={done}
