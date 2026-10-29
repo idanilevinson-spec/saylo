@@ -1,7 +1,7 @@
 "use client";
 
 import { ENGLISH_TEXT_INPUT } from "@/lib/utils/inputProps";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Target, GraduationCap, BookOpenText, BookOpen, PenLine, Headphones, NotebookPen, Mic, type LucideIcon } from "lucide-react";
@@ -89,6 +89,9 @@ export default function PlacementPage() {
   const [showWritingStep, setShowWritingStep] = useState(false);
   const [writingSample, setWritingSample] = useState("");
   const [saving, setSaving] = useState(false);
+  // The state above only reaches handleNext after a re-render, so taps that
+  // come before it (a fast double tap) would each pass a check on it.
+  const savingRef = useRef(false);
   const [finishing, setFinishing] = useState(false);
   const [finishingWithWriting, setFinishingWithWriting] = useState(false);
   const [result, setResult] = useState<PlacementResult | null>(null);
@@ -348,10 +351,11 @@ export default function PlacementPage() {
   }
 
   async function handleNext() {
-    if (selected === null || !testId || !profile || saving) return;
+    if (selected === null || !testId || !profile || savingRef.current) return;
 
     // A second tap while the answer is saving would record it twice and
     // jump over the next question.
+    savingRef.current = true;
     setSaving(true);
     const isCorrect = selected === question.correct_index;
     const { error: saveError } = await supabase.from("placement_test_responses").insert({
@@ -360,6 +364,9 @@ export default function PlacementPage() {
       selected_index: selected,
       is_correct: isCorrect,
     });
+    // Released together with the move to the next question, which also
+    // clears the selection, so a late tap finds nothing selected.
+    savingRef.current = false;
     setSaving(false);
     // Moving on anyway would lose the answer without a word (it would then
     // count as skipped); staying lets the learner tap again.
@@ -389,7 +396,8 @@ export default function PlacementPage() {
   // guessing (see placementScore). A skill with no answers at all still
   // shows "לא נבדק הפעם" on the results screen.
   function handleSkip() {
-    if (!testId) return;
+    // While an answer is saving, "הבא" will move on by itself.
+    if (!testId || savingRef.current) return;
     setSelected(null);
     setError(null);
     if (!isLast) {
