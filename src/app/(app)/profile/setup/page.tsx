@@ -14,8 +14,11 @@ import { EASE_OUT } from "@/lib/motion/easing";
 export default function ProfileSetupPage() {
   const router = useRouter();
   const { session, profile, loading: authLoading, refreshProfile } = useAuth();
-  const [displayName, setDisplayName] = useState("");
-  const [age, setAge] = useState("");
+  // null until the learner types in the field: before that it shows what
+  // sign-up already told us, and after that only what they typed, so
+  // clearing it to type something else doesn't bring the old value back.
+  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [age, setAge] = useState<string | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -26,12 +29,18 @@ export default function ProfileSetupPage() {
     }
   }, [authLoading, profile, router]);
 
-  const fallbackName = (session?.user.user_metadata?.display_name as string | undefined) ?? "";
-  const nameValue = displayName || fallbackName;
+  const meta = session?.user.user_metadata;
+  // Email sign-ups chose a nickname on the sign-up form; Google (and Apple,
+  // the first time) send a full name instead, of which the first name is
+  // offered.
+  const fullName = [meta?.full_name, meta?.name].find((v): v is string => typeof v === "string" && v.trim() !== "");
+  const fallbackName =
+    typeof meta?.display_name === "string" && meta.display_name ? meta.display_name : (fullName?.trim().split(/\s+/)[0] ?? "");
+  const nameValue = displayName ?? fallbackName;
   // Email sign-ups typed their age on the sign-up form already.
-  const metaAge = Number(session?.user.user_metadata?.age);
+  const metaAge = Number(meta?.age);
   const fallbackAge = Number.isInteger(metaAge) && metaAge >= 4 && metaAge <= 119 ? String(metaAge) : "";
-  const ageValue = age || fallbackAge;
+  const ageValue = age ?? fallbackAge;
   // Email sign-ups already accepted the terms on the sign-up form.
   const alreadyAccepted = Boolean(session?.user.user_metadata?.terms_accepted_at);
 
@@ -60,8 +69,16 @@ export default function ProfileSetupPage() {
       email_reminders_enabled: false,
     });
 
+    // 23505: the profile already exists (a double tap, or saved in another
+    // tab), so there is nothing left to do here but move on.
+    if (insertError?.code === "23505") {
+      await refreshProfile();
+      router.push("/dashboard");
+      return;
+    }
     if (insertError) {
-      setError(insertError.message);
+      console.error("profile setup failed:", insertError.message);
+      setError("לא הצלחנו לשמור את הפרטים. בדקו את החיבור לאינטרנט ונסו שוב.");
       setSubmitting(false);
       return;
     }
