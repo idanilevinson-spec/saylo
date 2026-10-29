@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import NotFoundRestore from "@/components/NotFoundRestore";
+import NotFoundSection from "@/components/NotFoundSection";
 
 const NOT_FOUND_TITLE = "הדף לא נמצא | Saylo";
 
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 
 // Where people who followed an old or mistyped link usually meant to go.
 const PLACES: { href: string; label: string }[] = [
+  { href: "/try", label: "שיעור ניסיון, בלי הרשמה" },
   { href: "/english-level-test", label: "מבחן רמה באנגלית" },
   { href: "/english-bagrut", label: "הכנה לבגרות" },
   { href: "/pricing", label: "מסלולים ומחירים" },
@@ -29,6 +31,8 @@ export default function NotFound() {
       <p className="mt-3 text-lg text-muted leading-relaxed">
         ייתכן שהקישור ישן, או שנפלה טעות בכתובת. אפשר להמשיך מכאן:
       </p>
+
+      <NotFoundSection />
 
       <div className="mt-8 flex flex-col sm:flex-row gap-3">
         <Link
