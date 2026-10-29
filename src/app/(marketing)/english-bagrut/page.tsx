@@ -74,6 +74,14 @@ export default function EnglishBagrutPage() {
           >
             להתחיל לתרגל, 3 ימים חינם
           </Link>
+          {/* Most visitors land here from Instagram on a phone; let them try a
+              short lesson before asking for a sign-up. */}
+          <Link
+            href="/try"
+            className="game-press inline-flex items-center gap-2 min-h-12 px-5 rounded-lg border border-primary/60 bg-card font-bold hover:border-primary transition-[border-color,transform] duration-150"
+          >
+            שיעור ניסיון, בלי הרשמה
+          </Link>
           <Link
             href="/english-level-test"
             className="game-press inline-flex items-center gap-2 min-h-12 px-5 rounded-lg border border-card-border bg-card font-bold hover:border-primary/50 transition-[border-color,transform] duration-150"
@@ -177,6 +185,11 @@ export default function EnglishBagrutPage() {
           <Link href="/signup" className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold">
             להרשמה חינם
           </Link>
+          <p className="mt-3 text-sm">
+            <Link href="/try" className="font-bold underline underline-offset-4 decoration-primary-ink/50 hover:decoration-primary-ink">
+              או שיעור ניסיון של כ-3 דקות, בלי הרשמה
+            </Link>
+          </p>
         </section>
 
         <BagrutCredit className="mt-10" />
