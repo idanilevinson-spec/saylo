@@ -189,7 +189,6 @@ export function ChoiceGrid({ options, correctIndex, selected, locked, onChoose, 
             type="button"
             disabled={locked}
             onClick={() => onChoose(i)}
-            aria-label={`${i + 1}. ${option}${showCorrect ? ", התשובה הנכונה" : showWrong ? ", לא נכון" : ""}`}
             aria-pressed={!locked && isSelected ? true : undefined}
             className={`game-press game-choice group relative flex items-center gap-3 min-h-14 px-3.5 py-3 rounded-lg border text-start transition-[background-color,border-color,opacity,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:cursor-default ${
               showCorrect
@@ -222,6 +221,10 @@ export function ChoiceGrid({ options, correctIndex, selected, locked, onChoose, 
             ) : (
               <span className="flex-1 font-medium leading-snug">{option}</span>
             )}
+            {/* The name comes from the visible word, so voice control ("click
+                trust") matches it; the verdict is added for screen readers. */}
+            {showCorrect && <span className="sr-only">, התשובה הנכונה</span>}
+            {showWrong && <span className="sr-only">, לא נכון</span>}
           </button>
         );
       })}
