@@ -852,7 +852,7 @@ textarea::placeholder {
   top: 0;
   width: 50.51%;
   height: 54.42%;
-  background: url("/intro/mark.png") center / 100% 100% no-repeat;
+  background: url("/intro/mark.webp") center / 100% 100% no-repeat;
   animation: intro-mark 520ms var(--ease-out) 260ms both;
 }
 .app-intro__dot {
@@ -883,13 +883,13 @@ textarea::placeholder {
   left: 0;
   width: 76.54%;
   background: var(--foreground);
-  mask: url("/intro/sayl.png") center / 100% 100% no-repeat;
+  mask: url("/intro/sayl.webp") center / 100% 100% no-repeat;
   animation: intro-write 560ms var(--ease-out) 1020ms both;
 }
 .app-intro__o {
   left: 76.54%;
   width: 23.46%;
-  background: url("/intro/o.png") center / 100% 100% no-repeat;
+  background: url("/intro/o.webp") center / 100% 100% no-repeat;
   transform-origin: 50% 52%;
   animation: intro-turn 620ms var(--ease-out) 1260ms both;
 }
@@ -899,7 +899,7 @@ textarea::placeholder {
   width: 81.79%;
   height: 5.98%;
   background: var(--muted);
-  mask: url("/intro/tagline.png") center / 100% 100% no-repeat;
+  mask: url("/intro/tagline.webp") center / 100% 100% no-repeat;
   animation: intro-tagline 420ms var(--ease-out) 1420ms both;
 }
 /* The bubble arrives where it will stay: a fade and a small growth from its
