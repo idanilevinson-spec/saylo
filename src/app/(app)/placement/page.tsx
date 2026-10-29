@@ -69,6 +69,8 @@ const GOAL_OPTIONS: { value: Goal; label: string; hint: string }[] = [
 // them never finished.
 const RESUME_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
+const CONNECTION_ERROR = "לא הצלחנו לשמור. בדקו את החיבור לאינטרנט ונסו שוב.";
+
 interface Resumable {
   testId: string;
   answered: number;
@@ -86,6 +88,7 @@ export default function PlacementPage() {
   const [selected, setSelected] = useState<number | null>(null);
   const [showWritingStep, setShowWritingStep] = useState(false);
   const [writingSample, setWritingSample] = useState("");
+  const [saving, setSaving] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [finishingWithWriting, setFinishingWithWriting] = useState(false);
   const [result, setResult] = useState<PlacementResult | null>(null);
@@ -169,9 +172,16 @@ export default function PlacementPage() {
     }
     setBagrutAnswers(bagrutSection ? bagrutSection.questions.map(() => null) : []);
     const { data: test } = await supabase.from("placement_tests").insert({ profile_id: profile.id }).select().single();
-    setTestId(test?.id ?? null);
-    setStarted(true);
     setStarting(false);
+    // Without a test to record into, "הבא" and the skip button do nothing,
+    // so the learner would be stuck on the first question.
+    if (!test) {
+      setError(CONNECTION_ERROR);
+      return;
+    }
+    setError(null);
+    setTestId(test.id);
+    setStarted(true);
   }
 
   function handleResume() {
@@ -288,6 +298,7 @@ export default function PlacementPage() {
             </button>
             <p className="text-xs text-muted">הערכה פנימית של Saylo לפי סולם CEFR, לא מבחן רשמי.</p>
           </div>
+          {error && <p role="alert" className="mt-4 text-sm text-danger">{error}</p>}
         </motion.div>
       </div>
     );
@@ -337,15 +348,26 @@ export default function PlacementPage() {
   }
 
   async function handleNext() {
-    if (selected === null || !testId || !profile) return;
+    if (selected === null || !testId || !profile || saving) return;
 
+    // A second tap while the answer is saving would record it twice and
+    // jump over the next question.
+    setSaving(true);
     const isCorrect = selected === question.correct_index;
-    await supabase.from("placement_test_responses").insert({
+    const { error: saveError } = await supabase.from("placement_test_responses").insert({
       placement_test_id: testId,
       question_id: question.id,
       selected_index: selected,
       is_correct: isCorrect,
     });
+    setSaving(false);
+    // Moving on anyway would lose the answer without a word (it would then
+    // count as skipped); staying lets the learner tap again.
+    if (saveError) {
+      setError(CONNECTION_ERROR);
+      return;
+    }
+    setError(null);
 
     if (!isLast) {
       setIndex((i) => i + 1);
@@ -369,6 +391,7 @@ export default function PlacementPage() {
   function handleSkip() {
     if (!testId) return;
     setSelected(null);
+    setError(null);
     if (!isLast) {
       setIndex((i) => i + 1);
       return;
@@ -576,7 +599,7 @@ export default function PlacementPage() {
           whileHover={selected !== null ? { scale: 1.02 } : undefined}
           whileTap={selected !== null ? { scale: 0.97 } : undefined}
           onClick={handleNext}
-          disabled={selected === null}
+          disabled={selected === null || saving}
           className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           {isLast ? "לשלב האחרון →" : "הבא →"}
