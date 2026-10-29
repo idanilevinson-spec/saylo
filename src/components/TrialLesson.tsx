@@ -173,6 +173,7 @@ export default function TrialLesson({ lesson }: { lesson: TrialLessonData }) {
         current={index}
         exitHref="/"
         exitLabel="יציאה משיעור הניסיון"
+        titleAs="h2"
       />
       {!hydrated ? (
         <div aria-hidden="true" className="h-72 rounded-lg border border-card-border bg-card animate-pulse" />
