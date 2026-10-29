@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import ReactMarkdown, { type Components } from "react-markdown";
 import { Capacitor } from "@capacitor/core";
 import { MessageCircleQuestionMark, X, ArrowUp, Square, RotateCcw, ThumbsUp, ThumbsDown, UserRound, ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
@@ -33,6 +32,11 @@ const ERROR_TEXT: Record<string, string> = {
   offline: "אין חיבור לאינטרנט. בדקו את החיבור ונסו שוב.",
   failed: "משהו השתבש בתשובה. נסו שוב, או השאירו פרטים ונחזור אליכם.",
 };
+
+// Fetched when the panel opens (or the launcher is hovered or focused), not
+// with the page; until it arrives a reply shows as plain text.
+const loadMarkdown = () => import("./SupportMarkdown");
+const SupportMarkdown = lazy(loadMarkdown);
 
 function localId() {
   return Math.random().toString(36).slice(2, 10);
@@ -326,31 +330,9 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
   };
   const formAlreadyShown = messages.some((m) => m.formTopic);
 
-  const markdownComponents: Components = {
-    a: ({ href, children }) => {
-      if (href?.startsWith("/")) {
-        return (
-          <Link
-            href={href}
-            onClick={() => {
-              // On a phone the panel covers the page the link opens.
-              if (window.matchMedia("(max-width: 639px)").matches) setOpen(false);
-            }}
-            className="text-primary underline underline-offset-2 decoration-primary/40 hover:decoration-primary"
-          >
-            {children}
-          </Link>
-        );
-      }
-      return (
-        <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
-          {children}
-        </a>
-      );
-    },
-    p: ({ children }) => <p className="[&:not(:first-child)]:mt-2">{children}</p>,
-    ul: ({ children }) => <ul className="mt-2 list-disc ps-5 space-y-1">{children}</ul>,
-    ol: ({ children }) => <ol className="mt-2 list-decimal ps-5 space-y-1">{children}</ol>,
+  // On a phone the panel covers the page an internal link opens.
+  const closeOnPhone = () => {
+    if (window.matchMedia("(max-width: 639px)").matches) setOpen(false);
   };
 
   return (
@@ -359,6 +341,8 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
         ref={launcherRef}
         type="button"
         onClick={() => (open ? close() : setOpen(true))}
+        onPointerEnter={loadMarkdown}
+        onFocus={loadMarkdown}
         aria-expanded={open}
         aria-controls="support-panel"
         aria-label={open ? "סגירת חלון העזרה" : "עזרה ותמיכה"}
@@ -513,9 +497,9 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
                       <span className="sr-only">העוזר: </span>
                       {m.content ? (
                         <div className="break-words [unicode-bidi:plaintext]">
-                          <ReactMarkdown components={markdownComponents} skipHtml allowedElements={["p", "a", "strong", "em", "ul", "ol", "li", "br", "code"]} unwrapDisallowed>
-                            {m.content}
-                          </ReactMarkdown>
+                          <Suspense fallback={<p className="whitespace-pre-wrap">{m.content}</p>}>
+                            <SupportMarkdown text={m.content} onInternalLink={closeOnPhone} />
+                          </Suspense>
                         </div>
                       ) : null}
                       {m.status === "streaming" && (
