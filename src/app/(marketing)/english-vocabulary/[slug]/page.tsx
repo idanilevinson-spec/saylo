@@ -11,7 +11,7 @@ import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { getPublicVocabulary, listPublicVocabulary } from "@/lib/content/publicVocabulary";
 
 // One public page per vocabulary topic: every word with its translation,
-// IPA, example and definition, and the way into practicing them.
+// a listen button, example and definition, and the way into practicing them.
 
 export const revalidate = 3600;
 
