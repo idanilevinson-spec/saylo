@@ -344,9 +344,6 @@ export function WordReveal({ word, verdict, compact = false, onNext, nextLabel =
         <div className="min-w-0 flex-1">
           <p className="flex flex-wrap items-baseline gap-x-2">
             <EnglishText className="text-xl font-bold">{word.headword}</EnglishText>
-            {!compact && word.ipa && (
-              <EnglishText className="text-sm text-muted">/{word.ipa.replace(/^\/|\/$/g, "")}/</EnglishText>
-            )}
             {!compact && pos && <span className="text-xs text-muted">{pos}</span>}
           </p>
           <p className="text-muted leading-snug">{word.translationHe}</p>

@@ -34,7 +34,8 @@ function highlight(example: string, headword: string): ReactNode {
   });
 }
 
-// One word in a vocabulary topic: how it's said, what kind of word it is,
+// One word in a vocabulary topic: how it's said (the speaker button; IPA
+// symbols mean nothing to most learners, so they stay in the data only), what kind of word it is,
 // what it means in Hebrew and in English, and the word in a sentence —
 // each shown once, with listening and speaking right there. Public pages
 // pass withRecorder={false}: pronunciation scoring needs a signed-in user.
@@ -52,7 +53,6 @@ export default function WordCard({ item, withRecorder = true }: { item: Vocabula
             <span className="text-2xl font-bold leading-tight text-primary font-content">{item.headword}</span>
             <SpeakButton text={item.headword} className="p-1 -m-1 rounded-md" />
           </p>
-          {item.ipa && <p className="text-sm text-muted font-content">{item.ipa}</p>}
         </div>
       </header>
 

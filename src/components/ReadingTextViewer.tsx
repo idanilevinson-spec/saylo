@@ -207,11 +207,6 @@ export default function ReadingTextViewer({ bodyEn, vocabByWord, textLevel, labe
               <EnglishText as="span" className="font-bold text-lg">
                 {popover.word}
               </EnglishText>
-              {popover.entry.ipa && (
-                <EnglishText as="span" className="text-sm text-muted">
-                  {popover.entry.ipa}
-                </EnglishText>
-              )}
               <button
                 onClick={() => speak(popover.word)}
                 aria-label={`השמעת הגייה של ${popover.word}`}
