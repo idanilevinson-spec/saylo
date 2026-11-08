@@ -34,12 +34,13 @@ const frank = Frank_Ruhl_Libre({
   weight: ["500", "700", "900"],
 });
 
-// The book face for reading texts set as a story (PrintedPage "story"): a
-// serif drawn for long reading on screens. Not preloaded on every page; it
-// loads where a story page uses it.
+// The book face: reading texts set as a story (PrintedPage "story") and the
+// italic English glosses (.gloss) beside Hebrew headings. Not preloaded on
+// every page; it loads where a page uses it.
 const book = Literata({
   variable: "--font-book",
   subsets: ["latin"],
+  style: ["normal", "italic"],
   preload: false,
 });
 
@@ -99,9 +100,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
-        <Script id="no-flash-theme" strategy="beforeInteractive">
-          {noFlashThemeScript}
-        </Script>
+        {/* Inline, not next/script: beforeInteractive runs after first paint,
+            so a dark-default visitor on a light-mode system saw the page
+            flash light first. */}
+        <script id="no-flash-theme" dangerouslySetInnerHTML={{ __html: noFlashThemeScript }} />
         <Script id="no-flash-a11y" strategy="beforeInteractive">
           {noFlashA11yScript}
         </Script>

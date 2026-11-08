@@ -48,14 +48,15 @@
   --marker: rgb(255 214 64 / 0.55);
   /* Skill inks, one per area, the way a learner colour-codes a binder:
      vocabulary blue, grammar orange, reading green, listening teal,
-     writing pink, speaking yellow. Icons and small marks only, never
-     fields. Light values are >= 3:1 on paper; dark values on the desk. */
-  --ink-vocab: #0066d6;
-  --ink-grammar: #b4471a;
-  --ink-reading: #17733f;
-  --ink-listening: #00726f;
-  --ink-writing: #a3245e;
-  --ink-speaking: #7d6500;
+     writing pink, speaking yellow. Muted, like real coloured pencils, so
+     six of them in one list read as a system and not a circus. Icons and
+     small marks only, never fields. All >= 3:1 on their background. */
+  --ink-vocab: #2b5f9e;
+  --ink-grammar: #a24a22;
+  --ink-reading: #2f6b45;
+  --ink-listening: #1f6b68;
+  --ink-writing: #8c3a5f;
+  --ink-speaking: #77621a;
 }
 
 /* Three theme states: an explicit choice (data-theme) always wins; with no
@@ -85,12 +86,12 @@
     --field-border: #7a7262;
     --pen: #ff8f80;
     --marker: rgb(255 214 64 / 0.32);
-    --ink-vocab: #4d9eff;
-    --ink-grammar: #ff9b6b;
-    --ink-reading: #5cc98a;
-    --ink-listening: #2dd4cf;
-    --ink-writing: #f49ac1;
-    --ink-speaking: #f2d24b;
+    --ink-vocab: #86b6f0;
+    --ink-grammar: #e3a383;
+    --ink-reading: #8fc4a2;
+    --ink-listening: #7fc2bf;
+    --ink-writing: #dba8c0;
+    --ink-speaking: #dcc883;
   }
 }
 
@@ -116,12 +117,12 @@
   --field-border: #7a7262;
   --pen: #ff8f80;
   --marker: rgb(255 214 64 / 0.32);
-  --ink-vocab: #4d9eff;
-  --ink-grammar: #ff9b6b;
-  --ink-reading: #5cc98a;
-  --ink-listening: #2dd4cf;
-  --ink-writing: #f49ac1;
-  --ink-speaking: #f2d24b;
+  --ink-vocab: #86b6f0;
+  --ink-grammar: #e3a383;
+  --ink-reading: #8fc4a2;
+  --ink-listening: #7fc2bf;
+  --ink-writing: #dba8c0;
+  --ink-speaking: #dcc883;
 }
 
 /* Softened field tints for large full-bleed areas (the hero, its studio
@@ -314,6 +315,23 @@ h2,
 .font-display {
   font-family: var(--font-frank), var(--font-rubik), Georgia, serif;
   letter-spacing: -0.01em;
+}
+/* Frank Ruhl reads best at its bold, not its black: at 900 the counters
+   close up and large headings turn into blots, worst on the dark desk.
+   Unlayered, so it wins over font-black / font-extrabold on headings. */
+h1,
+h2 {
+  font-weight: 700;
+}
+
+/* An English gloss under or beside Hebrew, the way a bilingual dictionary
+   sets a translation: the book face, italic, quieter than the headword. */
+.gloss {
+  font-family: var(--font-book), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--muted);
 }
 
 /* The highlighter swipe: a band over the lower part of the line, slightly

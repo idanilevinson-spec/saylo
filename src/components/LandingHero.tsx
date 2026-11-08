@@ -27,7 +27,12 @@ export default function LandingHero() {
             <br />
             שזוכר את <PenMark>הטעויות שלכם</PenMark>
           </h1>
-          <p className="mt-7 max-w-lg text-lg sm:text-xl text-muted leading-relaxed">
+          {/* The same line in English, set as a dictionary gloss: this is an
+              English school, so the first thing on the page is bilingual. */}
+          <p lang="en" dir="ltr" className="gloss mt-5 text-right text-xl sm:text-2xl">
+            The English teacher who remembers your mistakes.
+          </p>
+          <p className="mt-5 max-w-lg text-lg sm:text-xl text-muted leading-relaxed">
             קודם מבחן רמה קצר. אחר כך תרגול יומי ברמה שלכם, ומורה שמדבר איתכם באנגלית ומתקן אתכם תוך כדי.
           </p>
 

@@ -11,24 +11,34 @@ import { skillInk } from "@/lib/design/skillInk";
 const LEAD = [
   {
     title: "שיחה קולית עם המורה",
+    // A real exchange of the kind the voice call runs (the restaurant role-play).
+    sample: [
+      { who: "you", text: "Hi, can we get a table for two?" },
+      { who: "teacher", text: "Of course. Inside, or by the window?" },
+    ],
     body: "תרגלו מצבים אמיתיים (ראיון עבודה, מסעדה, שדה תעופה) בשיחה קולית חופשית, כמו שיחת טלפון עם מורה שמקשיב ומגיב אליכם.",
     href: "/speaking/voice",
   },
   {
     title: "או בכתב, בקצב שלכם",
+    // The teacher corrects the one mistake that matters and keeps talking.
+    sample: [
+      { who: "you", text: "Last week I have went to Eilat." },
+      { who: "teacher", text: "Nice! \"Last week I went to Eilat.\" What did you do there?" },
+    ],
     body: "מעדיפים להקליד? אותם תרחישים ואותו מורה, בכתב. יש זמן לחשוב לפני כל תשובה.",
     href: "/speaking",
   },
 ];
 
 const CONTENTS = [
-  { title: "אוצר מילים לפי נושא", body: "ממספרים ובגדים ועד Business ו-Technology", href: "/vocabulary" },
-  { title: "דקדוק", body: "הסבר קצר בעברית ותרגול לכל נושא, מ-present simple ועד nominalisation", href: "/grammar" },
-  { title: "האזנה", body: "שיחות לפי רמה, עם האטה ותמלול, וגם דיבור טבעי עם קיצורים והססות", href: "/listening" },
-  { title: "קריאה", body: "טקסטים מקוריים לפי רמה, תרגום בלחיצה על מילה, ושאלה פתוחה עם משוב", href: "/reading" },
-  { title: "חזרה חכמה", body: "מילים חוזרות אליכם במרווחי זמן מתוכננים, כדי שיישארו בזיכרון", href: "/review" },
-  { title: "משחקים", body: "שמונה משחקים על המילים שלכם: מהירות, האזנה, איות, זיכרון ועוד", href: "/games" },
-  { title: "הכנה לבגרות", body: "3, 4 ו-5 יח״ל: מבנה השאלונים, מיומנויות וערכות תרגול באותו מבנה", href: "/bagrut" },
+  { title: "אוצר מילים לפי נושא", en: "Vocabulary", body: "ממספרים ובגדים ועד Business ו-Technology", href: "/vocabulary" },
+  { title: "דקדוק", en: "Grammar", body: "הסבר קצר בעברית ותרגול לכל נושא, מ-present simple ועד nominalisation", href: "/grammar" },
+  { title: "האזנה", en: "Listening", body: "שיחות לפי רמה, עם האטה ותמלול, וגם דיבור טבעי עם קיצורים והססות", href: "/listening" },
+  { title: "קריאה", en: "Reading", body: "טקסטים מקוריים לפי רמה, תרגום בלחיצה על מילה, ושאלה פתוחה עם משוב", href: "/reading" },
+  { title: "חזרה חכמה", en: "Spaced review", body: "מילים חוזרות אליכם במרווחי זמן מתוכננים, כדי שיישארו בזיכרון", href: "/review" },
+  { title: "משחקים", en: "Word games", body: "שמונה משחקים על המילים שלכם: מהירות, האזנה, איות, זיכרון ועוד", href: "/games" },
+  { title: "הכנה לבגרות", en: "Bagrut prep", body: "3, 4 ו-5 יח״ל: מבנה השאלונים, מיומנויות וערכות תרגול באותו מבנה", href: "/bagrut" },
 ];
 
 export default function LandingFeatures() {
@@ -42,7 +52,8 @@ export default function LandingFeatures() {
     <section className="px-4 py-20 sm:py-28 bg-background-2">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl sm:text-5xl font-black leading-[1.1]">מה יש בפנים</h2>
-        <p className="mt-3 max-w-xl text-lg text-muted leading-relaxed">
+        <p lang="en" dir="ltr" className="gloss mt-2 text-right text-lg">What&rsquo;s inside</p>
+        <p className="mt-4 max-w-xl text-lg text-muted leading-relaxed">
           שש מיומנויות, כל אחת ברמה שלה. ומורה אחד שזוכר את הטעויות שלכם בכולן.
         </p>
 
@@ -55,6 +66,14 @@ export default function LandingFeatures() {
             >
               <h3 className="font-display text-2xl sm:text-3xl font-bold">{f.title}</h3>
               <p className="mt-3 text-muted leading-relaxed">{f.body}</p>
+              <div lang="en" dir="ltr" className="mt-4 space-y-1.5 border-s border-card-border ps-3 font-content text-[0.95rem] leading-snug">
+                {f.sample.map((line) => (
+                  <p key={line.text} className={line.who === "teacher" ? "text-foreground" : "text-muted"}>
+                    <span className="me-1.5 text-xs font-bold uppercase tracking-wide text-muted">{line.who === "teacher" ? "Teacher" : "You"}</span>
+                    {line.text}
+                  </p>
+                ))}
+              </div>
               <span className="mt-4 inline-flex items-center gap-1.5 font-bold text-primary-hover">
                 לנסות
                 <ArrowLeft size={16} aria-hidden="true" className="transition-transform group-hover:-translate-x-1" />
@@ -72,7 +91,10 @@ export default function LandingFeatures() {
               >
                 <span aria-hidden="true" className={`h-2.5 w-2.5 shrink-0 translate-y-[-0.1em] rounded-full ${skillInk(f.href).dot}`} />
                 <span className="min-w-0 sm:shrink-0 sm:max-w-[60%]">
-                  <span className="block font-bold text-lg">{f.title}</span>
+                  <span className="flex items-baseline gap-2.5">
+                    <span className="font-bold text-lg">{f.title}</span>
+                    <span lang="en" dir="ltr" className="gloss text-[0.95rem]">{f.en}</span>
+                  </span>
                   <span className="block text-sm text-muted leading-relaxed">{f.body}</span>
                 </span>
                 <span aria-hidden="true" className="hidden sm:block flex-1 translate-y-[-0.3em] border-b-2 border-dotted border-foreground/20" />
