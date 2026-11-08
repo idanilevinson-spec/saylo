@@ -1,5 +1,6 @@
 "use client";
 
+import { skillInk } from "@/lib/design/skillInk";
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -57,7 +58,7 @@ const FEATURED_MODULES: (ModuleItem & { tone: "accent" | "primary" })[] = [
   },
   {
     icon: MessageCircle,
-    title: "צ'אט עם מורה AI",
+    title: "צ'אט עם המורה",
     body: "תרגלו שיחה אמיתית באנגלית בהקלדה",
     href: "/speaking",
     tone: "primary",
@@ -83,7 +84,7 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
     items: [
       { icon: BookOpen, title: "אוצר מילים", body: "מספרים, צבעים, משפחה ועוד", href: "/vocabulary" },
       { icon: PenLine, title: "דקדוק", body: "מסלול מלא מ-A1 עד C2", href: "/grammar" },
-      { icon: BookOpenText, title: "הבנת הנקרא", body: "סיפורים עם שאלות ומשוב AI", href: "/reading" },
+      { icon: BookOpenText, title: "הבנת הנקרא", body: "סיפורים עם שאלות ומשוב מהמורה", href: "/reading" },
       { icon: Headphones, title: "האזנה", body: "הקשיבו ובדקו את עצמכם", href: "/listening" },
       { icon: NotebookPen, title: "כתיבה", body: "משוב אישי מהמורה על מה שכתבתם", href: "/writing" },
       { icon: Quote, title: "ניבים וביטויים", body: "אנגלית שאנשים באמת מדברים", href: "/idioms" },
@@ -93,7 +94,7 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
     title: "משחק ודיבור",
     items: [
       { icon: Gamepad2, title: "משחקי אוצר מילים", body: "סיבוב מהירות, איות ואתגר יומי", href: "/games" },
-      { icon: Mic, title: 'מבחן דיבור', body: 'עונים בקול על מילים ושאלות פתוחות, מדורג ע"י AI', href: "/speaking-test" },
+      { icon: Mic, title: 'מבחן דיבור', body: 'עונים בקול על מילים ושאלות פתוחות, ומקבלים ציון', href: "/speaking-test" },
     ],
   },
   {
@@ -292,7 +293,7 @@ export default function DashboardPage() {
 
       {stats !== null && <SubscriptionBanner subscription={subscription} />}
 
-      {/* Today's XP goal beside the two ways to talk with the AI teacher. */}
+      {/* Today's XP goal beside the two ways to talk with the teacher. */}
       <div className="mt-10 grid lg:grid-cols-[1.1fr_1fr] gap-3">
         <DailyGoal profileId={profile.id} todayXp={todayXp} />
 
@@ -303,13 +304,7 @@ export default function DashboardPage() {
                 href={m.href}
                 className="game-press lit-plate lit-hover group h-full flex items-center gap-4 rounded-lg border border-card-border p-4 duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               >
-                <span
-                  className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
-                    m.tone === "accent" ? "bg-accent/15 text-accent-hover" : "bg-primary/10 text-primary-hover"
-                  }`}
-                >
-                  <m.icon size={21} strokeWidth={2} aria-hidden="true" />
-                </span>
+                <m.icon size={24} strokeWidth={2} aria-hidden="true" className={`shrink-0 ${skillInk(m.href).text}`} />
                 <div className="min-w-0 flex-1">
                   <h3 className="font-bold">{m.title}</h3>
                   <p className="mt-0.5 text-xs text-muted truncate">{m.body}</p>
@@ -333,9 +328,7 @@ export default function DashboardPage() {
                   href={m.href}
                   className="lit-row group flex items-center gap-3 px-4 py-3.5 hover:bg-background-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
                 >
-                  <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
-                    <m.icon size={18} strokeWidth={2} />
-                  </span>
+                  <m.icon size={20} strokeWidth={2} aria-hidden="true" className={`shrink-0 ${skillInk(m.href).text}`} />
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-sm">{m.title}</p>
                     <p className="mt-0.5 text-xs text-muted truncate tabular-nums">{(plan && atLevel(plan, m.href)) ?? m.body}</p>

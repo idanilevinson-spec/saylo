@@ -10,7 +10,7 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: "דוח פעילות תקופתי — Saylo",
+  title: "דוח פעילות תקופתי | Saylo",
 };
 
 interface GuardianReportConsentInfo {

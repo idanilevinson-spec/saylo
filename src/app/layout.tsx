@@ -66,7 +66,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f6f1e7",
+  themeColor: "#15130f",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -74,9 +74,9 @@ export const viewport: Viewport = {
 
 // Runs before first paint to set data-theme from the stored theme,
 // avoiding a flash of the wrong theme (React only sees the DOM after
-// hydration). Paper (light) is the first-visit default since 2026-11-08;
-// a stored explicit choice (from the toggle) always wins over it.
-const noFlashThemeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t="light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`;
+// hydration). Dark (the desk at night) is the first-visit default, at the
+// owner's request; a stored explicit choice (the toggle) always wins.
+const noFlashThemeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t="dark"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`;
 
 // Same no-flash principle as the theme script above: apply any saved
 // accessibility preferences straight to <html> before first paint, so a

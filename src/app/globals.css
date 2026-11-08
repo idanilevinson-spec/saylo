@@ -44,6 +44,18 @@
   /* The teacher's red pen: corrections, the margin rule, the one mark of
      emphasis on a page. Never a status colour (that is --danger). */
   --pen: #b42318;
+  /* The highlighter: a yellow swipe behind a key phrase (.marker). */
+  --marker: rgb(255 214 64 / 0.55);
+  /* Skill inks, one per area, the way a learner colour-codes a binder:
+     vocabulary blue, grammar orange, reading green, listening teal,
+     writing pink, speaking yellow. Icons and small marks only, never
+     fields. Light values are >= 3:1 on paper; dark values on the desk. */
+  --ink-vocab: #0066d6;
+  --ink-grammar: #b4471a;
+  --ink-reading: #17733f;
+  --ink-listening: #00726f;
+  --ink-writing: #a3245e;
+  --ink-speaking: #7d6500;
 }
 
 /* Three theme states: an explicit choice (data-theme) always wins; with no
@@ -72,6 +84,13 @@
     --muted: #aaa190;
     --field-border: #7a7262;
     --pen: #ff8f80;
+    --marker: rgb(255 214 64 / 0.32);
+    --ink-vocab: #4d9eff;
+    --ink-grammar: #ff9b6b;
+    --ink-reading: #5cc98a;
+    --ink-listening: #2dd4cf;
+    --ink-writing: #f49ac1;
+    --ink-speaking: #f2d24b;
   }
 }
 
@@ -96,6 +115,13 @@
   --muted: #aaa190;
   --field-border: #7a7262;
   --pen: #ff8f80;
+  --marker: rgb(255 214 64 / 0.32);
+  --ink-vocab: #4d9eff;
+  --ink-grammar: #ff9b6b;
+  --ink-reading: #5cc98a;
+  --ink-listening: #2dd4cf;
+  --ink-writing: #f49ac1;
+  --ink-speaking: #f2d24b;
 }
 
 /* Softened field tints for large full-bleed areas (the hero, its studio
@@ -148,6 +174,12 @@
   --color-danger-ink: var(--danger-ink);
   --color-muted: var(--muted);
   --color-pen: var(--pen);
+  --color-ink-vocab: var(--ink-vocab);
+  --color-ink-grammar: var(--ink-grammar);
+  --color-ink-reading: var(--ink-reading);
+  --color-ink-listening: var(--ink-listening);
+  --color-ink-writing: var(--ink-writing);
+  --color-ink-speaking: var(--ink-speaking);
   --font-sans: var(--font-rubik);
   --font-content: var(--font-jakarta);
   --font-display: var(--font-frank);
@@ -282,6 +314,22 @@ h2,
 .font-display {
   font-family: var(--font-frank), var(--font-rubik), Georgia, serif;
   letter-spacing: -0.01em;
+}
+
+/* The highlighter swipe: a band over the lower part of the line, slightly
+   ragged at its ends, behind the text. Once per section at most. */
+.marker {
+  background-image: linear-gradient(100deg, transparent 0.15em, var(--marker) 0.3em, var(--marker) calc(100% - 0.3em), transparent calc(100% - 0.12em));
+  background-size: 100% 0.62em;
+  background-position: 0 88%;
+  background-repeat: no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding-inline: 0.12em;
+}
+:root[data-a11y-contrast="high"] .marker {
+  background-image: none;
+  text-decoration: underline;
 }
 
 /* Browser surfaces carry the design too. */

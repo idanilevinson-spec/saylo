@@ -205,7 +205,7 @@ export async function sendGuardianReportConsentEmail(
   const { error } = await resend.emails.send({
     from: "Saylo <consent@saylolearn.com>",
     to,
-    subject: "בקשה לדוח פעילות תקופתי — Saylo",
+    subject: "בקשה לדוח פעילות תקופתי | Saylo",
     html: `
       <div dir="rtl" style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
         <h1 style="color: #0066d6;">בקשה לדוח פעילות תקופתי</h1>

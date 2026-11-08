@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import PenMark from "@/components/PenMark";
 import { useAuth } from "@/context/AuthProvider";
 
 export default function LandingFinalCta() {
@@ -16,7 +15,7 @@ export default function LandingFinalCta() {
         <h2 className="text-4xl sm:text-6xl font-black leading-[1.08]">
           בעוד כעשר דקות
           <br />
-          תדעו את <PenMark>הרמה שלכם</PenMark>
+          תדעו את <span className="marker">הרמה שלכם</span>
         </h2>
         <p className="mt-6 text-lg text-muted leading-relaxed">
           ומיד אחריהן תחכה לכם תוכנית יומית שבנויה עליה. שלושה ימים חינם, בלי כרטיס אשראי.

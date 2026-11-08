@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import { skillInk } from "@/lib/design/skillInk";
 
 // The two ways to talk with the teacher lead; everything else is set as a
 // book's contents page (title, a dotted leader, the way in), not as a grid
@@ -69,8 +70,9 @@ export default function LandingFeatures() {
                 href={dest(f.href)}
                 className="group flex items-baseline gap-4 border-b border-foreground/15 py-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
               >
+                <span aria-hidden="true" className={`h-2.5 w-2.5 shrink-0 translate-y-[-0.1em] rounded-full ${skillInk(f.href).dot}`} />
                 <span className="min-w-0 sm:shrink-0 sm:max-w-[60%]">
-                  <span className="block font-bold text-lg group-hover:text-primary-hover transition-colors">{f.title}</span>
+                  <span className="block font-bold text-lg">{f.title}</span>
                   <span className="block text-sm text-muted leading-relaxed">{f.body}</span>
                 </span>
                 <span aria-hidden="true" className="hidden sm:block flex-1 translate-y-[-0.3em] border-b-2 border-dotted border-foreground/20" />

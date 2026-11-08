@@ -10,7 +10,7 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: "בקשת אישור הורה — Saylo",
+  title: "בקשת אישור הורה | Saylo",
 };
 
 interface ConsentInfo {

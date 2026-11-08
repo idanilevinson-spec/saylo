@@ -12,9 +12,9 @@ export default function NotFoundRestore({ title }: { title: string }) {
   useEffect(() => {
     const html = document.documentElement;
     if (!html.getAttribute("data-theme")) {
-      let theme = "light";
+      let theme = "dark";
       try {
-        if (localStorage.getItem("theme") === "dark") theme = "dark";
+        if (localStorage.getItem("theme") === "light") theme = "light";
       } catch {}
       html.setAttribute("data-theme", theme);
     }
