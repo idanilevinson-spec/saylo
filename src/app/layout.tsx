@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Rubik, Plus_Jakarta_Sans, Anton, Literata } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
 import Navbar from "@/components/Navbar";
@@ -102,15 +101,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
-        <Script id="no-flash-theme" strategy="beforeInteractive">
-          {noFlashThemeScript}
-        </Script>
-        <Script id="no-flash-a11y" strategy="beforeInteractive">
-          {noFlashA11yScript}
-        </Script>
-        <Script id="no-flash-cookie" strategy="beforeInteractive">
-          {noFlashCookieScript}
-        </Script>
+        {/* Plain inline scripts, not next/script: beforeInteractive runs from
+            Next's bootstrap, after first paint, so a visitor whose system is
+            in light mode saw the page flash light before turning dark, a
+            returning visitor saw the cookie notice flash, and saved text
+            size or high contrast applied a beat late. */}
+        <script id="no-flash-theme" dangerouslySetInnerHTML={{ __html: noFlashThemeScript }} />
+        <script id="no-flash-a11y" dangerouslySetInnerHTML={{ __html: noFlashA11yScript }} />
+        <script id="no-flash-cookie" dangerouslySetInnerHTML={{ __html: noFlashCookieScript }} />
         {/* A plain inline script, not next/script: beforeInteractive scripts
             run from Next's bootstrap, after first paint, which would show the
             page for a beat before the intro covers it. */}
