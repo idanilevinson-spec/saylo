@@ -34,13 +34,12 @@ const frank = Frank_Ruhl_Libre({
   weight: ["500", "700", "900"],
 });
 
-// The book face: reading texts set as a story (PrintedPage "story") and the
-// italic English glosses (.gloss) beside Hebrew headings. Not preloaded on
-// every page; it loads where a page uses it.
+// The book face for reading texts set as a story (PrintedPage "story"): a
+// serif drawn for long reading on screens. Not preloaded on every page; it
+// loads where a story page uses it.
 const book = Literata({
   variable: "--font-book",
   subsets: ["latin"],
-  style: ["normal", "italic"],
   preload: false,
 });
 
