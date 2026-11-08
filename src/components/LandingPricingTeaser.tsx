@@ -1,53 +1,27 @@
-"use client";
-
-import { motion } from "framer-motion";
 import Link from "next/link";
 import EnglishText from "@/components/EnglishText";
 import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
 
 const bestValue = PRICING_PLANS[PRICING_PLANS.length - 1];
-const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function LandingPricingTeaser() {
   return (
-    <section className="px-4 py-24 bg-background-2">
-      <div className="max-w-lg mx-auto">
-        <div
-          className="reveal-glow lit-plate relative border border-card-border rounded-lg px-7 py-8 sm:px-10 sm:py-10 text-center"
-        >
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
-          <span className="inline-block px-2.5 py-1 rounded-md bg-primary text-primary-ink text-xs font-bold tracking-[0.04em]">
-            {bestValue.badge}
-          </span>
-          <h2 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight">3 ימים חינם, בלי התחייבות</h2>
-
-          <div className="caption-stack mt-5 items-center">
-            <p className="caption-track-en text-muted">
-              then{" "}
-              <EnglishText as="span" className="font-bold text-primary">
-                ₪{monthlyEquivalent(bestValue)}
-              </EnglishText>
-              /mo
-            </p>
-            <p className="caption-track-he text-sm text-primary">
-              במסלול השנתי, <EnglishText as="span">₪{bestValue.totalPrice}</EnglishText> בתשלום אחד
-            </p>
-          </div>
-
-          <motion.div
-            className="mt-8 inline-block"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ duration: 0.16, ease: EASE_OUT }}
-          >
-            <Link
-              href="/pricing"
-              className="block px-8 py-3.5 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors"
-            >
-              לכל המסלולים
-            </Link>
-          </motion.div>
+    <section className="px-4 py-20 sm:py-24 bg-background-2">
+      <div className="max-w-5xl mx-auto grid gap-8 md:grid-cols-[1fr_auto] md:items-end border-t-2 border-foreground pt-8">
+        <div>
+          <h2 className="text-3xl sm:text-5xl font-black leading-[1.1]">3 ימים חינם, בלי התחייבות</h2>
+          <p className="mt-4 max-w-xl text-lg text-muted leading-relaxed">
+            אחר כך מ-<EnglishText as="span" className="font-bold text-foreground">₪{monthlyEquivalent(bestValue)}</EnglishText>{" "}
+            לחודש במסלול השנתי (<EnglishText as="span">₪{bestValue.totalPrice}</EnglishText> בתשלום אחד), או חודש אחרי חודש.
+            בלי כרטיס אשראי בניסיון, וביטול בכל עת.
+          </p>
         </div>
+        <Link
+          href="/pricing"
+          className="game-press inline-flex items-center justify-center px-8 py-3.5 rounded-md bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors"
+        >
+          לכל המסלולים
+        </Link>
       </div>
     </section>
   );

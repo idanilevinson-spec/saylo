@@ -132,7 +132,6 @@ export function GameStage({ children, className = "", stageKey }: { children: Re
       transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
       className={`relative overflow-hidden bg-card border border-card-border rounded-lg p-5 sm:p-7 ${className}`}
     >
-      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
       {children}
     </motion.section>
   );

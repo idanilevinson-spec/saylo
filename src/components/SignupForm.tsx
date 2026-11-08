@@ -216,14 +216,12 @@ export default function SignupForm() {
             point registration is required, why it's required — every
             feature past this point is tied to the account itself. */}
         <p className="mt-6 text-xs text-muted leading-relaxed max-w-sm">
-          החשבון הוא מה שמאפשר מסלול לימוד אישי, מורה AI שזוכר אתכם, ושמירת ההתקדמות בכל המכשירים שלכם.
+          החשבון הוא מה שמאפשר מסלול לימוד אישי, מורה שזוכר אתכם, ושמירת ההתקדמות בכל המכשירים שלכם.
         </p>
       </aside>
 
       <div className="rise-in lg:order-1" style={{ animationDelay: "0.1s" }}>
         <div className="lit-plate relative bg-card border border-card-border rounded-lg p-6 sm:p-7">
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
-
           {/* Consent first: it applies to every way of signing up below. */}
           <TermsConsent checked={accepted} onChange={setAccepted} />
 

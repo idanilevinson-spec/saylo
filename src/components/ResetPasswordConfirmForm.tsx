@@ -114,7 +114,6 @@ export default function ResetPasswordConfirmForm() {
       </div>
 
       <div className="lit-plate rise-in relative mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-7" style={{ animationDelay: "0.1s" }}>
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="new-password" className="block text-sm font-medium mb-1.5">סיסמה חדשה</label>

@@ -20,7 +20,7 @@ import { APP_STORE_URL, INSTAGRAM_URL } from "@/lib/site/links";
 import { CONTACT_EMAIL } from "@/lib/legal/siteInfo";
 import { siteOpenGraph } from "@/lib/og/meta";
 
-const DESCRIPTION = "לומדים אנגלית בקצב שלכם: מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם";
+const DESCRIPTION = "לומדים אנגלית בקצב שלכם: מבחן רמה, מסלול אישי ומורה שזוכר את הטעויות שלכם";
 
 export const metadata: Metadata = {
   title: "Saylo | לומדים אנגלית בקצב שלכם",

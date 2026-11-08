@@ -2,7 +2,25 @@
 
 <!-- impeccable:design-schema 1 -->
 
-## World
+## World: Paper and ink (2026-11-08, replaces "On Air")
+
+The owner's brief: the site and the app looked good but read as generated ("another gimmick"), and Saylo needs a brand nobody else has. The audit named the signals: the dark-SaaS look (a glowing planet horizon, blue bloom under every card, a light that followed the mouse, scroll-in reveals), English all-caps headlines with a full stop on a Hebrew site, the same icon-in-a-tinted-square card everywhere, a blue bar on top of every plate, a ticker and a LIVE flag, "AI" in every label, and a logo show before every web visit.
+
+The replacement grows out of what was already the most specific thing in the product: the mistakes notebook and the story-book reading page. **Saylo is a teacher's notebook: paper, ink, and a red pen.**
+
+- **Paper first.** Light is the first-visit default (layout.tsx no-flash script, manifest, intro script, ThemeToggle/NotFoundRestore fallbacks). Dark stays on the toggle as a warm desk at night (`#15130f` / card `#221f19`), not the cold `#0b0c0f` black.
+- **The red pen** (`--pen`: `#b42318` light, `#ff8f80` dark; `text-pen`). The teacher's mark, used for emphasis only: `PenMark` (a hand-drawn underline under the one phrase a heading turns on, at most once per section), the step numbers, the tick marks in the pricing list, the active tab's icon in the product tour. Never a status colour (that stays `--danger`), never gradient text.
+- **Display type: Frank Ruhl Libre** (`--font-frank`, weights 500/700/900) on every `h1`/`h2` and `.font-display`, site and app. A Hebrew book face with a long Israeli print history, so headings read as typeset. Rubik stays for everything you operate; Jakarta for English learning content; Literata for story reading. Anton is gone: `.chyron` (game clocks, scores, the level codes) now sets Frank Ruhl 900 with lining tabular numerals.
+- **Plates are paper.** `.lit-plate` is a card with a hairline border and a short downward shadow (`--shade` / `--shade-deep`), the same in both themes; `.lit-hover` lifts 1px and darkens its edge. The decorative blue top bar was removed from all 28 plates that had it (the Bagrut "your track" bar and the leaderboard's first place stay, they carry information).
+- **Structure from print, not from cards.** Headings stand alone, separated by rules (`border-t border-foreground/15`, or a 2px foreground rule to open a block). The landing's feature list is a contents page (title, dotted leader, arrow). Hub headers (`HubHeader`) are chapter openings closed by a rule. The trust line is a still row of facts. Steps are a numbered list in red, not giant 01/02/03.
+- **Copy.** Hebrew headlines only; English appears as learning content. In product UI the teacher is "המורה", not "מורה AI". Legal pages, consent screens and the support chat keep their explicit AI disclosure, on purpose.
+- **Motion.** One authored moment on the landing page: the notebook. Removed: the ticker, the LIVE pulse, the signal meter, the scroll-scrubbed rundown, the CSS scroll reveals, the horizon rise, PointerLight. The logo intro plays only in the iOS app (or with `?intro=1`), not before every web visit.
+
+Retired, not to come back: glowing horizons, coloured glows under cards, cursor-follow light, scroll-in reveals on every section, English all-caps headlines on Hebrew pages, a coloured bar on every card, icon-in-a-tinted-square feature cards, tickers, "AI" as a label for the teacher.
+
+The sections below record the "On Air" world and its passes for history. Where they disagree with this section, this section wins.
+
+## World (history: "On Air", 2026-09 to 2026-11)
 
 **On Air.** Your English gets corrected the moment it happens, cut into like a live broadcast, not filed away in a quiz result. Rooted in the same audience truth as before (Hebrew-speaking learners, children through adults), but replaces the old "Subtitle Culture" direction's quiet, letterboxed cinema-caption look with real spectacle: this is a full redesign-overhaul, explicitly requested by the user ("change everything design-wise, except the logo, and try to build something impressive"), not a refinement of the previous world. Direction contract: `.impeccable/surfaces/src-app-marketing-page-tsx.md`. Seed key `0a1ce211`, assigned candidate #5 of the grounded list (a live broadcast desk).
 

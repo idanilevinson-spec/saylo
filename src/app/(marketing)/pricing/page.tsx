@@ -22,7 +22,7 @@ export default function PricingPage() {
     <>
       <HubHeader title="מסלולים ומחירים" center>
         <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
-          3 ימים ראשונים על הבית, בלי כרטיס אשראי. שיחה עם מורה ה-AI זמינה במנוי בתשלום.
+          3 ימים ראשונים על הבית, בלי כרטיס אשראי. שיחה עם המורה זמינה במנוי בתשלום.
         </p>
       </HubHeader>
       <PricingCards />

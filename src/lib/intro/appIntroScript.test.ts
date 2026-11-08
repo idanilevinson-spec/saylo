@@ -12,6 +12,7 @@ function run({
   reducedMotion = false,
   stopAnimations = false,
   referrer = "",
+  app = true,
 } = {}) {
   const attrs: Record<string, string> = {};
   const session: Record<string, string> = seen ? { "saylo-intro-seen": "1" } : {};
@@ -23,7 +24,9 @@ function run({
   const localStorage = { getItem: (k: string) => local[k] ?? null };
   const performance = { getEntriesByType: () => [{ type: reload ? "reload" : "navigate" }] };
   const matchMedia = () => ({ matches: reducedMotion });
-  new Function("document", "location", "navigator", "sessionStorage", "localStorage", "performance", "matchMedia", appIntroScript)(
+  const window = app ? { Capacitor: { isNativePlatform: () => true } } : {};
+  new Function("window", "document", "location", "navigator", "sessionStorage", "localStorage", "performance", "matchMedia", appIntroScript)(
+    window,
     document,
     location,
     navigator,
@@ -36,10 +39,16 @@ function run({
 }
 
 describe("appIntroScript", () => {
-  it("plays on a first visit to the website, and marks the visit", () => {
+  it("plays on the app's launch, and marks the visit", () => {
     const r = run();
     expect(r.plays).toBe(true);
     expect(r.session["saylo-intro-seen"]).toBe("1");
+  });
+
+  it("never plays on the website, except as a ?intro=1 preview", () => {
+    expect(run({ app: false }).plays).toBe(false);
+    expect(run({ app: false, path: "/dashboard" }).plays).toBe(false);
+    expect(run({ app: false, search: "?intro=1" }).plays).toBe(true);
   });
 
   it("plays on any entry page, the app's included", () => {

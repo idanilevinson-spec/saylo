@@ -211,7 +211,6 @@ export default function PlacementPage() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}>
           {resumable && (
             <section aria-labelledby="resume-title" className="relative mb-8 overflow-hidden rounded-lg border border-primary bg-card p-5 sm:p-6">
-              <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
               <h2 id="resume-title" className="text-lg font-black">יש לכם מבחן באמצע</h2>
               <p className="mt-1 text-muted leading-relaxed">
                 {resumable.nextIndex < questions.length
@@ -416,7 +415,6 @@ export default function PlacementPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="relative overflow-hidden bg-card border border-card-border rounded-lg p-6 sm:p-8">
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
           <h1 className="text-xl font-bold flex items-center gap-2">
             <GraduationCap size={20} aria-hidden="true" className="text-primary shrink-0" />
             קטע קריאה בפורמט הבגרות ({bagrutSection.units} יח״ל)

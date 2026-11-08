@@ -85,7 +85,7 @@ const MODULE_GROUPS: { title: string; items: ModuleItem[] }[] = [
       { icon: PenLine, title: "דקדוק", body: "מסלול מלא מ-A1 עד C2", href: "/grammar" },
       { icon: BookOpenText, title: "הבנת הנקרא", body: "סיפורים עם שאלות ומשוב AI", href: "/reading" },
       { icon: Headphones, title: "האזנה", body: "הקשיבו ובדקו את עצמכם", href: "/listening" },
-      { icon: NotebookPen, title: "כתיבה", body: "משוב אישי מ-AI על מה שכתבתם", href: "/writing" },
+      { icon: NotebookPen, title: "כתיבה", body: "משוב אישי מהמורה על מה שכתבתם", href: "/writing" },
       { icon: Quote, title: "ניבים וביטויים", body: "אנגלית שאנשים באמת מדברים", href: "/idioms" },
     ],
   },
@@ -205,12 +205,8 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      {/* Status strip: greeting beside today's numbers. The same
-          primary-colored top edge as every other plate on the site
-          (hero, correction demo, auth forms) — one recurring detail
-          instead of a device invented per surface. */}
+      {/* Status strip: greeting beside today's numbers. */}
       <div className="lit-plate relative border border-card-border rounded-lg overflow-hidden sm:flex sm:items-stretch">
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="p-6 sm:p-7 sm:flex-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             {greeting()}, {profile.display_name}

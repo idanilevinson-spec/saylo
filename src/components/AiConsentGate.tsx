@@ -56,7 +56,6 @@ export default function AiConsentGate({ children, compact = false, declineHref =
         aria-labelledby="ai-consent-title"
         className="relative bg-card border border-card-border rounded-lg p-6 sm:p-7 text-start"
       >
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
         <div className="flex items-center gap-2.5">
           <ShieldCheck size={22} className="text-primary shrink-0" aria-hidden="true" />
           <h2 id="ai-consent-title" className="text-lg font-bold">

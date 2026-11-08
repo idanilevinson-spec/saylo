@@ -43,7 +43,6 @@ export function ExerciseSkeleton() {
           </div>
         </div>
         <div className="relative overflow-hidden rounded-lg border border-card-border bg-card p-5 sm:p-7">
-          <span className="absolute inset-x-0 top-0 h-1 bg-primary/40" />
           <Block className="h-5 w-3/4" />
           <Block className="mt-2 h-5 w-1/2" />
           <div className="mt-6 space-y-2.5">

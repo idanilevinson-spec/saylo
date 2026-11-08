@@ -9,11 +9,11 @@
    sampled from the real Saylo logo gradient (public/logo-mark.png), not
    chosen freely. See DESIGN.md. */
 :root {
-  --background: #faf7f0;
-  --background-2: #f1ebdf;
-  --foreground: #211c14;
-  --card: #ffffff;
-  --card-border: #e4dbc8;
+  --background: #f6f1e7;
+  --background-2: #ede5d5;
+  --foreground: #1e1a14;
+  --card: #fffdf8;
+  --card-border: #ddd2bd;
   --primary: #0066d6;
   --primary-hover: #0052ad;
   --primary-ink: #ffffff;
@@ -41,6 +41,9 @@
   /* Form-field outlines: --card-border is a decorative hairline (~1.3:1),
      but WCAG 1.4.11 needs 3:1 for the boundary of an input. */
   --field-border: #8a806c;
+  /* The teacher's red pen: corrections, the margin rule, the one mark of
+     emphasis on a page. Never a status colour (that is --danger). */
+  --pen: #b42318;
 }
 
 /* Three theme states: an explicit choice (data-theme) always wins; with no
@@ -49,11 +52,11 @@
    mix of light and dark tokens. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --background: #0b0c0f;
-    --background-2: #17181c;
-    --foreground: #f3efe4;
-    --card: #1c1d22;
-    --card-border: #2e2f36;
+    --background: #15130f;
+    --background-2: #1d1a15;
+    --foreground: #f1ebdd;
+    --card: #221f19;
+    --card-border: #3a342a;
     --primary: #4d9eff;
     --primary-hover: #7ab8ff;
     --primary-ink: #04122b;
@@ -66,17 +69,18 @@
     --danger: #f87171;
     --danger-hover: #fca5a5;
     --danger-ink: #450a0a;
-    --muted: #a39c8c;
-    --field-border: #6f7280;
+    --muted: #aaa190;
+    --field-border: #7a7262;
+    --pen: #ff8f80;
   }
 }
 
 :root[data-theme="dark"] {
-  --background: #0b0c0f;
-  --background-2: #17181c;
-  --foreground: #f3efe4;
-  --card: #1c1d22;
-  --card-border: #2e2f36;
+    --background: #15130f;
+    --background-2: #1d1a15;
+    --foreground: #f1ebdd;
+    --card: #221f19;
+    --card-border: #3a342a;
   --primary: #4d9eff;
   --primary-hover: #7ab8ff;
   --primary-ink: #04122b;
@@ -89,8 +93,9 @@
   --danger: #f87171;
   --danger-hover: #fca5a5;
   --danger-ink: #450a0a;
-  --muted: #a39c8c;
-  --field-border: #6f7280;
+  --muted: #aaa190;
+  --field-border: #7a7262;
+  --pen: #ff8f80;
 }
 
 /* Softened field tints for large full-bleed areas (the hero, its studio
@@ -142,9 +147,10 @@
   --color-danger-hover: var(--danger-hover);
   --color-danger-ink: var(--danger-ink);
   --color-muted: var(--muted);
+  --color-pen: var(--pen);
   --font-sans: var(--font-rubik);
   --font-content: var(--font-jakarta);
-  --font-display: var(--font-chyron);
+  --font-display: var(--font-frank);
 }
 
 body {
@@ -266,6 +272,25 @@ h1,
 h2 {
   letter-spacing: -0.02em;
   text-wrap: balance;
+}
+
+/* The display voice: Frank Ruhl Libre, a Hebrew book face with a century
+   of Israeli print behind it. Headings read as set, not generated; Rubik
+   stays for everything you operate. */
+h1,
+h2,
+.font-display {
+  font-family: var(--font-frank), var(--font-rubik), Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+/* Browser surfaces carry the design too. */
+::selection {
+  background: color-mix(in srgb, var(--primary) 22%, transparent);
+  color: var(--foreground);
+}
+:focus-visible {
+  outline-color: var(--primary);
 }
 
 /* Every text field's outline meets 3:1 (see --field-border), and the border
@@ -433,10 +458,11 @@ textarea::placeholder {
    .font-content so it wins the cascade tie when EnglishText applies both
    classes to the same element (equal specificity, source order decides). */
 .chyron {
-  font-family: var(--font-chyron), Impact, "Arial Narrow", sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
-  line-height: 0.92;
+  font-family: var(--font-frank), Georgia, serif;
+  font-weight: 900;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
 }
 
 /* Tailwind Typography's color palettes (prose-neutral etc.) are fixed
@@ -1593,274 +1619,61 @@ textarea::placeholder {
    answer, a selected plan's bg-primary, a shadow-* class) always wins over
    the lighting, so adding lit-plate to a plate can never repaint it. */
 @layer components {
-/* Studio lighting (pilot, 2026-10-22). The On Air set gets lit: plates
-   catch a key light from above and a rim along their top edge, and the
-   product tour's phone stands on a horizon of blue light. Same palette,
-   no new colours: every light here is the logo blue or the foreground.
-   --rim: the 1px highlight on a plate's top edge.
-   --plate-wash: the key light on a plate's upper half.
-   --plate-glow(-hover): the light a plate throws below itself.
-   --shade: the plain shadow under it.
-   --glint / --edge-glint: the hand-held light and the lit edge.
-   --hz-*: the horizon's crest, atmosphere, rim, glow, haze and far sky. */
+/* Paper and ink (2026-11-08). Replaced the "studio lighting" pilot: no key
+   light, no blue bloom under plates, no light that follows the mouse, no
+   glowing horizon and no scroll-in reveals. Those were the dark-SaaS-template
+   signals that made the site read as generated. A plate is a sheet of paper
+   on a desk: a hairline edge and a short, soft shadow that falls downward,
+   in both themes. The class names stay, so every page that used them
+   changes with this one block. */
 :root {
-  --rim: rgb(255 255 255 / 0.9);
-  --shade: rgb(60 45 20 / 0.08);
-  --glint: 10%;
-  --edge-glint: 75%;
-  /* Daylight translation (owner, 2026-10-24: light mode must be as good as
-     dark). Blue laid over the warm paper greys out, so in daylight the
-     plates get no blue wash and a warm paper shadow instead of a blue
-     bloom, and the horizon's light is mixed toward white: a sunrise,
-     not a smudge. Dark mode keeps the exact values it had. */
-  --plate-wash: transparent;
-  --plate-glow: rgb(70 55 30 / 0.14);
-  --plate-glow-hover: rgb(70 55 30 / 0.22);
-  --hz-crest: color-mix(in srgb, var(--primary) 12%, white);
-  --hz-atmos: rgb(255 255 255 / 0.7);
-  --hz-rim: color-mix(in srgb, var(--primary) 80%, transparent);
-  --hz-glow: color-mix(in srgb, var(--primary) 35%, white);
-  --hz-haze: color-mix(in srgb, var(--primary) 14%, white);
-  --hz-far: rgb(255 255 255 / 0.9);
+  --shade: rgb(60 45 20 / 0.07);
+  --shade-deep: rgb(60 45 20 / 0.12);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --rim: rgb(255 255 255 / 0.08);
-    --shade: rgb(0 0 0 / 0.45);
-    --glint: 42%;
-    --edge-glint: 95%;
-    --plate-wash: color-mix(in srgb, var(--primary) 10%, transparent);
-    --plate-glow: color-mix(in srgb, var(--primary) 38%, transparent);
-    --plate-glow-hover: color-mix(in srgb, var(--primary) 68%, transparent);
-    --hz-crest: color-mix(in srgb, var(--primary-hover) 55%, transparent);
-    --hz-atmos: color-mix(in srgb, var(--primary) 30%, transparent);
-    --hz-rim: color-mix(in srgb, var(--primary-hover) 95%, transparent);
-    --hz-glow: color-mix(in srgb, var(--primary) 70%, transparent);
-    --hz-haze: color-mix(in srgb, var(--primary) 57%, transparent);
-    --hz-far: color-mix(in srgb, var(--primary) 38%, transparent);
+    --shade: rgb(0 0 0 / 0.35);
+    --shade-deep: rgb(0 0 0 / 0.5);
   }
 }
 :root[data-theme="dark"] {
-  --rim: rgb(255 255 255 / 0.08);
-  --shade: rgb(0 0 0 / 0.45);
-  --glint: 42%;
-  --edge-glint: 95%;
-  --plate-wash: color-mix(in srgb, var(--primary) 10%, transparent);
-  --plate-glow: color-mix(in srgb, var(--primary) 38%, transparent);
-  --plate-glow-hover: color-mix(in srgb, var(--primary) 68%, transparent);
-  --hz-crest: color-mix(in srgb, var(--primary-hover) 55%, transparent);
-  --hz-atmos: color-mix(in srgb, var(--primary) 30%, transparent);
-  --hz-rim: color-mix(in srgb, var(--primary-hover) 95%, transparent);
-  --hz-glow: color-mix(in srgb, var(--primary) 70%, transparent);
-  --hz-haze: color-mix(in srgb, var(--primary) 57%, transparent);
-  --hz-far: color-mix(in srgb, var(--primary) 38%, transparent);
+  --shade: rgb(0 0 0 / 0.35);
+  --shade-deep: rgb(0 0 0 / 0.5);
 }
 
 .lit-plate {
   background-color: var(--card);
-  background-image: radial-gradient(130% 80% at 50% 0%, var(--plate-wash), transparent 70%);
   box-shadow:
-    inset 0 1px 0 var(--rim),
-    0 1px 2px var(--shade),
-    0 24px 48px -28px var(--plate-glow);
+    0 1px 1px var(--shade),
+    0 6px 14px -8px var(--shade-deep);
 }
-/* A plate that is also a link rises toward the light on hover. Pointer
-   devices only: on touch, hover sticks after the tap. A .lit-row (a row
-   inside a lit list) gets the same hand-held light but doesn't lift. */
 .lit-hover,
 .lit-row {
-  position: relative;
-  isolation: isolate;
-  transition-property: box-shadow, border-color, background-color, translate, transform;
+  transition-property: box-shadow, border-color, background-color, translate;
   transition-duration: 160ms;
   transition-timing-function: var(--ease-out);
 }
-/* A hand-held light: under a mouse, the plate brightens where the
-   pointer is (PointerLight writes --mx/--my). Behind the content, above
-   the plate's own fill. The first version was a 9-18% wash and nobody
-   could see it (owner, 2026-10-24); this one is meant to be noticed. */
-.lit-hover::after,
-.lit-row::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 200ms var(--ease-out);
-  background: radial-gradient(
-    12rem circle at var(--mx, 50%) var(--my, 0%),
-    color-mix(in srgb, var(--primary) var(--glint), transparent),
-    transparent 75%
-  );
-}
-/* ...and the plate's edge catches it: the edge lights up nearest the
-   pointer. A 1px ring cut out with a mask, just inside the border, so a
-   plate with overflow-hidden (ContentCard, TopicTile) doesn't clip it. */
-.lit-hover::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  padding: 1px;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 200ms var(--ease-out);
-  background: radial-gradient(
-    10rem circle at var(--mx, 50%) var(--my, 0%),
-    color-mix(in srgb, var(--primary-hover) var(--edge-glint), transparent),
-    transparent 80%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-}
 @media (hover: hover) {
-  .lit-hover:not(:disabled):hover::after,
-  .lit-hover:not(:disabled):hover::before,
-  .lit-row:not(:disabled):hover::after {
-    opacity: 1;
-  }
   .lit-hover:not(:disabled):hover {
-    translate: 0 -3px;
+    translate: 0 -1px;
+    border-color: color-mix(in srgb, var(--foreground) 28%, var(--card-border));
     box-shadow:
-      inset 0 1px 0 var(--rim),
-      0 4px 8px var(--shade),
-      0 30px 56px -24px var(--plate-glow-hover);
+      0 1px 1px var(--shade),
+      0 10px 20px -10px var(--shade-deep);
+  }
+  .lit-row:not(:disabled):hover {
+    background-color: var(--background-2);
   }
 }
-
-/* The horizon: a planet-sized ellipse whose top edge is lit from behind.
-   Sits behind whatever stands on it (the tour phone, a page header);
-   the section around it clips the overflow. Its body is the page
-   background, so on the lighter background-2 it reads as a dark world
-   rising, and its rim is the logo blue. */
+/* The horizon is retired; old markup may still carry the element. */
 .horizon {
-  position: absolute;
-  z-index: -1;
-  left: 50%;
-  top: var(--horizon-top, 60%);
-  width: var(--horizon-width, 72rem);
-  aspect-ratio: 2.2;
-  translate: -50% 0;
-  border-radius: 50%;
-  pointer-events: none;
-  /* Atmosphere: the light pooling just under the rim, brightest at the
-     crest, fading into the planet's dark body. */
-  background:
-    radial-gradient(42% 6% at 50% 0%, var(--hz-crest), transparent),
-    radial-gradient(70% 13% at 50% 0%, var(--hz-atmos), transparent),
-    var(--background);
-  /* Rim, then the light it throws up into the sky behind the subject. */
-  box-shadow:
-    0 -2px 0 var(--hz-rim),
-    0 -6px 18px -2px var(--hz-glow),
-    0 -40px 120px -10px var(--hz-haze),
-    0 -120px 260px -40px var(--hz-far);
-}
-
-/* Scroll-linked, CSS only: browsers without scroll timelines (and anyone
-   who asked for less motion) get the finished frame. Nothing waits on a
-   script, so content is never hidden at load. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    /* The tour: as the section comes up, the phone rises onto the
-       horizon and the horizon's light comes up with it. */
-    .tour-stage {
-      animation: tour-stage-rise linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 45%;
-    }
-    .tour-stage > .horizon {
-      animation: horizon-up linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 50%;
-    }
-    /* Public pages: a block settles in as it enters. */
-    .reveal {
-      animation: reveal-in linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 70%;
-    }
-    /* Three scroll moments (2026-10-24), each for one kind of thing, so a
-       page never repeats the same entrance on every section:
-       .reveal-wipe: a section heading cuts in like a chyron, wiped from
-         the reading start (right) across.
-       .reveal-item: a card or row settles in; --col (0, 1, ...) delays the
-         second card of a row a touch, so a row doesn't land as one slab.
-       .reveal-glow: the pricing card comes up and its light rises. */
-    .reveal-wipe {
-      animation: wipe-in linear both;
-      animation-timeline: view();
-      animation-range: entry 15% entry 75%;
-    }
-    .reveal-item {
-      animation: item-in linear both;
-      animation-timeline: view();
-      animation-range: entry calc(var(--col, 0) * 12%) entry calc(65% + var(--col, 0) * 12%);
-    }
-    .reveal-glow {
-      animation: glow-in linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 40%;
-    }
-  }
-}
-@keyframes tour-stage-rise {
-  from { transform: translateY(48px) scale(0.94); }
-  to { transform: none; }
-}
-@keyframes horizon-up {
-  from { opacity: 0.35; translate: -50% 18%; }
-  to { opacity: 1; translate: -50% 0; }
-}
-@keyframes wipe-in {
-  from { clip-path: inset(0 0 0 100%); }
-  to { clip-path: inset(0 0 0 0); }
-}
-@keyframes item-in {
-  from { opacity: 0; transform: translateY(28px); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes glow-in {
-  from { transform: translateY(32px) scale(0.94); box-shadow: inset 0 1px 0 var(--rim), 0 1px 2px var(--shade), 0 10px 24px -20px var(--plate-glow); }
-  to { transform: none; box-shadow: inset 0 1px 0 var(--rim), 0 2px 4px var(--shade), 0 40px 80px -30px var(--plate-glow-hover); }
-}
-@keyframes reveal-in {
-  from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
-  to { opacity: 1; transform: none; filter: none; }
-}
-/* The home page's opening: the horizon comes up once as the page loads.
-   It starts lower and dimmer and settles; the content in front of it is
-   there from the first frame. */
-@media (prefers-reduced-motion: no-preference) {
-  .hero-horizon {
-    animation: horizon-up 1.4s var(--ease-out) 0.1s both;
-  }
-}
-:root[data-a11y-motion="reduced"] .hero-horizon,
-:root[data-a11y-motion="reduced"] .tour-stage,
-:root[data-a11y-motion="reduced"] .tour-stage > .horizon,
-:root[data-a11y-motion="reduced"] .reveal,
-:root[data-a11y-motion="reduced"] .reveal-wipe,
-:root[data-a11y-motion="reduced"] .reveal-item,
-:root[data-a11y-motion="reduced"] .reveal-glow {
-  animation: none !important;
+  display: none;
 }
 :root[data-a11y-motion="reduced"] .lit-hover:hover {
   translate: none;
 }
-/* High contrast asked for the extremes: no washes, glows or horizon. */
 :root[data-a11y-contrast="high"] .lit-plate {
-  background-image: none;
   box-shadow: none;
-}
-:root[data-a11y-contrast="high"] .horizon,
-:root[data-a11y-contrast="high"] .lit-hover::after,
-:root[data-a11y-contrast="high"] .lit-hover::before,
-:root[data-a11y-contrast="high"] .lit-row::after {
-  display: none;
 }
 } /* @layer components */
 

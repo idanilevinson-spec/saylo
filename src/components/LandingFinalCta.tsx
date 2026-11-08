@@ -1,11 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { Play } from "lucide-react";
+import PenMark from "@/components/PenMark";
 import { useAuth } from "@/context/AuthProvider";
-
-const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 export default function LandingFinalCta() {
   // Same reasoning as LandingHero's CTA: a signed-in visitor should never
@@ -14,36 +11,26 @@ export default function LandingFinalCta() {
   const ctaHref = session ? "/dashboard" : "/signup";
 
   return (
-    <section className="relative overflow-hidden bg-primary px-4 py-20 sm:py-24">
-      <div className="relative max-w-lg mx-auto text-center">
-        <h2 className="reveal-wipe text-3xl sm:text-4xl font-black tracking-tight text-primary-ink">בעוד כעשר דקות תדעו את הרמה שלכם.</h2>
-        <p className="mt-4 text-primary-ink text-lg leading-relaxed">
+    <section className="px-4 py-24 sm:py-32">
+      <div className="max-w-2xl mx-auto text-center">
+        <h2 className="text-4xl sm:text-6xl font-black leading-[1.08]">
+          בעוד כעשר דקות
+          <br />
+          תדעו את <PenMark>הרמה שלכם</PenMark>
+        </h2>
+        <p className="mt-6 text-lg text-muted leading-relaxed">
           ומיד אחריהן תחכה לכם תוכנית יומית שבנויה עליה. שלושה ימים חינם, בלי כרטיס אשראי.
         </p>
-        {/* Unlike the hero's CTA (which sits on its own white/dark card,
-            not the field), this button sits directly on the field with
-            nothing between them — matching the field's own blue here
-            would make the button invisible, not restrained. Inverted
-            instead: the one punch-through moment on an otherwise
-            uniform section. */}
-        <motion.div
-          className="mt-8 inline-block"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ duration: 0.16, ease: EASE_OUT }}
+        <Link
+          href={ctaHref}
+          className="game-press mt-9 inline-flex items-center justify-center px-10 py-4 rounded-md bg-primary text-primary-ink font-bold text-lg hover:bg-primary-hover transition-colors"
         >
-          <Link
-            href={ctaHref}
-            className="flex items-center gap-2.5 px-10 py-4 rounded-lg bg-background text-foreground font-bold text-lg hover:bg-background-2 transition-colors"
-          >
-            <Play size={18} fill="currentColor" strokeWidth={0} />
-            התחילו ללמוד בחינם
-          </Link>
-        </motion.div>
+          התחילו ללמוד בחינם
+        </Link>
         {!session && (
-          <p className="mt-4 text-primary-ink/90">
+          <p className="mt-5 text-muted">
             רוצים קודם לנסות?{" "}
-            <Link href="/try" className="font-bold underline underline-offset-4 decoration-primary-ink/50 hover:decoration-primary-ink">
+            <Link href="/try" className="font-bold text-foreground underline decoration-card-border decoration-2 underline-offset-4 hover:decoration-foreground">
               שיעור ניסיון של כ-3 דקות, בלי הרשמה
             </Link>
           </p>

@@ -147,7 +147,7 @@ export default function PricingCards() {
           a reviewer after the fact. */}
       {!session && (
         <p className="max-w-2xl mx-auto mb-8 text-center text-sm text-muted leading-relaxed">
-          כל המסלולים למטה מותאמים אישית: מסלול לימוד שמתעדכן לפי הביצועים שלכם, ומורה AI שזוכר את הטעויות החוזרות
+          כל המסלולים למטה מותאמים אישית: מסלול לימוד שמתעדכן לפי הביצועים שלכם, ומורה שזוכר את הטעויות החוזרות
           שלכם. לכן ההרשמה היא הצעד הראשון. היא גם מה שמאפשר לגשת למנוי מכל אחד מהמכשירים שלכם.
         </p>
       )}
@@ -187,7 +187,7 @@ export default function PricingCards() {
                   <span className="flex flex-wrap items-center gap-2 font-bold">
                     {plan.label}
                     {plan.badge && (
-                      <span className="rounded-md bg-primary px-1.5 py-0.5 text-[0.7rem] font-bold text-primary-ink">{plan.badge}</span>
+                      <span className="text-xs font-bold text-pen">{plan.badge}</span>
                     )}
                   </span>
                   <span className="block text-xs text-muted">
@@ -212,7 +212,6 @@ export default function PricingCards() {
           transition={{ duration: 0.2, ease: EASE_OUT }}
           className="lit-plate relative overflow-hidden rounded-lg border border-primary bg-card p-6 sm:p-7 lg:sticky lg:top-24"
         >
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
           <h2 className="text-lg font-black">{selected.label}</h2>
           <p className="mt-3 flex items-baseline gap-2">
             <EnglishText as="span" className="chyron text-6xl leading-none">
@@ -229,7 +228,7 @@ export default function PricingCards() {
           <ul className="mt-5 space-y-2 border-t border-card-border pt-5 text-sm">
             {INCLUDED.map((item) => (
               <li key={item} className="flex items-center gap-2">
-                <Check size={16} className="shrink-0 text-success" aria-hidden="true" />
+                <Check size={16} strokeWidth={2.75} className="shrink-0 text-pen" aria-hidden="true" />
                 {item}
               </li>
             ))}

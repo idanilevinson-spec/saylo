@@ -346,7 +346,7 @@ export default function ProgressPage() {
 
       {data.conversationScores.length > 0 && (
         <div className="lit-plate mt-4 bg-card border border-card-border rounded-lg p-6">
-          <h2 className="font-bold">ציוני שיחות עם AI</h2>
+          <h2 className="font-bold">ציוני שיחות עם המורה</h2>
           <p className="text-xs text-muted mt-0.5">10 השיחות האחרונות שסיימתם</p>
           <ScoreSparkline values={data.conversationScores} />
         </div>
@@ -488,7 +488,7 @@ function SkillLevelsPanel({ skillLevels }: { skillLevels: Partial<Record<SkillAr
                     </>
                   ) : (
                     <p className="text-xs text-muted">
-                      {skill === "speaking" ? "יבדק בשיחה עם ה-AI" : "טרם נבדק"}
+                      {skill === "speaking" ? "ייבדק בשיחה עם המורה" : "טרם נבדק"}
                     </p>
                   )}
                 </div>

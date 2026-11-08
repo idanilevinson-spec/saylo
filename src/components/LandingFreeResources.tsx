@@ -16,7 +16,7 @@ export default function LandingFreeResources({ grammarTopics, words }: { grammar
   return (
     <section aria-labelledby="free-title" className="px-4 pb-20 sm:pb-24">
       <div className="max-w-4xl mx-auto">
-        <h2 id="free-title" className="reveal-wipe text-2xl sm:text-3xl font-black tracking-tight">
+        <h2 id="free-title" className="text-2xl sm:text-3xl font-black">
           אפשר להציץ גם בלי חשבון
         </h2>
         <p className="mt-2 max-w-xl text-muted leading-relaxed">ההסברים והמילים שבאפליקציה פתוחים לכולם. התרגול, החזרה והמורה מחכים אחרי ההרשמה.</p>
@@ -25,7 +25,7 @@ export default function LandingFreeResources({ grammarTopics, words }: { grammar
             <li key={item.href} className="reveal-item" style={{ "--col": i % 2 } as CSSProperties}>
               <Link
                 href={item.href}
-                className="lit-plate lit-hover flex items-center justify-between gap-3 rounded-lg border border-card-border px-4 py-3.5 hover:border-primary/50"
+                className="lit-plate lit-hover flex items-center justify-between gap-3 rounded-lg border border-card-border px-4 py-3.5"
               >
                 <span className="min-w-0">
                   <span className="block font-bold">{item.title}</span>

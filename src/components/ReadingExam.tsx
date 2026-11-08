@@ -364,7 +364,6 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
           transition={{ duration: 0.3, ease: EASE_OUT }}
           className="relative overflow-hidden mt-4 bg-card border border-card-border rounded-lg p-5 sm:p-7"
         >
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
           {currentExercise && (
             <>
               <McqQuestion

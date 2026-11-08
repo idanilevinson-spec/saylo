@@ -150,7 +150,7 @@ export default function Navbar() {
       // Phones: the header scrolls away with the page. Pinned under iOS
       // Safari's own collapsing toolbar it trailed the content on every
       // page and drifted when the toolbar resized. Desktop keeps it pinned.
-      className="relative md:sticky md:top-0 z-40 border-b-2 border-accent bg-background/90 backdrop-blur"
+      className="relative md:sticky md:top-0 z-40 border-b border-card-border bg-background/90 backdrop-blur"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       {/* Tracks the scroll, so it only makes sense while the header is pinned. */}

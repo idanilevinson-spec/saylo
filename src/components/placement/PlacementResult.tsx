@@ -51,7 +51,6 @@ function BagrutResultCard({ bagrut }: { bagrut: NonNullable<PlacementResult["bag
       aria-labelledby="bagrut-result-title"
       className="relative overflow-hidden mt-6 bg-card border border-card-border rounded-lg p-6"
     >
-      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
       <h2 id="bagrut-result-title" className="text-lg font-bold flex items-center gap-2">
         <GraduationCap size={18} aria-hidden="true" className="text-primary shrink-0" />
         בגרות {bagrut.units} יח״ל: {readiness.titleHe}
@@ -88,7 +87,6 @@ export function PlacementFinishing({ withWriting }: { withWriting: boolean }) {
   return (
     <div className="max-w-xl mx-auto px-4 py-20">
       <section role="status" className="relative overflow-hidden rounded-lg border border-card-border bg-card p-6 sm:p-8">
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <h1 className="text-2xl font-black tracking-tight">בודקים את המבחן</h1>
         <p className="mt-2 text-muted leading-relaxed">
           {withWriting

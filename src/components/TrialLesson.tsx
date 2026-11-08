@@ -93,7 +93,6 @@ export default function TrialLesson({ lesson }: { lesson: TrialLessonData }) {
     const mistakes = lesson.questions.filter((_, i) => results[i] === "wrong");
     return (
       <section aria-labelledby="trial-done" className="lit-plate relative overflow-hidden rounded-lg border border-card-border p-6 sm:p-8">
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <h2 id="trial-done" className="text-2xl sm:text-3xl font-black tracking-tight">
           סיימתם את שיעור הניסיון
         </h2>

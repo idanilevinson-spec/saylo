@@ -209,7 +209,6 @@ export default function GamesHubPage() {
         aria-labelledby="daily-title"
         className="lit-plate relative overflow-hidden mt-8 bg-card border border-card-border rounded-lg p-5 sm:p-6"
       >
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <span className="inline-flex w-12 h-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary-hover">
             <CalendarCheck size={22} aria-hidden="true" />

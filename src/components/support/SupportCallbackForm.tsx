@@ -150,7 +150,6 @@ export default function SupportCallbackForm({
       aria-labelledby={`${id}-title`}
       className="relative mt-2 rounded-lg border border-card-border bg-background p-3.5 text-sm"
     >
-      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 rounded-t-lg bg-primary" />
       <h3 id={`${id}-title`} className="font-bold">
         נחזור אליכם
       </h3>

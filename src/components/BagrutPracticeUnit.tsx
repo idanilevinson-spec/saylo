@@ -110,7 +110,6 @@ export default function BagrutPracticeUnit({ unit, format }: BagrutPracticeUnitP
 
       {unit.listeningTask && (
         <section className="relative overflow-hidden mt-6 bg-card border border-card-border rounded-lg p-6">
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
           <h2 className="flex items-center gap-2 font-bold text-sm text-muted">
             <Headphones size={16} /> הבנת הנשמע
           </h2>
@@ -348,7 +347,6 @@ function WritingTaskCard({ promptEn, wordCountRange }: { promptEn: string; wordC
 
   return (
     <section className="relative overflow-hidden mt-8 bg-card border border-card-border rounded-lg p-6">
-      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
       <h2 className="flex items-center gap-2 font-bold text-sm text-muted">
         <PenLine size={16} /> מטלת כתיבה
       </h2>

@@ -47,7 +47,7 @@ export default function TeacherSuggestionCard({ leadHref = null }: { leadHref?: 
         <Lightbulb size={18} />
       </span>
       <div>
-        <p className="text-sm font-bold text-primary">{leadHref ? "בנוסף למסלול: חזרה קצרה מהמורה AI" : "המורה AI שלכם ממליץ"}</p>
+        <p className="text-sm font-bold text-primary">{leadHref ? "בנוסף למסלול: חזרה קצרה מהמורה" : "המורה ממליץ"}</p>
         <p className="mt-1 leading-relaxed">{suggestion}</p>
         {shown.length > 0 && (
           <ul className="mt-3 flex flex-wrap gap-2">

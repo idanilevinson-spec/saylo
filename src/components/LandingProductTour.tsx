@@ -33,7 +33,7 @@ const TABS: { id: TabId; icon: LucideIcon; title: string; body: string }[] = [
   { id: "listening", icon: Headphones, title: "האזנה", body: "שומעים שיחה, מאטים אותה, ומציגים את הטקסט רק כשצריך." },
   { id: "vocabulary", icon: Link2, title: "אוצר מילים", body: "מחברים כל מילה לפירוש שלה. מילה שטעיתם בה חוזרת אליכם בחזרה החכמה." },
   { id: "spelling", icon: PenTool, title: "איות", body: "בונים את המילה אות אחר אות, כדי לזכור אותה גם בכתיבה." },
-  { id: "teacher", icon: MessageCircle, title: "מורה AI", body: "מדברים חופשי. המורה מתקן תוך כדי שיחה, בלי לעצור אותה." },
+  { id: "teacher", icon: MessageCircle, title: "שיחה עם המורה", body: "מדברים חופשי. המורה מתקן תוך כדי שיחה, בלי לעצור אותה." },
 ];
 
 export default function LandingProductTour() {
@@ -68,7 +68,7 @@ export default function LandingProductTour() {
         {/* min-w-0: the tab row scrolls sideways on phones instead of
             stretching the column past the screen. */}
         <div className="min-w-0">
-          <h2 id="tour-title" className="reveal-wipe text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
+          <h2 id="tour-title" className="text-3xl sm:text-5xl font-black leading-[1.1]">
             ככה זה נראה מבפנים
           </h2>
           <p className="mt-3 max-w-lg text-lg text-muted leading-relaxed">
@@ -91,16 +91,10 @@ export default function LandingProductTour() {
                     setTab(t.id);
                   }}
                   className={`game-press relative flex shrink-0 items-center gap-2.5 overflow-hidden rounded-lg border p-2.5 pe-4 text-start lg:shrink lg:items-start lg:gap-3 lg:p-4 transition-[background-color,border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
-                    active ? "border-primary bg-card shadow-[0_14px_30px_-20px_rgb(0_0_0/0.45)]" : "border-transparent hover:bg-card/70"
+                    active ? "border-card-border bg-card shadow-[0_6px_14px_-8px_rgb(60_45_20/0.18)]" : "border-transparent hover:bg-card/70"
                   }`}
                 >
-                  <span
-                    className={`inline-flex w-9 h-9 lg:w-10 lg:h-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-150 ${
-                      active ? "bg-primary text-primary-ink" : "bg-card text-primary"
-                    }`}
-                  >
-                    <t.icon size={19} aria-hidden="true" />
-                  </span>
+                  <t.icon size={18} aria-hidden="true" className={`shrink-0 lg:mt-0.5 transition-colors duration-150 ${active ? "text-pen" : "text-muted"}`} />
                   <span className="min-w-0">
                     <span className="block font-bold">{t.title}</span>
                     <span className="mt-0.5 hidden text-sm text-muted leading-snug lg:block">{t.body}</span>
@@ -110,7 +104,7 @@ export default function LandingProductTour() {
                     <motion.span
                       key={tab}
                       aria-hidden="true"
-                      className="absolute bottom-0 start-0 h-0.5 bg-primary"
+                      className="absolute bottom-0 start-0 h-0.5 bg-pen"
                       initial={{ width: "0%" }}
                       animate={{ width: "100%" }}
                       transition={{ duration: 7, ease: "linear" }}
@@ -154,8 +148,6 @@ export default function LandingProductTour() {
 function Phone({ children }: { children: ReactNode }) {
   return (
     <div className="tour-stage relative isolate mx-auto w-[19.5rem] shrink-0">
-      {/* The phone stands on a horizon of light (see .horizon). */}
-      <span aria-hidden="true" className="horizon" />
       <div className="relative rounded-[2.75rem] bg-[#0d0f14] p-2.5 ring-1 ring-white/10 shadow-[0_40px_80px_-30px_rgb(0_0_0/0.55)]">
         <div className="relative h-[37rem] overflow-hidden rounded-[2.2rem] bg-background">
           {/* Status bar + island */}

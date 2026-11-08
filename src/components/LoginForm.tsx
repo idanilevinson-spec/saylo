@@ -89,11 +89,9 @@ export default function LoginForm() {
         <p className="mt-2 text-center text-muted">התחברו כדי להמשיך ללמוד</p>
       </div>
 
-      {/* The same plate language as the rest of the site: a card with a
-          primary-colored edge, not bare inputs floating on the page. */}
+      {/* The same plate language as the rest of the site: a sheet of
+          paper, not bare inputs floating on the page. */}
       <div className="lit-plate rise-in relative mt-8 bg-card border border-card-border rounded-lg p-6 sm:p-7" style={{ animationDelay: "0.1s" }}>
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 rounded-t-lg bg-primary" />
-
         <div className="space-y-2.5">
           <button type="button" onClick={handleGoogleLogin} className={socialClass}>
             <GoogleLogo /> המשך עם Google

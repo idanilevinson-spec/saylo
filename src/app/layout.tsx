@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Rubik, Plus_Jakarta_Sans, Anton, Literata } from "next/font/google";
+import { Rubik, Plus_Jakarta_Sans, Frank_Ruhl_Libre, Literata } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
@@ -15,7 +15,6 @@ import { appIntroScript } from "@/lib/intro/appIntroScript";
 import SupportChat from "@/components/support/SupportChatLazy";
 import SiteAnalytics from "@/components/SiteAnalytics";
 import CourseReturnBar from "@/components/course/CourseReturnBar";
-import PointerLight from "@/components/PointerLight";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -27,13 +26,12 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
-// The chyron voice: one earned, oversized-impact display face for the
-// marketing page's broadcast headlines only. Never used for body copy,
-// exercise content, or dense Operate surfaces.
-const chyron = Anton({
-  variable: "--font-chyron",
-  subsets: ["latin"],
-  weight: "400",
+// The display voice: headings (h1, h2) and scoreboard numerals. A Hebrew
+// book face, so the site's headings read as typeset, not as a default sans.
+const frank = Frank_Ruhl_Libre({
+  variable: "--font-frank",
+  subsets: ["hebrew", "latin"],
+  weight: ["500", "700", "900"],
 });
 
 // The book face for reading texts set as a story (PrintedPage "story"): a
@@ -48,7 +46,7 @@ const book = Literata({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.saylolearn.com"),
   title: "Saylo",
-  description: "לומדים אנגלית בקצב שלכם: מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם",
+  description: "לומדים אנגלית בקצב שלכם: מבחן רמה, מסלול אישי ומורה שזוכר את הטעויות שלכם",
   formatDetection: {
     telephone: false,
   },
@@ -59,7 +57,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Saylo",
-    description: "לומדים אנגלית בקצב שלכם: מבחן רמה, מסלול אישי ומורה AI שמכיר את החולשות שלכם",
+    description: "לומדים אנגלית בקצב שלכם: מבחן רמה, מסלול אישי ומורה שזוכר את הטעויות שלכם",
     url: "https://www.saylolearn.com",
     siteName: "Saylo",
     locale: "he_IL",
@@ -68,7 +66,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#4d9eff",
+  themeColor: "#f6f1e7",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -76,10 +74,9 @@ export const viewport: Viewport = {
 
 // Runs before first paint to set data-theme from the stored theme,
 // avoiding a flash of the wrong theme (React only sees the DOM after
-// hydration). Dark is the deliberate first-visit default — the "On Air"
-// world reads best there — not a system-preference guess; a stored
-// explicit choice (from the toggle) always wins over it.
-const noFlashThemeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t="dark"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`;
+// hydration). Paper (light) is the first-visit default since 2026-11-08;
+// a stored explicit choice (from the toggle) always wins over it.
+const noFlashThemeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t="light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`;
 
 // Same no-flash principle as the theme script above: apply any saved
 // accessibility preferences straight to <html> before first paint, so a
@@ -98,7 +95,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="he"
       dir="rtl"
-      className={`${rubik.variable} ${jakarta.variable} ${chyron.variable} ${book.variable} h-full antialiased`}
+      className={`${rubik.variable} ${jakarta.variable} ${frank.variable} ${book.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
@@ -135,7 +132,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <PageTransition>{children}</PageTransition>
             </main>
             <SupportChat />
-            <PointerLight />
           </AuthProvider>
           <CookieNotice />
         </AccessibilityProvider>

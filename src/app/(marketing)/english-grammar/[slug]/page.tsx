@@ -88,7 +88,6 @@ export default async function EnglishGrammarTopic({ params }: { params: Promise<
               key={lesson.title_he}
               className="lit-plate relative overflow-hidden rounded-lg border border-card-border bg-card px-5 py-6 sm:px-9 sm:py-8"
             >
-              <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
               <h2 className="text-xl sm:text-2xl font-black tracking-tight">{lesson.title_he}</h2>
               <div className="mt-4">
                 <GrammarLessonContent bodyMd={lesson.body_md} />

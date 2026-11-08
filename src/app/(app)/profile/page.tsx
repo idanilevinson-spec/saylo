@@ -177,7 +177,6 @@ export default function ProfilePage() {
       {/* Who you are and where you stand, in one row — not a centered
           avatar badge with a separate stats strip under it. */}
       <header className="lit-plate relative overflow-hidden rounded-lg border border-card-border bg-card p-5">
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <div className="flex items-center gap-4">
           <div className="chyron flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary text-3xl text-primary-ink">
             {initial}

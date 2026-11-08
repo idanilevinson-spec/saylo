@@ -35,7 +35,6 @@ export default function LevelShelves<T>({
     <div className="space-y-12">
       {level && (
         <section aria-labelledby="shelf-mine" className="relative rounded-lg bg-primary/[0.05] ring-1 ring-primary/25 p-4 sm:p-5">
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 rounded-t-lg bg-primary" />
           <h2 id="shelf-mine" className="flex flex-wrap items-baseline gap-x-2 text-xl font-black tracking-tight">
             ברמה שלכם
             <span className="chyron text-2xl text-primary" dir="ltr">

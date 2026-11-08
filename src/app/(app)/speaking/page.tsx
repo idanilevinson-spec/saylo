@@ -209,7 +209,7 @@ export default function SpeakingPage() {
   if (requiresParentalConsent(profile)) {
     return (
       <div className="max-w-md mx-auto px-4 py-16">
-        <h1 className="text-2xl font-bold text-center mb-6">מורה AI</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">שיחה עם המורה</h1>
         <ConsentRequestForm status={profile.parental_consent_status} />
       </div>
     );

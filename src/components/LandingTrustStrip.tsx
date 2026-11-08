@@ -1,10 +1,6 @@
-import EnglishText from "@/components/EnglishText";
-
-// The site's one marquee (design-taste-frontend's max-one-per-page rule),
-// spent on the single place it's actually earned: a real news ticker is
-// this world's own thesis, not a decorative reach. A static duplicate
-// list, not fetched data — motion.div wrapping isn't needed since the
-// CSS animation runs on mount regardless.
+// The plain facts, set once and left still: the kind of line a printed
+// prospectus runs under its title. (It was a scrolling news ticker; motion
+// that repeats forever was the loudest "template" signal on the page.)
 const ITEMS = [
   "3 ימים חינם, בלי כרטיס אשראי",
   "מבחן רמה של כ-10 דקות",
@@ -14,38 +10,17 @@ const ITEMS = [
   "ביטול בכל עת",
 ];
 
-// One "group" repeats the item set enough times to safely exceed any real
-// viewport width on its own (five short phrases don't fill a wide desktop
-// screen once). Rendering exactly two such groups, animated by exactly
-// one group-width, is what makes the loop seamless — too few repeats
-// leaves a visible gap of bare track before the seam.
-const GROUP = Array.from({ length: 4 }, () => ITEMS).flat();
-
 export default function LandingTrustStrip() {
   return (
-    <div className="bg-primary overflow-hidden">
-      <div className="flex items-stretch">
-        <EnglishText
-          as="span"
-          className="chyron shrink-0 flex items-center px-4 py-2 bg-foreground text-background text-xs tracking-[0.15em]"
-        >
-          Now
-        </EnglishText>
-        {/* The window is LTR on purpose: in an RTL box the track anchors to
-            the right edge, so translateX(-50%) carried every item out of
-            view and the strip sat empty after the first second (found
-            2026-10-24). Anchored left, the same animation brings new items
-            in from the right, and each item keeps its own RTL text. */}
-        <div className="flex-1 overflow-hidden py-2.5" dir="ltr">
-          <div className="ticker-track flex w-max gap-12 whitespace-nowrap">
-            {[...GROUP, ...GROUP].map((item, i) => (
-              <span key={i} dir="rtl" className="text-sm font-bold text-primary-ink">
-                {item}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
+    <div className="border-y border-card-border bg-background-2 px-4">
+      <ul className="max-w-6xl mx-auto flex flex-wrap justify-center gap-x-5 gap-y-1.5 py-4 text-sm text-muted">
+        {ITEMS.map((item, i) => (
+          <li key={item} className="flex items-center gap-5">
+            {i > 0 && <span aria-hidden="true" className="h-1 w-1 rounded-full bg-muted/50" />}
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

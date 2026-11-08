@@ -34,7 +34,7 @@ export default function SubscriptionBanner({ subscription }: SubscriptionBannerP
         {...bannerMotion}
         className="mt-4 flex items-center justify-between gap-3 flex-wrap px-4 py-3 rounded-lg bg-danger-ink border border-danger/20"
       >
-        <p className="text-sm font-medium">דיבור, כתיבה והמלצות AI זמינים רק לפרימיום</p>
+        <p className="text-sm font-medium">דיבור, כתיבה והמלצות המורה זמינים רק לפרימיום</p>
         <Link href="/pricing" className="text-sm font-bold text-primary">
           שדרגו עכשיו ←
         </Link>
@@ -54,7 +54,7 @@ export default function SubscriptionBanner({ subscription }: SubscriptionBannerP
         >
           <p className="flex items-center gap-1.5 text-sm font-bold text-primary-ink">
             <Clock size={16} className="shrink-0" /> היום היום האחרון בניסיון החינמי. מחר נסגרים הדיבור, הכתיבה
-            וההמלצות של ה-AI
+            וההמלצות של המורה
           </p>
           <Link href="/pricing" className="text-sm font-bold text-primary-ink underline underline-offset-2">
             שדרגו עכשיו ←

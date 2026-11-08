@@ -41,8 +41,8 @@ export default function LandingLevels({ catalog }: { catalog: Record<CefrLevel, 
   return (
     <section aria-labelledby="levels-title" className="px-4 py-20 sm:py-24">
       <div className="max-w-4xl mx-auto">
-        <h2 id="levels-title" className="reveal-wipe text-3xl sm:text-5xl font-black tracking-tight leading-[1.05]">
-          שש רמות. בכל אחת יש מה לעשות.
+        <h2 id="levels-title" className="text-3xl sm:text-5xl font-black leading-[1.1]">
+          שש רמות, ובכל אחת יש מה לעשות
         </h2>
         <p className="mt-3 max-w-xl text-lg text-muted leading-relaxed">
           מבחן הרמה מציב אתכם על הסולם הבינלאומי (CEFR), ומשם התוכן נפתח לפי הרמה שלכם בכל מיומנות. בחרו רמה:
@@ -103,7 +103,6 @@ export default function LandingLevels({ catalog }: { catalog: Record<CefrLevel, 
               transition={{ duration: 0.2, ease: EASE_OUT }}
               className="lit-plate relative overflow-hidden rounded-lg border border-card-border p-6"
             >
-              <span aria-hidden="true" className="absolute inset-y-0 start-0 w-1.5 bg-primary" />
               <p className="flex items-baseline gap-3">
                 <EnglishText as="span" className="chyron text-6xl leading-none text-primary">
                   {level}

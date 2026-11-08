@@ -124,7 +124,6 @@ export default function GameResults({ title, percent, score, detail, gameType, s
   return (
     <div className="max-w-xl mx-auto px-4 py-12">
       <section ref={summaryRef} className="relative overflow-hidden bg-card border border-card-border rounded-lg p-6 sm:p-8 text-center">
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-primary" />
         <h1 className="text-2xl font-bold">{title}</h1>
         <GameCompletionScore>
           {score ?? (

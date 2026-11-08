@@ -306,7 +306,7 @@ export default function VoiceConversationPanel({
             if (activeRecognizerRef.current === recognizer) activeRecognizerRef.current = null;
             if (cancelled) return;
             const denied = isMicPermissionDeniedError(err);
-            setErrorMessage(denied ? "לא ניתנה גישה למיקרופון, ולכן אי אפשר לדבר עם ה-AI." : "אירעה שגיאה בגישה למיקרופון.");
+            setErrorMessage(denied ? "לא ניתנה גישה למיקרופון, ולכן אי אפשר לדבר עם המורה." : "אירעה שגיאה בגישה למיקרופון.");
             setPermissionDenied(denied);
             setState("error");
           }

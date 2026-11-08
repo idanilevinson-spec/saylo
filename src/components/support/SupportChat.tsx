@@ -374,8 +374,6 @@ function SupportChatPanel({ userId, userEmail, pathname }: PanelProps) {
           className="launch-panel launch-panel-sheet fixed z-[61] inset-x-0 top-0 h-[100dvh] sm:inset-auto sm:top-auto sm:bottom-[8.5rem] sm:end-4 sm:w-[25rem] sm:h-[min(40rem,calc(100dvh-10rem))] flex flex-col bg-card sm:border sm:border-card-border sm:rounded-lg shadow-2xl overflow-hidden"
           style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
         >
-          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary sm:rounded-t-lg" />
-
           <header className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-card-border">
             <div className="min-w-0 flex-1">
               <h2 id="support-title" className="font-bold leading-tight">

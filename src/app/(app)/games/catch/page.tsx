@@ -120,7 +120,6 @@ function FallingWord({
         transition={{ duration: 0.12, ease: [0.23, 1, 0.32, 1] }}
         className="absolute -translate-x-1/2 overflow-hidden px-4 sm:px-6 py-3 sm:py-4 rounded-lg bg-card border border-primary/40 shadow-[0_6px_18px_-6px_rgb(0_0_0/0.35)]"
       >
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary" />
         <EnglishText className="text-2xl sm:text-3xl font-bold whitespace-nowrap">{headword}</EnglishText>
       </motion.div>
     </div>
