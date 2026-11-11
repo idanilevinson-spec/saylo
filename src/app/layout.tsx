@@ -13,6 +13,7 @@ import AppIntro from "@/components/AppIntro";
 import { appIntroScript } from "@/lib/intro/appIntroScript";
 import SupportChat from "@/components/support/SupportChatLazy";
 import SiteAnalytics from "@/components/SiteAnalytics";
+import MarketingVisitBeacon from "@/components/MarketingVisitBeacon";
 import CourseReturnBar from "@/components/course/CourseReturnBar";
 import PointerLight from "@/components/PointerLight";
 
@@ -138,6 +139,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <CookieNotice />
         </AccessibilityProvider>
         <SiteAnalytics />
+        <MarketingVisitBeacon />
       </body>
     </html>
   );

@@ -15,5 +15,17 @@ export async function GET(request: Request) {
     console.error("support cleanup failed", error);
     return NextResponse.json({ error: "purge failed" }, { status: 500 });
   }
+  // Marketing visit counts (migration 055) are kept 12 months.
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - 12);
+  const { error: visitsError } = await supabaseAdmin
+    .from("marketing_visits")
+    .delete()
+    .lt("created_at", cutoff.toISOString());
+  if (visitsError) {
+    console.error("marketing visits cleanup failed", visitsError);
+    return NextResponse.json({ error: "purge failed" }, { status: 500 });
+  }
+
   return NextResponse.json({ ok: true });
 }
