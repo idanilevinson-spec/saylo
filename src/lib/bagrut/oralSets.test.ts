@@ -19,7 +19,7 @@ describe("resolveSet", () => {
 const good = {
   scores: { topic: 72.4, delivery: 80, vocabulary: 65, language: 140 },
   notesHe: { topic: "א", delivery: "ב", vocabulary: "ג", language: "ד" },
-  missedQuestions: [1, 1, 7, -1, "x"],
+  missedQuestions: [2, 2, 7, 0, -1, "x"],
   nextLevelAnswer: " A better answer. ",
   patterns: [
     { said: "I am agree", better: "I agree", whyHe: "הסבר" },
