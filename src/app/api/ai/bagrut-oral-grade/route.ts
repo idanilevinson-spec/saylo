@@ -65,13 +65,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: ORAL_LIMIT_ERROR, trial: !paid }, { status: 429 });
   }
 
-  const message = await anthropic.messages.create({
-    model: CLAUDE_MODEL,
-    // Thinking off: it would eat into max_tokens before the JSON is written.
-    max_tokens: 2000,
-    thinking: { type: "disabled" },
-    messages: [{ role: "user", content: buildBagrutOralGradePrompt(set, transcript, seconds, projectTopic) }],
-  });
+  let message;
+  try {
+    message = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
+      // Thinking off: it would eat into max_tokens before the JSON is written.
+      // (This model takes no temperature; steadiness comes from the prompt.)
+      max_tokens: 2000,
+      thinking: { type: "disabled" },
+      messages: [{ role: "user", content: buildBagrutOralGradePrompt(set, transcript, seconds, projectTopic) }],
+    });
+  } catch (err) {
+    console.error("bagrut-oral-grade: AI call failed", err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: "grading failed" }, { status: 502 });
+  }
   await logAiUsage(supabase, user.id, ORAL_GRADE_FEATURE, message.usage.input_tokens, message.usage.output_tokens);
 
   const raw = extractText(message);

@@ -54,8 +54,11 @@ export function parseOralFeedback(raw: unknown, questionCount: number): OralSetF
     notesHe[key] = n.trim().slice(0, MAX_NOTE);
   }
 
+  // The prompt numbers questions from 1, as a learner would; stored from 0.
   const missedQuestions = Array.isArray(r.missedQuestions)
-    ? [...new Set(r.missedQuestions.filter((i): i is number => Number.isInteger(i) && i >= 0 && i < questionCount))].sort()
+    ? [...new Set(r.missedQuestions.filter((n): n is number => Number.isInteger(n) && n >= 1 && n <= questionCount))]
+        .map((n) => n - 1)
+        .sort()
     : [];
   const nextLevelAnswer = typeof r.nextLevelAnswer === "string" ? r.nextLevelAnswer.trim().slice(0, MAX_ANSWER) : "";
   if (!nextLevelAnswer) return null;

@@ -110,6 +110,14 @@ describe("POST /api/ai/bagrut-oral-grade", () => {
     expect((await post({ setId: "a-food", transcript: "x", seconds: 5 })).status).toBe(429);
   });
 
+  it("answers with an error, not a crash, when the AI service fails", async () => {
+    createMessage.mockRejectedValue(new Error("overloaded"));
+    const res = await post({ setId: "a-food", transcript: "x", seconds: 5 });
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toBe("grading failed");
+    expect(logAiUsage).not.toHaveBeenCalled();
+  });
+
   it("never shows a made-up grade when the AI reply is broken", async () => {
     createMessage.mockResolvedValue({ text: "not json", usage: { input_tokens: 1, output_tokens: 1 } });
     const res = await post({ setId: "a-food", transcript: "x", seconds: 5 });
