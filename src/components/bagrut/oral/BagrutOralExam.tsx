@@ -45,6 +45,29 @@ export default function BagrutOralExam() {
   const [results, setResults] = useState<Record<string, SetResult>>({});
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [now, setNow] = useState(0);
+  // Room for a whole simulation today (or in the trial)? Asked before the
+  // start button, so nobody records for four minutes and then hits a limit.
+  const [avail, setAvail] = useState<"checking" | "ok" | "day" | "trial">("checking");
+
+  function fetchAvailability() {
+    fetch("/api/ai/bagrut-oral-grade")
+      .then((r) => r.json())
+      .then((b: { available?: boolean; trial?: boolean }) =>
+        setAvail(b.available === false ? (b.trial ? "trial" : "day") : "ok"),
+      )
+      // A failed check never blocks; grading still enforces the limit.
+      .catch(() => setAvail("ok"));
+  }
+
+  function checkAvailability() {
+    setAvail("checking");
+    fetchAvailability();
+  }
+
+  // On first load the state already says "checking"; only the answer is set.
+  useEffect(() => {
+    fetchAvailability();
+  }, []);
 
   // The exam's own 30-minute clock, as information: practice is never cut off.
   useEffect(() => {
@@ -98,6 +121,7 @@ export default function BagrutOralExam() {
       else
         result = {
           status: "error",
+          retryable: body.error !== ORAL_LIMIT_ERROR,
           message:
             body.error === ORAL_LIMIT_ERROR
               ? body.trial
@@ -106,7 +130,7 @@ export default function BagrutOralExam() {
               : "לא הצלחנו לבדוק את התשובה הזו. אפשר לנסות שוב.",
         };
     } catch {
-      result = { status: "error", message: "אין חיבור כרגע. אפשר לנסות שוב כשהחיבור יחזור." };
+      result = { status: "error", retryable: true, message: "אין חיבור כרגע. אפשר לנסות שוב כשהחיבור יחזור." };
     }
     setResults((r) => ({ ...r, [set.setId]: result }));
   }
@@ -126,7 +150,7 @@ export default function BagrutOralExam() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 sm:py-10">
       {step === "intro" ? (
-        <Intro onStart={start} />
+        <Intro onStart={start} avail={avail} />
       ) : (
         <>
           <header className="mb-6">
@@ -234,7 +258,10 @@ export default function BagrutOralExam() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={start}
+                  onClick={() => {
+                    checkAvailability();
+                    go("intro");
+                  }}
                   className="game-press inline-flex items-center gap-2 min-h-12 px-6 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
                   <RotateCcw size={16} aria-hidden="true" /> סימולציה חדשה
@@ -325,7 +352,7 @@ function Listen({ script, titleHe, onNext }: { script: string; titleHe: string; 
   );
 }
 
-function Intro({ onStart }: { onStart: () => void }) {
+function Intro({ onStart, avail }: { onStart: () => void; avail: "checking" | "ok" | "day" | "trial" }) {
   return (
     <div>
       <h1 className="text-3xl sm:text-4xl font-black tracking-tight">סימולציה: בגרות בעל פה</h1>
@@ -351,10 +378,18 @@ function Intro({ onStart }: { onStart: () => void }) {
         <li>ההקלטות והתשובות לא נשמרות אצלנו. הן נשלחות רק לזיהוי הדיבור ולבדיקה, ונעלמות כשסוגרים את הדף.</li>
         <li>השאלות והקטעים נכתבו על ידי Saylo במבנה של הבחינה. הם לא שאלות של משרד החינוך.</li>
       </ul>
+      {(avail === "day" || avail === "trial") && (
+        <p role="status" className="mt-7 rounded-lg bg-background-2 px-4 py-3 text-sm">
+          {avail === "trial"
+            ? "בתקופת הניסיון אפשר לעשות סימולציה אחת, והיא כבר נוצלה. סימולציות נוספות זמינות במנוי."
+            : "ניצלתם את הסימולציות של היום. אפשר לעשות סימולציה חדשה מחר."}
+        </p>
+      )}
       <button
         type="button"
         onClick={onStart}
-        className="game-press mt-7 inline-flex items-center gap-2 min-h-12 px-7 rounded-lg bg-primary text-primary-ink font-bold text-lg hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        disabled={avail !== "ok"}
+        className="disabled:opacity-50 disabled:pointer-events-none game-press mt-7 inline-flex items-center gap-2 min-h-12 px-7 rounded-lg bg-primary text-primary-ink font-bold text-lg hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
       >
         <Play size={18} fill="currentColor" strokeWidth={0} aria-hidden="true" /> להתחיל את הסימולציה
       </button>

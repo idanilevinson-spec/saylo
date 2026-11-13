@@ -42,7 +42,7 @@ vi.mock("@/lib/ai/usageLog", () => ({ logAiUsage }));
 vi.mock("@/lib/ai/reportParseFailure", () => ({ reportAiParseFailure: vi.fn() }));
 vi.mock("@/lib/ai/consent", () => ({ AI_CONSENT_REQUIRED_ERROR: "ai consent required", hasAiConsent: () => true }));
 
-import { POST } from "./route";
+import { GET, POST } from "./route";
 
 const reply = {
   scores: { topic: 100, delivery: 100, vocabulary: 100, language: 100 },
@@ -123,5 +123,15 @@ describe("POST /api/ai/bagrut-oral-grade", () => {
     const res = await post({ setId: "a-food", transcript: "x", seconds: 5 });
     expect(res.status).toBe(502);
     expect(logAiUsage).toHaveBeenCalled();
+  });
+
+  it("GET says up front whether a whole simulation still fits", async () => {
+    counts.last24h = 6;
+    expect(await (await GET()).json()).toEqual({ available: true, trial: false });
+    counts.last24h = 7;
+    expect(await (await GET()).json()).toEqual({ available: false, trial: false });
+    isPaidServer.mockResolvedValue(false);
+    counts.ever = 4;
+    expect(await (await GET()).json()).toEqual({ available: false, trial: true });
   });
 });

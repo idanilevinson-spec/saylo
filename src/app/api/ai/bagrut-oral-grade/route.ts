@@ -8,10 +8,43 @@ import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 import { isPaidServer, isPremiumServer } from "@/lib/subscriptions/requirePremium";
 import { parseOralFeedback, resolveSet } from "@/lib/bagrut/oralSets";
 import { MAX_ANSWER_SECONDS, partBLengthDeduction, setGrade } from "@/lib/bagrut/oralRules";
-import { ORAL_GRADE_FEATURE, ORAL_LIMIT_ERROR, oralGradeAllowed } from "@/lib/bagrut/oralAllowance";
+import { ORAL_GRADE_FEATURE, ORAL_LIMIT_ERROR, oralGradeAllowed, oralSimulationAvailable } from "@/lib/bagrut/oralAllowance";
 
 const MAX_TRANSCRIPT_CHARS = 4000;
 const MAX_TOPIC_CHARS = 120;
+
+type ServerClient = Awaited<ReturnType<typeof createClient>>;
+
+async function readUsage(supabase: ServerClient, userId: string): Promise<{ usedLast24h: number; usedEver: number }> {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const [{ count: usedLast24h }, { count: usedEver }] = await Promise.all([
+    supabase
+      .from("ai_usage_log")
+      .select("id", { count: "exact", head: true })
+      .eq("profile_id", userId)
+      .eq("feature", ORAL_GRADE_FEATURE)
+      .gte("created_at", since),
+    supabase
+      .from("ai_usage_log")
+      .select("id", { count: "exact", head: true })
+      .eq("profile_id", userId)
+      .eq("feature", ORAL_GRADE_FEATURE),
+  ]);
+  return { usedLast24h: usedLast24h ?? 0, usedEver: usedEver ?? 0 };
+}
+
+// Before the intro's start button: is there room for a whole simulation?
+export async function GET() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const [premium, paid] = await Promise.all([isPremiumServer(supabase, user.id), isPaidServer(supabase, user.id)]);
+  if (!premium) return NextResponse.json({ error: "premium required" }, { status: 403 });
+  const usage = await readUsage(supabase, user.id);
+  return NextResponse.json({ available: oralSimulationAvailable({ paid, ...usage }), trial: !paid });
+}
 
 // Grades one question set of the oral Bagrut simulation
 // (docs/specs/bagrut-oral.md). The browser sends only the set id, the
@@ -47,21 +80,8 @@ export async function POST(request: Request) {
   const [premium, paid] = await Promise.all([isPremiumServer(supabase, user.id), isPaidServer(supabase, user.id)]);
   if (!premium) return NextResponse.json({ error: "premium required" }, { status: 403 });
 
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const [{ count: usedLast24h }, { count: usedEver }] = await Promise.all([
-    supabase
-      .from("ai_usage_log")
-      .select("id", { count: "exact", head: true })
-      .eq("profile_id", user.id)
-      .eq("feature", ORAL_GRADE_FEATURE)
-      .gte("created_at", since),
-    supabase
-      .from("ai_usage_log")
-      .select("id", { count: "exact", head: true })
-      .eq("profile_id", user.id)
-      .eq("feature", ORAL_GRADE_FEATURE),
-  ]);
-  if (!oralGradeAllowed({ paid, usedLast24h: usedLast24h ?? 0, usedEver: usedEver ?? 0 })) {
+  const usage = await readUsage(supabase, user.id);
+  if (!oralGradeAllowed({ paid, ...usage })) {
     return NextResponse.json({ error: ORAL_LIMIT_ERROR, trial: !paid }, { status: 429 });
   }
 

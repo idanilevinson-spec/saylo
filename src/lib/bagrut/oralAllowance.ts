@@ -13,4 +13,12 @@ export function oralGradeAllowed(opts: { paid: boolean; usedLast24h: number; use
   return opts.paid ? opts.usedLast24h < PAID_SETS_PER_DAY : opts.usedEver < TRIAL_SETS_TOTAL;
 }
 
+// Before a simulation starts: is there room for all four sets? Checked up
+// front so nobody records for four minutes and only then hears "limit".
+export function oralSimulationAvailable(opts: { paid: boolean; usedLast24h: number; usedEver: number }): boolean {
+  return opts.paid
+    ? opts.usedLast24h + SETS_PER_SIMULATION <= PAID_SETS_PER_DAY
+    : opts.usedEver + SETS_PER_SIMULATION <= TRIAL_SETS_TOTAL;
+}
+
 export const ORAL_LIMIT_ERROR = "oral grade limit";
