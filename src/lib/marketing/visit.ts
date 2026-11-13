@@ -77,3 +77,28 @@ export function deviceFromUserAgent(userAgent: string): "mobile" | "tablet" | "d
   if (/mobi|iphone|ipod|android/i.test(userAgent)) return "mobile";
   return "desktop";
 }
+
+// One arrival was stored three times within 150 ms (Facebook's in-app
+// browser, 2026-11-12), which tripled the count of a link. With no IP or
+// cookie kept, a repeat is recognised by what is stored: the same tags,
+// landing page, referrer and device within a few seconds. Two different
+// people matching all of that inside the window is rare at our volume, and
+// counting them once is the smaller error.
+export const DUPLICATE_WINDOW_MS = 10_000;
+
+export function visitKey(
+  v: Partial<Record<UtmKey, string | null>> & { path: string; referrerHost: string | null },
+  device: string,
+): string {
+  return [...UTM_KEYS.map((k) => v[k] ?? ""), v.path, v.referrerHost ?? "", device].join("|");
+}
+
+// Remembers keys seen in this server instance; requests that arrive
+// together usually land on the same warm instance, which the database
+// check alone can't catch (they all read before any of them writes).
+export function seenRecently(seen: Map<string, number>, key: string, now: number): boolean {
+  for (const [k, t] of seen) if (now - t > DUPLICATE_WINDOW_MS) seen.delete(k);
+  const last = seen.get(key);
+  seen.set(key, now);
+  return last !== undefined && now - last <= DUPLICATE_WINDOW_MS;
+}
