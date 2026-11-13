@@ -47,6 +47,7 @@ const AI_FEATURE_LABELS: Record<string, string> = {
   reading_exam_summary: "סיכום מבחן קריאה",
   teacher_suggestion: "הצעת המורה AI",
   vocabulary_topic_intro: "הקדמה לנושא אוצר מילים",
+  bagrut_oral_grade: "בגרות בעל פה (בדיקת קבוצת שאלות)",
 };
 
 function Bar({ label, count, max }: { label: string; count: number; max: number }) {
