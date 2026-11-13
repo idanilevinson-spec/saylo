@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import EnglishText from "@/components/EnglishText";
-import { PRICING_PLANS, monthlyEquivalent } from "@/lib/subscriptions/plans";
+import { PRICING_PLANS, TRIAL_DAYS, monthlyEquivalent } from "@/lib/subscriptions/plans";
 
 const bestValue = PRICING_PLANS[PRICING_PLANS.length - 1];
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
@@ -19,7 +19,7 @@ export default function LandingPricingTeaser() {
           <span className="inline-block px-2.5 py-1 rounded-md bg-primary text-primary-ink text-xs font-bold tracking-[0.04em]">
             {bestValue.badge}
           </span>
-          <h2 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight">3 ימים חינם, בלי התחייבות</h2>
+          <h2 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight">{TRIAL_DAYS} ימים חינם, בלי התחייבות</h2>
 
           <div className="caption-stack mt-5 items-center">
             <p className="caption-track-en text-muted">

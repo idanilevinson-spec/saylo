@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
+import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
@@ -18,7 +19,7 @@ export default function LandingFinalCta() {
       <div className="relative max-w-lg mx-auto text-center">
         <h2 className="reveal-wipe text-3xl sm:text-4xl font-black tracking-tight text-primary-ink">בעוד כעשר דקות תדעו את הרמה שלכם.</h2>
         <p className="mt-4 text-primary-ink text-lg leading-relaxed">
-          ומיד אחריהן תחכה לכם תוכנית יומית שבנויה עליה. שלושה ימים חינם, בלי כרטיס אשראי.
+          ומיד אחריהן תחכה לכם תוכנית יומית שבנויה עליה. {TRIAL_DAYS} ימים חינם, בלי כרטיס אשראי.
         </p>
         {/* Unlike the hero's CTA (which sits on its own white/dark card,
             not the field), this button sits directly on the field with

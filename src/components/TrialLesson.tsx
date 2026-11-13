@@ -16,6 +16,7 @@ import EnglishText from "@/components/EnglishText";
 import { GameHud, GameStage, type RoundResult } from "@/components/games/GameKit";
 import type { FillBlankContent, McqContent } from "@/types/exercises";
 import type { TrialLesson as TrialLessonData, TrialQuestion } from "@/lib/content/trialLesson";
+import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 const KIND_HE: Record<TrialQuestion["kind"], string> = { vocabulary: "אוצר מילים", grammar: "דקדוק" };
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
@@ -154,7 +155,8 @@ export default function TrialLesson({ lesson }: { lesson: TrialLessonData }) {
             מבחן רמה של כ-10 דקות, ותוכנית יומית ברמה שלכם
           </li>
           <li className="flex items-center gap-2">
-            <CheckCircle2 size={16} aria-hidden="true" className="shrink-0 text-success" />3 ימים חינם, בלי כרטיס אשראי
+            <CheckCircle2 size={16} aria-hidden="true" className="shrink-0 text-success" />
+            {TRIAL_DAYS} ימים חינם, בלי כרטיס אשראי
           </li>
         </ul>
 
