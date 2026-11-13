@@ -4,16 +4,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/browserClient";
 import { fetchAll } from "@/lib/supabase/fetchAll";
 import type { DashboardMetrics } from "@/lib/admin/dashboardMetrics";
+import { buildFunnel, type FunnelStep } from "@/lib/admin/funnel";
 
 interface PlanBreakdown {
   code: string;
   count: number;
   mrr: number;
-}
-
-interface FunnelStep {
-  label: string;
-  count: number;
 }
 
 interface AiUsageRow {
@@ -85,19 +81,23 @@ export default function AdminAnalyticsPage() {
         { data: profiles },
         { data: streaks },
         { count: exerciseAttemptsLast7Days },
-        { count: completedPlacements },
+        { data: completedPlacements },
         { data: usersWithAttempts },
         { data: usersWithConversations },
         { data: aiUsageLast30Days },
         { count: aiUsageCallsLast7Days },
       ] = await Promise.all([
         fetch("/api/admin/metrics", { cache: "no-store" }),
-        fetchAll((from, to) => supabase.from("profiles").select("id, created_at").order("id").range(from, to)),
+        fetchAll((from, to) =>
+          supabase.from("profiles").select("id, created_at, is_test_account").order("id").range(from, to),
+        ),
         fetchAll((from, to) =>
           supabase.from("streaks").select("profile_id, last_active_date").order("profile_id").range(from, to),
         ),
         supabase.from("exercise_attempts").select("*", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
-        supabase.from("placement_tests").select("*", { count: "exact", head: true }).eq("status", "completed"),
+        fetchAll((from, to) =>
+          supabase.from("placement_tests").select("profile_id").eq("status", "completed").order("id").range(from, to),
+        ),
         fetchAll((from, to) => supabase.from("exercise_attempts").select("profile_id").order("id").range(from, to)),
         fetchAll((from, to) => supabase.from("conversations").select("profile_id").order("id").range(from, to)),
         fetchAll((from, to) =>
@@ -116,15 +116,16 @@ export default function AdminAnalyticsPage() {
         return;
       }
       const dashboard = (await dashboardRes.json()) as DashboardMetrics;
-      const eligibleForRetention = (profiles ?? []).filter((p) => p.created_at < thirtyDaysAgo);
+      // Test/demo accounts stay out of every learner number on this page.
+      const realProfiles = (profiles ?? []).filter((p) => !p.is_test_account);
+      const realProfileIds = new Set(realProfiles.map((p) => p.id));
+      const eligibleForRetention = realProfiles.filter((p) => p.created_at < thirtyDaysAgo);
       const streakByProfile = new Map((streaks ?? []).map((s) => [s.profile_id, s.last_active_date]));
       const retainedCount = eligibleForRetention.filter((p) => {
         const lastActive = streakByProfile.get(p.id);
         return lastActive && lastActive >= sevenDaysAgo.slice(0, 10);
       }).length;
 
-      const distinctAttemptUsers = new Set((usersWithAttempts ?? []).map((r) => r.profile_id)).size;
-      const distinctConversationUsers = new Set((usersWithConversations ?? []).map((r) => r.profile_id)).size;
 
       const aiUsageByFeature = new Map<string, AiUsageRow>();
       (aiUsageLast30Days ?? []).forEach((row) => {
@@ -152,13 +153,13 @@ export default function AdminAnalyticsPage() {
         totalUsers: dashboard.totalUsers,
         exerciseAttemptsLast7Days: exerciseAttemptsLast7Days ?? 0,
         retainedPct: eligibleForRetention.length ? Math.round((retainedCount / eligibleForRetention.length) * 100) : 0,
-        funnel: [
-          { label: "פתחו חשבון", count: dashboard.totalUsers + dashboard.incompleteSignups.length },
-          { label: "השלימו פרופיל", count: dashboard.totalUsers },
-          { label: "השלימו מבחן רמה", count: completedPlacements ?? 0 },
-          { label: "ביצעו תרגיל אחד לפחות", count: distinctAttemptUsers },
-          { label: "ניסו שיחת AI", count: distinctConversationUsers },
-        ],
+        funnel: buildFunnel({
+          realProfileIds,
+          incompleteSignups: dashboard.incompleteSignups.length,
+          completedPlacementProfileIds: (completedPlacements ?? []).map((r) => r.profile_id),
+          attemptProfileIds: (usersWithAttempts ?? []).map((r) => r.profile_id),
+          conversationProfileIds: (usersWithConversations ?? []).map((r) => r.profile_id),
+        }),
         aiUsage,
         aiUsageCallsLast7Days: aiUsageCallsLast7Days ?? 0,
       });
