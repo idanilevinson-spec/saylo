@@ -24,6 +24,18 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
+  async redirects() {
+    return [
+      // A short address to say or show in TikTok videos (the profile has no
+      // link). Lands on the trial lesson with a tag, so the visit counts in
+      // marketing_visits like a tagged bio link. 307, so it can change later.
+      {
+        source: "/tt",
+        destination: "/try?utm_source=tiktok&utm_medium=social&utm_campaign=short-link",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
