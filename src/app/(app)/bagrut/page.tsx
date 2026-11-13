@@ -10,6 +10,7 @@ import {
   PenLine,
   Timer,
   CalendarCheck,
+  Mic,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -154,6 +155,24 @@ export default async function BagrutHubPage() {
         </div>
       </section>
 
+
+      {/* The oral exam (COBE) is 20% of the 4- and 5-point grade and the one
+          part written practice can't cover: its own simulation. */}
+      <Link
+        href="/bagrut/oral"
+        className="game-press lit-plate lit-hover mt-6 flex items-center gap-4 rounded-lg border border-card-border bg-card p-5 hover:border-primary/50 duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+      >
+        <span className="inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg bg-primary/12 text-primary-hover">
+          <Mic size={20} aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-black">סימולציה של בגרות בעל פה</span>
+          <span className="block text-sm text-muted leading-snug">
+            30 דקות במבנה של הבחינה הממוחשבת ל-4 ו-5 יח״ל, עם ציון לפי המחוון ומה לשפר בכל חלק.
+          </span>
+        </span>
+        <ChevronLeft size={18} aria-hidden="true" className="shrink-0 text-muted" />
+      </Link>
 
       <section aria-labelledby="tracks-title" className="mt-12">
         <h2 id="tracks-title" className="text-xl font-black tracking-tight">

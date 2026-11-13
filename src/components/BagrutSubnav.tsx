@@ -10,6 +10,7 @@ const TABS: { href: string; label: string; match: (p: string) => boolean }[] = [
   { href: "/bagrut/track/4", label: "4 יח״ל", match: (p) => p.startsWith("/bagrut/track/4") },
   { href: "/bagrut/track/5", label: "5 יח״ל", match: (p) => p.startsWith("/bagrut/track/5") },
   { href: "/bagrut/skills", label: "מיומנויות", match: (p) => p.startsWith("/bagrut/skills") },
+  { href: "/bagrut/oral", label: "בעל פה", match: (p) => p.startsWith("/bagrut/oral") },
   { href: "/bagrut/exam-guide", label: "לקראת הבחינה", match: (p) => p.startsWith("/bagrut/exam-guide") },
 ];
 
