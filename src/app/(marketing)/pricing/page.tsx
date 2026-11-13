@@ -4,6 +4,7 @@ import SiteFooter from "@/components/SiteFooter";
 import HubHeader from "@/components/HubHeader";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { PRICING_PLANS, TRIAL_DAYS, monthlyEquivalent } from "@/lib/subscriptions/plans";
+import { TRIAL_TEACHER_CONVERSATIONS } from "@/lib/subscriptions/teacherTrial";
 
 const ANNUAL = PRICING_PLANS.find((p) => p.months === 12)!;
 // Built from the plans themselves, so the search snippet can't drift
@@ -22,7 +23,10 @@ export default function PricingPage() {
     <>
       <HubHeader title="מסלולים ומחירים" center>
         <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
-          {TRIAL_DAYS} ימים ראשונים על הבית, בלי כרטיס אשראי. שיחה עם מורה ה-AI זמינה במנוי בתשלום.
+          {/* Must match what the routes allow (teacherTrial.ts): the trial
+              includes a few teacher conversations, unlimited is paid. */}
+          {TRIAL_DAYS} ימים ראשונים על הבית, בלי כרטיס אשראי, כולל {TRIAL_TEACHER_CONVERSATIONS} שיחות ניסיון עם
+          מורה ה-AI. שיחה בלי הגבלה זמינה במנוי בתשלום.
         </p>
       </HubHeader>
       <PricingCards />
