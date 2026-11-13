@@ -33,6 +33,7 @@ import TeacherSuggestionCard from "@/components/TeacherSuggestionCard";
 import { KIND_META } from "@/components/dashboard/TodayAtLevel";
 import CourseLead, { courseNextHref } from "@/components/dashboard/CourseLead";
 import ReminderOptIn from "@/components/dashboard/ReminderOptIn";
+import TrialCarryover from "@/components/dashboard/TrialCarryover";
 import { useCourseProgress } from "@/components/course/useCourseProgress";
 import { getLevelPlan, type LevelPlan, type PlanKind } from "@/lib/content/levelPlan";
 import SubscriptionBanner from "@/components/SubscriptionBanner";
@@ -290,6 +291,9 @@ export default function DashboardPage() {
       {/* Under the lead, as its complement: a short review, never a
           competing next step. */}
       <TeacherSuggestionCard leadHref={plan?.overall && course ? courseNextHref(course) : null} />
+
+      {/* Mistakes from a trial lesson on this device, carried in once. */}
+      {plan?.overall && <TrialCarryover />}
 
       {/* After placement, when there is a course to come back to. */}
       {plan?.overall && <ReminderOptIn />}

@@ -7,6 +7,7 @@ import { CheckCircle2, XCircle, CornerDownLeft, Play, RotateCcw } from "lucide-r
 import { useAuth } from "@/context/AuthProvider";
 import { gradeExercise } from "@/lib/exercises/grade";
 import { correctAnswerLabel } from "@/lib/exercises/correctAnswerLabel";
+import { saveTrialMistakes } from "@/lib/trial/carryover";
 import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/sound/effects";
 import McqQuestion from "@/components/McqQuestion";
 import FillBlankQuestion from "@/components/FillBlankQuestion";
@@ -27,7 +28,8 @@ function promptOf(q: TrialQuestion): string {
 
 // The trial lesson: the app's own practice parts (the HUD track, the answer
 // stage, the verdict panel), graded on the device so right/wrong shows the
-// instant the visitor answers. No session, so nothing is recorded.
+// instant the visitor answers. No session, so nothing is recorded on the
+// server; only the ids of wrong answers stay on the device (lib/trial/carryover).
 export default function TrialLesson({ lesson }: { lesson: TrialLessonData }) {
   const { session } = useAuth();
   const total = lesson.questions.length;
@@ -88,6 +90,14 @@ export default function TrialLesson({ lesson }: { lesson: TrialLessonData }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [answered, next]);
 
+  // On finishing, keep this round's mistakes on the device so the account
+  // (once there is one) starts with them in the mistake notebook. A clean
+  // round clears whatever an earlier round left.
+  useEffect(() => {
+    if (!done) return;
+    saveTrialMistakes(lesson.questions.filter((_, i) => results[i] === "wrong").map((q) => q.id));
+  }, [done, lesson.questions, results]);
+
   if (done) {
     const correct = results.filter((r) => r === "correct").length;
     const mistakes = lesson.questions.filter((_, i) => results[i] === "wrong");
@@ -126,6 +136,11 @@ export default function TrialLesson({ lesson }: { lesson: TrialLessonData }) {
                 </li>
               ))}
             </ul>
+            <p className="mt-3 text-sm text-muted">
+              {session
+                ? "הן יחכו לכם במחברת הטעויות, לחזרה בזמן הנכון."
+                : "אחרי שתיצרו חשבון במכשיר הזה, הן יחכו לכם במחברת הטעויות, לחזרה בזמן הנכון."}
+            </p>
           </div>
         )}
 
