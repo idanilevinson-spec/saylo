@@ -38,7 +38,7 @@ export default function OralRecorder({
             <span className="mt-0.5 shrink-0 text-sm font-bold text-muted tabular-nums" aria-hidden="true">
               {i + 1}
             </span>
-            <EnglishText as="p" className="font-medium leading-relaxed">
+            <EnglishText as="p" className="min-w-0 flex-1 font-medium leading-relaxed">
               {q}
             </EnglishText>
           </li>

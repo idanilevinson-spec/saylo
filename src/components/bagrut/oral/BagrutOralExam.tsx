@@ -7,7 +7,7 @@ import EnglishText from "@/components/EnglishText";
 import BagrutCredit from "@/components/BagrutCredit";
 import { useNeuralSpeech } from "@/lib/speech/useNeuralSpeech";
 import { pickSimulation, type OralSimulation } from "@/lib/bagrut/oralPick";
-import { examGrade, ORAL_EXAM_MINUTES, formatSeconds, type OralPart } from "@/lib/bagrut/oralRules";
+import { examGrade, ORAL_EXAM_MINUTES, formatSeconds, partName, type OralPart } from "@/lib/bagrut/oralRules";
 import { ORAL_LIMIT_ERROR } from "@/lib/bagrut/oralAllowance";
 import type { PartATopic } from "@/lib/content/bagrutOral";
 import OralRecorder, { type RecordedAnswer } from "./OralRecorder";
@@ -27,9 +27,9 @@ const PART_OF: Record<Step, OralPart | null> = {
 };
 
 const PART_TITLE: Record<OralPart, string> = {
-  A: "חלק A: תגובה אישית",
-  B: "חלק B: הפרויקט שלכם",
-  C: "חלק C: תגובה לקטע שמע",
+  A: `${partName("A")}: תגובה אישית`,
+  B: `${partName("B")}: הפרויקט שלכם`,
+  C: `${partName("C")}: תגובה לקטע שמע`,
 };
 
 // The oral Bagrut simulation (docs/specs/bagrut-oral.md): intro, the three
@@ -149,7 +149,7 @@ export default function BagrutOralExam() {
                     className={`h-1.5 rounded-full ${order < current ? "bg-primary" : order === current ? "bg-primary/60" : "bg-background-2"}`}
                   >
                     <span className="sr-only">
-                      חלק {p}
+                      {partName(p)}
                       {order < current ? ", הושלם" : order === current ? ", עכשיו" : ""}
                     </span>
                   </li>
@@ -262,10 +262,10 @@ function buildSets(
   results: Record<string, SetResult>,
 ): GradedSet[] {
   const rows = [
-    { setId: topicA.id, part: "A" as const, labelHe: `חלק A · ${topicA.topicHe}`, questions: topicA.questions },
-    { setId: sim.partB.id, part: "B" as const, labelHe: "חלק B · הפרויקט", questions: sim.partB.questions },
-    { setId: sim.partC.sets[0].id, part: "C" as const, labelHe: `חלק C · ${sim.partC.titleHe}, קבוצה 1`, questions: sim.partC.sets[0].questions },
-    { setId: sim.partC.sets[1].id, part: "C" as const, labelHe: `חלק C · ${sim.partC.titleHe}, קבוצה 2`, questions: sim.partC.sets[1].questions },
+    { setId: topicA.id, part: "A" as const, labelHe: `${partName("A")} · ${topicA.topicHe}`, questions: topicA.questions },
+    { setId: sim.partB.id, part: "B" as const, labelHe: `${partName("B")} · הפרויקט`, questions: sim.partB.questions },
+    { setId: sim.partC.sets[0].id, part: "C" as const, labelHe: `${partName("C")} · ${sim.partC.titleHe}, קבוצה 1`, questions: sim.partC.sets[0].questions },
+    { setId: sim.partC.sets[1].id, part: "C" as const, labelHe: `${partName("C")} · ${sim.partC.titleHe}, קבוצה 2`, questions: sim.partC.sets[1].questions },
   ];
   return rows
     .filter((r) => answers[r.setId])
@@ -336,9 +336,9 @@ function Intro({ onStart }: { onStart: () => void }) {
       </p>
       <ol className="mt-6 divide-y divide-card-border rounded-lg border border-card-border bg-card">
         {[
-          ["חלק A · 25 נקודות", "שני נושאים אישיים. בוחרים אחד ועונים על השאלות שלו."],
-          ["חלק B · 25 נקודות", "מדברים על הפרויקט שלכם, בין דקה לשתי דקות. מד זמן מראה מתי עברתם את הדקה."],
-          ["חלק C · 50 נקודות", "מקשיבים לקטע קצר ועונים על שתי קבוצות שאלות."],
+          [`${partName("A")} · 25 נקודות`, "שני נושאים אישיים. בוחרים אחד ועונים על השאלות שלו."],
+          [`${partName("B")} · 25 נקודות`, "מדברים על הפרויקט שלכם, בין דקה לשתי דקות. מד זמן מראה מתי עברתם את הדקה."],
+          [`${partName("C")} · 50 נקודות`, "מקשיבים לקטע קצר ועונים על שתי קבוצות שאלות."],
         ].map(([title, body]) => (
           <li key={title} className="px-5 py-4">
             <span className="block font-bold">{title}</span>

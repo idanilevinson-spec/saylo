@@ -81,3 +81,8 @@ describe("examGrade", () => {
 it("formats seconds", () => {
   expect([0, 9, 60, 125].map(formatSeconds)).toEqual(["0:00", "0:09", "1:00", "2:05"]);
 });
+
+it("isolates the part letter inside Hebrew", async () => {
+  const { partName } = await import("./oralRules");
+  expect(partName("A")).toBe("חלק ⁨A⁩");
+});

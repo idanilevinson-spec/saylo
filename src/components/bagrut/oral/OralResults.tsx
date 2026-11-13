@@ -2,7 +2,7 @@
 
 import { AlertTriangle, ArrowLeft, RotateCcw } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
-import { CRITERIA, PART_POINTS, type OralPart } from "@/lib/bagrut/oralRules";
+import { CRITERIA, PART_POINTS, partName, type OralPart } from "@/lib/bagrut/oralRules";
 import type { OralSetFeedback } from "@/lib/bagrut/oralSets";
 import { markChanges } from "@/lib/bagrut/oralPick";
 import type { RecordedAnswer } from "./OralRecorder";
@@ -54,7 +54,7 @@ export default function OralResults({
               : null;
             return (
               <li key={part} className="rounded-lg bg-background-2 px-3 py-2">
-                <span className="font-bold">חלק {part}</span>
+                <span className="font-bold">{partName(part)}</span>
                 <span className="text-muted"> · {PART_POINTS[part]} נקודות</span>
                 <span className="block tabular-nums">
                   {avg === null ? "..." : `${Math.round((avg * PART_POINTS[part]) / 100)} מתוך ${PART_POINTS[part]}`}

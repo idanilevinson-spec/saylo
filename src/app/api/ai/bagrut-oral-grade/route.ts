@@ -77,6 +77,8 @@ export async function POST(request: Request) {
   const raw = extractText(message);
   const feedback = parseOralFeedback(parseJsonResponse<unknown>(raw), set.questions.length);
   if (!feedback) {
+    // Development only: production logs never carry a learner's answer.
+    if (process.env.NODE_ENV === "development") console.warn("bagrut-oral-grade: unusable AI reply", raw.slice(0, 1500));
     await reportAiParseFailure("bagrut-oral-grade", raw);
     return NextResponse.json({ error: "grading failed" }, { status: 502 });
   }

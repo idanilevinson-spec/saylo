@@ -86,3 +86,10 @@ export function formatSeconds(total: number): string {
   const s = Math.max(0, Math.floor(total));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
+
+// "חלק A" inside Hebrew text: the Latin letter is isolated (FSI ... PDI) so a
+// number after it can't pull it out of order ("חלק A · 25 נקודות" otherwise
+// shows as "חלק 25 · A נקודות").
+export function partName(part: OralPart): string {
+  return `חלק ⁨${part}⁩`;
+}
