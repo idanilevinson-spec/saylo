@@ -48,11 +48,13 @@ export default function TrialCarryover() {
     <p role="status" className="mt-4 flex items-start gap-3 rounded-lg border border-card-border bg-card px-4 py-3 text-sm">
       <NotebookPen size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-primary-hover" />
       <span className="flex-1 leading-relaxed">
-        מה שטעיתם בו בשיעור הניסיון כבר מחכה לכם ב
+        {/* A wrong answer comes back the next day (sm2), so the items are
+            not due yet today: say "tomorrow", never "already waiting". */}
+        מה שטעיתם בו בשיעור הניסיון נשמר ב
         <Link href="/mistakes" className="font-bold text-primary-hover underline underline-offset-2">
           מחברת הטעויות
         </Link>
-        , לחזרה בזמן הנכון.
+        , ויחזור אליכם לחזרה מחר.
       </span>
       <button
         type="button"
