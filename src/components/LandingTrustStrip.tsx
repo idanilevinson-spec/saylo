@@ -1,4 +1,5 @@
 import EnglishText from "@/components/EnglishText";
+import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 // The site's one marquee (design-taste-frontend's max-one-per-page rule),
 // spent on the single place it's actually earned: a real news ticker is
@@ -6,7 +7,7 @@ import EnglishText from "@/components/EnglishText";
 // list, not fetched data — motion.div wrapping isn't needed since the
 // CSS animation runs on mount regardless.
 const ITEMS = [
-  "3 ימים חינם, בלי כרטיס אשראי",
+  `${TRIAL_DAYS} ימים חינם, בלי כרטיס אשראי`,
   "מבחן רמה של כ-10 דקות",
   "שש רמות, מ-A1 עד C2",
   "תרגול לבגרות: 3, 4 ו-5 יח״ל",

@@ -10,6 +10,7 @@ import BagrutCredit from "@/components/BagrutCredit";
 import { BAGRUT_MODULE_FORMATS, type BagrutModuleCode } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_SAMPLE_UNITS } from "@/lib/content/bagrut/sampleUnits";
 import { BAGRUT_SKILLS } from "@/lib/content/bagrut/skills";
+import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 // One public page per Bagrut questionnaire (A–G): the verified structure,
 // the skills it tests, and one worked example from the skill lessons, so
@@ -166,7 +167,7 @@ export default async function BagrutModulePage({ params }: { params: Promise<{ m
           </h2>
           <p className="mt-1 text-primary-ink/90">עם שעון באורך הבחינה האמיתית ומעקב אחרי הציון הכי טוב שלכם.</p>
           <Link href="/signup" className="game-press mt-4 inline-flex min-h-12 items-center px-6 rounded-lg bg-background text-foreground font-bold">
-            להתחיל לתרגל, 3 ימים חינם
+            להתחיל לתרגל, {TRIAL_DAYS} ימים חינם
           </Link>
         </section>
 

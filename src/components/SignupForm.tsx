@@ -194,7 +194,7 @@ export default function SignupForm() {
       {/* What happens after this form — the next ten minutes, not a pitch. */}
       <aside className="rise-in lg:order-2 lg:pt-4">
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight">יוצרים חשבון</h1>
-        <p className="mt-2 text-muted text-lg">3 ימים ראשונים חינם, בלי כרטיס אשראי.</p>
+        <p className="mt-2 text-muted text-lg">{TRIAL_DAYS} ימים ראשונים חינם, בלי כרטיס אשראי.</p>
         <ol className="mt-8 hidden lg:block space-y-5">
           {[
             ["חשבון", "דקה אחת. כינוי מספיק, אין צורך בשם מלא."],

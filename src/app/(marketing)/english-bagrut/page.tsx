@@ -9,6 +9,7 @@ import BagrutCredit from "@/components/BagrutCredit";
 import { BAGRUT_MODULE_FORMATS, modulesForUnits, type BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_SAMPLE_UNITS } from "@/lib/content/bagrut/sampleUnits";
 import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/lib/content/bagrut/skills";
+import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 
 // A public, indexable page for people searching for Bagrut English prep.
 // Everything on it comes from the same data the signed-in Bagrut area
@@ -72,7 +73,7 @@ export default function EnglishBagrutPage() {
             href="/signup"
             className="game-press inline-flex items-center gap-2 min-h-12 px-6 rounded-lg bg-primary text-primary-ink font-bold hover:bg-primary-hover transition-[background-color,transform] duration-150"
           >
-            להתחיל לתרגל, 3 ימים חינם
+            להתחיל לתרגל, {TRIAL_DAYS} ימים חינם
           </Link>
           {/* Most visitors land here from Instagram on a phone; let them try a
               short lesson before asking for a sign-up. */}
