@@ -9,7 +9,7 @@ import type { RecordedAnswer } from "./OralRecorder";
 
 export type SetResult =
   | { status: "loading" }
-  | { status: "error"; message: string }
+  | { status: "error"; message: string; retryable: boolean }
   | { status: "ok"; grade: number; lengthDeduction: number; feedback: OralSetFeedback };
 
 export interface GradedSet {
@@ -104,6 +104,7 @@ function SetCard({ set, onRetry }: { set: GradedSet; onRetry: (setId: string) =>
           <p role="alert" className="text-danger-hover">
             {r.message}
           </p>
+{r.retryable && (
           <button
             type="button"
             onClick={() => onRetry(set.setId)}
@@ -111,6 +112,7 @@ function SetCard({ set, onRetry }: { set: GradedSet; onRetry: (setId: string) =>
           >
             <RotateCcw size={14} aria-hidden="true" /> לבדוק שוב
           </button>
+          )}
         </div>
       )}
 

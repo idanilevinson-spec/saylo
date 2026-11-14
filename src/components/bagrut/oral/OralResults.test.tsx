@@ -20,7 +20,7 @@ const base: Omit<GradedSet, "setId" | "part" | "labelHe" | "result"> = {
 const sets: GradedSet[] = [
   { ...base, setId: "a", part: "A", labelHe: "A", result: { status: "ok", grade: 80, lengthDeduction: 0, feedback } },
   { ...base, setId: "b", part: "B", labelHe: "B", result: { status: "ok", grade: 49, lengthDeduction: 0.1, feedback } },
-  { ...base, setId: "c1", part: "C", labelHe: "C1", result: { status: "error", message: "לא הצלחנו לבדוק" } },
+  { ...base, setId: "c1", part: "C", labelHe: "C1", result: { status: "error", message: "לא הצלחנו לבדוק", retryable: true } },
   { ...base, setId: "c2", part: "C", labelHe: "C2", result: { status: "loading" } },
 ];
 
@@ -42,6 +42,11 @@ describe("OralResults", () => {
   it("marks only what changed in the improved answer", () => {
     expect(html).toMatch(/<mark[^>]*>\[one<\/mark>/);
     expect(html).not.toMatch(/<mark[^>]*>project<\/mark>/);
+  });
+
+  it("offers no retry when the problem is the daily limit", () => {
+    const limited = [{ ...sets[2], result: { status: "error" as const, message: "הגעתם למספר הסימולציות ליום", retryable: false } }];
+    expect(renderToStaticMarkup(<OralResults sets={limited} examGrade={null} onRetry={() => {}} />)).not.toContain("לבדוק שוב");
   });
 
   it("states that it is an estimate, not an official grade", () => {
