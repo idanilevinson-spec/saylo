@@ -134,4 +134,45 @@ describe("POST /api/ai/bagrut-oral-grade", () => {
     counts.ever = 4;
     expect(await (await GET()).json()).toEqual({ available: false, trial: true });
   });
+
+  const withBadNote = {
+    ...reply,
+    notesHe: { ...reply.notesHe, vocabulary: "יש שימוש טוב ב-'repair'. אוצר המילים בסיסי." },
+  };
+
+  it("sends a note that quotes a word never said to one fix, and keeps the scores", async () => {
+    createMessage
+      .mockResolvedValueOnce({ text: JSON.stringify(withBadNote), usage: { input_tokens: 1, output_tokens: 1 } })
+      .mockResolvedValueOnce({
+        text: JSON.stringify({ notesHe: { vocabulary: "אוצר המילים בסיסי ומדויק." } }),
+        usage: { input_tokens: 2, output_tokens: 2 },
+      });
+    const json = await (await post({ setId: "a-food", transcript: "I like pasta.", seconds: 20 })).json();
+    expect(createMessage).toHaveBeenCalledTimes(2);
+    expect(createMessage.mock.calls[1][0].messages[0].content).toContain("'repair' does not appear in the answer");
+    expect(json.feedback.notesHe.vocabulary).toBe("אוצר המילים בסיסי ומדויק.");
+    expect(json.grade).toBe(100);
+    expect(logAiUsage).toHaveBeenCalledWith(expect.anything(), "u1", "bagrut_oral_review", 2, 2);
+  });
+
+  it("needs no second call when the notes keep the rules", async () => {
+    await post({ setId: "a-food", transcript: "I like pasta.", seconds: 20 });
+    expect(createMessage).toHaveBeenCalledTimes(1);
+  });
+
+  it("cuts the false sentence when the fix fails", async () => {
+    createMessage
+      .mockResolvedValueOnce({ text: JSON.stringify(withBadNote), usage: { input_tokens: 1, output_tokens: 1 } })
+      .mockRejectedValueOnce(new Error("overloaded"));
+    const res = await post({ setId: "a-food", transcript: "I like pasta.", seconds: 20 });
+    expect(res.status).toBe(200);
+    expect((await res.json()).feedback.notesHe.vocabulary).toBe("אוצר המילים בסיסי.");
+  });
+
+  it("drops a 'Hebrew-speaker mistake' that isn't in the transcript", async () => {
+    const withPattern = { ...reply, patterns: [{ said: "I am agree", better: "I agree", whyHe: "x" }] };
+    createMessage.mockResolvedValue({ text: JSON.stringify(withPattern), usage: { input_tokens: 1, output_tokens: 1 } });
+    const json = await (await post({ setId: "a-food", transcript: "I agree that pasta is good.", seconds: 20 })).json();
+    expect(json.feedback.patterns).toEqual([]);
+  });
 });

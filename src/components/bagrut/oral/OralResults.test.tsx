@@ -10,6 +10,7 @@ const feedback = {
   missedQuestions: [1],
   nextLevelAnswer: "So, my project is about bees in my city. [one example of something new you learned about bees]",
   patterns: [{ said: "I am agree with him", better: "I agree with him", whyHe: "בעברית אומרים 'אני מסכים', ובאנגלית 'I agree'." }],
+  words: { usedWell: ["archive"], repeated: [{ phrase: "things", times: 3 }], tryNext: ["community"] },
 };
 
 const base: Omit<GradedSet, "setId" | "part" | "labelHe" | "result"> = {
@@ -47,6 +48,12 @@ describe("OralResults", () => {
   it("offers no retry when the problem is the daily limit", () => {
     const limited = [{ ...sets[2], result: { status: "error" as const, message: "הגעתם למספר הסימולציות ליום", retryable: false } }];
     expect(renderToStaticMarkup(<OralResults sets={limited} examGrade={null} onRetry={() => {}} />)).not.toContain("לבדוק שוב");
+  });
+
+  it("shows the checked word lists under vocabulary", () => {
+    expect(html).toContain("השתמשתם יפה ב");
+    expect(html).toContain("things (3)");
+    expect(html).toContain("community");
   });
 
   it("states that it is an estimate, not an official grade", () => {

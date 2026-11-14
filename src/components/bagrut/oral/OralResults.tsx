@@ -157,6 +157,7 @@ function SetCard({ set, onRetry }: { set: GradedSet; onRetry: (setId: string) =>
                     />
                   </div>
                   <p className="mt-1.5 text-sm leading-relaxed text-muted">{r.feedback.notesHe[c.key]}</p>
+                  {c.key === "vocabulary" && <WordLists words={r.feedback.words} />}
                 </dd>
               </div>
             ))}
@@ -203,5 +204,30 @@ function SetCard({ set, onRetry }: { set: GradedSet; onRetry: (setId: string) =>
         </>
       )}
     </section>
+  );
+}
+
+// Every word here was checked against the transcript in code (oralVerify.ts):
+// used words were said, repeated counts are real, suggestions are new.
+function WordLists({ words }: { words: OralSetFeedback["words"] }) {
+  const rows: { label: string; items: string[] }[] = [
+    { label: "השתמשתם יפה ב", items: words.usedWell },
+    { label: "חזרתם כמה פעמים על", items: words.repeated.map((r) => `${r.phrase} (${r.times})`) },
+    { label: "כדאי לנסות גם", items: words.tryNext },
+  ].filter((row) => row.items.length);
+  if (!rows.length) return null;
+  return (
+    <dl className="mt-2 space-y-1.5 text-sm">
+      {rows.map((row) => (
+        <div key={row.label} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <dt className="text-muted">{row.label}:</dt>
+          {row.items.map((w) => (
+            <dd key={w}>
+              <EnglishText className="rounded-md bg-background-2 px-1.5 py-0.5">{w}</EnglishText>
+            </dd>
+          ))}
+        </div>
+      ))}
+    </dl>
   );
 }
