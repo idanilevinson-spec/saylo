@@ -32,6 +32,13 @@ export interface OralSetFeedback {
   missedQuestions: number[];
   nextLevelAnswer: string;
   patterns: { said: string; better: string; whyHe: string }[];
+  // Word-level claims as lists, so code can check each one against the
+  // transcript (oralVerify.ts) instead of trusting free text.
+  words: {
+    usedWell: string[];
+    repeated: { phrase: string; times: number }[];
+    tryNext: string[];
+  };
 }
 
 const MAX_NOTE = 400;
@@ -78,5 +85,17 @@ export function parseOralFeedback(raw: unknown, questionCount: number): OralSetF
         .slice(0, 3)
     : [];
 
-  return { scores, notesHe, missedQuestions, nextLevelAnswer, patterns };
+  const w = (r.words && typeof r.words === "object" ? r.words : {}) as Record<string, unknown>;
+  const list = (v: unknown) =>
+    Array.isArray(v)
+      ? [...new Set(v.filter((x): x is string => typeof x === "string").map((x) => x.trim().slice(0, 40)).filter(Boolean))].slice(0, 5)
+      : [];
+  const words = {
+    usedWell: list(w.usedWell),
+    // The count is set from the transcript in oralVerify.ts, never by the AI.
+    repeated: list(w.repeated).map((phrase) => ({ phrase, times: 0 })),
+    tryNext: list(w.tryNext),
+  };
+
+  return { scores, notesHe, missedQuestions, nextLevelAnswer, patterns, words };
 }

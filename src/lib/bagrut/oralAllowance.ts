@@ -4,6 +4,8 @@
 // cost money counts too; the allowance has one set of slack per simulation
 // for that.
 export const ORAL_GRADE_FEATURE = "bagrut_oral_grade";
+// The proofreading pass after each grade; logged for cost, never counted.
+export const ORAL_REVIEW_FEATURE = "bagrut_oral_review";
 export const SETS_PER_SIMULATION = 4;
 // Paid: two simulations in any 24 hours. Trial: one simulation, ever.
 export const PAID_SETS_PER_DAY = 2 * SETS_PER_SIMULATION + 2;

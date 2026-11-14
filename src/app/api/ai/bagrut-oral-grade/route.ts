@@ -2,13 +2,16 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
 import { anthropic, CLAUDE_MODEL, extractText, parseJsonResponse } from "@/lib/ai/claudeClient";
 import { buildBagrutOralGradePrompt } from "@/lib/ai/prompts/bagrutOralGrade";
+import { buildBagrutOralFixPrompt } from "@/lib/ai/prompts/bagrutOralReview";
+import { mergeFixedNotes } from "@/lib/bagrut/oralReview";
+import { keepPatternsFromTranscript, noteProblems, stripProblemSentences, verifyWords } from "@/lib/bagrut/oralVerify";
 import { logAiUsage } from "@/lib/ai/usageLog";
 import { reportAiParseFailure } from "@/lib/ai/reportParseFailure";
 import { AI_CONSENT_REQUIRED_ERROR, hasAiConsent } from "@/lib/ai/consent";
 import { isPaidServer, isPremiumServer } from "@/lib/subscriptions/requirePremium";
 import { parseOralFeedback, resolveSet } from "@/lib/bagrut/oralSets";
 import { MAX_ANSWER_SECONDS, partBLengthDeduction, setGrade } from "@/lib/bagrut/oralRules";
-import { ORAL_GRADE_FEATURE, ORAL_LIMIT_ERROR, oralGradeAllowed, oralSimulationAvailable } from "@/lib/bagrut/oralAllowance";
+import { ORAL_GRADE_FEATURE, ORAL_LIMIT_ERROR, ORAL_REVIEW_FEATURE, oralGradeAllowed, oralSimulationAvailable } from "@/lib/bagrut/oralAllowance";
 
 const MAX_TRANSCRIPT_CHARS = 4000;
 const MAX_TOPIC_CHARS = 120;
@@ -102,13 +105,35 @@ export async function POST(request: Request) {
   await logAiUsage(supabase, user.id, ORAL_GRADE_FEATURE, message.usage.input_tokens, message.usage.output_tokens);
 
   const raw = extractText(message);
-  const feedback = parseOralFeedback(parseJsonResponse<unknown>(raw), set.questions.length);
-  if (!feedback) {
+  const draft = parseOralFeedback(parseJsonResponse<unknown>(raw), set.questions.length);
+  if (!draft) {
     // Development only: production logs never carry a learner's answer.
     if (process.env.NODE_ENV === "development") console.warn("bagrut-oral-grade: unusable AI reply", raw.slice(0, 1500));
     await reportAiParseFailure("bagrut-oral-grade", raw);
     return NextResponse.json({ error: "grading failed" }, { status: 502 });
   }
+
+  // Word claims and patterns are made true by code; notes that break the
+  // rules (English only as quotes from the answer, no repetition claims) go
+  // to one targeted rewrite, and whatever still breaks them is cut.
+  let feedback = keepPatternsFromTranscript(verifyWords(draft, transcript), transcript);
+  const problems = noteProblems(feedback, transcript);
+  const keys = Object.keys(problems) as (keyof typeof problems)[];
+  if (keys.length) {
+    try {
+      const fix = await anthropic.messages.create({
+        model: CLAUDE_MODEL,
+        max_tokens: 1200,
+        thinking: { type: "disabled" },
+        messages: [{ role: "user", content: buildBagrutOralFixPrompt(transcript, feedback.notesHe, problems) }],
+      });
+      await logAiUsage(supabase, user.id, ORAL_REVIEW_FEATURE, fix.usage.input_tokens, fix.usage.output_tokens);
+      feedback = mergeFixedNotes(feedback, parseJsonResponse<unknown>(extractText(fix)), keys);
+    } catch (err) {
+      console.error("bagrut-oral-grade: note fix failed", err instanceof Error ? err.message : err);
+    }
+  }
+  feedback = stripProblemSentences(feedback, transcript);
 
   const grade = setGrade(
     Object.entries(feedback.scores).map(([key, score]) => ({ key: key as keyof typeof feedback.scores, score })),
