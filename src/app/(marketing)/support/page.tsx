@@ -3,6 +3,7 @@ import Link from "next/link";
 import LegalPage, { EmailLink, LegalSection } from "@/components/LegalPage";
 import OpenSupportButton from "@/components/support/OpenSupportButton";
 import { siteOpenGraph } from "@/lib/og/meta";
+import { TRIAL_TEACHER_CONVERSATIONS, TRIAL_TEACHER_MESSAGES } from "@/lib/subscriptions/teacherTrial";
 
 const DESCRIPTION = "עזרה ב-Saylo: יצירת קשר, ביטול מנוי, מחיקת חשבון, ותשובות לשאלות נפוצות על המורה, הניסיון והחשבון.";
 
@@ -64,7 +65,7 @@ export default function SupportPage() {
         </p>
         <p>
           <strong className="text-foreground">השיחה עם מורה ה-AI לא זמינה לי.</strong> בתקופת הניסיון אפשר
-          לנסות את המורה ב-2 שיחות, עד 12 הודעות בכל אחת, ואחר כך השיחה זמינה במנוי בתשלום. יש גם מגבלת שימוש הוגן, כמפורט ב
+          לנסות את המורה ב-{TRIAL_TEACHER_CONVERSATIONS} שיחות, עד {TRIAL_TEACHER_MESSAGES} הודעות בכל אחת, ואחר כך השיחה זמינה במנוי בתשלום. יש גם מגבלת שימוש הוגן, כמפורט ב
           <Link href="/terms" className={linkClass}>
             תנאי השימוש
           </Link>
