@@ -9,6 +9,7 @@ import { Capacitor } from "@capacitor/core";
 import EnglishText from "@/components/EnglishText";
 import { useAuth } from "@/context/AuthProvider";
 import { PRICING_PLANS, TRIAL_DAYS, monthlyEquivalent, type PricingPlan } from "@/lib/subscriptions/plans";
+import { TRIAL_TEACHER_CONVERSATIONS, TRIAL_TEACHER_MESSAGES } from "@/lib/subscriptions/teacherTrial";
 import {
   BUSINESS_ADDRESS,
   BUSINESS_NAME,
@@ -254,7 +255,7 @@ export default function PricingCards() {
           )}
           <p className="mt-3 text-xs text-muted leading-relaxed">
             שימוש הוגן: עד {DAILY_CONVERSATION_LIMIT} שיחות חדשות עם המורה ועד {DAILY_WRITING_LIMIT} הגשות כתיבה בכל 24 שעות.
-            בניסיון החינם אפשר לנסות את המורה ב-2 שיחות, עד 12 הודעות בכל אחת. שיחה בלי הגבלה זמינה במנוי בתשלום.
+            בניסיון החינם אפשר לנסות את המורה ב-{TRIAL_TEACHER_CONVERSATIONS} שיחות, עד {TRIAL_TEACHER_MESSAGES} הודעות בכל אחת. שיחה בלי הגבלה זמינה במנוי בתשלום.
           </p>
         </motion.div>
       </div>

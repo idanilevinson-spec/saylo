@@ -3,6 +3,7 @@ import Link from "next/link";
 import LegalPage, { BusinessDetails, LegalSection, LegalList } from "@/components/LegalPage";
 import { BUSINESS_NAME, BUSINESS_TYPE, DAILY_CONVERSATION_LIMIT, DAILY_WRITING_LIMIT } from "@/lib/legal/siteInfo";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
+import { TRIAL_TEACHER_CONVERSATIONS, TRIAL_TEACHER_MESSAGES } from "@/lib/subscriptions/teacherTrial";
 import { siteOpenGraph } from "@/lib/og/meta";
 
 const DESCRIPTION = "תנאי השימוש ב-Saylo: החשבון, ניסיון חינם, מנוי ותשלום, שימוש הוגן במורה ה-AI, גיל וקטינים, וזכויות ואחריות.";
@@ -56,7 +57,7 @@ export default function TermsPage() {
       <LegalSection title="ניסיון חינם">
         <p>
           כל חשבון חדש מקבל {TRIAL_DAYS} ימי ניסיון חינם, בלי כרטיס אשראי ובלי חיוב אוטומטי בסופם. הניסיון כולל את
-          תכונות המנוי. השיחה עם מורה ה-AI, בטקסט ובקול, כלולה בניסיון בהיקף של 2 שיחות, עד 12 הודעות בכל שיחה, ובלי
+          תכונות המנוי. השיחה עם מורה ה-AI, בטקסט ובקול, כלולה בניסיון בהיקף של {TRIAL_TEACHER_CONVERSATIONS} שיחות, עד {TRIAL_TEACHER_MESSAGES} הודעות בכל שיחה, ובלי
           הגבלה זו במנוי בתשלום.
         </p>
         <p>
