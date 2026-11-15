@@ -2,6 +2,8 @@ import { PRICING_PLANS, TRIAL_DAYS, monthlyEquivalent } from "@/lib/subscription
 import { CONTACT_EMAIL, DAILY_CONVERSATION_LIMIT, DAILY_WRITING_LIMIT } from "@/lib/legal/siteInfo";
 import { MAX_FREEZES, FREEZE_EARN_INTERVAL_DAYS } from "@/lib/gamification/streakRules";
 import { REGEN_INTERVAL_MS } from "@/lib/subscriptions/hearts";
+import { ORAL_EXAM_MINUTES } from "@/lib/bagrut/oralRules";
+import { PAID_SIMULATIONS_PER_DAY, TRIAL_SIMULATIONS } from "@/lib/bagrut/oralAllowance";
 
 // Everything the support assistant is allowed to state as fact about Saylo.
 // The system prompt tells it to answer only from this text (plus the
@@ -42,6 +44,7 @@ Saylo היא פלטפורמה ללימוד אנגלית לדוברי עברית,
 - [משחקים](/games) ו[טבלת המובילים](/games/leaderboard) השבועית.
 - [התקדמות](/progress): שבוע, חודש, מתחילת הדרך.
 - [בגרות](/bagrut): תרגול בפורמט של בחינת הבגרות באנגלית.
+- [בגרות בעל פה](/bagrut/oral): סימולציה של הבחינה הממוחשבת בעל פה של 4 ו-5 יחידות, ${ORAL_EXAM_MINUTES} דקות, באותו מבנה: חלק A (שאלות אישיות), חלק B (הפרויקט, דקה עד שתי דקות) וחלק C (קטע להאזנה ושתי קבוצות שאלות). מקליטים תשובות בקול, ומקבלים ציון משוער לפי ארבעת הקריטריונים של המחוון, מה להוסיף בכל חלק ואת התשובה ברמה הבאה. בתקופת הניסיון: ${TRIAL_SIMULATIONS === 1 ? "סימולציה אחת" : `${TRIAL_SIMULATIONS} סימולציות`}. במנוי: עד ${PAID_SIMULATIONS_PER_DAY} סימולציות ביום. זו הערכה של AI, לא ציון של בוחן ולא תחזית לציון האמיתי. השאלות נכתבו על ידי Saylo ואינן שאלות של משרד החינוך. צריך מיקרופון והסכמה לשימוש ב-AI (ולמי שמתחת לגיל 18, הסכמת הורה). ההקלטות לא נשמרות.
 - [פרופיל](/profile): מנוי, ביטול מנוי, התראות, מחיקת חשבון.
 - [מסלולים ומחירים](/pricing), [תמיכה](/support), [תנאי שימוש](/terms), [ביטולים והחזרים](/refunds), [מדיניות פרטיות](/privacy), [הצהרת נגישות](/accessibility).
 - [הרשמה](/signup), [התחברות](/login), [איפוס סיסמה](/reset-password).
@@ -53,7 +56,7 @@ Saylo היא פלטפורמה ללימוד אנגלית לדוברי עברית,
 - [נושאים לחיבור](/english-writing): משימות כתיבה לפי רמה (הכתיבה והמשוב באפליקציה).
 - [ביטויים באנגלית](/english-idioms): ביטויים ופעלים מורכבים לפי רמה, עם פירוש בעברית ומשפט לדוגמה.
 - [מה לומדים בכל רמה](/english-level-test): מבחן הרמה והסבר על הרמות A1 עד C2.
-- [הכנה לבגרות](/english-bagrut): מבנה כל שאלון (A עד G) ומה הוא בודק.
+- [הכנה לבגרות](/english-bagrut): מבנה כל שאלון (A עד G) ומה הוא בודק, ומבנה הבחינה בעל פה.
 התרגול עצמו, החזרה החכמה, המורה והמעקב אחרי ההתקדמות נמצאים באפליקציה, אחרי הרשמה.
 
 # תקופת ניסיון

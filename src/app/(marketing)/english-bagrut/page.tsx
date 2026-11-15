@@ -10,6 +10,14 @@ import { BAGRUT_MODULE_FORMATS, modulesForUnits, type BagrutStudyUnits } from "@
 import { BAGRUT_SAMPLE_UNITS } from "@/lib/content/bagrut/sampleUnits";
 import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/lib/content/bagrut/skills";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
+import { ORAL_EXAM_MINUTES, PART_POINTS, partName, type OralPart } from "@/lib/bagrut/oralRules";
+import { PAID_SIMULATIONS_PER_DAY, TRIAL_SIMULATIONS } from "@/lib/bagrut/oralAllowance";
+
+const ORAL_PARTS: [OralPart, string][] = [
+  ["A", "שני נושאים אישיים. בוחרים אחד ועונים על השאלות שלו."],
+  ["B", "מדברים על הפרויקט שלכם, בין דקה לשתי דקות. מד זמן מראה מתי עברתם את הדקה."],
+  ["C", "מקשיבים לקטע קצר ועונים על שתי קבוצות שאלות."],
+];
 
 // A public, indexable page for people searching for Bagrut English prep.
 // Everything on it comes from the same data the signed-in Bagrut area
@@ -17,7 +25,7 @@ import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
 // practice sets. Nothing here is a promise the product doesn't keep.
 
 const DESCRIPTION =
-  "מבנה כל שאלון בבגרות באנגלית (A עד G), מיומנויות עם דוגמה פתורה, וערכות תרגול באותו מבנה, עם שעון באורך הבחינה. לפי 3, 4 ו-5 יחידות לימוד.";
+  "מבנה כל שאלון בבגרות באנגלית (A עד G), מיומנויות עם דוגמה פתורה, וערכות תרגול באותו מבנה, עם שעון באורך הבחינה. לפי 3, 4 ו-5 יחידות לימוד, וגם סימולציה של הבגרות בעל פה.";
 
 export const metadata: Metadata = {
   title: "הכנה לבגרות באנגלית: 3, 4 ו-5 יח״ל | Saylo",
@@ -41,6 +49,10 @@ const FAQ: { q: string; a: string }[] = [
   {
     q: "אפשר לתרגל בזמן אמיתי של בחינה?",
     a: "כן. בכל ערכת תרגול אפשר להפעיל שעון באורך השאלון האמיתי, כדי לתרגל גם את חלוקת הזמן.",
+  },
+  {
+    q: "אפשר לתרגל את הבגרות בעל פה?",
+    a: `כן, ב-4 וב-5 יח״ל. באפליקציה יש סימולציה של הבחינה הממוחשבת בעל פה: ${ORAL_EXAM_MINUTES} דקות, שלושה חלקים באותו מבנה, הקלטה בקול, וציון משוער לפי המחוון עם מה לשפר בכל חלק. זו הערכה של AI, לא ציון של בוחן.`,
   },
   {
     q: "איך יודעים באיזה מסלול להתחיל?",
@@ -134,6 +146,35 @@ export default function EnglishBagrutPage() {
               </article>
             ))}
           </div>
+        </section>
+
+        {/* The oral exam (COBE): 20% of the final grade in 4 and 5 points,
+            and the one part only the app's own simulation practises. Every
+            fact here is the same one the simulation's intro screen states. */}
+        <section aria-labelledby="oral" className="mt-14">
+          <h2 id="oral" className="text-2xl sm:text-3xl font-black tracking-tight">
+            בגרות בעל פה, 4 ו-5 יח״ל
+          </h2>
+          <p className="mt-2 max-w-2xl text-muted leading-relaxed">
+            הבחינה הממוחשבת בעל פה שווה 20% מהציון הסופי. באפליקציה יש סימולציה שלה: {ORAL_EXAM_MINUTES} דקות באותו מבנה,
+            מקליטים את התשובות בקול, ובסוף מקבלים ציון משוער לפי ארבעת הקריטריונים של המחוון, מה להוסיף בכל חלק ואת התשובה
+            שלכם עצמה ברמה הבאה.
+          </p>
+          <ol className="lit-plate mt-5 grid gap-px overflow-hidden rounded-lg border border-card-border bg-card-border sm:grid-cols-3">
+            {ORAL_PARTS.map(([part, body]) => (
+              <li key={part} className="bg-card p-4">
+                <p className="flex items-baseline justify-between gap-2">
+                  <span className="chyron text-2xl">{partName(part)}</span>
+                  <span className="text-sm text-muted tabular-nums">{PART_POINTS[part]} נק׳</span>
+                </p>
+                <p className="mt-1.5 text-sm leading-relaxed">{body}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-3 text-sm text-muted leading-relaxed">
+            זו סימולציה של Saylo, לא בחינה רשמית. הציון הוא הערכה של AI, לא ציון של בוחן. השאלות והקטעים נכתבו על ידינו
+            ואינם שאלות של משרד החינוך. בתקופת הניסיון: {TRIAL_SIMULATIONS === 1 ? "סימולציה אחת" : `${TRIAL_SIMULATIONS} סימולציות`}. במנוי: עד {PAID_SIMULATIONS_PER_DAY} סימולציות ביום.
+          </p>
         </section>
 
         {/* Skills */}

@@ -8,8 +8,11 @@ export const ORAL_GRADE_FEATURE = "bagrut_oral_grade";
 export const ORAL_REVIEW_FEATURE = "bagrut_oral_review";
 export const SETS_PER_SIMULATION = 4;
 // Paid: two simulations in any 24 hours. Trial: one simulation, ever.
-export const PAID_SETS_PER_DAY = 2 * SETS_PER_SIMULATION + 2;
-export const TRIAL_SETS_TOTAL = SETS_PER_SIMULATION + 1;
+// The public Bagrut page and the support assistant quote these two numbers.
+export const PAID_SIMULATIONS_PER_DAY = 2;
+export const TRIAL_SIMULATIONS = 1;
+export const PAID_SETS_PER_DAY = PAID_SIMULATIONS_PER_DAY * SETS_PER_SIMULATION + 2;
+export const TRIAL_SETS_TOTAL = TRIAL_SIMULATIONS * SETS_PER_SIMULATION + 1;
 
 export function oralGradeAllowed(opts: { paid: boolean; usedLast24h: number; usedEver: number }): boolean {
   return opts.paid ? opts.usedLast24h < PAID_SETS_PER_DAY : opts.usedEver < TRIAL_SETS_TOTAL;
