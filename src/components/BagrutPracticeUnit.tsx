@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ArrowUp,
   ArrowDown,
+  RotateCcw,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
@@ -27,6 +28,15 @@ import BagrutCredit from "@/components/BagrutCredit";
 import { optionOrder } from "@/lib/utils/shuffle";
 import { withoutAnswerLetter } from "@/lib/content/bagrut/answerLetter";
 import { paragraphRef, splitParagraphs } from "@/lib/content/bagrut/studyHelpers";
+import {
+  clearDraft,
+  draftKey,
+  loadDraftRaw,
+  parseDraft,
+  saveDraft,
+  summarizeMarks,
+  type SelfMark,
+} from "@/lib/content/bagrut/setDraft";
 import type { BagrutModuleFormat } from "@/lib/content/bagrut/moduleFormats";
 
 interface BagrutPracticeUnitProps {
@@ -35,22 +45,25 @@ interface BagrutPracticeUnitProps {
   nextUnit?: { slug: string; titleHe: string } | null;
 }
 
-// Self-check, not auto-graded: multiple-choice reveals correct/incorrect on
-// selection; open and sentence-completion questions reveal a model answer
-// on demand (there's no automated grading for free text here — that would
-// need an AI call this v1 deliberately doesn't add, see
-// docs/specs/bagrut-track.md §6). The writing task is just a counted
-// textarea, not submitted or graded anywhere.
-// Multiple-choice questions are the only ones with a right answer to count,
-// so they're what a practice set's score is made of. Keyed by section so the
-// same index in two sections doesn't collide.
-function mcKeys(unit: BagrutSampleUnit): string[] {
-  const keys: string[] = [];
-  unit.listeningTask?.questions.forEach((q, i) => q.options && keys.push(`L${i}`));
-  unit.readingQuestions.forEach((q, i) => q.options && keys.push(`R${i}`));
-  unit.vocabularyQuestions?.forEach((q, i) => q.options && keys.push(`V${i}`));
-  return keys;
+type Question = BagrutReadingQuestion | BagrutVocabularyQuestion;
+
+// Every question in the set with a stable key per section ("L0", "R3",
+// "V1"), so the same index in two sections doesn't collide and a saved
+// draft finds its answers again.
+function allQuestions(unit: BagrutSampleUnit): { key: string; q: Question }[] {
+  return [
+    ...(unit.listeningTask?.questions ?? []).map((q, i) => ({ key: `L${i}`, q })),
+    ...unit.readingQuestions.map((q, i) => ({ key: `R${i}`, q })),
+    ...(unit.vocabularyQuestions ?? []).map((q, i) => ({ key: `V${i}`, q })),
+  ];
 }
+
+// Self-check, not auto-graded: multiple-choice reveals correct/incorrect on
+// selection, and those are what the saved score is made of. Open and
+// sentence-completion questions reveal a model answer on demand, and the
+// learner rates their own answer against it (shown back to them, never
+// added to the saved score). The writing task is a counted textarea, not
+// submitted or graded anywhere. See docs/specs/bagrut-track.md §6.
 
 const paragraphId = (passage: number, paragraph: number) => `passage-${passage}-p${paragraph}`;
 
@@ -67,20 +80,50 @@ function goTo(id: string) {
 export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPracticeUnitProps) {
   const isLiterature = unit.moduleCode === "D";
   const { profile } = useAuth();
-  const [results, setResults] = useState<Record<string, boolean>>({});
+  // Every answer lives here rather than in the question cards, so the set
+  // can be kept as a draft in this browser and restored on return.
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [marks, setMarks] = useState<Record<string, SelfMark>>({});
+  const [writing, setWriting] = useState("");
+  const [restored, setRestored] = useState(false);
+  const [draftReady, setDraftReady] = useState(false);
+  // Bumped by "start over" so every card also forgets what it had opened.
+  const [round, setRound] = useState(0);
   // The question a learner jumped up to the text from, so one tap brings
   // them back to it instead of a long scroll down.
   const [returnTo, setReturnTo] = useState<{ id: string; label: string } | null>(null);
   const savedRef = useRef(false);
-  const keys = mcKeys(unit);
-  const answered = keys.filter((k) => k in results).length;
-  const correct = keys.filter((k) => results[k]).length;
-  const finished = keys.length > 0 && answered === keys.length;
+
+  const questions = allQuestions(unit);
+  const mc = questions.filter(({ q }) => q.options);
+  const openCount = questions.length - mc.length;
+  const answered = mc.filter(({ key }) => key in answers).length;
+  const correct = mc.filter(({ key, q }) => answers[key] === q.correctOptionIndex).length;
+  const finished = mc.length > 0 && answered === mc.length;
   const paragraphs = unit.readingPassages.map(splitParagraphs);
   const counts = paragraphs.map((p) => p.length);
+  const draftId = draftKey(unit.moduleCode, unit.unitSlug);
+  const selfMarks = summarizeMarks(marks);
+  const marked = selfMarks.right + selfMarks.partial + selfMarks.wrong;
 
-  function record(key: string, isCorrect: boolean) {
-    setResults((r) => (key in r ? r : { ...r, [key]: isCorrect }));
+  function choose(key: string, index: number) {
+    setAnswers((a) => (key in a ? a : { ...a, [key]: index }));
+  }
+
+  function rate(key: string, value: SelfMark) {
+    setMarks((m) => ({ ...m, [key]: value }));
+  }
+
+  function startOver() {
+    clearDraft(draftId);
+    // A new attempt is saved again when it's finished.
+    savedRef.current = false;
+    setAnswers({});
+    setMarks({});
+    setWriting("");
+    setRestored(false);
+    setRound((r) => r + 1);
+    goTo("how-title");
   }
 
   function toText(fromId: string, label: string, target: string) {
@@ -88,12 +131,42 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
     goTo(target);
   }
 
+  // Once, after the first render (localStorage doesn't exist on the
+  // server): bring back a set left in the middle.
+  useEffect(() => {
+    const all = allQuestions(unit);
+    const draft = parseDraft(loadDraftRaw(draftId), {
+      optionCounts: Object.fromEntries(all.filter(({ q }) => q.options).map(({ key, q }) => [key, q.options!.length])),
+      openKeys: all.filter(({ q }) => !q.options).map(({ key }) => key),
+      hasWriting: !!unit.writingTask,
+    });
+    /* eslint-disable react-hooks/set-state-in-effect -- restoring from
+       browser storage can only happen after mount; doing it during render
+       would make the server and browser HTML differ. */
+    if (draft) {
+      setAnswers(draft.answers);
+      setMarks(draft.marks);
+      setWriting(draft.writing);
+      setRestored(true);
+    }
+    setDraftReady(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [draftId, unit]);
+
+  // Kept after every change until the set is finished; then cleared, so
+  // the next attempt starts fresh (the score itself is saved below).
+  useEffect(() => {
+    if (!draftReady) return;
+    if (finished) clearDraft(draftId);
+    else saveDraft(draftId, { answers, marks, writing });
+  }, [draftReady, finished, draftId, answers, marks, writing]);
+
   // Saved once, when the last multiple-choice question is answered. Doing a
   // set again keeps the best score and counts the attempt.
   useEffect(() => {
     if (!finished || !profile || savedRef.current) return;
     savedRef.current = true;
-    const percent = Math.round((correct / keys.length) * 100);
+    const percent = Math.round((correct / mc.length) * 100);
     void (async () => {
       const { data: prev } = await supabase
         .from("bagrut_unit_progress")
@@ -107,13 +180,13 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
         module_code: unit.moduleCode,
         unit_slug: unit.unitSlug,
         mc_correct: correct,
-        mc_total: keys.length,
+        mc_total: mc.length,
         best_percent: Math.max(percent, prev?.best_percent ?? 0),
         attempts: (prev?.attempts ?? 0) + 1,
         completed_at: new Date().toISOString(),
       });
     })();
-  }, [finished, profile, correct, keys.length, unit.moduleCode, unit.unitSlug]);
+  }, [finished, profile, correct, mc.length, unit.moduleCode, unit.unitSlug]);
 
   // A reading question gets the paragraph it names (shown in the card) or,
   // when it names none, a way up to the text and back.
@@ -130,13 +203,28 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
     return { kind: "jump", go: () => toText(cardId, label, "passage-0") };
   }
 
+  const card = (key: string, index: number, q: Question, help?: QuestionHelp) => (
+    <QuestionCard
+      key={`${round}-${key}`}
+      id={`q-${key}`}
+      index={index}
+      question={q}
+      help={help}
+      selected={answers[key]}
+      onChoose={(i) => choose(key, i)}
+      mark={marks[key]}
+      onMark={(m) => rate(key, m)}
+    />
+  );
+
   const steps = [
     unit.listeningTask ? "מקשיבים לקטע ועונים על השאלות שלו." : null,
     "קוראים את הקטע. המספרים בשוליים הם מספרי הפסקאות.",
-    "עונים על השאלות. בשאלות עם אפשרויות רואים מיד אם צדקתם; בשאלות הפתוחות כותבים לבד ומשווים לתשובה לדוגמה.",
+    "עונים על השאלות. בשאלות עם אפשרויות רואים מיד אם צדקתם. בשאלות הפתוחות עונים לבד, פותחים את התשובה לדוגמה ומסמנים איך הלך.",
     unit.vocabularyQuestions?.length ? "עונים על שאלות אוצר המילים." : null,
     unit.writingTask ? "כותבים את החיבור. הוא לתרגול עצמי ולא נשלח לבדיקה." : null,
-    keys.length > 0 ? "בסוף מקבלים ציון על השאלות עם האפשרויות, והוא נשמר." : null,
+    mc.length > 0 ? "בסוף מקבלים ציון על השאלות עם האפשרויות, והוא נשמר." : null,
+    "אפשר לעצור באמצע: התשובות נשמרות במכשיר הזה עד שמסיימים.",
   ].filter((s): s is string => s !== null);
 
   return (
@@ -155,8 +243,27 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
         {format.timeMinutes ? ` · בבחינה: ${format.timeMinutes} דקות` : ""}
       </p>
 
+      {restored && (
+        <div
+          role="status"
+          className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-lg border border-primary/40 bg-primary/[0.06] px-4 py-3"
+        >
+          <p className="text-sm font-medium">
+            המשכתם מאיפה שעצרתם: התשובות מהפעם הקודמת שמורות.
+          </p>
+          <button
+            type="button"
+            onClick={startOver}
+            className="inline-flex min-h-10 items-center gap-1.5 rounded text-sm font-bold text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-primary"
+          >
+            <RotateCcw size={15} aria-hidden="true" />
+            להתחיל מחדש
+          </button>
+        </div>
+      )}
+
       <section aria-labelledby="how-title" className="mt-5 rounded-lg bg-background-2 px-5 py-4">
-        <h2 id="how-title" className="text-sm font-bold">
+        <h2 id="how-title" tabIndex={-1} className="text-sm font-bold focus:outline-none">
           איך עובדים עם הערכה
         </h2>
         <ol className="mt-2 space-y-1.5 text-sm leading-relaxed list-decimal ps-5 marker:text-muted marker:font-bold">
@@ -190,11 +297,7 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
           <div className="mt-3 rounded-lg border border-card-border bg-card p-5">
             <ListeningPlayer transcriptEn={unit.listeningTask.transcriptEn} />
           </div>
-          <div className="mt-4 space-y-4">
-            {unit.listeningTask.questions.map((q, i) => (
-              <QuestionCard key={i} id={`q-L${i}`} index={i + 1} question={q} onAnswer={(c) => record(`L${i}`, c)} />
-            ))}
-          </div>
+          <div className="mt-4 space-y-4">{unit.listeningTask.questions.map((q, i) => card(`L${i}`, i + 1, q))}</div>
         </section>
       )}
 
@@ -209,11 +312,7 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
             >
               <div className="text-lg leading-relaxed space-y-4">
                 {paragraphs[passageIndex].map((paragraph, i) => (
-                  <p
-                    key={i}
-                    id={paragraphId(passageIndex, i + 1)}
-                    className="whitespace-pre-line"
-                  >
+                  <p key={i} id={paragraphId(passageIndex, i + 1)} className="whitespace-pre-line">
                     {paragraph}
                   </p>
                 ))}
@@ -224,19 +323,7 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
 
         <h3 className="mt-8 text-base font-bold">שאלות על הקטע</h3>
         <div className="mt-3 space-y-4">
-          {unit.readingQuestions.map((q, i) => {
-            const id = `q-R${i}`;
-            return (
-              <QuestionCard
-                key={i}
-                id={id}
-                index={i + 1}
-                question={q}
-                help={readingHelp(q, id, `לשאלה ${i + 1}`)}
-                onAnswer={(c) => record(`R${i}`, c)}
-              />
-            );
-          })}
+          {unit.readingQuestions.map((q, i) => card(`R${i}`, i + 1, q, readingHelp(q, `q-R${i}`, `לשאלה ${i + 1}`)))}
         </div>
       </section>
 
@@ -245,19 +332,20 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
           <h2 id="vocab-title" className="flex items-center gap-2 text-lg font-bold">
             <BookOpenText size={18} aria-hidden="true" className="text-muted" /> אוצר מילים
           </h2>
-          <div className="mt-3 space-y-4">
-            {unit.vocabularyQuestions.map((q, i) => (
-              <QuestionCard key={i} id={`q-V${i}`} index={i + 1} question={q} onAnswer={(c) => record(`V${i}`, c)} />
-            ))}
-          </div>
+          <div className="mt-3 space-y-4">{unit.vocabularyQuestions.map((q, i) => card(`V${i}`, i + 1, q))}</div>
         </section>
       )}
 
       {unit.writingTask && (
-        <WritingTaskCard promptEn={unit.writingTask.promptEn} wordCountRange={unit.writingTask.wordCountRange} />
+        <WritingTaskCard
+          promptEn={unit.writingTask.promptEn}
+          wordCountRange={unit.writingTask.wordCountRange}
+          value={writing}
+          onChange={setWriting}
+        />
       )}
 
-      {keys.length > 0 && (
+      {mc.length > 0 && (
         <section
           aria-live="polite"
           className={`mt-10 rounded-lg border p-5 ${finished ? "border-primary/40 bg-primary/[0.05]" : "border-card-border bg-card"}`}
@@ -266,13 +354,20 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
             <>
               <p className="flex items-center gap-2 text-lg font-bold">
                 <Trophy size={20} aria-hidden="true" className="text-primary" />
-                {correct} מתוך {keys.length} נכונות
+                {correct} מתוך {mc.length} נכונות
               </p>
               <p className="mt-1 text-sm text-muted leading-relaxed">
                 {profile ? "הציון נשמר. " : ""}
-                את השאלות הפתוחות ואת הכתיבה בודקים לבד מול התשובה לדוגמה.
+                הציון הוא על השאלות עם האפשרויות.
               </p>
-              {correct / keys.length < 0.6 && (
+              {openCount > 0 && (
+                <p className="mt-1 text-sm leading-relaxed">
+                  {marked > 0
+                    ? `בשאלות הפתוחות (${marked} מתוך ${openCount} סומנו): נכונות ${selfMarks.right} · חלקיות ${selfMarks.partial} · לא נכונות ${selfMarks.wrong}.`
+                    : `יש בערכה ${openCount} שאלות פתוחות: אחרי שעונים, פותחים את התשובה לדוגמה ומסמנים איך הלך.`}
+                </p>
+              )}
+              {correct / mc.length < 0.6 && (
                 <p className="mt-2 text-sm leading-relaxed">
                   זה בסדר, בשביל זה מתרגלים. כדאי לקרוא את ההסבר ליד כל שאלה שטעיתם בה, ואחר כך לחזור על הערכה. נשמר
                   הציון הכי טוב שלכם.
@@ -288,6 +383,14 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
                     <ChevronLeft size={17} aria-hidden="true" />
                   </Link>
                 )}
+                <button
+                  type="button"
+                  onClick={startOver}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-card-border px-5 font-bold hover:bg-background-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                >
+                  <RotateCcw size={16} aria-hidden="true" />
+                  לנסות שוב את הערכה
+                </button>
                 <Link
                   href={`/bagrut/${unit.moduleCode}`}
                   className="inline-flex min-h-12 items-center justify-center rounded-lg border border-card-border px-5 font-bold hover:bg-background-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
@@ -298,7 +401,7 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
             </>
           ) : (
             <p className="text-sm text-muted tabular-nums">
-              נענו {answered} מתוך {keys.length} השאלות עם האפשרויות. כשכולן נענות, הציון מופיע כאן.
+              נענו {answered} מתוך {mc.length} השאלות עם האפשרויות. כשכולן נענות, הציון מופיע כאן.
             </p>
           )}
         </section>
@@ -385,23 +488,36 @@ type QuestionHelp =
   | { kind: "paragraph"; number: number; textLabel: string; text: string }
   | { kind: "jump"; go: () => void };
 
+const SELF_MARKS: { value: SelfMark; label: string; on: string }[] = [
+  { value: "right", label: "צדקתי", on: "border-success bg-success-ink" },
+  { value: "partial", label: "חלקית", on: "border-accent bg-accent/15" },
+  { value: "wrong", label: "טעיתי", on: "border-danger bg-danger-ink" },
+];
+
 function QuestionCard({
   id,
   index,
   question,
   help,
-  onAnswer,
+  selected,
+  onChoose,
+  mark,
+  onMark,
 }: {
   id: string;
   index: number;
-  question: BagrutReadingQuestion | BagrutVocabularyQuestion;
+  question: Question;
   help?: QuestionHelp;
-  onAnswer?: (isCorrect: boolean) => void;
+  selected: number | undefined;
+  onChoose: (index: number) => void;
+  mark: SelfMark | undefined;
+  onMark: (mark: SelfMark) => void;
 }) {
-  const [selected, setSelected] = useState<number | null>(null);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [openedAnswer, setOpenedAnswer] = useState(false);
   const [showParagraph, setShowParagraph] = useState(false);
-  const answered = selected !== null;
+  // A rated answer was opened before, also in a restored draft.
+  const showAnswer = openedAnswer || mark !== undefined;
+  const answered = selected !== undefined;
   const right = answered && selected === question.correctOptionIndex;
   const linkButton =
     "inline-flex min-h-10 items-center gap-1.5 rounded text-sm font-medium text-primary hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-primary";
@@ -457,9 +573,7 @@ function QuestionCard({
                 // lines up with the one-line answers instead of jumping sides.
                 dir={/[֐-׿]/.test(option) ? "rtl" : "ltr"}
                 onClick={() => {
-                  if (answered) return;
-                  setSelected(i);
-                  onAnswer?.(i === question.correctOptionIndex);
+                  if (!answered) onChoose(i);
                 }}
                 // aria-disabled, not disabled: after answering the buttons
                 // stay focusable, so keyboard and screen-reader users keep
@@ -506,13 +620,37 @@ function QuestionCard({
         </div>
       ) : (
         <div className="mt-3">
-          <button type="button" aria-expanded={showAnswer} onClick={() => setShowAnswer((v) => !v)} className={linkButton}>
+          <button type="button" aria-expanded={showAnswer} onClick={() => setOpenedAnswer((v) => !v)} className={linkButton}>
             <Eye size={15} aria-hidden="true" /> {showAnswer ? "להסתיר את התשובה לדוגמה" : "להציג תשובה לדוגמה"}
           </button>
           {showAnswer && (
-            <p className="mt-2 rounded-lg bg-background-2 p-3 text-sm leading-relaxed">
-              <MixedText sentencesOnOwnLine>{question.modelAnswerHe}</MixedText>
-            </p>
+            <>
+              <p className="mt-2 rounded-lg bg-background-2 p-3 text-sm leading-relaxed">
+                <MixedText sentencesOnOwnLine>{question.modelAnswerHe}</MixedText>
+              </p>
+              {/* The learner's own check against the model answer. */}
+              <div role="group" aria-labelledby={`${id}-rate`} className="mt-3">
+                <p id={`${id}-rate`} className="text-sm font-medium">
+                  איך הלך, בהשוואה לתשובה לדוגמה?
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {SELF_MARKS.map((m) => (
+                    <button
+                      key={m.value}
+                      type="button"
+                      aria-pressed={mark === m.value}
+                      onClick={() => onMark(m.value)}
+                      className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                        mark === m.value ? `${m.on} font-bold` : "border-card-border hover:bg-background-2"
+                      }`}
+                    >
+                      {mark === m.value && <CheckCircle2 size={15} aria-hidden="true" />}
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
       )}
@@ -520,9 +658,18 @@ function QuestionCard({
   );
 }
 
-function WritingTaskCard({ promptEn, wordCountRange }: { promptEn: string; wordCountRange: [number, number] }) {
-  const [text, setText] = useState("");
-  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+function WritingTaskCard({
+  promptEn,
+  wordCountRange,
+  value,
+  onChange,
+}: {
+  promptEn: string;
+  wordCountRange: [number, number];
+  value: string;
+  onChange: (text: string) => void;
+}) {
+  const wordCount = value.trim() ? value.trim().split(/\s+/).length : 0;
   const [min, max] = wordCountRange;
   const inRange = wordCount >= min && wordCount <= max;
 
@@ -542,8 +689,8 @@ function WritingTaskCard({ promptEn, wordCountRange }: { promptEn: string; wordC
         </label>
         <textarea
           id="writing-answer"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
           dir="ltr"
           lang="en"
           rows={7}
@@ -553,7 +700,7 @@ function WritingTaskCard({ promptEn, wordCountRange }: { promptEn: string; wordC
         <p id="writing-count" className={`mt-1.5 text-sm tabular-nums ${inRange ? "text-success" : "text-muted"}`}>
           {wordCount} מילים{inRange ? ", בטווח" : ""}
         </p>
-        <p className="mt-1 text-xs text-muted">הכתיבה כאן לתרגול עצמי ואינה נשלחת לבדיקה.</p>
+        <p className="mt-1 text-xs text-muted">הכתיבה כאן לתרגול עצמי ואינה נשלחת לבדיקה. היא נשמרת במכשיר הזה עד שמסיימים.</p>
       </div>
     </section>
   );

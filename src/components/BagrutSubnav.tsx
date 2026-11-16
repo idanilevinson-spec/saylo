@@ -4,22 +4,31 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { GraduationCap } from "lucide-react";
+import type { BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 
-const TABS: { href: string; label: string; match: (p: string) => boolean }[] = [
-  // A questionnaire and its practice sets (/bagrut/E, /bagrut/E/4) are
-  // reached from the overview, so it stays the marked tab there.
-  { href: "/bagrut", label: "סקירה", match: (p) => p === "/bagrut" || /^\/bagrut\/[A-G](\/|$)/i.test(p) },
-  { href: "/bagrut/track/3", label: "3 יח״ל", match: (p) => p.startsWith("/bagrut/track/3") },
-  { href: "/bagrut/track/4", label: "4 יח״ל", match: (p) => p.startsWith("/bagrut/track/4") },
-  { href: "/bagrut/track/5", label: "5 יח״ל", match: (p) => p.startsWith("/bagrut/track/5") },
-  { href: "/bagrut/skills", label: "מיומנויות", match: (p) => p.startsWith("/bagrut/skills") },
-  { href: "/bagrut/oral", label: "בעל פה", match: (p) => p.startsWith("/bagrut/oral") },
-  { href: "/bagrut/exam-guide", label: "לקראת הבחינה", match: (p) => p.startsWith("/bagrut/exam-guide") },
-];
+type Tab = { href: string; label: string; match: (p: string) => boolean };
+
+// Five tabs at most, so they nearly fit a phone: with a track, one tab for
+// the learner's own questionnaires instead of three track tabs (the other
+// tracks stay one tap away on the Bagrut home). The oral exam is part of
+// the 4- and 5-point Bagrut only.
+function tabsFor(track: BagrutStudyUnits | null): Tab[] {
+  return [
+    // A questionnaire and its practice sets (/bagrut/E, /bagrut/E/4) are
+    // reached from the overview, so it stays the marked tab there.
+    { href: "/bagrut", label: "סקירה", match: (p) => p === "/bagrut" || /^\/bagrut\/[A-G](\/|$)/i.test(p) },
+    ...(track
+      ? [{ href: `/bagrut/track/${track}`, label: "השאלונים שלי", match: (p: string) => p.startsWith(`/bagrut/track/${track}`) }]
+      : []),
+    { href: "/bagrut/skills", label: "מיומנויות", match: (p) => p.startsWith("/bagrut/skills") },
+    ...(track === 3 ? [] : [{ href: "/bagrut/oral", label: "בעל פה", match: (p: string) => p.startsWith("/bagrut/oral") }]),
+    { href: "/bagrut/exam-guide", label: "לקראת הבחינה", match: (p) => p.startsWith("/bagrut/exam-guide") },
+  ];
+}
 
 // The Bagrut area's own navigation, under the site navbar on every
 // /bagrut page — so the area reads as one place with its own sections.
-export default function BagrutSubnav() {
+export default function BagrutSubnav({ track }: { track: BagrutStudyUnits | null }) {
   const pathname = usePathname();
   const navRef = useRef<HTMLElement>(null);
   // On a phone the tabs run off the edge; keep the current one in view.
@@ -39,7 +48,7 @@ export default function BagrutSubnav() {
           aria-label="אזור הבגרות"
           className="-mx-4 sm:mx-0 flex flex-1 gap-1 overflow-x-auto ps-4 pe-10 sm:px-0 [scrollbar-width:none] [mask-image:linear-gradient(to_left,transparent,black_2.5rem)] sm:[mask-image:none]"
         >
-          {TABS.map((tab) => {
+          {tabsFor(track).map((tab) => {
             const active = tab.match(pathname);
             return (
               <Link
