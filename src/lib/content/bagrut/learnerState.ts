@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/serverClient";
 import type { BagrutStudyUnits } from "./moduleFormats";
 import type { BagrutExamKind, BagrutUnitProgress } from "@/types/database";
@@ -9,7 +10,9 @@ import { ORAL_GRADE_FEATURE } from "@/lib/bagrut/oralAllowance";
 // area: which track they chose (profiles.bagrut_units, set in the
 // placement test or on /bagrut) and their best score per practice set.
 // Both degrade to "nothing yet" if the columns/table aren't there.
-export async function getBagrutLearnerState(): Promise<{ track: BagrutStudyUnits | null; progress: BagrutUnitProgress[] }> {
+// cache(): the Bagrut layout (sub-menu) and the page both ask for this in
+// the same request; one database round trip serves both.
+export const getBagrutLearnerState = cache(async (): Promise<{ track: BagrutStudyUnits | null; progress: BagrutUnitProgress[] }> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -25,7 +28,7 @@ export async function getBagrutLearnerState(): Promise<{ track: BagrutStudyUnits
     track: units === 3 || units === 4 || units === 5 ? units : null,
     progress: (progress ?? []) as BagrutUnitProgress[],
   };
-}
+});
 
 // The exam date and this week's activity for the plan on /bagrut
 // (src/lib/bagrut/examPlan.ts). available = false until migration 056 has
