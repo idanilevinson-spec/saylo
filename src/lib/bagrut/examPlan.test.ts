@@ -145,6 +145,12 @@ describe("buildExamPlan", () => {
     expect(buildExamPlan({ ...base, examDate: "2026-11-10" })).toEqual({ status: "past", daysAgo: 8 });
   });
 
+  it("isolates the questionnaire letter so it stays before the score in Hebrew", () => {
+    const plan = buildExamPlan({ ...base, progress: [row("1", 90, "2026-11-16T10:00:00Z")] });
+    if (plan.status !== "upcoming") throw new Error();
+    expect(plan.tasks[0].labelHe).toBe("ערכה 1 בשאלון ⁨E⁩: 90%");
+  });
+
   it("ignores progress of other questionnaires", () => {
     const plan = buildExamPlan({ ...base, progress: [{ ...row("1", 90, "2026-11-16T10:00:00Z"), module_code: "F" }] });
     if (plan.status !== "upcoming") throw new Error();
