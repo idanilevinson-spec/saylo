@@ -22,9 +22,15 @@ export interface Profile {
   weekly_report_enabled: boolean;
   monthly_report_enabled: boolean;
   bagrut_units: 3 | 4 | 5 | null;
+  // The learner's next Bagrut exam (YYYY-MM-DD) and which one: a
+  // questionnaire code or the oral exam. Optional until migration 056 runs.
+  bagrut_exam_date?: string | null;
+  bagrut_exam_kind?: BagrutExamKind | null;
   created_at: string;
   updated_at: string;
 }
+
+export type BagrutExamKind = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "oral";
 
 export interface GuardianLink {
   id: string;
