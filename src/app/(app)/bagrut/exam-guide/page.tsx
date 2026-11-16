@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Clock, ListChecks, Map as MapIcon, Layers, Timer, NotebookPen, CheckCircle2 } from "lucide-react";
 import { BAGRUT_MODULE_FORMATS, modulesForUnits, type BagrutModuleCode, type BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 import BagrutCredit from "@/components/BagrutCredit";
+import { getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
 
 export const metadata: Metadata = {
   title: "לקראת בחינת הבגרות | Saylo",
@@ -56,9 +57,9 @@ const PREP_STEPS: { icon: typeof MapIcon; title: string; body: string; href: str
   {
     icon: NotebookPen,
     title: "לחזור על הטעויות",
-    body: "מילים ונושאי דקדוק שטעיתם בהם חוזרים במחברת הטעויות. כדאי לעבור עליה לפני כל ערכה חדשה.",
-    href: "/mistakes",
-    cta: "למחברת הטעויות",
+    body: "אחרי כל ערכה: לקרוא את ההסבר ליד כל שאלה שטעיתם בה, ולחזור על ערכות עם ציון נמוך. בעמוד הבגרות מופיעה תמיד הערכה שהכי כדאי לעשות עכשיו.",
+    href: "/bagrut",
+    cta: "לעמוד הבגרות",
   },
 ];
 
@@ -71,7 +72,12 @@ const EXAM_DAY_TIPS = [
   "להשאיר כמה דקות בסוף לבדיקה: איות, זמנים, ושלא דילגתם על שאלה.",
 ];
 
-export default function BagrutExamGuidePage() {
+export default async function BagrutExamGuidePage() {
+  // The learner's own track first; the other two folded away below it.
+  const { track } = await getBagrutLearnerState();
+  const ordered = track ? [track] : TRACKS;
+  const others = track ? TRACKS.filter((u) => u !== track) : [];
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold">לקראת הבחינה</h1>
@@ -95,7 +101,10 @@ export default function BagrutExamGuidePage() {
                   {step.title}
                 </p>
                 <p className="mt-1 text-sm text-muted leading-relaxed">{step.body}</p>
-                <Link href={step.href} className="mt-2 inline-block text-sm font-bold text-primary hover:underline">
+                <Link
+                  href={step.href}
+                  className="mt-1 inline-flex min-h-10 items-center rounded text-sm font-bold text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                >
                   {step.cta}
                 </Link>
               </div>
@@ -112,62 +121,22 @@ export default function BagrutExamGuidePage() {
           הצעה בלבד: כעשירית מהזמן לבדיקה בסוף, והשאר לפי משקל הנקודות של כל חלק. זה לא כלל רשמי.
         </p>
         <div className="mt-5 space-y-8">
-          {TRACKS.map((units) => (
-            <div key={units}>
-              <h3 className="flex items-baseline gap-1.5 font-bold">
-                <span className="chyron text-3xl text-primary tabular-nums">{units}</span> יח״ל
-                <span className="text-sm font-normal text-muted">
-                  · שאלונים <span dir="ltr">{modulesForUnits(units).join(" + ")}</span>
-                </span>
-              </h3>
-              <ul className="mt-3 grid sm:grid-cols-3 gap-3">
-                {modulesForUnits(units).map((code) => {
-                  const f = BAGRUT_MODULE_FORMATS[code];
-                  const plan = timePlan(code);
-                  return (
-                    <li key={code} className="lit-plate rounded-lg border border-card-border bg-card p-4">
-                      <p className="flex items-baseline justify-between gap-2">
-                        <span className="chyron text-3xl">{code}</span>
-                        <span className="text-sm text-muted tabular-nums">{f.timeMinutes ? `${f.timeMinutes} דק׳` : "זמן לא אומת"}</span>
-                      </p>
-                      {plan ? (
-                        <>
-                          {/* The split as one bar, then the minutes per part. */}
-                          <div className="mt-3 flex h-2 overflow-hidden rounded-full" aria-hidden="true">
-                            {plan.map((p, i) => (
-                              <span
-                                key={p.nameHe}
-                                className={i === plan.length - 1 ? "bg-card-border" : i === 0 ? "bg-primary" : "bg-accent"}
-                                style={{ width: `${(p.minutes / (f.timeMinutes as number)) * 100}%` }}
-                              />
-                            ))}
-                          </div>
-                          <ul className="mt-2.5 space-y-1 text-sm">
-                            {plan.map((p) => (
-                              <li key={p.nameHe} className="flex justify-between gap-2">
-                                <span className="text-muted">{p.nameHe}</span>
-                                <span className="font-bold tabular-nums">כ-{p.minutes} דק׳</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </>
-                      ) : (
-                        <ul className="mt-2.5 space-y-1 text-sm">
-                          {f.sections.map((s) => (
-                            <li key={s.nameHe} className="flex justify-between gap-2">
-                              <span className="text-muted">{s.nameHe}</span>
-                              <span className="font-bold tabular-nums">{s.points} נק׳</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+          {ordered.map((units) => (
+            <TrackTimes key={units} units={units} />
           ))}
         </div>
+        {others.length > 0 && (
+          <details className="mt-8 rounded-lg border border-card-border">
+            <summary className="flex min-h-12 cursor-pointer items-center px-4 font-bold">
+              החלוקה במסלולים האחרים ({others.join(" ו-")} יח״ל)
+            </summary>
+            <div className="space-y-8 px-4 pb-5 pt-2">
+              {others.map((units) => (
+                <TrackTimes key={units} units={units} />
+              ))}
+            </div>
+          </details>
+        )}
       </section>
 
       <section aria-labelledby="day-title" className="mt-12">
@@ -185,6 +154,65 @@ export default function BagrutExamGuidePage() {
       </section>
 
       <BagrutCredit className="mt-12" />
+    </div>
+  );
+}
+
+// One track's questionnaires with the suggested time split for each.
+function TrackTimes({ units }: { units: BagrutStudyUnits }) {
+  return (
+    <div>
+      <h3 className="flex items-baseline gap-1.5 font-bold">
+        <span className="chyron text-3xl text-primary tabular-nums">{units}</span> יח״ל
+        <span className="text-sm font-normal text-muted">
+          · שאלונים <span dir="ltr">{modulesForUnits(units).join(" + ")}</span>
+        </span>
+      </h3>
+      <ul className="mt-3 grid sm:grid-cols-3 gap-3">
+        {modulesForUnits(units).map((code) => {
+          const f = BAGRUT_MODULE_FORMATS[code];
+          const plan = timePlan(code);
+          return (
+            <li key={code} className="lit-plate rounded-lg border border-card-border bg-card p-4">
+              <p className="flex items-baseline justify-between gap-2">
+                <span className="chyron text-3xl">{code}</span>
+                <span className="text-sm text-muted tabular-nums">{f.timeMinutes ? `${f.timeMinutes} דק׳` : "הזמן כתוב בטופס הבחינה"}</span>
+              </p>
+              {plan ? (
+                <>
+                  {/* The split as one bar, then the minutes per part. */}
+                  <div className="mt-3 flex h-2 overflow-hidden rounded-full" aria-hidden="true">
+                    {plan.map((p, i) => (
+                      <span
+                        key={p.nameHe}
+                        className={i === plan.length - 1 ? "bg-card-border" : i === 0 ? "bg-primary" : "bg-accent"}
+                        style={{ width: `${(p.minutes / (f.timeMinutes as number)) * 100}%` }}
+                      />
+                    ))}
+                  </div>
+                  <ul className="mt-2.5 space-y-1 text-sm">
+                    {plan.map((p) => (
+                      <li key={p.nameHe} className="flex justify-between gap-2">
+                        <span className="text-muted">{p.nameHe}</span>
+                        <span className="font-bold tabular-nums">כ-{p.minutes} דק׳</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <ul className="mt-2.5 space-y-1 text-sm">
+                  {f.sections.map((s) => (
+                    <li key={s.nameHe} className="flex justify-between gap-2">
+                      <span className="text-muted">{s.nameHe}</span>
+                      <span className="font-bold tabular-nums">{s.points} נק׳</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

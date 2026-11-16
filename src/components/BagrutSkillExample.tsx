@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Eye, Lightbulb } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import MixedText from "@/components/MixedText";
 import { ChoiceGrid, SpeakButton } from "@/components/games/GameKit";
 import type { BagrutSkill } from "@/lib/content/bagrut/skills";
 
@@ -15,6 +16,13 @@ export default function BagrutSkillExample({ skill }: { skill: BagrutSkill }) {
   const [revealed, setRevealed] = useState(false);
   const isMcq = !!example.options && example.correctOptionIndex !== undefined;
   const answered = isMcq ? selected !== null : revealed;
+  const resultRef = useRef<HTMLDivElement>(null);
+  // The reveal button disappears once pressed; move focus to the answer it
+  // opened, so keyboard and screen-reader users land on it and don't fall
+  // back to the top of the page.
+  useEffect(() => {
+    if (revealed) resultRef.current?.focus();
+  }, [revealed]);
 
   return (
     <div>
@@ -51,7 +59,7 @@ export default function BagrutSkillExample({ skill }: { skill: BagrutSkill }) {
           <button
             type="button"
             onClick={() => setRevealed(true)}
-            className="game-press mt-4 inline-flex items-center gap-1.5 min-h-10 px-3.5 rounded-lg border border-card-border text-sm font-medium hover:border-primary/50 transition-[border-color,transform] duration-150"
+            className="game-press mt-4 inline-flex items-center gap-1.5 min-h-11 px-3.5 rounded-lg border border-card-border text-sm font-medium hover:border-primary/50 transition-[border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             <Eye size={15} aria-hidden="true" />
             {skill.kind === "writing" ? "הצגת תשובה לדוגמה" : "הצגת התשובה וההסבר"}
@@ -60,7 +68,12 @@ export default function BagrutSkillExample({ skill }: { skill: BagrutSkill }) {
       )}
 
       {answered && (
-        <div role="status" className="mt-4 rounded-lg border border-primary/30 bg-primary/[0.05] p-4">
+        <div
+          ref={resultRef}
+          tabIndex={-1}
+          role="status"
+          className="mt-4 rounded-lg border border-primary/30 bg-primary/[0.05] p-4 focus:outline-none focus-visible:outline-2 focus-visible:outline-primary"
+        >
           {example.modelAnswerEn && (
             <EnglishText as="p" className="whitespace-pre-line leading-relaxed">
               {example.modelAnswerEn}
@@ -68,7 +81,9 @@ export default function BagrutSkillExample({ skill }: { skill: BagrutSkill }) {
           )}
           <p className={`${example.modelAnswerEn ? "mt-3 border-t border-card-border pt-3" : ""} flex gap-2 text-sm leading-relaxed`}>
             <Lightbulb size={16} aria-hidden="true" className="shrink-0 mt-0.5 text-accent-hover" />
-            <span>{example.explanationHe}</span>
+            <span>
+              <MixedText sentencesOnOwnLine>{example.explanationHe}</MixedText>
+            </span>
           </p>
         </div>
       )}
