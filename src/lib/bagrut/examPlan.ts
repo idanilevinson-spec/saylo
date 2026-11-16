@@ -51,13 +51,17 @@ export function examKindsFor(track: BagrutStudyUnits | null): BagrutExamKind[] {
   return [...modulesForUnits(track), ...(track >= 4 ? (["oral"] as const) : [])];
 }
 
+// A Latin letter next to digits in Hebrew text swaps places with them
+// ("שאלון E: 20%" shows the score before the letter); isolating it fixes it.
+const isolate = (s: string) => `⁨${s}⁩`;
+
 export function examKindLabel(kind: BagrutExamKind): string {
-  return kind === "oral" ? "הבחינה בעל פה" : `שאלון ${kind}`;
+  return kind === "oral" ? "הבחינה בעל פה" : `שאלון ${isolate(kind)}`;
 }
 
 // After a prefix letter (ל/ב), Hebrew drops the definite ה: "לבחינה בעל פה".
 export function examKindAfter(prefix: "ל" | "ב", kind: BagrutExamKind): string {
-  return kind === "oral" ? `${prefix}בחינה בעל פה` : `${prefix}שאלון ${kind}`;
+  return kind === "oral" ? `${prefix}בחינה בעל פה` : `${prefix}שאלון ${isolate(kind)}`;
 }
 
 export type ExamDateCheck = "ok" | "invalid" | "past" | "too-far";
@@ -120,17 +124,17 @@ function writtenTasks(input: ExamPlanInput, finalWeek: boolean): PlanTask[] {
     if (tasks.length >= SETS_PER_WEEK) break;
     if (!doneThisWeek(s.unitSlug)) continue;
     const best = rows.get(s.unitSlug)!.best_percent;
-    tasks.push({ key: s.unitSlug, labelHe: `ערכה ${s.unitSlug} בשאלון ${kind}: ${best}%`, href: href(s.unitSlug), done: true });
+    tasks.push({ key: s.unitSlug, labelHe: `ערכה ${s.unitSlug} בשאלון ${isolate(kind)}: ${best}%`, href: href(s.unitSlug), done: true });
   }
   for (const s of [...fresh, ...weak, ...strong]) {
     if (tasks.length >= SETS_PER_WEEK) break;
     if (doneThisWeek(s.unitSlug)) continue;
     const row = rows.get(s.unitSlug);
     const labelHe = !row
-      ? `ערכה ${s.unitSlug} בשאלון ${kind}${timed}`
+      ? `ערכה ${s.unitSlug} בשאלון ${isolate(kind)}${timed}`
       : row.best_percent < STRONG_PERCENT
-        ? `לחזור על ערכה ${s.unitSlug} בשאלון ${kind} (${row.best_percent}%)${timed}`
-        : `ערכה ${s.unitSlug} בשאלון ${kind} שוב, עם השעון של הבחינה`;
+        ? `לחזור על ערכה ${s.unitSlug} בשאלון ${isolate(kind)} (${row.best_percent}%)${timed}`
+        : `ערכה ${s.unitSlug} בשאלון ${isolate(kind)} שוב, עם השעון של הבחינה`;
     tasks.push({ key: s.unitSlug, labelHe, href: href(s.unitSlug), done: false });
   }
   return tasks;
