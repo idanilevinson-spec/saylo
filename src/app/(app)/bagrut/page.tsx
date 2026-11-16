@@ -21,9 +21,10 @@ import {
 } from "@/lib/content/bagrut/moduleFormats";
 import { getPublishableSampleUnits, getSampleUnit } from "@/lib/content/bagrut/sampleUnits";
 import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/lib/content/bagrut/skills";
-import { bestScore, getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
+import { bestScore, getBagrutExamState, getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
 import type { BagrutUnitProgress } from "@/types/database";
 import BagrutCredit from "@/components/BagrutCredit";
+import BagrutExamCard from "@/components/bagrut/BagrutExamCard";
 
 export const metadata: Metadata = {
   title: "בגרות באנגלית | Saylo",
@@ -58,7 +59,7 @@ function trackProgress(units: BagrutStudyUnits, progress: BagrutUnitProgress[]) 
 }
 
 export default async function BagrutHubPage() {
-  const { track, progress } = await getBagrutLearnerState();
+  const [{ track, progress }, exam] = await Promise.all([getBagrutLearnerState(), getBagrutExamState()]);
   // The practice set worked on most recently, to pick up from.
   const last = [...progress].sort((a, b) => b.completed_at.localeCompare(a.completed_at))[0];
   const lastUnit = last ? getSampleUnit(last.module_code as BagrutModuleCode, last.unit_slug) : undefined;
@@ -155,6 +156,7 @@ export default async function BagrutHubPage() {
         </div>
       </section>
 
+      <BagrutExamCard exam={exam} track={track} progress={progress} />
 
       {/* The oral exam (COBE) is 20% of the 4- and 5-point grade and the one
           part written practice can't cover: its own simulation. */}
