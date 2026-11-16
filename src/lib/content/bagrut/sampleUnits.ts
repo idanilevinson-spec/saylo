@@ -40,6 +40,7 @@
 
 import { BAGRUT_MODULE_FORMATS, type BagrutModuleCode } from "./moduleFormats";
 import { BAGRUT_SAMPLE_UNITS_SET3 } from "./sampleUnitsSet3";
+import { BAGRUT_SAMPLE_UNITS_SETS_4_TO_6 } from "./sampleUnitsSets456";
 
 export const BAGRUT_AI_CONTENT_DISCLAIMER =
   "התכנים באזור הבגרות נכתבו בהובלת אדם בעל השכלה אקדמית באנגלית ובעזרת כלי בינה מלאכותית, לפי מבנה השאלונים שמשרד החינוך מפרסם לציבור. הם מקוריים, ואינם רשמיים או מטעם משרד החינוך.";
@@ -1241,6 +1242,7 @@ export const BAGRUT_SAMPLE_UNITS: readonly BagrutSampleUnit[] = [
     },
   },
   ...BAGRUT_SAMPLE_UNITS_SET3,
+  ...BAGRUT_SAMPLE_UNITS_SETS_4_TO_6,
 ] as const;
 
 export function getSampleUnit(moduleCode: BagrutModuleCode, unitSlug: string): BagrutSampleUnit | undefined {

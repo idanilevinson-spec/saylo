@@ -112,6 +112,39 @@ describe("BAGRUT_SAMPLE_UNITS", () => {
     }
   });
 
+  // The answer key, checked like a teacher would: every question with
+  // options has exactly one marked answer, no option appears twice, and
+  // the model answer names the same option the key marks (by letter,
+  // "תשובה נכונה: B.", or by the option's own text, "תשובה נכונה: sure.").
+  it("keeps every answer key consistent with its options", () => {
+    for (const unit of BAGRUT_SAMPLE_UNITS) {
+      const questions = [
+        ...unit.readingQuestions,
+        ...(unit.vocabularyQuestions ?? []),
+        ...(unit.listeningTask?.questions ?? []),
+      ];
+      for (const q of questions) {
+        if (!q.options) continue;
+        const where = `${unit.moduleCode}${unit.unitSlug}: ${q.promptEn}`;
+        expect(q.correctOptionIndex, where).toBeDefined();
+        const i = q.correctOptionIndex!;
+        expect(i >= 0 && i < q.options.length, where).toBe(true);
+        const normalized = q.options.map((o) => o.trim().toLowerCase());
+        expect(new Set(normalized).size, where).toBe(q.options.length);
+        const named = q.modelAnswerHe.match(/^תשובה נכונה:\s*(.+?)\.(?:\s|$)/)?.[1]?.trim();
+        if (!named) continue;
+        if (/^[A-D]$/.test(named)) expect("ABCD".indexOf(named), where).toBe(i);
+        else expect(named.toLowerCase(), where).toBe(normalized[i]);
+      }
+    }
+  });
+
+  it("has six practice sets for each 5-point questionnaire (E, F and G)", () => {
+    for (const code of ["E", "F", "G"] as const) {
+      expect(getPublishableSampleUnits(code).map((u) => u.unitSlug)).toEqual(["1", "2", "3", "4", "5", "6"]);
+    }
+  });
+
   it("gives every module a unique unitSlug per module (no two units with the same slug)", () => {
     const seen = new Set<string>();
     for (const unit of BAGRUT_SAMPLE_UNITS) {
