@@ -6,6 +6,8 @@ import { BAGRUT_SKILL_KIND_LABEL, getBagrutSkill } from "@/lib/content/bagrut/sk
 import { BAGRUT_MODULE_FORMATS, type BagrutModuleCode } from "@/lib/content/bagrut/moduleFormats";
 import BagrutSkillExample from "@/components/BagrutSkillExample";
 import BagrutCredit from "@/components/BagrutCredit";
+import MixedText from "@/components/MixedText";
+import { getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -22,21 +24,27 @@ export default async function BagrutSkillPage({ params, searchParams }: PageProp
   if (!skill) notFound();
   const from = (await searchParams).from;
   const fromModule = from && from in BAGRUT_MODULE_FORMATS ? (from as BagrutModuleCode) : null;
-  // Back to the track the learner came from, or the hub.
-  const backTrack = fromModule ? BAGRUT_MODULE_FORMATS[fromModule].studyUnitTracks[0] : null;
+  // Back to the track the learner came from: their own track when it has
+  // this questionnaire (C and E are in two tracks), else the first one.
+  // Without a questionnaire, back to the skills list.
+  const { track } = await getBagrutLearnerState();
+  const tracks = fromModule ? BAGRUT_MODULE_FORMATS[fromModule].studyUnitTracks : [];
+  const backTrack = fromModule ? (track && tracks.includes(track) ? track : tracks[0]) : null;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <Link
-        href={backTrack ? `/bagrut/track/${backTrack}#module-${fromModule}` : "/bagrut"}
-        className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+        href={backTrack ? `/bagrut/track/${backTrack}#module-${fromModule}` : "/bagrut/skills"}
+        className="inline-flex items-center gap-1 rounded py-2 text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
       >
         <ChevronLeft size={15} aria-hidden="true" className="rotate-180" />
-        {backTrack ? `חזרה לשאלון ${fromModule}` : "אזור הבגרות"}
+        {backTrack ? `חזרה לשאלון ${fromModule}` : "כל המיומנויות"}
       </Link>
 
       <h1 className="mt-4 text-3xl font-bold">{skill.titleHe}</h1>
-      <p className="mt-2 text-lg text-muted leading-relaxed">{skill.summaryHe}</p>
+      <p className="mt-2 text-lg text-muted leading-relaxed">
+        <MixedText>{skill.summaryHe}</MixedText>
+      </p>
       <p className="mt-3 text-sm text-muted">
         {BAGRUT_SKILL_KIND_LABEL[skill.kind]} · שימושי בשאלונים{" "}
         <span dir="ltr" className="chyron text-base text-foreground">
@@ -48,7 +56,9 @@ export default async function BagrutSkillPage({ params, searchParams }: PageProp
         <h2 id="what-title" className="text-lg font-bold">
           מה זה בודק
         </h2>
-        <p className="mt-2 leading-relaxed">{skill.whatHe}</p>
+        <p className="mt-2 leading-relaxed">
+          <MixedText sentencesOnOwnLine>{skill.whatHe}</MixedText>
+        </p>
       </section>
 
       <section aria-labelledby="steps-title" className="mt-8">
@@ -61,7 +71,9 @@ export default async function BagrutSkillPage({ params, searchParams }: PageProp
               <span className="chyron inline-flex w-7 h-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary-hover text-lg tabular-nums">
                 {i + 1}
               </span>
-              <span className="leading-relaxed pt-0.5">{step}</span>
+              <span className="leading-relaxed pt-0.5">
+                <MixedText sentencesOnOwnLine>{step}</MixedText>
+              </span>
             </li>
           ))}
         </ol>
@@ -75,7 +87,9 @@ export default async function BagrutSkillPage({ params, searchParams }: PageProp
           {skill.trapsHe.map((trap, i) => (
             <li key={i} className="flex gap-2.5 leading-relaxed">
               <span aria-hidden="true" className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-danger" />
-              {trap}
+              <span>
+                <MixedText sentencesOnOwnLine>{trap}</MixedText>
+              </span>
             </li>
           ))}
         </ul>

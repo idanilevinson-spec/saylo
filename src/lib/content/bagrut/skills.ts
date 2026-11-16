@@ -216,7 +216,7 @@ export const BAGRUT_SKILLS: readonly BagrutSkill[] = [
         "Noa stopped taking the bus to school last month. The bus was often late, and she missed the first lesson twice. Now she rides her bike, and she says she arrives earlier and feels more awake.",
       questionEn: "Why did Noa stop taking the bus? Give one reason from the text.",
       explanationHe:
-        "תשובה טובה עונה במשפט מלא, חוזרת על מילות השאלה ונשענת על פרט מהטקסט: She stopped taking the bus because it was often late and she missed the first lesson. התשובה 'she rides her bike' נכונה לגבי ההווה, אבל לא עונה על 'למה'.",
+        "התשובה למעלה עונה במשפט מלא, חוזרת על מילות השאלה (stopped taking the bus) ונשענת על פרט מהטקסט (often late). התשובה 'she rides her bike' נכונה לגבי ההווה, אבל לא עונה על 'למה'.",
       modelAnswerEn: "She stopped taking the bus because it was often late, and she missed the first lesson twice.",
     },
     modules: ["A", "B", "C", "D", "E", "F", "G"],
@@ -300,7 +300,7 @@ export const BAGRUT_SKILLS: readonly BagrutSkill[] = [
     titleHe: "ניתוח סיפור ושיר",
     summaryHe: "לדבר על דמות, קונפליקט, נושא ואמצעים ספרותיים, עם עוגן ביצירה.",
     whatHe:
-      "במודול D לומדים מראש יצירות שנבחרו על ידי משרד החינוך, ושואלים עליהן שאלות ניתוח. ההכנה היא בעיקר להכיר היטב את היצירות שנלמדות בבית הספר. מה שמתורגל כאן הוא סוג החשיבה שהשאלות מבקשות.",
+      "בשאלון D לומדים מראש יצירות שנבחרו על ידי משרד החינוך, ושואלים עליהן שאלות ניתוח. ההכנה היא בעיקר להכיר היטב את היצירות שנלמדות בבית הספר. מה שמתורגל כאן הוא סוג החשיבה שהשאלות מבקשות.",
     stepsHe: [
       "דמות: מה הדמות רוצה, מה מונע ממנה, ואיך היא משתנה מתחילת היצירה ועד סופה.",
       "קונפליקט ונושא: מה המאבק המרכזי, ומה היצירה אומרת על החיים דרכו.",
@@ -321,10 +321,10 @@ export const BAGRUT_SKILLS: readonly BagrutSkill[] = [
   {
     slug: "vocabulary",
     kind: "vocabulary",
-    titleHe: "אוצר מילים במודול E",
+    titleHe: "אוצר מילים בשאלון E",
     summaryHe: "לבחור או להשלים מילה לפי משמעות, צורה דקדוקית וצירוף נפוץ.",
     whatHe:
-      "בחלק אוצר המילים של מודול E משלימים משפטים, בוחרים מילה או מתאימים. השאלות נבנות מתוך רשימות המילים הרשמיות (Core). חשוב להכיר לא רק את התרגום, אלא גם את הצורה הנכונה של המילה במשפט.",
+      "בחלק אוצר המילים של שאלון E משלימים משפטים, בוחרים מילה או מתאימים. השאלות נבנות מתוך רשימות המילים הרשמיות (Core). חשוב להכיר לא רק את התרגום, אלא גם את הצורה הנכונה של המילה במשפט.",
     stepsHe: [
       "קראו את כל המשפט לפני שאתם מסתכלים על המילים לבחירה.",
       "זהו מה חסר מבחינה דקדוקית: שם עצם, פועל, שם תואר או תואר הפועל.",
@@ -346,7 +346,7 @@ export const BAGRUT_SKILLS: readonly BagrutSkill[] = [
     titleHe: "כתיבה קצרה (35–40 מילים)",
     summaryHe: "לכתוב תשובה קצרה וממוקדת שעונה על כל מה שהמשימה מבקשת.",
     whatHe:
-      "במודול B כותבים טקסט קצר של 35–40 מילים. באורך כזה כל משפט צריך לעשות עבודה: לענות על חלק מהמשימה. בודקים בעיקר אם עניתם על הכול, ואם הכתיבה ברורה.",
+      "בשאלון B כותבים טקסט קצר של 35–40 מילים. באורך כזה כל משפט צריך לעשות עבודה: לענות על חלק מהמשימה. בודקים בעיקר אם עניתם על הכול, ואם הכתיבה ברורה.",
     stepsHe: [
       "סמנו במשימה כל דבר שמבקשים לכתוב (למשל: מה, למה ומתי). כל אחד מהם הוא משפט.",
       "כתבו 3–4 משפטים פשוטים ומדויקים, עם מילת קישור אחת או שתיים.",
@@ -368,7 +368,7 @@ export const BAGRUT_SKILLS: readonly BagrutSkill[] = [
     titleHe: "כתיבת פסקה (70–120 מילים)",
     summaryHe: "לבנות פסקה עם משפט פתיחה, תוכן שתומך בו וסגירה.",
     whatHe:
-      "במודול C כותבים 70–90 מילים ובמודול D 100–120 מילים. באורך כזה כבר צריך מבנה: משפט פתיחה שאומר את הרעיון, שני-שלושה משפטים שמפתחים אותו עם דוגמה, ומשפט סיום.",
+      "בשאלון C כותבים 70–90 מילים ובשאלון D 100–120 מילים. באורך כזה כבר צריך מבנה: משפט פתיחה שאומר את הרעיון, שני-שלושה משפטים שמפתחים אותו עם דוגמה, ומשפט סיום.",
     stepsHe: [
       "תכננו דקה לפני הכתיבה: מה הרעיון, ומה שתי הדוגמאות או הסיבות.",
       "פתחו במשפט שעונה ישירות על המשימה.",
@@ -379,7 +379,7 @@ export const BAGRUT_SKILLS: readonly BagrutSkill[] = [
     example: {
       questionEn: "Should students have less homework? Write a paragraph giving your opinion.",
       explanationHe:
-        "המבנה: משפט פתיחה עם הדעה, שתי סיבות שכל אחת נפתחת במילת קישור, ומשפט סיום שמסכם. האורך כ-80 מילים, בטווח של מודול C. במודול D מרחיבים לאותו מבנה עם דוגמה נוספת.",
+        "המבנה: משפט פתיחה עם הדעה, שתי סיבות שכל אחת נפתחת במילת קישור, ומשפט סיום שמסכם. האורך כ-80 מילים, בטווח של שאלון C. בשאלון D מרחיבים לאותו מבנה עם דוגמה נוספת.",
       modelAnswerEn:
         "In my opinion, students should have less homework, but not none at all. First, after a long school day, many students also have sports, music or jobs, and too much homework leaves no time to rest. In addition, a few well-planned tasks help more than many repetitive ones. For example, one short reading task can teach more than three pages of copying. To sum up, less but better homework would help students learn and stay healthy.",
     },
@@ -391,7 +391,7 @@ export const BAGRUT_SKILLS: readonly BagrutSkill[] = [
     titleHe: "חיבור (120–140 מילים)",
     summaryHe: "חיבור דעה או תיאור עם פתיחה, גוף וסיום, בטווח המילים.",
     whatHe:
-      "במודולים F ו-G כותבים חיבור של 120–140 מילים. ב-G סוגי החיבור הם בדרך כלל תיאורי או חיבור דעה, ולעיתים נדירות מכתב רשמי. החיבור נבדק על התוכן, הארגון והשפה, ולכן תכנון קצר לפני הכתיבה משתלם.",
+      "בשאלונים F ו-G כותבים חיבור של 120–140 מילים. ב-G סוגי החיבור הם בדרך כלל תיאורי או חיבור דעה, ולעיתים נדירות מכתב רשמי. החיבור נבדק על התוכן, הארגון והשפה, ולכן תכנון קצר לפני הכתיבה משתלם.",
     stepsHe: [
       "פתיחה (2 משפטים): הצגת הנושא ועמדה ברורה, או מה מתארים ולמה.",
       "גוף (2 פסקאות קצרות): בכל פסקה רעיון אחד עם דוגמה או פירוט.",

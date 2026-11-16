@@ -19,6 +19,7 @@ import {
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/lib/supabase/browserClient";
 import EnglishText from "@/components/EnglishText";
+import MixedText from "@/components/MixedText";
 import PrintedPage from "@/components/PrintedPage";
 import ListeningPlayer from "@/components/ListeningPlayer";
 import type { BagrutSampleUnit, BagrutReadingQuestion, BagrutVocabularyQuestion } from "@/lib/content/bagrut/sampleUnits";
@@ -496,7 +497,7 @@ function QuestionCard({
                 <span>
                   <strong>{right ? "נכון. " : "לא נכון. "}</strong>
                   <span className="text-muted">
-                    {withoutAnswerLetter(question.modelAnswerHe) || (right ? "" : "התשובה הנכונה מסומנת בירוק.")}
+                    <MixedText>{withoutAnswerLetter(question.modelAnswerHe) || (right ? "" : "התשובה הנכונה מסומנת בירוק.")}</MixedText>
                   </span>
                 </span>
               </p>
@@ -508,7 +509,11 @@ function QuestionCard({
           <button type="button" aria-expanded={showAnswer} onClick={() => setShowAnswer((v) => !v)} className={linkButton}>
             <Eye size={15} aria-hidden="true" /> {showAnswer ? "להסתיר את התשובה לדוגמה" : "להציג תשובה לדוגמה"}
           </button>
-          {showAnswer && <p className="mt-2 rounded-lg bg-background-2 p-3 text-sm leading-relaxed">{question.modelAnswerHe}</p>}
+          {showAnswer && (
+            <p className="mt-2 rounded-lg bg-background-2 p-3 text-sm leading-relaxed">
+              <MixedText sentencesOnOwnLine>{question.modelAnswerHe}</MixedText>
+            </p>
+          )}
         </div>
       )}
     </div>

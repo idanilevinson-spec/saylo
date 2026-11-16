@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { GraduationCap } from "lucide-react";
 
 const TABS: { href: string; label: string; match: (p: string) => boolean }[] = [
-  { href: "/bagrut", label: "סקירה", match: (p) => p === "/bagrut" },
+  // A questionnaire and its practice sets (/bagrut/E, /bagrut/E/4) are
+  // reached from the overview, so it stays the marked tab there.
+  { href: "/bagrut", label: "סקירה", match: (p) => p === "/bagrut" || /^\/bagrut\/[A-G](\/|$)/i.test(p) },
   { href: "/bagrut/track/3", label: "3 יח״ל", match: (p) => p.startsWith("/bagrut/track/3") },
   { href: "/bagrut/track/4", label: "4 יח״ל", match: (p) => p.startsWith("/bagrut/track/4") },
   { href: "/bagrut/track/5", label: "5 יח״ל", match: (p) => p.startsWith("/bagrut/track/5") },
@@ -18,6 +21,11 @@ const TABS: { href: string; label: string; match: (p: string) => boolean }[] = [
 // /bagrut page — so the area reads as one place with its own sections.
 export default function BagrutSubnav() {
   const pathname = usePathname();
+  const navRef = useRef<HTMLElement>(null);
+  // On a phone the tabs run off the edge; keep the current one in view.
+  useEffect(() => {
+    navRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [pathname]);
   return (
     <div className="border-b border-card-border bg-background-2/60">
       <div className="max-w-4xl mx-auto px-4 flex items-center gap-3">
@@ -25,7 +33,12 @@ export default function BagrutSubnav() {
           <GraduationCap size={17} aria-hidden="true" className="text-primary" />
           אזור הבגרות
         </Link>
-        <nav aria-label="אזור הבגרות" className="-mx-4 sm:mx-0 flex flex-1 gap-1 overflow-x-auto px-4 sm:px-0 [scrollbar-width:none]">
+        {/* The fade at the far edge shows a phone user there are more tabs. */}
+        <nav
+          ref={navRef}
+          aria-label="אזור הבגרות"
+          className="-mx-4 sm:mx-0 flex flex-1 gap-1 overflow-x-auto ps-4 pe-10 sm:px-0 [scrollbar-width:none] [mask-image:linear-gradient(to_left,transparent,black_2.5rem)] sm:[mask-image:none]"
+        >
           {TABS.map((tab) => {
             const active = tab.match(pathname);
             return (

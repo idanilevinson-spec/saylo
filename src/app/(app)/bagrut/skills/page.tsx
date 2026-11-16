@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import MixedText from "@/components/MixedText";
 import { BookOpenText, Headphones, Feather, BookOpen, PenLine, ChevronLeft, type LucideIcon } from "lucide-react";
 import { BAGRUT_SKILLS, BAGRUT_SKILL_KIND_LABEL, type BagrutSkillKind } from "@/lib/content/bagrut/skills";
 
@@ -46,10 +47,15 @@ export default function BagrutSkillsIndexPage() {
                     >
                       <span className="flex-1 min-w-0">
                         <span className="block font-bold">{s.titleHe}</span>
-                        <span className="mt-0.5 block text-sm text-muted leading-snug">{s.summaryHe}</span>
+                        <span className="mt-0.5 block text-sm text-muted leading-snug">
+                          <MixedText>{s.summaryHe}</MixedText>
+                        </span>
                       </span>
-                      <span dir="ltr" className="chyron shrink-0 text-sm text-muted tracking-wide">
-                        {s.modules.join(" ")}
+                      <span className="shrink-0 text-sm text-muted">
+                        <span className="sr-only">בשאלונים </span>
+                        <span dir="ltr" className="chyron tracking-wide">
+                          {s.modules.join(" ")}
+                        </span>
                       </span>
                       <ChevronLeft size={18} aria-hidden="true" className="text-muted shrink-0 transition-transform group-hover:-translate-x-0.5" />
                     </Link>

@@ -109,14 +109,14 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
         wordCountRange: [1, 400],
         questionCount: 9,
         questionFormatsHe: ["רב-ברירה", "שאלות פתוחות", "השלמת משפטים", "מארגן גרפי"],
-        notesHe: "טקסט אחד בלבד, עד 400 מילים, 8–10 שאלות.",
+        notesHe: "טקסט אחד בלבד, 8–10 שאלות.",
       },
       {
         nameHe: "אוצר מילים",
         points: 30,
         questionCount: 5,
         questionFormatsHe: ["השלמת משפטים", "רב-ברירה", "התאמה"],
-        notesHe: "מתוך רשימות המילים הרשמיות (Core). אין במודול הזה כתיבה או האזנה, למרות שרבים חושבים שיש.",
+        notesHe: "מתוך רשימות המילים הרשמיות (Core). אין בשאלון הזה כתיבה או האזנה, למרות שרבים חושבים שיש.",
       },
     ],
     verified: true,
@@ -128,7 +128,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
     timeMinutes: 90,
     sections: [
       { nameHe: "הבנת הנקרא", points: 60, wordCountRange: [400, 450] },
-      { nameHe: "חיבור", points: 40, wordCountRange: [120, 140], notesHe: "מאז 2020 אין ספרות במודול זה, רק חיבורים." },
+      { nameHe: "חיבור", points: 40, wordCountRange: [120, 140], notesHe: "מאז 2020 אין בשאלון הזה ספרות, רק חיבורים." },
     ],
     verified: true,
     sourceNotesHe: "jpostlite.co.il, מדריך מודולים E/F/G. ראו docs/specs/bagrut-track.md §2.1.",
@@ -138,7 +138,7 @@ export const BAGRUT_MODULE_FORMATS: Record<BagrutModuleCode, BagrutModuleFormat>
     studyUnitTracks: [5],
     timeMinutes: 105,
     sections: [
-      { nameHe: "הבנת הנקרא", points: 60, notesHe: "קטע ברמת קושי גבוהה יותר ואוצר מילים מתקדם יותר ממודולים קודמים." },
+      { nameHe: "הבנת הנקרא", points: 60, notesHe: "קטע ברמת קושי גבוהה יותר ואוצר מילים מתקדם יותר מאשר בשאלונים הקודמים." },
       {
         nameHe: "חיבור",
         points: 40,

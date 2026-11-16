@@ -11,6 +11,8 @@ import {
 import { getPublishableSampleUnits } from "@/lib/content/bagrut/sampleUnits";
 import { skillsForModule } from "@/lib/content/bagrut/skills";
 import { bestScore, getBagrutLearnerState } from "@/lib/content/bagrut/learnerState";
+import { nextSet, type SetRef } from "@/lib/content/bagrut/studyHelpers";
+import { STRONG_PERCENT } from "@/lib/bagrut/examPlan";
 import SetBagrutTrackButton from "@/components/SetBagrutTrackButton";
 import BagrutCredit from "@/components/BagrutCredit";
 
@@ -40,11 +42,17 @@ export default async function BagrutTrackPage({ params }: PageProps) {
 
   const { track, progress } = await getBagrutLearnerState();
   const codes = modulesForUnits(units);
+  // The same "next" the Bagrut home shows, marked here too, but only on the
+  // learner's own track.
+  const next = track === units ? nextSet(codes, progress) : null;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <Link href="/bagrut" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-        <ChevronLeft size={15} aria-hidden="true" className="rotate-180" /> כל המסלולים
+      <Link
+        href="/bagrut"
+        className="inline-flex items-center gap-1 rounded py-2 text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+      >
+        <ChevronLeft size={15} aria-hidden="true" className="rotate-180" /> לעמוד הבגרות
       </Link>
 
       <div className="mt-3 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
@@ -67,7 +75,7 @@ export default async function BagrutTrackPage({ params }: PageProps) {
           <a
             key={code}
             href={`#module-${code}`}
-            className="game-press inline-flex items-center gap-1.5 min-h-10 px-3 rounded-lg border border-card-border bg-card text-sm font-medium hover:border-primary/50 transition-[border-color,transform] duration-150"
+            className="game-press inline-flex items-center gap-1.5 min-h-11 px-3 rounded-lg border border-card-border bg-card text-sm font-medium hover:border-primary/50 transition-[border-color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
           >
             שאלון <span className="chyron text-lg">{code}</span>
           </a>
@@ -76,7 +84,7 @@ export default async function BagrutTrackPage({ params }: PageProps) {
 
       <div className="mt-8 space-y-12">
         {codes.map((code) => (
-          <ModuleBlock key={code} code={code} progress={progress} />
+          <ModuleBlock key={code} code={code} progress={progress} next={next} />
         ))}
       </div>
       <BagrutCredit className="mt-12" />
@@ -84,7 +92,15 @@ export default async function BagrutTrackPage({ params }: PageProps) {
   );
 }
 
-function ModuleBlock({ code, progress }: { code: BagrutModuleCode; progress: Awaited<ReturnType<typeof getBagrutLearnerState>>["progress"] }) {
+function ModuleBlock({
+  code,
+  progress,
+  next,
+}: {
+  code: BagrutModuleCode;
+  progress: Awaited<ReturnType<typeof getBagrutLearnerState>>["progress"];
+  next: SetRef | null;
+}) {
   const format = BAGRUT_MODULE_FORMATS[code];
   const sets = getPublishableSampleUnits(code);
   const skills = skillsForModule(code);
@@ -179,6 +195,7 @@ function ModuleBlock({ code, progress }: { code: BagrutModuleCode; progress: Awa
           <ul className="lit-plate mt-2 bg-card border border-card-border rounded-lg divide-y divide-card-border overflow-hidden">
             {sets.map((set) => {
               const best = bestScore(progress, code, set.unitSlug);
+              const isNext = next?.code === code && next.slug === set.unitSlug;
               return (
                 <li key={set.unitSlug}>
                   <Link
@@ -190,7 +207,13 @@ function ModuleBlock({ code, progress }: { code: BagrutModuleCode; progress: Awa
                     </span>
                     <span className="flex-1 min-w-0">
                       <span className="block font-bold leading-snug">{set.titleHe}</span>
-                      <span className={`mt-0.5 flex items-center gap-1 text-xs tabular-nums ${best !== null ? "text-success font-medium" : "text-muted"}`}>
+                      {/* Green only for a strong score: a low one in the
+                          success color read as "well done". */}
+                      <span
+                        className={`mt-0.5 flex items-center gap-1 text-xs tabular-nums ${
+                          best !== null && best >= STRONG_PERCENT ? "text-success font-medium" : "text-muted"
+                        }`}
+                      >
                         {best !== null ? (
                           <>
                             <CheckCircle2 size={12} aria-hidden="true" /> הציון הכי טוב: {best}%
@@ -200,6 +223,11 @@ function ModuleBlock({ code, progress }: { code: BagrutModuleCode; progress: Awa
                         )}
                       </span>
                     </span>
+                    {isNext && (
+                      <span className="shrink-0 rounded-md bg-primary px-2 py-1 text-xs font-bold text-primary-ink">
+                        {best === null ? "הבאה בתור" : "כדאי לחזור"}
+                      </span>
+                    )}
                     <ChevronLeft size={18} aria-hidden="true" className="text-muted shrink-0 transition-transform group-hover:-translate-x-0.5" />
                   </Link>
                 </li>
