@@ -6,6 +6,7 @@ import EnglishText from "@/components/EnglishText";
 import MixedText from "@/components/MixedText";
 import { ChoiceGrid, SpeakButton } from "@/components/games/GameKit";
 import type { BagrutSkill } from "@/lib/content/bagrut/skills";
+import TextRights from "@/components/TextRights";
 
 // The worked example on a skill page: a multiple-choice example is answered
 // first and explained after; an open/writing one shows the model answer on
@@ -37,6 +38,7 @@ export default function BagrutSkillExample({ skill }: { skill: BagrutSkill }) {
           <EnglishText as="p" className="leading-relaxed">
             {example.passageEn}
           </EnglishText>
+          <TextRights className="mt-3" />
         </div>
       )}
 
