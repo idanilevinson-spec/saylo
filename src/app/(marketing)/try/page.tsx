@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { webPageJsonLd } from "@/lib/site/structuredData";
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
 import HubHeader from "@/components/HubHeader";
@@ -29,6 +31,22 @@ export default async function TryPage({ searchParams }: PageProps) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdHtml(
+            webPageJsonLd({
+              name: "שיעור ניסיון באנגלית בחינם, בלי הרשמה",
+              description: DESCRIPTION,
+              path: "/try",
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "שיעור ניסיון", path: "/try" },
+              ],
+            }),
+          ),
+        }}
+      />
       <HubHeader title="שיעור ניסיון, בלי הרשמה">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           כ-3 דקות. שש שאלות מהיחידה הראשונה במסלול, ברמה שתבחרו, עם בדיקה מיידית אחרי כל תשובה. בלי חשבון ובלי כרטיס

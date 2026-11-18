@@ -7,7 +7,8 @@ import PracticeLink from "@/components/PracticeLink";
 import PrintedPage, { DropCap, splitDropCap } from "@/components/PrintedPage";
 import TextRights from "@/components/TextRights";
 import { pageOpenGraph } from "@/lib/og/meta";
-import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { learningResourceJsonLd } from "@/lib/site/structuredData";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { getPublicReading, listPublicReading } from "@/lib/content/publicReading";
 
@@ -48,11 +49,19 @@ export default async function EnglishReadingText({ params }: { params: Promise<{
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLdHtml(
-            breadcrumbJsonLd([
-              { name: "Saylo", path: "/" },
-              { name: "קטעי קריאה באנגלית", path: "/english-reading" },
-              { name: text.title_en, path: `/english-reading/${text.slug}` },
-            ]),
+            learningResourceJsonLd({
+              name: text.title_en,
+              description: `${text.title_he}: קטע קריאה באנגלית ברמה ${text.cefr_level}, ${text.words} מילים, עם שאלות הבנה.`,
+              path: `/english-reading/${text.slug}`,
+              level: text.cefr_level,
+              resourceType: "Reading passage",
+              teaches: "English reading comprehension",
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "קטעי קריאה באנגלית", path: "/english-reading" },
+                { name: text.title_en, path: `/english-reading/${text.slug}` },
+              ],
+            }),
           ),
         }}
       />

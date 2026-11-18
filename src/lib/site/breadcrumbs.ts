@@ -15,6 +15,8 @@ export function breadcrumbJsonLd(trail: { name: string; path: string }[]) {
 
 // JSON for a <script type="application/ld+json">, with "<" escaped so no
 // string in the data can close the script tag (as the Next.js guide does).
+// The replacement is the six characters \u003c, which JSON reads back as
+// "<". In source that is "\\u003c": a bare "\u003c" is "<" itself.
 export function jsonLdHtml(data: unknown): string {
-  return JSON.stringify(data).replace(/</g, "\u003c");
+  return JSON.stringify(data).replace(/</g, "\\u003c");
 }

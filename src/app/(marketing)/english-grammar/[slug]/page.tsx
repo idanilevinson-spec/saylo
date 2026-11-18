@@ -7,7 +7,9 @@ import SiteFooter from "@/components/SiteFooter";
 import PracticeLink from "@/components/PracticeLink";
 import GrammarLessonContent from "@/components/GrammarLessonContent";
 import { pageOpenGraph } from "@/lib/og/meta";
-import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { learningResourceJsonLd } from "@/lib/site/structuredData";
+import type { CefrLevel } from "@/types/database";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { getPublicGrammar, listPublicGrammar } from "@/lib/content/publicGrammar";
 
@@ -20,6 +22,9 @@ export const revalidate = 3600;
 // are"); then the title and heading shouldn't say it twice.
 const hasHebrew = (s: string) => /[֐-׿]/.test(s);
 
+const grammarDescription = (nameEn: string, level: CefrLevel) =>
+  `הסבר בעברית ל-${nameEn} (רמה ${level}): מתי משתמשים, איך בונים משפט, דוגמאות, והטעויות הנפוצות של דוברי עברית.`;
+
 export async function generateStaticParams() {
   return (await listPublicGrammar()).map((t) => ({ slug: t.slug }));
 }
@@ -28,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const topic = await getPublicGrammar((await params).slug);
   if (!topic) return {};
   const title = grammarTopicTitle(topic.name_en, topic.name_he);
-  const description = `הסבר בעברית ל-${topic.name_en} (רמה ${topic.cefr_level}): מתי משתמשים, איך בונים משפט, דוגמאות, והטעויות הנפוצות של דוברי עברית.`;
+  const description = grammarDescription(topic.name_en, topic.cefr_level);
   const path = `/english-grammar/${topic.slug}`;
   return {
     title: `${title} | Saylo`,
@@ -50,11 +55,19 @@ export default async function EnglishGrammarTopic({ params }: { params: Promise<
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLdHtml(
-            breadcrumbJsonLd([
-              { name: "Saylo", path: "/" },
-              { name: "דקדוק באנגלית", path: "/english-grammar" },
-              { name: topic.name_he, path: `/english-grammar/${topic.slug}` },
-            ]),
+            learningResourceJsonLd({
+              name: grammarTopicTitle(topic.name_en, topic.name_he),
+              description: grammarDescription(topic.name_en, topic.cefr_level),
+              path: `/english-grammar/${topic.slug}`,
+              level: topic.cefr_level,
+              resourceType: "Grammar lesson",
+              teaches: `English grammar: ${topic.name_en}`,
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "דקדוק באנגלית", path: "/english-grammar" },
+                { name: topic.name_he, path: `/english-grammar/${topic.slug}` },
+              ],
+            }),
           ),
         }}
       />

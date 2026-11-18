@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { collectionPageJsonLd } from "@/lib/site/structuredData";
 import type { CSSProperties } from "react";
 import { unstable_cache } from "next/cache";
 import SiteFooter from "@/components/SiteFooter";
@@ -44,6 +46,23 @@ export default async function EnglishWritingPage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdHtml(
+            collectionPageJsonLd({
+              name: "נושאים לחיבור ולכתיבה באנגלית, לפי רמה",
+              description: DESCRIPTION,
+              path: "/english-writing",
+              items: [],
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "כתיבה באנגלית", path: "/english-writing" },
+              ],
+            }),
+          ),
+        }}
+      />
       <HubHeader title="נושאים לחיבור באנגלית">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           {prompts.length} משימות כתיבה לפי רמה, מכמה משפטים על עצמכם ועד מסה ומכתב רשמי. בוחרים נושא, כותבים באפליקציה,

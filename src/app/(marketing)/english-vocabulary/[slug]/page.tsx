@@ -6,7 +6,8 @@ import SiteFooter from "@/components/SiteFooter";
 import PracticeLink from "@/components/PracticeLink";
 import WordCard from "@/components/content/WordCard";
 import { pageOpenGraph } from "@/lib/og/meta";
-import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { learningResourceJsonLd } from "@/lib/site/structuredData";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
 import { getPublicVocabulary, listPublicVocabulary } from "@/lib/content/publicVocabulary";
 
@@ -49,11 +50,19 @@ export default async function EnglishVocabularyTopic({ params }: { params: Promi
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLdHtml(
-            breadcrumbJsonLd([
-              { name: "Saylo", path: "/" },
-              { name: "אוצר מילים באנגלית", path: "/english-vocabulary" },
-              { name: topic.name_he, path: `/english-vocabulary/${topic.slug}` },
-            ]),
+            learningResourceJsonLd({
+              name: `${topic.name_he} באנגלית: ${topic.wordCount} מילים עם תרגום והגייה`,
+              description: `אוצר מילים באנגלית בנושא ${topic.name_he} (רמה ${topic.cefr_level}), כל מילה עם תרגום, הגייה ומשפט לדוגמה.`,
+              path: `/english-vocabulary/${topic.slug}`,
+              level: topic.cefr_level,
+              resourceType: "Vocabulary list",
+              teaches: `English vocabulary: ${topic.name_en}`,
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "אוצר מילים באנגלית", path: "/english-vocabulary" },
+                { name: topic.name_he, path: `/english-vocabulary/${topic.slug}` },
+              ],
+            }),
           ),
         }}
       />

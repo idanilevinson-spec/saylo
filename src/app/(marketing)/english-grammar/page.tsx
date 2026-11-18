@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { collectionPageJsonLd } from "@/lib/site/structuredData";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -31,6 +33,23 @@ export default async function EnglishGrammarIndex() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdHtml(
+            collectionPageJsonLd({
+              name: "דקדוק באנגלית: הסברים בעברית לפי רמה",
+              description: DESCRIPTION,
+              path: "/english-grammar",
+              items: topics.map((t) => ({ name: t.name_he, path: `/english-grammar/${t.slug}` })),
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "דקדוק באנגלית", path: "/english-grammar" },
+              ],
+            }),
+          ),
+        }}
+      />
       <HubHeader title="דקדוק באנגלית, בעברית">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           {topics.length} נושאים, מהבסיס ועד הרמה הגבוהה. כל הסבר כולל מבנה, דוגמאות, ואת הטעויות שדוברי עברית עושים

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { webPageJsonLd } from "@/lib/site/structuredData";
 import PricingCards from "@/components/PricingCards";
 import SiteFooter from "@/components/SiteFooter";
 import HubHeader from "@/components/HubHeader";
@@ -21,6 +23,22 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdHtml(
+            webPageJsonLd({
+              name: "מסלולים ומחירים",
+              description: DESCRIPTION,
+              path: "/pricing",
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "מסלולים ומחירים", path: "/pricing" },
+              ],
+            }),
+          ),
+        }}
+      />
       <HubHeader title="מסלולים ומחירים" center>
         <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
           {/* Must match what the routes allow (teacherTrial.ts): the trial
