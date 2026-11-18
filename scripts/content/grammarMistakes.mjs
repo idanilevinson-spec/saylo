@@ -111,7 +111,7 @@ export const GRAMMAR_MISTAKES = {
     ],
   },
   "modals-of-deduction": {
-    intro: "must, might ו-can't משמשים גם להסקת מסקנות. בעברית אומרים \"בטח\" או \"אין מצב\", ובתרגום הישיר המודל הלא נכון נבחר.",
+    intro: "המודלים must, might ו-can't משמשים גם להסקת מסקנות. בעברית אומרים \"בטח\" או \"אין מצב\", ובתרגום הישיר המודל הלא נכון נבחר.",
     mistakes: [
       ["mustn't במקום can't", "He mustn't be at home, his car is gone.", "He can't be at home, his car is gone.", "למסקנה שלילית בטוחה משתמשים ב-can't."],
       ["must + עבר רגיל", "She must forgot her keys.", "She must have forgotten her keys.", "למסקנה על העבר: must have + צורה שלישית."],
