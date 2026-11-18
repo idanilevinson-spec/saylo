@@ -1,3 +1,4 @@
+import { normalizeAnswer } from "./answerNormalize";
 // Turns a headword into a partially-masked hint string for the Spelling
 // Challenge game, e.g. "elephant" -> "e_ep_a_t". Deterministic per word
 // (not per render) so the same question doesn't re-shuffle its blanks
@@ -42,7 +43,7 @@ export function maskWord(word: string): string {
 }
 
 export function checkSpelling(userInput: string, correctWord: string): boolean {
-  return userInput.trim().toLowerCase() === correctWord.trim().toLowerCase();
+  return normalizeAnswer(userInput) === normalizeAnswer(correctWord);
 }
 
 // The word's own example sentence with the word blanked, as a context cue

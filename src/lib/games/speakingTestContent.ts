@@ -1,3 +1,4 @@
+import { normalizeAnswer } from "./answerNormalize";
 import { shuffle } from "@/lib/utils/shuffle";
 import type { VocabularyItemLite } from "@/lib/games/testContent";
 
@@ -49,5 +50,5 @@ export function buildSpeakingTest(
 // Same normalization as testContent.ts's recall grading — a transcribed
 // spoken answer gets the identical exact-match treatment as a typed one.
 export function normalizeSpokenWord(text: string): string {
-  return text.trim().toLowerCase().replace(/\s+/g, " ");
+  return normalizeAnswer(text);
 }

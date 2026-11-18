@@ -22,8 +22,8 @@ export const VOCAB_ADDITIONS = {
     ["gray", "/ɡreɪ/", "adjective", "אפור", "The sky is gray this morning.", "the color between black and white"],
     ["gold", "/ɡoʊld/", "adjective", "זהוב", "She wore a gold dress to the wedding.", "the shiny yellow color of the metal gold"],
     ["silver", "/ˈsɪlvər/", "adjective", "כסוף", "He drives an old silver car.", "the shiny gray color of the metal silver"],
-    ["dark", "/dɑrk/", "adjective", "כהה", "I like dark colors in winter.", "close to black; not light"],
-    ["light", "/laɪt/", "adjective", "בהיר", "The room is painted light green.", "pale; close to white"],
+    ["dark", "/dɑrk/", "adjective", "כהה (גם: חושך)", "I like dark colors in winter.", "close to black; not light"],
+    ["light", "/laɪt/", "adjective", "בהיר (גם: אור)", "The room is painted light green.", "pale; close to white"],
     ["beige", "/beɪʒ/", "adjective", "בז'", "They bought a beige sofa.", "a light brown color, like sand"],
     ["turquoise", "/ˈtɜrkwɔɪz/", "adjective", "טורקיז", "The sea near Eilat is turquoise.", "a color between blue and green"],
     ["navy blue", "/ˌneɪvi ˈblu/", "adjective", "כחול כהה", "The school uniform is navy blue.", "a very dark blue"],
@@ -49,7 +49,7 @@ export const VOCAB_ADDITIONS = {
     ["how are you", "/ˌhaʊ ˈɑr ju/", "phrase", "מה נשמע?", "Hi! How are you today?", "a friendly question when you meet someone"],
     ["nice to meet you", "/ˌnaɪs tə ˈmit ju/", "phrase", "נעים להכיר", "I'm Noa. Nice to meet you.", "what you say when you meet someone for the first time"],
     ["see you later", "/ˌsi ju ˈleɪtər/", "phrase", "נתראה אחר כך", "I have to go. See you later!", "an informal way to say goodbye"],
-    ["excuse me", "/ɪkˈskjuz mi/", "phrase", "סליחה (כדי לפנות למישהו)", "Excuse me, where is the train station?", "a polite way to get someone's attention"],
+    ["excuse me", "/ɪkˈskjuz mi/", "phrase", "סלחו לי (כדי לפנות למישהו)", "Excuse me, where is the train station?", "a polite way to get someone's attention"],
     ["you're welcome", "/jʊr ˈwɛlkəm/", "phrase", "על לא דבר", "\"Thanks for the help!\" \"You're welcome.\"", "a polite answer when someone thanks you"],
     ["welcome", "/ˈwɛlkəm/", "phrase", "ברוכים הבאים", "Welcome to our home!", "what you say to someone who has just arrived"],
     ["good luck", "/ɡʊd ˈlʌk/", "phrase", "בהצלחה", "Good luck on your exam tomorrow!", "what you say when you hope things go well for someone"],
@@ -83,14 +83,14 @@ export const VOCAB_ADDITIONS = {
   shopping: [
     ["customer", "/ˈkʌstəmər/", "noun", "לקוח", "The shop was full of customers.", "a person who buys something from a shop or business"],
     ["credit card", "/ˈkrɛdɪt ˌkɑrd/", "noun", "כרטיס אשראי", "Can I pay by credit card?", "a plastic card you use to buy things now and pay later"],
-    ["sale", "/seɪl/", "noun", "מבצע (סייל)", "These shoes were on sale for half price.", "a time when a shop sells things for less money"],
-    ["size", "/saɪz/", "noun", "מידה", "Do you have this shirt in a bigger size?", "how big clothes or shoes are"],
+    ["sale", "/seɪl/", "noun", "מבצע (גם: מכירה)", "These shoes were on sale for half price.", "a time when a shop sells things for less money"],
+    ["size", "/saɪz/", "noun", "מידה, גודל", "Do you have this shirt in a bigger size?", "how big clothes or shoes are"],
     ["try on", "/ˌtraɪ ˈɑn/", "verb", "למדוד (בגד)", "Can I try on these jeans?", "to put on clothes to see if they fit"],
-    ["change", "/tʃeɪndʒ/", "noun", "עודף", "Here is your change: five shekels.", "the money you get back when you pay more than the price"],
+    ["change", "/tʃeɪndʒ/", "noun", "עודף (כסף); גם: שינוי", "Here is your change: five shekels.", "the money you get back when you pay more than the price"],
     ["bag", "/bæɡ/", "noun", "שקית", "Do you need a bag?", "a container made of plastic, paper or cloth for carrying things"],
     ["pay", "/peɪ/", "verb", "לשלם", "I'll pay for the coffee.", "to give money for something you buy"],
     ["mall", "/mɔl/", "noun", "קניון", "Let's meet at the mall at five.", "a large building with many shops"],
-    ["return", "/rɪˈtɜrn/", "verb", "להחזיר (מוצר לחנות)", "I want to return this jacket; it's too small.", "to take something back to the shop because you don't want it"],
+    ["return", "/rɪˈtɜrn/", "verb", "להחזיר (גם: לחזור)", "I want to return this jacket; it's too small.", "to take something back to the shop because you don't want it"],
   ],
   hobbies: [
     ["hiking", "/ˈhaɪkɪŋ/", "noun", "טיולים רגליים", "We go hiking in the Galilee every spring.", "walking a long way in nature for fun"],
@@ -110,13 +110,27 @@ export const VOCAB_ADDITIONS = {
     ["divorced", "/dɪˈvɔrst/", "adjective", "גרוש", "His parents are divorced.", "no longer married by law"],
     ["relationship", "/rɪˈleɪʃənˌʃɪp/", "noun", "מערכת יחסים", "They have a close relationship.", "the way two people feel about and behave toward each other"],
     ["forgive", "/fərˈɡɪv/", "verb", "לסלוח", "It took her a long time to forgive him.", "to stop being angry with someone for something they did"],
-    ["close", "/kloʊs/", "adjective", "קרוב (רגשית)", "We've been close friends since school.", "knowing and caring about someone very much"],
-    ["date", "/deɪt/", "noun", "דייט", "They went on a first date to a small café.", "a meeting with someone you are romantically interested in"],
+    ["close", "/kloʊs/", "adjective", "קרוב (גם: לסגור)", "We've been close friends since school.", "knowing and caring about someone very much"],
+    ["date", "/deɪt/", "noun", "דייט (גם: תאריך)", "They went on a first date to a small café.", "a meeting with someone you are romantically interested in"],
     ["betray", "/bɪˈtreɪ/", "verb", "לבגוד באמון", "He felt that his best friend had betrayed him.", "to hurt someone who trusted you"],
     ["commitment", "/kəˈmɪtmənt/", "noun", "מחויבות", "Marriage is a big commitment.", "a promise to stay with someone or to do something"],
     ["acquaintance", "/əˈkweɪntəns/", "noun", "מכר", "She's not a friend, just an acquaintance from work.", "someone you know a little, but not well"],
   ],
 };
+
+// Words that mean nearly the same in Hebrew; never offered as each other's
+// wrong option in a multiple-choice question.
+export const TOO_CLOSE = [
+  ["hello", "hi"], ["sorry", "excuse me"], ["how are you", "what's up"], ["goodbye", "see you later"],
+  ["goodbye", "good night"], ["good evening", "good night"], ["thank you", "you're welcome"],
+  ["sad", "upset"], ["angry", "upset"], ["scared", "worried"], ["nervous", "worried"], ["tired", "bored"],
+  ["baby", "child"], ["son", "child"], ["daughter", "child"], ["son", "grandson"], ["daughter", "granddaughter"],
+  ["shop", "mall"], ["cash", "change"], ["money", "change"], ["price", "sale"], ["discount", "sale"], ["buy", "pay"],
+  ["drawing", "painting"], ["running", "hiking"], ["dark", "navy blue"], ["blue", "navy blue"], ["blue", "turquoise"],
+  ["yellow", "gold"], ["white", "silver"], ["gray", "silver"], ["brown", "beige"],
+  ["night", "evening"], ["partner", "date"], ["engaged", "commitment"], ["loyal", "commitment"], ["trust", "betray"],
+  ["one", "first"],
+];
 
 // Corrections to words already published.
 export const FIXES = [

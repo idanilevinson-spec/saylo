@@ -59,7 +59,9 @@ function VocabTestPageInner() {
     let query = supabase.from("vocabulary_items").select("id, headword, translation_he").eq("status", "published");
     if (topicId) query = query.eq("topic_id", topicId);
     else query = query.eq("cefr_level", (await currentLevel(profile.id)) ?? "A1");
-    const { data } = await query.limit(200);
+    // A level has more than 200 words now (A1: 200 exactly on 2026-11-18);
+    // a lower cap would silently drop some of them from the pool.
+    const { data } = await query.limit(1000);
     const pool = (data ?? []) as VocabularyItemLite[];
     if (pool.length < MIN_POOL_SIZE) {
       setPhase("empty");
