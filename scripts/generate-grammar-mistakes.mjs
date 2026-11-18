@@ -20,9 +20,16 @@ const rows = Object.entries(GRAMMAR_MISTAKES).map(([slug, { intro, mistakes }]) 
     intro,
     ...mistakes.map(
       ([title, wrong, right, why], i) =>
-        `**${i + 1}. ${title}**\n\n- לא נכון: ${wrong}\n- נכון: ${right}\n\n${why}`,
+        `**טעות ${i + 1}: ${title}**\n\n- לא נכון: ${wrong}\n- נכון: ${right}\n\nלמה: ${why}`,
     ),
   ].join("\n\n");
+  // Every line opens with a Hebrew word: the lesson renderer picks a line's
+  // direction from its text, and a line that starts in English is laid out
+  // left to right with its Hebrew scrambled.
+  for (const line of body.split("\n").filter((l) => l.trim())) {
+    const start = line.replace(/^[-*\s\d.]+/, "");
+    if (/^[^א-ת]*[A-Za-z]/.test(start.split(/[א-ת]/)[0])) errors.push(`${slug}: line starts in English: ${line}`);
+  }
   if (HEBREW_DASH.test(body)) errors.push(`${slug}: long dash next to Hebrew`);
   for (const [, wrong, right] of mistakes) if (wrong === right) errors.push(`${slug}: wrong equals right: ${wrong}`);
   return `  (${q(slug)}, ${dollar(body)})`;

@@ -18,785 +18,785 @@ from public.grammar_topics gt
 join (values
   ('verb-to-be', $md$בעברית אומרים "אני עייף" בלי פועל. באנגלית אי אפשר לוותר עליו, ומכאן רוב הטעויות.
 
-**1. משמיטים את to be**
+**טעות 1: משמיטים את to be**
 
 - לא נכון: She happy today.
 - נכון: She is happy today.
 
-באנגלית כל משפט צריך פועל, גם כשבעברית אין.
+למה: באנגלית כל משפט צריך פועל, גם כשבעברית אין.
 
-**2. is עם רבים**
+**טעות 2: is עם רבים**
 
 - לא נכון: My parents is at home.
 - נכון: My parents are at home.
 
-parents זה רבים, ולכן are.
+למה: parents זה רבים, ולכן are.
 
-**3. have במקום be לגיל**
+**טעות 3: have במקום be לגיל**
 
 - לא נכון: I have 25 years.
 - נכון: I am 25 years old.
 
-באנגלית "נמצאים" בגיל, לא "מחזיקים" שנים.
+למה: באנגלית "נמצאים" בגיל, לא "מחזיקים" שנים.
 
-**4. שאלה בלי היפוך**
+**טעות 4: שאלה בלי היפוך**
 
 - לא נכון: You are ready?
 - נכון: Are you ready?
 
-בשאלה are עובר לפני הנושא.$md$),
+למה: בשאלה are עובר לפני הנושא.$md$),
   ('articles', $md$בעברית יש ה' הידיעה ואין מילה ל-a. לכן קל לשכוח את a/an, ולשים the במקומות שבהם לא צריך.
 
-**1. שוכחים a לפני מקצוע**
+**טעות 1: שוכחים a לפני מקצוע**
 
 - לא נכון: I am teacher.
 - נכון: I am a teacher.
 
-שם עצם ביחיד שאפשר לספור צריך a או the.
+למה: שם עצם ביחיד שאפשר לספור צריך a או the.
 
-**2. the לפני דברים כלליים**
+**טעות 2: the לפני דברים כלליים**
 
 - לא נכון: The life is beautiful.
 - נכון: Life is beautiful.
 
-כשמדברים על משהו באופן כללי, אין the.
+למה: כשמדברים על משהו באופן כללי, אין the.
 
-**3. a או an לפי הצליל**
+**טעות 3: a או an לפי הצליל**
 
 - לא נכון: a hour, an university
 - נכון: an hour, a university
 
-בוחרים לפי הצליל הראשון: hour נשמע "אַוּר", university נשמע "יוּ".
+למה: בוחרים לפי הצליל הראשון: hour נשמע "אַוּר", university נשמע "יוּ".
 
-**4. the לפני שפות וארוחות**
+**טעות 4: the לפני שפות וארוחות**
 
 - לא נכון: I speak the English after the breakfast.
 - נכון: I speak English after breakfast.
 
-שפות, ארוחות וספורט באים בלי the.$md$),
+למה: שפות, ארוחות וספורט באים בלי the.$md$),
   ('present-simple', $md$בעברית הפועל משתנה לפי מין ומספר, באנגלית רק ה-s של he/she/it. דווקא בגלל שזה כל כך קטן, שוכחים אותו.
 
-**1. שוכחים s בגוף שלישי**
+**טעות 1: שוכחים s בגוף שלישי**
 
 - לא נכון: He work in Haifa.
 - נכון: He works in Haifa.
 
-he, she ו-it תמיד מקבלים s בהווה פשוט.
+למה: he, she ו-it תמיד מקבלים s בהווה פשוט.
 
-**2. doesn't ואחריו s**
+**טעות 2: doesn't ואחריו s**
 
 - לא נכון: She doesn't likes tea.
 - נכון: She doesn't like tea.
 
-ה-s כבר נמצא ב-does, אז הפועל נשאר בצורת בסיס.
+למה: ה-s כבר נמצא ב-does, אז הפועל נשאר בצורת בסיס.
 
-**3. שאלה בלי do**
+**טעות 3: שאלה בלי do**
 
 - לא נכון: You like pizza?
 - נכון: Do you like pizza?
 
-שאלה בהווה פשוט נפתחת ב-Do או Does.
+למה: שאלה בהווה פשוט נפתחת ב-Do או Does.
 
-**4. הווה פשוט לפעולה שקורית עכשיו**
+**טעות 4: הווה פשוט לפעולה שקורית עכשיו**
 
 - לא נכון: Look! It rains.
 - נכון: Look! It's raining.
 
-למשהו שקורה ברגע זה משתמשים ב-ing.$md$),
+למה: למשהו שקורה ברגע זה משתמשים ב-ing.$md$),
   ('plurals', $md$רוב הרבים באנגלית פשוטים, אבל יש כמה מילים שבעברית הן רבים ובאנגלית לא, וכמה רבים לא רגילים שחוזרים כל הזמן.
 
-**1. informations ו-advices**
+**טעות 1: informations ו-advices**
 
 - לא נכון: Can you give me some informations?
 - נכון: Can you give me some information?
 
-information, advice, furniture ו-news לא מקבלות s.
+למה: information, advice, furniture ו-news לא מקבלות s.
 
-**2. רבים לא רגילים**
+**טעות 2: רבים לא רגילים**
 
 - לא נכון: two childs, three mans
 - נכון: two children, three men
 
-את הרבים האלה פשוט זוכרים: men, women, children, people, feet, teeth.
+למה: את הרבים האלה פשוט זוכרים: men, women, children, people, feet, teeth.
 
-**3. s אחרי מספר בתואר**
+**טעות 3: s אחרי מספר בתואר**
 
 - לא נכון: a ten-years-old boy
 - נכון: a ten-year-old boy
 
-כשהמספר והמילה באים לפני שם עצם, הם לא ברבים.
+למה: כשהמספר והמילה באים לפני שם עצם, הם לא ברבים.
 
-**4. people עם is**
+**טעות 4: people עם is**
 
 - לא נכון: The people is nice here.
 - נכון: The people are nice here.
 
-people זה כבר רבים.$md$),
+למה: people זה כבר רבים.$md$),
   ('possessive-adjectives', $md$בעברית השייכות נדבקת למילה ("הספר שלה", "ספרה"), ובאנגלית יש מילה נפרדת שבאה לפני שם העצם.
 
-**1. the במקום מילת שייכות**
+**טעות 1: the במקום מילת שייכות**
 
 - לא נכון: I washed the hands.
 - נכון: I washed my hands.
 
-על חלקי גוף ודברים אישיים מציינים של מי הם.
+למה: על חלקי גוף ודברים אישיים מציינים של מי הם.
 
-**2. his ו-her לפי הדבר במקום לפי האדם**
+**טעות 2: his ו-her לפי הדבר במקום לפי האדם**
 
 - לא נכון: Dana loves his brother.
 - נכון: Dana loves her brother.
 
-בוחרים לפי מי שהדבר שייך לו: Dana, ולכן her.
+למה: בוחרים לפי מי שהדבר שייך לו: Dana, ולכן her.
 
-**3. its ו-it's**
+**טעות 3: its ו-it's**
 
 - לא נכון: The dog wagged it's tail.
 - נכון: The dog wagged its tail.
 
-it's זה it is. לשייכות כותבים its בלי גרש.
+למה: it's זה it is. לשייכות כותבים its בלי גרש.
 
-**4. their, there, they're**
+**טעות 4: their, there, they're**
 
 - לא נכון: There car is new.
 - נכון: Their car is new.
 
-their זה "שלהם", there זה "שם", they're זה they are.$md$),
+למה: their זה "שלהם", there זה "שם", they're זה they are.$md$),
   ('past-simple', $md$בעבר הפשוט מספיק לסמן את העבר פעם אחת. הטעויות מגיעות כשמסמנים פעמיים, או כשמנחשים צורה של פועל לא רגיל.
 
-**1. did ופועל בעבר**
+**טעות 1: did ופועל בעבר**
 
 - לא נכון: Did you went to the party?
 - נכון: Did you go to the party?
 
-did כבר אומר שזה עבר, אז הפועל חוזר לצורת בסיס.
+למה: did כבר אומר שזה עבר, אז הפועל חוזר לצורת בסיס.
 
-**2. ed על פועל לא רגיל**
+**טעות 2: ed על פועל לא רגיל**
 
 - לא נכון: I buyed a new phone.
 - נכון: I bought a new phone.
 
-לפעלים לא רגילים יש צורת עבר משלהם שצריך לזכור.
+למה: לפעלים לא רגילים יש צורת עבר משלהם שצריך לזכור.
 
-**3. didn't ואחריו עבר**
+**טעות 3: didn't ואחריו עבר**
 
 - לא נכון: She didn't called me.
 - נכון: She didn't call me.
 
-גם בשלילה, אחרי didn't באה צורת בסיס.
+למה: גם בשלילה, אחרי didn't באה צורת בסיס.
 
-**4. was עם פועל רגיל**
+**טעות 4: was עם פועל רגיל**
 
 - לא נכון: I was go to work yesterday.
 - נכון: I went to work yesterday.
 
-was בא עם תואר או עם ing, לא עם פועל רגיל.$md$),
+למה: was בא עם תואר או עם ing, לא עם פועל רגיל.$md$),
   ('modals-can-must-should', $md$אחרי can, must ו-should בא פועל בצורת בסיס, תמיד. בעברית אומרים "צריך ל...", ואת ה"ל" הזה מתרגמים בטעות ל-to.
 
-**1. to אחרי מודל**
+**טעות 1: to אחרי מודל**
 
 - לא נכון: You should to rest.
 - נכון: You should rest.
 
-אחרי can, must ו-should לא בא to.
+למה: אחרי can, must ו-should לא בא to.
 
-**2. s על המודל**
+**טעות 2: s על המודל**
 
 - לא נכון: He cans swim.
 - נכון: He can swim.
 
-מודלים לא משתנים לפי הגוף.
+למה: מודלים לא משתנים לפי הגוף.
 
-**3. must not במקום don't have to**
+**טעות 3: must not במקום don't have to**
 
 - לא נכון: You mustn't come tomorrow, it's optional.
 - נכון: You don't have to come tomorrow, it's optional.
 
-mustn't זה אסור. don't have to זה לא חייבים.
+למה: mustn't זה אסור. don't have to זה לא חייבים.
 
-**4. שאלה עם do**
+**טעות 4: שאלה עם do**
 
 - לא נכון: Do you can help me?
 - נכון: Can you help me?
 
-בשאלה המודל עצמו עובר להתחלה.$md$),
+למה: בשאלה המודל עצמו עובר להתחלה.$md$),
   ('past-continuous', $md$עבר מתמשך מתאר פעולה שהייתה באמצע. דוברי עברית, שאין להם זמן כזה, משתמשים בו או יותר מדי או פחות מדי.
 
-**1. עבר מתמשך לפעולה קצרה**
+**טעות 1: עבר מתמשך לפעולה קצרה**
 
 - לא נכון: When I was arriving, he left.
 - נכון: When I arrived, he was leaving.
 
-הפעולה הארוכה ב-ing, הקצרה שקטעה אותה בעבר פשוט.
+למה: הפעולה הארוכה ב-ing, הקצרה שקטעה אותה בעבר פשוט.
 
-**2. פעלי מצב ב-ing**
+**טעות 2: פעלי מצב ב-ing**
 
 - לא נכון: I was knowing the answer.
 - נכון: I knew the answer.
 
-know, want, like ו-believe בדרך כלל לא באים ב-ing.
+למה: know, want, like ו-believe בדרך כלל לא באים ב-ing.
 
-**3. was עם רבים**
+**טעות 3: was עם רבים**
 
 - לא נכון: They was watching TV.
 - נכון: They were watching TV.
 
-they, we ו-you באים עם were.$md$),
+למה: they, we ו-you באים עם were.$md$),
   ('first-conditional', $md$בעברית אומרים "אם ירד גשם", בעתיד. באנגלית אחרי if באה צורת הווה, וזו הטעות הכי נפוצה בנושא.
 
-**1. will אחרי if**
+**טעות 1: will אחרי if**
 
 - לא נכון: If it will rain, we will stay home.
 - נכון: If it rains, we will stay home.
 
-בחלק של if משתמשים בהווה פשוט.
+למה: בחלק של if משתמשים בהווה פשוט.
 
-**2. when במקום if לדבר לא בטוח**
+**טעות 2: when במקום if לדבר לא בטוח**
 
 - לא נכון: When I win the lottery, I'll buy a boat.
 - נכון: If I win the lottery, I'll buy a boat.
 
-when זה משהו שיקרה בטוח, if זה משהו שאולי יקרה.
+למה: when זה משהו שיקרה בטוח, if זה משהו שאולי יקרה.
 
-**3. unless עם not**
+**טעות 3: unless עם not**
 
 - לא נכון: Unless you don't hurry, you'll be late.
 - נכון: Unless you hurry, you'll be late.
 
-unless כבר אומר "אם לא".$md$),
+למה: unless כבר אומר "אם לא".$md$),
   ('passive-voice', $md$בעברית יש בניינים סבילים ("נבנה", "נכתב"), ובאנגלית הסביל נבנה מ-be ועוד צורת פועל שלישית. כששוכחים את אחד החלקים, המשפט נשבר.
 
-**1. שוכחים את be**
+**טעות 1: שוכחים את be**
 
 - לא נכון: The house built in 1990.
 - נכון: The house was built in 1990.
 
-בלי was המשפט אומר שהבית בנה משהו.
+למה: בלי was המשפט אומר שהבית בנה משהו.
 
-**2. צורת עבר במקום צורה שלישית**
+**טעות 2: צורת עבר במקום צורה שלישית**
 
 - לא נכון: The letter was wrote yesterday.
 - נכון: The letter was written yesterday.
 
-בסביל באה הצורה השלישית: written ולא wrote.
+למה: בסביל באה הצורה השלישית: written ולא wrote.
 
-**3. from במקום by**
+**טעות 3: from במקום by**
 
 - לא נכון: The book was written from a famous author.
 - נכון: The book was written by a famous author.
 
-מי שעשה את הפעולה בא אחרי by.
+למה: מי שעשה את הפעולה בא אחרי by.
 
-**4. סביל לפועל שלא מקבל מושא**
+**טעות 4: סביל לפועל שלא מקבל מושא**
 
 - לא נכון: The accident was happened at night.
 - נכון: The accident happened at night.
 
-happen, arrive ו-die לא יכולים להיות בסביל.$md$),
+למה: happen, arrive ו-die לא יכולים להיות בסביל.$md$),
   ('reported-speech', $md$בעברית מצטטים בלי לשנות זמנים: "הוא אמר שהוא עייף". באנגלית בדיבור עקיף הזמן בדרך כלל זז צעד אחד אחורה.
 
-**1. לא מזיזים את הזמן**
+**טעות 1: לא מזיזים את הזמן**
 
 - לא נכון: He said that he is tired.
 - נכון: He said that he was tired.
 
-אחרי said הזמן זז אחורה, אלא אם זה עדיין נכון עכשיו.
+למה: אחרי said הזמן זז אחורה, אלא אם זה עדיין נכון עכשיו.
 
-**2. say עם מושא**
+**טעות 2: say עם מושא**
 
 - לא נכון: She said me that she was busy.
 - נכון: She told me that she was busy.
 
-tell בא עם מי ששומע, say בלי.
+למה: tell בא עם מי ששומע, say בלי.
 
-**3. סדר של שאלה בדיבור עקיף**
+**טעות 3: סדר של שאלה בדיבור עקיף**
 
 - לא נכון: He asked me where do I live.
 - נכון: He asked me where I lived.
 
-בשאלה מדווחת הסדר הוא של משפט רגיל, בלי do.$md$),
+למה: בשאלה מדווחת הסדר הוא של משפט רגיל, בלי do.$md$),
   ('relative-clauses', $md$בעברית "ש" מתאימה לכל דבר. באנגלית בוחרים בין who, which ו-that, ואסור להוסיף כינוי שחוזר על אותו דבר.
 
-**1. which על אנשים**
+**טעות 1: which על אנשים**
 
 - לא נכון: The man which called you is here.
 - נכון: The man who called you is here.
 
-who לאנשים, which לדברים.
+למה: who לאנשים, which לדברים.
 
-**2. כינוי כפול**
+**טעות 2: כינוי כפול**
 
 - לא נכון: The book that I read it was great.
 - נכון: The book that I read was great.
 
-that כבר מחליף את it. בעברית אומרים "שקראתי אותו", באנגלית לא.
+למה: that כבר מחליף את it. בעברית אומרים "שקראתי אותו", באנגלית לא.
 
-**3. that אחרי פסיק**
+**טעות 3: that אחרי פסיק**
 
 - לא נכון: My brother, that lives in Eilat, is a chef.
 - נכון: My brother, who lives in Eilat, is a chef.
 
-אחרי פסיק (מידע נוסף) לא משתמשים ב-that.$md$),
-  ('modals-of-deduction', $md$must, might ו-can't משמשים גם להסקת מסקנות. בעברית אומרים "בטח" או "אין מצב", ובתרגום הישיר המודל הלא נכון נבחר.
+למה: אחרי פסיק (מידע נוסף) לא משתמשים ב-that.$md$),
+  ('modals-of-deduction', $md$המודלים must, might ו-can't משמשים גם להסקת מסקנות. בעברית אומרים "בטח" או "אין מצב", ובתרגום הישיר המודל הלא נכון נבחר.
 
-**1. mustn't במקום can't**
+**טעות 1: mustn't במקום can't**
 
 - לא נכון: He mustn't be at home, his car is gone.
 - נכון: He can't be at home, his car is gone.
 
-למסקנה שלילית בטוחה משתמשים ב-can't.
+למה: למסקנה שלילית בטוחה משתמשים ב-can't.
 
-**2. must + עבר רגיל**
+**טעות 2: must + עבר רגיל**
 
 - לא נכון: She must forgot her keys.
 - נכון: She must have forgotten her keys.
 
-למסקנה על העבר: must have + צורה שלישית.
+למה: למסקנה על העבר: must have + צורה שלישית.
 
-**3. can במקום might**
+**טעות 3: can במקום might**
 
 - לא נכון: It can rain later.
 - נכון: It might rain later.
 
-לאפשרות ספציפית עכשיו או בעתיד משתמשים ב-might או may.$md$),
+למה: לאפשרות ספציפית עכשיו או בעתיד משתמשים ב-might או may.$md$),
   ('past-perfect', $md$עבר מושלם מסמן מה קרה קודם, כששני דברים קרו בעבר. בעברית אין זמן כזה, ולכן משתמשים בו לפעמים בלי צורך.
 
-**1. עבר מושלם בלי נקודת זמן אחרת**
+**טעות 1: עבר מושלם בלי נקודת זמן אחרת**
 
 - לא נכון: I had visited Paris last year.
 - נכון: I visited Paris last year.
 
-צריך שתי נקודות בעבר. אם יש רק אחת, עבר פשוט.
+למה: צריך שתי נקודות בעבר. אם יש רק אחת, עבר פשוט.
 
-**2. עבר פשוט כשהסדר חשוב**
+**טעות 2: עבר פשוט כשהסדר חשוב**
 
 - לא נכון: When I got to the station, the train left.
 - נכון: When I got to the station, the train had left.
 
-בלי had נשמע שהרכבת יצאה ברגע שהגעתם.
+למה: בלי had נשמע שהרכבת יצאה ברגע שהגעתם.
 
-**3. צורת עבר במקום צורה שלישית**
+**טעות 3: צורת עבר במקום צורה שלישית**
 
 - לא נכון: She had went home.
 - נכון: She had gone home.
 
-אחרי had באה הצורה השלישית.$md$),
+למה: אחרי had באה הצורה השלישית.$md$),
   ('used-to-would', $md$בעברית "הייתי הולך" מתאר הרגל בעבר. באנגלית יש used to ו-would, ולכל אחד מגבלה משלו.
 
-**1. use to בחיוב**
+**טעות 1: use to בחיוב**
 
 - לא נכון: I use to play football.
 - נכון: I used to play football.
 
-בחיוב כותבים used to, עם d.
+למה: בחיוב כותבים used to, עם d.
 
-**2. used to בשאלה ובשלילה**
+**טעות 2: used to בשאלה ובשלילה**
 
 - לא נכון: Did you used to live here?
 - נכון: Did you use to live here?
 
-אחרי did חוזרים לצורת בסיס: use to.
+למה: אחרי did חוזרים לצורת בסיס: use to.
 
-**3. would למצב**
+**טעות 3: would למצב**
 
 - לא נכון: I would have long hair.
 - נכון: I used to have long hair.
 
-would רק לפעולות שחזרו. למצבים (have, be, live) רק used to.
+למה: would רק לפעולות שחזרו. למצבים (have, be, live) רק used to.
 
-**4. used to להווה**
+**טעות 4: used to להווה**
 
 - לא נכון: I used to drink coffee every morning, and I still do.
 - נכון: I drink coffee every morning.
 
-used to אומר שזה כבר לא קורה.$md$),
+למה: used to אומר שזה כבר לא קורה.$md$),
   ('inversion', $md$היפוך (Never have I...) נשמע רשמי ומרשים, אבל כמעט תמיד שוכחים את פועל העזר.
 
-**1. היפוך בלי פועל עזר**
+**טעות 1: היפוך בלי פועל עזר**
 
 - לא נכון: Never I have seen such a mess.
 - נכון: Never have I seen such a mess.
 
-אחרי מילה שלילית בהתחלה, פועל העזר בא לפני הנושא.
+למה: אחרי מילה שלילית בהתחלה, פועל העזר בא לפני הנושא.
 
-**2. שוכחים do**
+**טעות 2: שוכחים do**
 
 - לא נכון: Rarely we go out these days.
 - נכון: Rarely do we go out these days.
 
-כשאין פועל עזר, מוסיפים do, does או did.
+למה: כשאין פועל עזר, מוסיפים do, does או did.
 
-**3. היפוך כשהמילה לא בהתחלה**
+**טעות 3: היפוך כשהמילה לא בהתחלה**
 
 - לא נכון: I have never seen such a mess, have I.
 - נכון: I have never seen such a mess.
 
-היפוך קורה רק כשהמילה השלילית פותחת את המשפט.$md$),
+למה: היפוך קורה רק כשהמילה השלילית פותחת את המשפט.$md$),
   ('cleft-sentences', $md$משפטי הדגשה (It was... that, What I need is...) מקבילים ל"מה שאני צריך זה". הבעיה היא בעיקר בהתאם בין החלקים.
 
-**1. what ואחריו that**
+**טעות 1: what ואחריו that**
 
 - לא נכון: What I need it is a break.
 - נכון: What I need is a break.
 
-אין צורך ב-it. החלק של what הוא הנושא.
+למה: אין צורך ב-it. החלק של what הוא הנושא.
 
-**2. who במקום that במשפט It was**
+**טעות 2: who במקום that במשפט It was**
 
 - לא נכון: It was in Rome who we met.
 - נכון: It was in Rome that we met.
 
-כשמדגישים מקום או זמן, משתמשים ב-that.
+למה: כשמדגישים מקום או זמן, משתמשים ב-that.
 
-**3. היפוך מיותר**
+**טעות 3: היפוך מיותר**
 
 - לא נכון: What did she say was surprising.
 - נכון: What she said was surprising.
 
-בחלק של what הסדר הוא של משפט רגיל.$md$),
+למה: בחלק של what הסדר הוא של משפט רגיל.$md$),
   ('subjunctive', $md$אחרי suggest, insist ו-it's essential that באה צורת בסיס, בלי s ובלי should. זה נשמע מוזר, ולכן מתקנים את זה בטעות.
 
-**1. s אחרי suggest that**
+**טעות 1: s אחרי suggest that**
 
 - לא נכון: I suggest that he takes a break.
 - נכון: I suggest that he take a break.
 
-בצורה הרשמית הפועל נשאר בצורת בסיס, גם עם he.
+למה: בצורה הרשמית הפועל נשאר בצורת בסיס, גם עם he.
 
-**2. to אחרי suggest**
+**טעות 2: to אחרי suggest**
 
 - לא נכון: She suggested me to call.
 - נכון: She suggested that I call.
 
-suggest לא בא עם מושא ו-to.
+למה: suggest לא בא עם מושא ו-to.
 
-**3. were ו-was**
+**טעות 3: were ו-was**
 
 - לא נכון: If I was you, I'd ask.
 - נכון: If I were you, I'd ask.
 
-בדיבור שומעים גם was, אבל בכתיבה ובבחינות כותבים If I were you.$md$),
+למה: בדיבור שומעים גם was, אבל בכתיבה ובבחינות כותבים If I were you.$md$),
   ('zero-conditional', $md$משפט תנאי אפס מתאר עובדה קבועה. בעברית לפעמים משתמשים בעתיד, ובאנגלית שני החלקים בהווה.
 
-**1. will בעובדה קבועה**
+**טעות 1: will בעובדה קבועה**
 
 - לא נכון: If you heat ice, it will melt.
 - נכון: If you heat ice, it melts.
 
-לעובדה שתמיד נכונה, שני החלקים בהווה פשוט.
+למה: לעובדה שתמיד נכונה, שני החלקים בהווה פשוט.
 
-**2. s שנשכח בחלק השני**
+**טעות 2: s שנשכח בחלק השני**
 
 - לא נכון: If water reach 100 degrees, it boil.
 - נכון: If water reaches 100 degrees, it boils.
 
-water ו-it הם יחיד, ולכן s.
+למה: water ו-it הם יחיד, ולכן s.
 
-**3. when ו-if מתחלפים**
+**טעות 3: when ו-if מתחלפים**
 
 - לא נכון: If I wake up, I always drink water.
 - נכון: When I wake up, I always drink water.
 
-כשזה תמיד קורה, when טבעי יותר.$md$),
+למה: כשזה תמיד קורה, when טבעי יותר.$md$),
   ('question-tags', $md$בעברית אומרים "נכון?" בסוף כל משפט. באנגלית התג משתנה לפי הפועל במשפט, ותמיד הפוך ממנו.
 
-**1. isn't it על כל משפט**
+**טעות 1: isn't it על כל משפט**
 
 - לא נכון: You live in Tel Aviv, isn't it?
 - נכון: You live in Tel Aviv, don't you?
 
-התג משתמש בפועל העזר של המשפט ובנושא שלו.
+למה: התג משתמש בפועל העזר של המשפט ובנושא שלו.
 
-**2. חיובי אחרי חיובי**
+**טעות 2: חיובי אחרי חיובי**
 
 - לא נכון: She is nice, is she?
 - נכון: She is nice, isn't she?
 
-משפט חיובי מקבל תג שלילי, ולהפך.
+למה: משפט חיובי מקבל תג שלילי, ולהפך.
 
-**3. תג אחרי I am**
+**טעות 3: תג אחרי I am**
 
 - לא נכון: I'm late, amn't I?
 - נכון: I'm late, aren't I?
 
-ל-I am התג הוא aren't I.$md$),
+למה: ל-I am התג הוא aren't I.$md$),
   ('nominalisation', $md$הפיכת פועל לשם עצם (decide → decision) נותנת לכתיבה טון אקדמי. דוברי עברית לפעמים מגזימים, ולפעמים בוחרים סיומת לא קיימת.
 
-**1. סיומת לא קיימת**
+**טעות 1: סיומת לא קיימת**
 
 - לא נכון: The decidement was quick.
 - נכון: The decision was quick.
 
-לכל פועל יש שם עצם משלו, וצריך לבדוק אותו.
+למה: לכל פועל יש שם עצם משלו, וצריך לבדוק אותו.
 
-**2. יותר מדי שמות עצם**
+**טעות 2: יותר מדי שמות עצם**
 
 - לא נכון: The making of a decision about the improvement of the situation...
 - נכון: Deciding how to improve the situation...
 
-שני שמות עצם במשפט זה אקדמי. חמישה זה כבד.
+למה: שני שמות עצם במשפט זה אקדמי. חמישה זה כבד.
 
-**3. of ו-for**
+**טעות 3: of ו-for**
 
 - לא נכון: The increase of prices worried people.
 - נכון: The increase in prices worried people.
 
-increase ו-decrease באים עם in.$md$),
+למה: increase ו-decrease באים עם in.$md$),
   ('imperatives', $md$בעברית יש ציווי לכל מין ומספר. באנגלית יש צורה אחת, צורת הבסיס, וכמעט כל הטעויות הן בשלילה ובנימוס.
 
-**1. no במקום don't**
+**טעות 1: no במקום don't**
 
 - לא נכון: No touch the screen!
 - נכון: Don't touch the screen!
 
-שלילה בציווי נבנית עם Don't.
+למה: שלילה בציווי נבנית עם Don't.
 
-**2. you בהתחלה**
+**טעות 2: you בהתחלה**
 
 - לא נכון: You sit down, please.
 - נכון: Sit down, please.
 
-בציווי רגיל לא אומרים את you.
+למה: בציווי רגיל לא אומרים את you.
 
-**3. ציווי שנשמע קשוח**
+**טעות 3: ציווי שנשמע קשוח**
 
 - לא נכון: Give me the salt.
 - נכון: Could you pass me the salt?
 
-באנגלית ציווי ישיר יכול להישמע גס. בבקשה מנומסת משתמשים בשאלה.$md$),
+למה: באנגלית ציווי ישיר יכול להישמע גס. בבקשה מנומסת משתמשים בשאלה.$md$),
   ('object-pronouns', $md$בעברית אומרים "אותו", "לה" ו"איתם". באנגלית יש מילה אחת לכל מקום שבו האדם מקבל את הפעולה: me, him, her, us, them.
 
-**1. כינוי נושא במקום מושא**
+**טעות 1: כינוי נושא במקום מושא**
 
 - לא נכון: She called I yesterday.
 - נכון: She called me yesterday.
 
-אחרי פועל באים me, him, her, us, them.
+למה: אחרי פועל באים me, him, her, us, them.
 
-**2. אחרי מילת יחס**
+**טעות 2: אחרי מילת יחס**
 
 - לא נכון: This is for he.
 - נכון: This is for him.
 
-אחרי for, with ו-to באה צורת המושא.
+למה: אחרי for, with ו-to באה צורת המושא.
 
-**3. me and you בסדר הפוך**
+**טעות 3: me and you בסדר הפוך**
 
 - לא נכון: Me and Dana went out.
 - נכון: Dana and I went out.
 
-כנושא משתמשים ב-I, ובנימוס שמים את עצמנו בסוף.$md$),
+למה: כנושא משתמשים ב-I, ובנימוס שמים את עצמנו בסוף.$md$),
   ('question-words', $md$בעברית מספיקה מילת שאלה ואינטונציה: "איפה אתם גרים?". באנגלית צריך גם פועל עזר, ובסדר הנכון.
 
-**1. בלי פועל עזר**
+**טעות 1: בלי פועל עזר**
 
 - לא נכון: Where you live?
 - נכון: Where do you live?
 
-אחרי מילת השאלה בא do, does או did.
+למה: אחרי מילת השאלה בא do, does או did.
 
-**2. what במקום which**
+**טעות 2: what במקום which**
 
 - לא נכון: What color do you prefer, red or blue?
 - נכון: Which color do you prefer, red or blue?
 
-כשיש מספר אפשרויות ידוע, which.
+למה: כשיש מספר אפשרויות ידוע, which.
 
-**3. how much ו-how many**
+**טעות 3: how much ו-how many**
 
 - לא נכון: How much people came?
 - נכון: How many people came?
 
-how many לדברים שסופרים, how much לדברים שלא.
+למה: how many לדברים שסופרים, how much לדברים שלא.
 
-**4. do כשהשאלה על הנושא**
+**טעות 4: do כשהשאלה על הנושא**
 
 - לא נכון: Who did call you?
 - נכון: Who called you?
 
-כש-who הוא מי שעשה את הפעולה, אין do.$md$),
+למה: כש-who הוא מי שעשה את הפעולה, אין do.$md$),
   ('adverbs-of-frequency', $md$בעברית "תמיד" יכול לבוא כמעט בכל מקום. באנגלית ל-always, usually ו-never יש מקום קבוע במשפט.
 
-**1. אחרי הפועל**
+**טעות 1: אחרי הפועל**
 
 - לא נכון: I drink always coffee.
 - נכון: I always drink coffee.
 
-מילת התדירות באה לפני פועל רגיל.
+למה: מילת התדירות באה לפני פועל רגיל.
 
-**2. לפני be**
+**טעות 2: לפני be**
 
 - לא נכון: She always is late.
 - נכון: She is always late.
 
-עם be היא באה אחרי הפועל.
+למה: עם be היא באה אחרי הפועל.
 
-**3. never עם not**
+**טעות 3: never עם not**
 
 - לא נכון: I don't never eat meat.
 - נכון: I never eat meat.
 
-never כבר שלילי. אין שלילה כפולה.$md$),
+למה: never כבר שלילי. אין שלילה כפולה.$md$),
   ('possessive-s', $md$בעברית אומרים "האוטו של דני". באנגלית מוסיפים 's לבעלים, והטעויות הן בעיקר בגרש.
 
-**1. of לאנשים**
+**טעות 1: of לאנשים**
 
 - לא נכון: the car of Danny
 - נכון: Danny's car
 
-לאנשים ולבעלי חיים משתמשים ב-'s.
+למה: לאנשים ולבעלי חיים משתמשים ב-'s.
 
-**2. גרש ברבים**
+**טעות 2: גרש ברבים**
 
 - לא נכון: my parents's house
 - נכון: my parents' house
 
-לרבים שנגמר ב-s מוסיפים רק גרש.
+למה: לרבים שנגמר ב-s מוסיפים רק גרש.
 
-**3. גרש ברבים רגילים**
+**טעות 3: גרש ברבים רגילים**
 
 - לא נכון: I have two cat's.
 - נכון: I have two cats.
 
-גרש מסמן שייכות, לא רבים.$md$),
+למה: גרש מסמן שייכות, לא רבים.$md$),
   ('have-to', $md$"צריך" בעברית מתורגם לכמה דברים באנגלית. have to זה חובה, וההבדל החשוב באמת הוא בשלילה.
 
-**1. have to בלי do בשאלה**
+**טעות 1: have to בלי do בשאלה**
 
 - לא נכון: Have you to work tomorrow?
 - נכון: Do you have to work tomorrow?
 
-have to מתנהג כמו פועל רגיל ומקבל do.
+למה: have to מתנהג כמו פועל רגיל ומקבל do.
 
-**2. has to עם he**
+**טעות 2: has to עם he**
 
 - לא נכון: He have to leave.
 - נכון: He has to leave.
 
-עם he, she ו-it כותבים has to.
+למה: עם he, she ו-it כותבים has to.
 
-**3. don't have to ו-mustn't**
+**טעות 3: don't have to ו-mustn't**
 
 - לא נכון: You don't have to smoke here. (אסור)
 - נכון: You mustn't smoke here.
 
-don't have to זה לא חייבים. mustn't זה אסור.$md$),
+למה: don't have to זה לא חייבים. mustn't זה אסור.$md$),
   ('verb-gerund-or-infinitive', $md$בעברית אחרי פועל בא שם פועל: "נהנה לשחות". באנגלית יש פעלים שאחריהם בא ing, ויש שאחריהם בא to.
 
-**1. to אחרי enjoy**
+**טעות 1: to אחרי enjoy**
 
 - לא נכון: I enjoy to swim.
 - נכון: I enjoy swimming.
 
-אחרי enjoy, finish, avoid ו-mind בא ing.
+למה: אחרי enjoy, finish, avoid ו-mind בא ing.
 
-**2. ing אחרי want**
+**טעות 2: ing אחרי want**
 
 - לא נכון: I want going home.
 - נכון: I want to go home.
 
-אחרי want, decide, hope ו-plan בא to.
+למה: אחרי want, decide, hope ו-plan בא to.
 
-**3. look forward to + פועל בסיס**
+**טעות 3: look forward to + פועל בסיס**
 
 - לא נכון: I look forward to see you.
 - נכון: I look forward to seeing you.
 
-כאן to היא מילת יחס, ולכן אחריה ing.
+למה: כאן to היא מילת יחס, ולכן אחריה ing.
 
-**4. stop + to לעומת stop + ing**
+**טעות 4: stop + to לעומת stop + ing**
 
 - לא נכון: I stopped to smoke. (הפסקתי לעשן)
 - נכון: I stopped smoking.
 
-stop + to זה "עצרתי כדי לעשן".$md$),
+למה: stop + to זה "עצרתי כדי לעשן".$md$),
   ('may-might-possibility', $md$"אולי" בעברית היא מילה שעומדת בצד. באנגלית האפשרות נכנסת לפועל עצמו עם may או might.
 
-**1. maybe במקום might**
+**טעות 1: maybe במקום might**
 
 - לא נכון: Maybe I come later.
 - נכון: I might come later.
 
-maybe פותח משפט שלם עם פועל: Maybe I will come later.
+למה: maybe פותח משפט שלם עם פועל: Maybe I will come later.
 
-**2. to אחרי might**
+**טעות 2: to אחרי might**
 
 - לא נכון: She might to call.
 - נכון: She might call.
 
-אחרי might ו-may בא פועל בצורת בסיס.
+למה: אחרי might ו-may בא פועל בצורת בסיס.
 
-**3. might not בקיצור**
+**טעות 3: might not בקיצור**
 
 - לא נכון: I mightn't go.
 - נכון: I might not go.
 
-בדיבור יום יומי אומרים might not, בלי קיצור.$md$),
+למה: בדיבור יום יומי אומרים might not, בלי קיצור.$md$),
   ('so-such', $md$בעברית "כל כך" מתאים לכל דבר. באנגלית בוחרים: so לפני תואר לבד, such לפני שם עצם.
 
-**1. so לפני שם עצם**
+**טעות 1: so לפני שם עצם**
 
 - לא נכון: It was so a good movie.
 - נכון: It was such a good movie.
 
-כשיש שם עצם אחרי התואר, such a.
+למה: כשיש שם עצם אחרי התואר, such a.
 
-**2. such לפני תואר לבד**
+**טעות 2: such לפני תואר לבד**
 
 - לא נכון: The movie was such good.
 - נכון: The movie was so good.
 
-תואר לבד מקבל so.
+למה: תואר לבד מקבל so.
 
-**3. שוכחים את a**
+**טעות 3: שוכחים את a**
 
 - לא נכון: She is such nice person.
 - נכון: She is such a nice person.
 
-שם עצם ביחיד צריך a גם אחרי such.$md$),
+למה: שם עצם ביחיד צריך a גם אחרי such.$md$),
   ('causative-have-get', $md$בעברית אומרים "תיקנתי את האוטו" גם כשמוסך תיקן. באנגלית have something done אומר שמישהו אחר עשה את זה בשבילנו.
 
-**1. אומרים שעשינו בעצמנו**
+**טעות 1: אומרים שעשינו בעצמנו**
 
 - לא נכון: I cut my hair yesterday. (במספרה)
 - נכון: I had my hair cut yesterday.
 
-בלי had נשמע שהסתפרתם לבד.
+למה: בלי had נשמע שהסתפרתם לבד.
 
-**2. סדר המילים**
+**טעות 2: סדר המילים**
 
 - לא נכון: I had cut my hair.
 - נכון: I had my hair cut.
 
-הדבר בא באמצע, ואחריו הצורה השלישית.
+למה: הדבר בא באמצע, ואחריו הצורה השלישית.
 
-**3. צורת בסיס במקום צורה שלישית**
+**טעות 3: צורת בסיס במקום צורה שלישית**
 
 - לא נכון: We got the car fix.
 - נכון: We got the car fixed.
 
-אחרי הדבר באה צורה שלישית: fixed.$md$),
+למה: אחרי הדבר באה צורה שלישית: fixed.$md$),
   ('future-continuous-perfect', $md$בעברית יש עתיד אחד. באנגלית will be doing מתאר משהו באמצע, ו-will have done משהו שיהיה גמור עד נקודה מסוימת.
 
-**1. עתיד פשוט לפעולה באמצע**
+**טעות 1: עתיד פשוט לפעולה באמצע**
 
 - לא נכון: At 8 tonight I will watch the game.
 - נכון: At 8 tonight I will be watching the game.
 
-בשעה 8 המשחק כבר באמצע, ולכן be + ing.
+למה: בשעה 8 המשחק כבר באמצע, ולכן be + ing.
 
-**2. by + עתיד פשוט**
+**טעות 2: by + עתיד פשוט**
 
 - לא נכון: By Friday I will finish the project.
 - נכון: By Friday I will have finished the project.
 
-by + זמן אומר שעד אז זה כבר יהיה גמור.
+למה: by + זמן אומר שעד אז זה כבר יהיה גמור.
 
-**3. צורת עבר במקום צורה שלישית**
+**טעות 3: צורת עבר במקום צורה שלישית**
 
 - לא נכון: I will have went home by then.
 - נכון: I will have gone home by then.
 
-אחרי will have באה הצורה השלישית.$md$)
+למה: אחרי will have באה הצורה השלישית.$md$)
 ) as l(slug, body_md) on gt.slug = l.slug;
 
 -- Check: should be 32.
