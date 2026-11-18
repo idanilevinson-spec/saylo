@@ -25,6 +25,7 @@ import PrintedPage from "@/components/PrintedPage";
 import ListeningPlayer from "@/components/ListeningPlayer";
 import type { BagrutSampleUnit, BagrutReadingQuestion, BagrutVocabularyQuestion } from "@/lib/content/bagrut/sampleUnits";
 import BagrutCredit from "@/components/BagrutCredit";
+import TextRights from "@/components/TextRights";
 import { optionOrder } from "@/lib/utils/shuffle";
 import { withoutAnswerLetter } from "@/lib/content/bagrut/answerLetter";
 import { paragraphRef, splitParagraphs } from "@/lib/content/bagrut/studyHelpers";
@@ -318,6 +319,7 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
                 ))}
               </div>
             </PrintedPage>
+            <TextRights className="mt-2" />
           </div>
         ))}
 

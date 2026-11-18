@@ -5,6 +5,7 @@ import { ChevronRight, Target } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import PracticeLink from "@/components/PracticeLink";
 import PrintedPage, { DropCap, splitDropCap } from "@/components/PrintedPage";
+import TextRights from "@/components/TextRights";
 import { pageOpenGraph } from "@/lib/og/meta";
 import { breadcrumbJsonLd, jsonLdHtml } from "@/lib/site/breadcrumbs";
 import { CEFR_NAME_HE } from "@/lib/content/levelOrder";
@@ -98,6 +99,7 @@ export default async function EnglishReadingText({ params }: { params: Promise<{
             })}
           </div>
         </PrintedPage>
+        <TextRights className="mt-3" />
 
         {text.questions.length > 0 && (
           <section aria-labelledby="questions" className="mt-10">

@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { Timer, ChevronRight, CheckCircle2 } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
 import BagrutCredit from "@/components/BagrutCredit";
+import TextRights from "@/components/TextRights";
 import { BAGRUT_MODULE_FORMATS, type BagrutModuleCode } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_SAMPLE_UNITS } from "@/lib/content/bagrut/sampleUnits";
 import { BAGRUT_SKILLS } from "@/lib/content/bagrut/skills";
@@ -131,6 +132,7 @@ export default async function BagrutModulePage({ params }: { params: Promise<{ m
                   {sample.example.passageEn}
                 </p>
               )}
+              {sample.example.passageEn && <TextRights className="mt-2" />}
               <p dir="ltr" lang="en" className="mt-4 text-left font-content font-bold">
                 {sample.example.questionEn}
               </p>

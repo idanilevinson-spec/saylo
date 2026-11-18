@@ -6,11 +6,11 @@
 // s.14C); the email is the channel for cancellations and requests. No phone
 // number is published anywhere: neither of those rules requires one.
 
-export const LEGAL_UPDATED = "11.11.2026";
+export const LEGAL_UPDATED = "18.11.2026";
 
 // Bump when the terms or privacy policy change in substance. Saved next to
 // each email sign-up so we can show which version someone accepted.
-export const TERMS_VERSION = "2026-10-06";
+export const TERMS_VERSION = "2026-11-18";
 
 export const CONTACT_EMAIL = "saylo20037@gmail.com";
 

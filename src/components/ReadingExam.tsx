@@ -11,6 +11,7 @@ import { playCorrectSound, playIncorrectSound, playCompleteSound } from "@/lib/s
 import McqQuestion from "@/components/McqQuestion";
 import ReadingResponseForm from "@/components/ReadingResponseForm";
 import ReadingTextViewer from "@/components/ReadingTextViewer";
+import TextRights from "@/components/TextRights";
 import HeartsGate from "@/components/HeartsGate";
 import EnglishText from "@/components/EnglishText";
 import MotionLink from "@/components/MotionLink";
@@ -187,6 +188,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
         <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
         <div className="mt-3">
           <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} label="הבנת הנקרא" storyTitle={text.title_en} />
+          <TextRights className="mt-3" />
         </div>
       </>
     );
@@ -198,6 +200,7 @@ export default function ReadingExam({ text, exercises, openQuestions, vocabByWor
         <h2 className="mt-8 text-lg font-bold text-muted">הטקסט</h2>
         <div className="mt-3">
           <ReadingTextViewer bodyEn={text.body_en} vocabByWord={vocabByWord} textLevel={text.cefr_level} label="הבנת הנקרא" storyTitle={text.title_en} />
+          <TextRights className="mt-3" />
         </div>
 
         <h2 className="mt-8 text-lg font-bold text-muted">מבחן הבנה</h2>
