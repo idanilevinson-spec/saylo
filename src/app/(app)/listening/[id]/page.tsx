@@ -6,6 +6,7 @@ import CefrBadge from "@/components/CefrBadge";
 import ListeningPlayer from "@/components/ListeningPlayer";
 import MotionLink from "@/components/MotionLink";
 import ReportContentError from "@/components/ReportContentError";
+import TextRights from "@/components/TextRights";
 import { Target } from "lucide-react";
 import { getListeningClip } from "@/lib/content/listening";
 import { createClient } from "@/lib/supabase/serverClient";
@@ -69,6 +70,7 @@ export default async function ListeningClipPage({ params }: PageProps) {
           defaultRate={clip.style === "natural_speech" ? 0.75 : 1}
         />
       </div>
+      <TextRights className="mt-3" />
 
       {firstExercise && (
         <MotionLink
