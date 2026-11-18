@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { webPageJsonLd } from "@/lib/site/structuredData";
 import { pageOpenGraph } from "@/lib/og/meta";
 import Link from "next/link";
 import { BookOpen, PenLine, BookOpenText, Headphones, NotebookPen, ChevronLeft, type LucideIcon } from "lucide-react";
@@ -39,6 +41,22 @@ export default async function EnglishLevelTestPage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdHtml(
+            webPageJsonLd({
+              name: "מבחן רמה באנגלית לפי CEFR",
+              description: DESCRIPTION,
+              path: "/english-level-test",
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "מבחן רמה באנגלית", path: "/english-level-test" },
+              ],
+            }),
+          ),
+        }}
+      />
       <HubHeader title="מבחן רמה באנגלית">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           כ-10 דקות. בסוף מקבלים רמה לפי הסולם הבינלאומי (CEFR) לכל מיומנות בנפרד, כי קריאה ודיבור לא תמיד באותה רמה,

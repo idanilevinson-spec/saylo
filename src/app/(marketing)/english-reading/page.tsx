@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { collectionPageJsonLd } from "@/lib/site/structuredData";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -29,6 +31,23 @@ export default async function EnglishReadingIndex() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdHtml(
+            collectionPageJsonLd({
+              name: "קטעי קריאה באנגלית עם שאלות, לפי רמה",
+              description: DESCRIPTION,
+              path: "/english-reading",
+              items: texts.map((t) => ({ name: t.title_en, path: `/english-reading/${t.slug}` })),
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "קטעי קריאה באנגלית", path: "/english-reading" },
+              ],
+            }),
+          ),
+        }}
+      />
       <HubHeader title="קטעי קריאה באנגלית">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           {texts.length} טקסטים מקוריים עם שאלות הבנה, מקטעים קצרים לרמת מתחילים ועד מאמרים לרמה הגבוהה ביותר.

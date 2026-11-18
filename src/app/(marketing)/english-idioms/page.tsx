@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { collectionPageJsonLd } from "@/lib/site/structuredData";
 import type { CSSProperties } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import HubHeader from "@/components/HubHeader";
@@ -42,6 +44,23 @@ export default async function EnglishIdiomsPage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdHtml(
+            collectionPageJsonLd({
+              name: "ביטויים באנגלית ופירושם בעברית, לפי רמה",
+              description: DESCRIPTION,
+              path: "/english-idioms",
+              items: [],
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "ביטויים באנגלית", path: "/english-idioms" },
+              ],
+            }),
+          ),
+        }}
+      />
       <HubHeader title="ביטויים באנגלית ופירושם">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           {counts.idioms} ביטויים ו-{counts.phrasal} פעלים מורכבים (

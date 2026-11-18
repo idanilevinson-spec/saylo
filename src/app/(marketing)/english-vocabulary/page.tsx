@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { jsonLdHtml } from "@/lib/site/breadcrumbs";
+import { collectionPageJsonLd } from "@/lib/site/structuredData";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -31,6 +33,23 @@ export default async function EnglishVocabularyIndex() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdHtml(
+            collectionPageJsonLd({
+              name: "אוצר מילים באנגלית לפי נושא ורמה",
+              description: DESCRIPTION,
+              path: "/english-vocabulary",
+              items: topics.map((t) => ({ name: t.name_he, path: `/english-vocabulary/${t.slug}` })),
+              trail: [
+                { name: "Saylo", path: "/" },
+                { name: "אוצר מילים באנגלית", path: "/english-vocabulary" },
+              ],
+            }),
+          ),
+        }}
+      />
       <HubHeader title="אוצר מילים באנגלית לפי נושא">
         <p className="mt-3 max-w-2xl text-lg text-muted leading-relaxed">
           {words} מילים ב-{topics.length} נושאים. לכל מילה: תרגום, הגייה, משפט לדוגמה והגדרה פשוטה באנגלית.
