@@ -8,7 +8,7 @@
 const APOSTROPHES = /[‘’ʼ`´]/g;
 const TRAILING_PUNCTUATION = /[\s.?!,;:]+$/;
 
-export function normalizeAnswer(text: string): string {
+export function normalizeWordAnswer(text: string): string {
   return text
     .replace(APOSTROPHES, "'")
     .trim()

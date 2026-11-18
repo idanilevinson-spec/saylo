@@ -1,4 +1,4 @@
-import { normalizeAnswer } from "./answerNormalize";
+import { normalizeWordAnswer } from "./answerNormalize";
 import { shuffle } from "@/lib/utils/shuffle";
 import type { VocabularyItemLite } from "@/lib/games/testContent";
 
@@ -47,8 +47,22 @@ export function buildSpeakingTest(
   return shuffle(steps);
 }
 
+// Speech recognition writes spoken numbers as digits ("eleven" -> "11",
+// "first" -> "1st"), so a learner who says the number word right would be
+// marked wrong. Spoken answers only: a typed "11" stays wrong.
+const NUMBER_WORDS: Record<string, string> = {
+  "0": "zero", "1": "one", "2": "two", "3": "three", "4": "four", "5": "five", "6": "six",
+  "7": "seven", "8": "eight", "9": "nine", "10": "ten", "11": "eleven", "12": "twelve",
+  "13": "thirteen", "14": "fourteen", "15": "fifteen", "16": "sixteen", "17": "seventeen",
+  "18": "eighteen", "19": "nineteen", "20": "twenty", "30": "thirty", "40": "forty",
+  "50": "fifty", "60": "sixty", "70": "seventy", "80": "eighty", "90": "ninety",
+  "100": "hundred", "1000": "thousand", "1,000": "thousand", "1st": "first", "2nd": "second", "3rd": "third",
+};
+
 // Same normalization as testContent.ts's recall grading — a transcribed
-// spoken answer gets the identical exact-match treatment as a typed one.
+// spoken answer gets the identical exact-match treatment as a typed one,
+// plus number digits read back as words.
 export function normalizeSpokenWord(text: string): string {
-  return normalizeAnswer(text);
+  const normalized = normalizeWordAnswer(text).replace(/^(a|one) (hundred|thousand)$/, "$2");
+  return NUMBER_WORDS[normalized] ?? normalized;
 }

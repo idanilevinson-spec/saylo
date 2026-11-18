@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { normalizeAnswer } from "./answerNormalize";
+import { normalizeWordAnswer } from "./answerNormalize";
 import { checkSpelling } from "./spelling";
 import { gradeTestStep } from "./testContent";
 import { normalizeSpokenWord } from "./speakingTestContent";
 
-describe("normalizeAnswer", () => {
+describe("normalizeWordAnswer", () => {
   it("accepts the iPhone's curly apostrophe for a straight one", () => {
     expect(checkSpelling("You’re welcome", "you're welcome")).toBe(true);
     expect(checkSpelling("what‘s up", "what's up")).toBe(true);
@@ -15,10 +15,19 @@ describe("normalizeAnswer", () => {
     expect(normalizeSpokenWord("Good night.")).toBe("good night");
   });
 
+  it("reads digits from speech recognition back as number words", () => {
+    expect(normalizeSpokenWord("11.")).toBe(normalizeSpokenWord("eleven"));
+    expect(normalizeSpokenWord("100")).toBe(normalizeSpokenWord("hundred"));
+    expect(normalizeSpokenWord("a hundred")).toBe(normalizeSpokenWord("hundred"));
+    expect(normalizeSpokenWord("1st")).toBe(normalizeSpokenWord("first"));
+    expect(normalizeSpokenWord("12")).not.toBe(normalizeSpokenWord("eleven"));
+    expect(checkSpelling("11", "eleven")).toBe(false);
+  });
+
   it("still rejects a different word", () => {
     expect(checkSpelling("your welcome", "you're welcome")).toBe(false);
     expect(checkSpelling("hi", "hello")).toBe(false);
-    expect(normalizeAnswer("cats")).not.toBe(normalizeAnswer("cat"));
+    expect(normalizeWordAnswer("cats")).not.toBe(normalizeWordAnswer("cat"));
   });
 
   it("grades a typed recall step the same way", () => {

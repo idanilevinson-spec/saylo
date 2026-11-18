@@ -1,4 +1,4 @@
-import { normalizeAnswer } from "./answerNormalize";
+import { normalizeWordAnswer } from "./answerNormalize";
 import { shuffle } from "@/lib/utils/shuffle";
 
 export interface VocabularyItemLite {
@@ -82,7 +82,7 @@ export function buildVocabTest(items: VocabularyItemLite[], length = MCQ_COUNT +
 }
 
 function normalize(text: string): string {
-  return normalizeAnswer(text);
+  return normalizeWordAnswer(text);
 }
 
 export function gradeTestStep(step: TestStep, response: unknown): boolean {
