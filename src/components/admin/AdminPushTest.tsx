@@ -10,10 +10,10 @@ export default function AdminPushTest() {
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
   const [result, setResult] = useState<{ message: string; lines: string[] } | null>(null);
 
-  async function send() {
+  async function send(delayed: boolean) {
     setState("sending");
     try {
-      const res = await fetch("/api/admin/test-push", { method: "POST" });
+      const res = await fetch(`/api/admin/test-push${delayed ? "?delay=1" : ""}`, { method: "POST" });
       const data = (await res.json()) as { message?: string; lines?: string[] };
       setResult({ message: data.message ?? "הבדיקה נכשלה.", lines: data.lines ?? [] });
     } catch {
@@ -28,14 +28,27 @@ export default function AdminPushTest() {
       <p className="mt-1 text-sm text-muted">
         על כל נרשם חדש, בקשה לחזור אליו ושיחה חדשה בצ&apos;אט העזרה נשלחת התראה למכשירים של המנהלים.
       </p>
-      <button
-        type="button"
-        onClick={send}
-        disabled={state === "sending"}
-        className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-      >
-        {state === "sending" ? "שולח..." : "שליחת התראת בדיקה"}
-      </button>
+      <p className="mt-1 text-sm text-muted">
+        באייפון, התראה שמגיעה בזמן שהאפליקציה פתוחה על המסך לא מוצגת. לכן כדאי לבדוק עם &quot;בעוד 10 שניות&quot; ולצאת מהאפליקציה.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => send(true)}
+          disabled={state === "sending"}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        >
+          {state === "sending" ? "שולח..." : "שליחת בדיקה בעוד 10 שניות"}
+        </button>
+        <button
+          type="button"
+          onClick={() => send(false)}
+          disabled={state === "sending"}
+          className="rounded-lg border border-card-border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+        >
+          שליחה עכשיו (עם פירוט)
+        </button>
+      </div>
       {result && (
         <div className="mt-3 text-sm" role="status">
           <p className="font-semibold">{result.message}</p>
