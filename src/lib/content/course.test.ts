@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/supabase/browserClient", () => ({ supabase: {} }));
 
 import { COURSE_LEVELS, COURSE_UNITS, findUnit, unitNumber, unitsForLevel } from "./course";
-import { pickCheckQuestions, pickCurrent, questionsStatus, summarizeUnit, topicStatus, type ResolvedStep } from "./courseProgress";
+import { FIXED_STEP_MINUTES, firstStepMinutes, pickCheckQuestions, pickCurrent, questionsStatus, summarizeUnit, topicStatus, type ResolvedStep } from "./courseProgress";
 
 // Whether each key matches real content is checked against the database
 // by scripts/course-audit.mjs; these hold the shape of the map itself.
@@ -98,5 +98,21 @@ describe("course progress", () => {
     expect(even.filter((q) => q.startsWith("g"))).toHaveLength(5);
     expect(pickCheckQuestions(vocab.slice(0, 2), grammar, 10).filter((q) => q.startsWith("g"))).toHaveLength(8);
     expect(pickCheckQuestions([], grammar.slice(0, 4), 10)).toHaveLength(4);
+  });
+});
+
+// The placement result says how long the first practice takes, from the
+// unit's first step alone (its content is not loaded yet).
+describe("firstStepMinutes", () => {
+  it("gives a time for the first step of every level's first unit", () => {
+    for (const level of COURSE_LEVELS) {
+      const unit = unitsForLevel(level)[0];
+      expect(firstStepMinutes(unit)).toBe(FIXED_STEP_MINUTES[unit.steps[0].kind as keyof typeof FIXED_STEP_MINUTES]);
+    }
+  });
+
+  it("says nothing when the first step's length depends on its text", () => {
+    const unit = { ...unitsForLevel("A1")[0], steps: [{ kind: "reading" as const, ref: "My Family" }] };
+    expect(firstStepMinutes(unit)).toBeNull();
   });
 });
