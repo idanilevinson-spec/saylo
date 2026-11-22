@@ -5,6 +5,7 @@ import { AuthProvider } from "@/context/AuthProvider";
 import Navbar from "@/components/Navbar";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import AppUpdateWatcher from "@/components/AppUpdateWatcher";
+import PushTapHandler from "@/components/PushTapHandler";
 import OfflineBanner from "@/components/OfflineBanner";
 import PageTransition from "@/components/PageTransition";
 import AccessibilityProvider from "@/components/AccessibilityProvider";
@@ -125,6 +126,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         <ServiceWorkerRegister />
         <AppUpdateWatcher />
+        <PushTapHandler />
         <OfflineBanner />
         <AccessibilityProvider>
           <AuthProvider>

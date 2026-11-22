@@ -36,6 +36,16 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: "automatic",
   },
+  plugins: {
+    // Without this, iOS shows nothing when a push arrives while the app is
+    // open on screen (the owner pressed the admin test button inside the app
+    // and saw no notification, 22.11.2026). Show the banner, play the
+    // sound and update the badge in the foreground too. Native setting:
+    // takes effect from the next App Store build (Codemagic runs cap sync).
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"],
+    },
+  },
 };
 
 export default config;
