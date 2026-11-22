@@ -99,6 +99,8 @@ export default function SignupForm() {
         .from("subscriptions")
         .insert({ profile_id: data.user.id, status: "trialing", trial_ends_at: trialEndsAt });
 
+      // Tells the admins' phones about the new signup; never blocks the learner.
+      void fetch("/api/notify/new-signup", { method: "POST", keepalive: true }).catch(() => undefined);
       router.push("/dashboard");
       return;
     }

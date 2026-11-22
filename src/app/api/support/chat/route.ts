@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/serverClient";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { logAiUsage } from "@/lib/ai/usageLog";
+import { isRealPerson, notifyAdmins } from "@/lib/notifications/adminPush";
 import { runSupportAgent, type AgentEvent } from "@/lib/support/agent";
 import { buildSupportContext } from "@/lib/support/systemPrompt";
 import { readAccountStatus } from "@/lib/support/tools";
@@ -104,6 +105,7 @@ export async function POST(request: Request) {
       .single();
     if (error || !data) return NextResponse.json({ error: "server_error" }, { status: 500 });
     conversation = data;
+    after(() => notifyNewConversation(user?.id ?? null, pagePath ?? null));
   }
   const convId = conversation.id;
 
@@ -276,6 +278,7 @@ async function answerQuickReply(request: Request, body: z.infer<typeof Body>, id
       });
       if (error) return;
       messageCount = 0;
+      await notifyNewConversation(knownUser?.id ?? null, body.pagePath ?? null);
     }
     await supabaseAdmin.from("support_messages").insert({ conversation_id: conversationId, role: "user", content: QUICK_REPLIES[id] });
     await Promise.all([
@@ -301,5 +304,16 @@ async function answerQuickReply(request: Request, body: z.infer<typeof Body>, id
   ];
   return new Response(events.map((event) => JSON.stringify(event)).join("\n") + "\n", {
     headers: { "Content-Type": "application/x-ndjson; charset=utf-8", "Cache-Control": "no-store" },
+  });
+}
+
+// One push to the admins' phones per new help-chat conversation (not per
+// message), so the owner sees in real time that someone is asking for help.
+async function notifyNewConversation(profileId: string | null, pagePath: string | null) {
+  if (!(await isRealPerson(profileId))) return;
+  await notifyAdmins({
+    title: "פנייה חדשה בצ'אט העזרה",
+    body: `${profileId ? "משתמש רשום" : "מבקר שלא נרשם"} פתח שיחה${pagePath ? ` מהעמוד ${pagePath}` : ""}.`,
+    url: "/admin/support",
   });
 }

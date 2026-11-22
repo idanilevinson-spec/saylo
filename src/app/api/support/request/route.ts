@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/serverClient";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { sendSupportRequestNotification } from "@/lib/notifications/resend";
+import { isRealPerson, notifyAdmins } from "@/lib/notifications/adminPush";
 import { clientIp, ownerKey, supportHash, VISITOR_TOKEN_PATTERN } from "@/lib/support/identity";
 import { consumeRateLimit, SUPPORT_LIMITS } from "@/lib/support/rateLimit";
 import { isValidEmail, normalizePhone } from "@/lib/support/contact";
 import { redactSensitiveNumbers } from "@/lib/support/redact";
-import { SUPPORT_CHANNELS, SUPPORT_TOPICS } from "@/lib/support/topics";
+import { SUPPORT_CHANNELS, SUPPORT_TOPICS, SUPPORT_TOPIC_LABELS } from "@/lib/support/topics";
 
 const Body = z.object({
   conversationId: z.uuid().nullish(),
@@ -100,6 +101,15 @@ export async function POST(request: Request) {
     adminUrl: `${new URL(request.url).origin}/admin/support?request=${saved.id}`,
   });
   if (!emailSent) console.error("support request saved but notification email not sent", saved.id);
+
+  after(async () => {
+    if (!(await isRealPerson(user?.id))) return;
+    await notifyAdmins({
+      title: "בקשה לחזור אליו",
+      body: `${user ? "משתמש רשום" : "מבקר שלא נרשם"} ביקש שיחזרו אליו (${SUPPORT_TOPIC_LABELS[body.topic]}).`,
+      url: `/admin/support?request=${saved.id}`,
+    });
+  });
 
   return NextResponse.json({ reference: saved.id.slice(0, 8).toUpperCase() });
 }

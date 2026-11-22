@@ -88,6 +88,9 @@ export default function ProfileSetupPage() {
       .from("subscriptions")
       .insert({ profile_id: session.user.id, status: "trialing", trial_ends_at: trialEndsAt });
 
+    // Tells the admins' phones about the new signup; never blocks the learner.
+    void fetch("/api/notify/new-signup", { method: "POST", keepalive: true }).catch(() => undefined);
+
     if (!alreadyAccepted) {
       await supabase.auth.updateUser({ data: termsConsentMetadata() });
     }
