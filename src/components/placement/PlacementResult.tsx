@@ -203,7 +203,7 @@ export function PlacementResultView({ result }: { result: PlacementResult }) {
             {firstUnit ? (
               <span>
                 לתרגול הראשון: {firstUnit.titleHe}
-                {firstMinutes && <span className="font-medium tabular-nums"> · כ-{firstMinutes} דקות</span>}
+                {firstMinutes && <span className="font-medium tabular-nums whitespace-nowrap"> · כ-{firstMinutes} דקות</span>}
               </span>
             ) : (
               "ללוח הבקרה"
