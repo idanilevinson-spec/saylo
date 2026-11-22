@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useEffect } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, ChevronLeft, ChevronRight, ClipboardCheck, Clock, Play, Trophy } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
 import { KIND_META } from "@/components/dashboard/TodayAtLevel";
@@ -14,9 +15,21 @@ import { stepGoal, stepProgressText } from "@/lib/content/courseStepText";
 
 export default function CourseUnitPage() {
   const { unitId } = useParams<{ unitId: string }>();
+  const router = useRouter();
   const course = useCourseProgress();
+  // "?start=1" (from the placement result): open the unit's next step at
+  // once, so a new learner lands in a practice, not in one more list.
+  const autoStart = useSearchParams().has("start");
+  const startProgress = autoStart && course ? course.units.find((u) => u.unit.id === unitId) : undefined;
+  const startStep = startProgress ? nextInUnit(startProgress) : null;
+  const startTarget = startProgress && startStep && startStep !== "check" ? startStep : null;
+  useEffect(() => {
+    if (!startProgress || !startTarget) return;
+    setActiveUnit(unitSession(startProgress));
+    router.replace(startTarget.href);
+  }, [startProgress, startTarget, router]);
 
-  if (!course) {
+  if (!course || startTarget) {
     return (
       <div className="max-w-2xl mx-auto px-4 pt-8 pb-16" aria-busy="true">
         <div className="h-5 w-32 rounded bg-background-2 animate-pulse" />
@@ -49,15 +62,7 @@ export default function CourseUnitPage() {
   const nextUnit = course.units[index + 1] ?? null;
   const levelSize = unitsForLevel(unit.level).length;
 
-  const remember = () =>
-    setActiveUnit({
-      id: unit.id,
-      number,
-      level: unit.level,
-      titleHe: unit.titleHe,
-      paths: progress.steps.map((s) => stepPath(s.href)),
-      goals: Object.fromEntries(progress.steps.map((s) => [stepPath(s.href), stepGoal(s.kind)])),
-    });
+  const remember = () => setActiveUnit(unitSession(progress));
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-8 pb-16">
@@ -157,6 +162,18 @@ export default function CourseUnitPage() {
       </nav>
     </div>
   );
+}
+
+// What a step's page needs to offer the way back to its unit.
+function unitSession(progress: UnitProgress) {
+  return {
+    id: progress.unit.id,
+    number: progress.number,
+    level: progress.unit.level,
+    titleHe: progress.unit.titleHe,
+    paths: progress.steps.map((s) => stepPath(s.href)),
+    goals: Object.fromEntries(progress.steps.map((s) => [stepPath(s.href), stepGoal(s.kind)])),
+  };
 }
 
 function StatusIcon({ status }: { status: ResolvedStep["status"] }) {

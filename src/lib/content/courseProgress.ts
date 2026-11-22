@@ -75,6 +75,16 @@ export interface CourseProgress {
 export const MASTERED_THRESHOLD = 80;
 export const MIN_ATTEMPTS_FOR_MASTERY = 3;
 
+// Steps whose length does not depend on the text: the same number the unit
+// page shows, so a link into a step can say how long it takes before the
+// step's content is loaded. Reading and listening depend on the text length.
+export const FIXED_STEP_MINUTES = { vocabulary: 6, grammar: 8, writing: 10, speaking: 10 } as const;
+
+export function firstStepMinutes(unit: CourseUnit): number | null {
+  const kind = unit.steps[0]?.kind;
+  return kind && kind in FIXED_STEP_MINUTES ? FIXED_STEP_MINUTES[kind as keyof typeof FIXED_STEP_MINUTES] : null;
+}
+
 export function topicStatus(correct: number, total: number): StepStatus {
   if (total === 0) return "todo";
   return total >= MIN_ATTEMPTS_FOR_MASTERY && (correct / total) * 100 >= MASTERED_THRESHOLD ? "done" : "started";
@@ -145,8 +155,8 @@ async function loadContent(): Promise<Record<CourseStepKind, Map<string, Content
   ]);
   const index = (rows: ContentRow[]) => new Map(rows.map((r) => [r.key, r]));
   return {
-    vocabulary: index((vocab.data ?? []).map((t) => ({ id: t.id, key: t.slug, titleHe: t.name_he, titleEn: t.name_en, minutes: 6 }))),
-    grammar: index((grammar.data ?? []).map((t) => ({ id: t.id, key: t.slug, titleHe: t.name_he, titleEn: t.name_en, minutes: 8 }))),
+    vocabulary: index((vocab.data ?? []).map((t) => ({ id: t.id, key: t.slug, titleHe: t.name_he, titleEn: t.name_en, minutes: FIXED_STEP_MINUTES.vocabulary }))),
+    grammar: index((grammar.data ?? []).map((t) => ({ id: t.id, key: t.slug, titleHe: t.name_he, titleEn: t.name_en, minutes: FIXED_STEP_MINUTES.grammar }))),
     reading: index(
       (reading.data ?? []).map((t) => ({
         id: t.id,
@@ -165,8 +175,8 @@ async function loadContent(): Promise<Record<CourseStepKind, Map<string, Content
         minutes: Math.max(1, Math.round(words(t.transcript_en) / 130)) + 3,
       })),
     ),
-    writing: index((writing.data ?? []).map((t) => ({ id: t.id, key: t.id, titleHe: t.title_he, titleEn: null, minutes: 10 }))),
-    speaking: index((scenarios.data ?? []).map((t) => ({ id: t.id, key: t.slug, titleHe: t.title_he, titleEn: t.title_en, minutes: 10 }))),
+    writing: index((writing.data ?? []).map((t) => ({ id: t.id, key: t.id, titleHe: t.title_he, titleEn: null, minutes: FIXED_STEP_MINUTES.writing }))),
+    speaking: index((scenarios.data ?? []).map((t) => ({ id: t.id, key: t.slug, titleHe: t.title_he, titleEn: t.title_en, minutes: FIXED_STEP_MINUTES.speaking }))),
   };
 }
 
