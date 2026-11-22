@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { createClient } from "@/lib/supabase/serverClient";
 import { supabaseAdmin } from "@/lib/supabase/adminClient";
 import { sendPushNotification } from "@/lib/notifications/webpush";
@@ -30,7 +30,44 @@ function explainApns(r: ApnsResult): string {
   }
 }
 
-async function run() {
+async function sendToOwnDevices(userId: string) {
+  const payload = { title: "בדיקת התראות Saylo", body: "אם אתם רואים את זה, ההתראות עובדות!", url: "/admin" };
+
+  const [{ data: webSubs }, { data: deviceTokens }] = await Promise.all([
+    supabaseAdmin.from("push_subscriptions").select("*").eq("profile_id", userId),
+    supabaseAdmin.from("device_push_tokens").select("*").eq("profile_id", userId),
+  ]);
+
+  const lines: string[] = [];
+  // For the server log: what Apple / the browser said, never the token itself.
+  const log: { kind: string; ok: boolean; reason?: string; status?: number }[] = [];
+  let sent = 0;
+
+  for (const device of deviceTokens ?? []) {
+    const r = await sendApnsPush(device.token, payload);
+    if (r.ok) sent++;
+    if (r.expired) await supabaseAdmin.from("device_push_tokens").delete().eq("token", device.token);
+    log.push({ kind: "ios", ok: r.ok, reason: r.reason, status: r.status });
+    lines.push(`אייפון (נרשם ב-${new Date(device.created_at).toLocaleDateString("he-IL")}): ${explainApns(r)}`);
+  }
+  for (const sub of webSubs ?? []) {
+    const r = await sendPushNotification(sub, payload);
+    if (r.ok) sent++;
+    if (r.expired) await supabaseAdmin.from("push_subscriptions").delete().eq("id", sub.id);
+    log.push({ kind: "web", ok: r.ok });
+    lines.push(`דפדפן: ${r.ok ? "נשלחה." : r.expired ? "הרישום כבר לא תקף ונמחק." : "השליחה נכשלה."}`);
+  }
+
+  if (lines.length === 0) {
+    lines.push("אין אף מכשיר רשום להתראות. באפליקציה: פרופיל, להדליק התראות, ואז לבדוק שוב.");
+  }
+  console.log("test-push result", JSON.stringify(log));
+  return { sent, lines };
+}
+
+const DELAY_SECONDS = 10;
+
+async function run(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -47,32 +84,22 @@ async function run() {
     return NextResponse.json({ error: "forbidden", message: "רק מנהל יכול להריץ את הבדיקה." }, { status: 403 });
   }
 
-  const payload = { title: "בדיקת התראות Saylo", body: "אם אתם רואים את זה, ההתראות עובדות!", url: "/admin" };
-
-  const [{ data: webSubs }, { data: deviceTokens }] = await Promise.all([
-    supabaseAdmin.from("push_subscriptions").select("*").eq("profile_id", user.id),
-    supabaseAdmin.from("device_push_tokens").select("*").eq("profile_id", user.id),
-  ]);
-
-  const lines: string[] = [];
-  let sent = 0;
-
-  for (const device of deviceTokens ?? []) {
-    const r = await sendApnsPush(device.token, payload);
-    if (r.ok) sent++;
-    if (r.expired) await supabaseAdmin.from("device_push_tokens").delete().eq("token", device.token);
-    lines.push(`אייפון (נרשם ב-${new Date(device.created_at).toLocaleDateString("he-IL")}): ${explainApns(r)}`);
-  }
-  for (const sub of webSubs ?? []) {
-    const r = await sendPushNotification(sub, payload);
-    if (r.ok) sent++;
-    if (r.expired) await supabaseAdmin.from("push_subscriptions").delete().eq("id", sub.id);
-    lines.push(`דפדפן: ${r.ok ? "נשלחה." : r.expired ? "הרישום כבר לא תקף ונמחק." : "השליחה נכשלה."}`);
+  // A notification that arrives while the app is open on screen is not
+  // shown by iOS (the app doesn't ask for foreground banners). "delay" lets
+  // the admin leave the app first; the result then goes to the server log.
+  if (new URL(request.url).searchParams.get("delay")) {
+    after(async () => {
+      await new Promise((r) => setTimeout(r, DELAY_SECONDS * 1000));
+      await sendToOwnDevices(user.id);
+    });
+    return NextResponse.json({
+      message: `ההתראה תישלח בעוד ${DELAY_SECONDS} שניות. צא עכשיו מהאפליקציה למסך הבית, או נעל את הטלפון, וחכה.`,
+      lines: [],
+      sent: 0,
+    });
   }
 
-  if (lines.length === 0) {
-    lines.push("אין אף מכשיר רשום להתראות. באפליקציה: פרופיל, להדליק התראות, ואז לבדוק שוב.");
-  }
+  const { sent, lines } = await sendToOwnDevices(user.id);
 
   return NextResponse.json({
     message: sent > 0 ? `נשלחה התראת בדיקה ל-${sent} מכשירים.` : "ההתראה לא נשלחה.",
@@ -81,9 +108,9 @@ async function run() {
   });
 }
 
-async function handle() {
+async function handle(request: Request) {
   try {
-    return await run();
+    return await run(request);
   } catch (err) {
     console.error("test-push failed", err);
     return NextResponse.json({ error: "server_error", message: "שגיאה בשרת בזמן הבדיקה." }, { status: 500 });
