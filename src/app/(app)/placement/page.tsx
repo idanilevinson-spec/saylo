@@ -17,6 +17,7 @@ import type { BagrutStudyUnits } from "@/lib/content/bagrut/moduleFormats";
 import { BAGRUT_PLACEMENT_SECTIONS } from "@/lib/content/bagrut/placementItems";
 import BagrutCredit from "@/components/BagrutCredit";
 import { placementResumePoint } from "@/lib/assessment/placementResume";
+import { partAt, placementParts } from "@/lib/placement/parts";
 import { PlacementFinishing, PlacementResultView, SKILL_LABELS_HE, SKILL_ORDER, type PlacementResult } from "@/components/placement/PlacementResult";
 
 import { EASE_OUT } from "@/lib/motion/easing";
@@ -544,16 +545,35 @@ export default function PlacementPage() {
     );
   }
 
+  const parts = placementParts(questions.map((q) => q.skill_area));
+  const current = partAt(parts, index);
+
   return (
     <div className="max-w-xl mx-auto px-4 py-12">
-      <p className="text-sm text-muted mb-4">
-        שאלה {index + 1} מתוך {questions.length}
-      </p>
-      <div className="h-1.5 rounded-full bg-background-2 overflow-hidden mb-8">
-        <div
-          className="h-full bg-primary transition-[width] duration-300"
-          style={{ width: `${((index + 1) / questions.length) * 100}%` }}
-        />
+      {current ? (
+        <p className="mb-4 flex flex-wrap items-baseline justify-between gap-x-3 text-sm">
+          <span className="font-bold">
+            חלק {current.number} מתוך {parts.length}: {current.part.label}
+          </span>
+          <span className="text-muted tabular-nums">
+            שאלה {index - current.part.start + 1} מתוך {current.part.size}
+          </span>
+        </p>
+      ) : (
+        <p className="text-sm text-muted mb-4">
+          שאלה {index + 1} מתוך {questions.length}
+        </p>
+      )}
+      {/* One segment per part, so the end of a part is in sight. */}
+      <div className="mb-8 flex gap-1" aria-hidden="true">
+        {parts.map((p) => (
+          <div key={p.start} className="h-1.5 rounded-full bg-background-2 overflow-hidden" style={{ flexGrow: p.size }}>
+            <div
+              className="h-full bg-primary transition-[width] duration-300"
+              style={{ width: `${Math.min(1, Math.max(0, (index + 1 - p.start) / p.size)) * 100}%` }}
+            />
+          </div>
+        ))}
       </div>
 
       <motion.div
