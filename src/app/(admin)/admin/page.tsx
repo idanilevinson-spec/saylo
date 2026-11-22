@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/browserClient";
 import type { DashboardMetrics } from "@/lib/admin/dashboardMetrics";
+import AdminPushTest from "@/components/admin/AdminPushTest";
 
 interface Metrics {
   totalUsers: number;
@@ -101,6 +102,7 @@ export default function AdminOverviewPage() {
           {metrics.testAccountCount} חשבונות בדיקה לא נכללים במספרי המשתמשים, הפעילות וההכנסה.
         </p>
       )}
+      <AdminPushTest />
     </div>
   );
 }
