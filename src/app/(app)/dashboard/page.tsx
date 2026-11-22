@@ -34,6 +34,7 @@ import { KIND_META } from "@/components/dashboard/TodayAtLevel";
 import CourseLead, { courseNextHref } from "@/components/dashboard/CourseLead";
 import ReminderOptIn from "@/components/dashboard/ReminderOptIn";
 import TrialCarryover from "@/components/dashboard/TrialCarryover";
+import { showFirstStepsOnly } from "@/components/dashboard/firstSteps";
 import { useCourseProgress } from "@/components/course/useCourseProgress";
 import { getLevelPlan, type LevelPlan, type PlanKind } from "@/lib/content/levelPlan";
 import SubscriptionBanner from "@/components/SubscriptionBanner";
@@ -203,6 +204,70 @@ export default function DashboardPage() {
   }
 
   const todayXp = stats?.todayXp ?? 0;
+  const firstSteps = showFirstStepsOnly(stats?.totalXp ?? null, !!plan?.overall);
+
+  const allAreas = (
+    <>
+      <div className="mt-10 grid lg:grid-cols-[1.1fr_1fr] gap-3">
+        <DailyGoal profileId={profile.id} todayXp={todayXp} />
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-3">
+          {FEATURED_MODULES.map((m) => (
+            <div key={m.title}>
+              <Link
+                href={m.href}
+                className="game-press lit-plate lit-hover group h-full flex items-center gap-4 rounded-lg border border-card-border p-4 duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+              >
+                <span
+                  className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
+                    m.tone === "accent" ? "bg-accent/15 text-accent-hover" : "bg-primary/10 text-primary-hover"
+                  }`}
+                >
+                  <m.icon size={21} strokeWidth={2} aria-hidden="true" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-bold">{m.title}</h3>
+                  <p className="mt-0.5 text-xs text-muted truncate">{m.body}</p>
+                </div>
+                <ChevronLeft size={17} aria-hidden="true" className="shrink-0 text-muted transition-transform group-hover:-translate-x-0.5" />
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* In the first-steps view the summary above is this heading. */}
+      {!firstSteps && <h2 className="mt-12 text-xl font-black tracking-tight">כל האזורים</h2>}
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+        {MODULE_GROUPS.map((group) => (
+          <div key={group.title}>
+            <h2 className="text-sm font-bold text-muted mb-3">{group.title}</h2>
+            <div className="lit-plate rounded-lg border border-card-border overflow-hidden divide-y divide-card-border">
+              {group.items.map((m) => (
+                <Link
+                  key={m.title}
+                  href={m.href}
+                  className="lit-row group flex items-center gap-3 px-4 py-3.5 hover:bg-background-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+                >
+                  <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
+                    <m.icon size={18} strokeWidth={2} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-sm">{m.title}</p>
+                    <p className="mt-0.5 text-xs text-muted truncate tabular-nums">{(plan && atLevel(plan, m.href)) ?? m.body}</p>
+                  </div>
+                  <ChevronLeft
+                    size={16}
+                    className="shrink-0 text-muted group-hover:text-primary group-hover:-translate-x-0.5 transition-[color,translate]"
+                  />
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
@@ -289,75 +354,29 @@ export default function DashboardPage() {
       )}
 
       {/* Under the lead, as its complement: a short review, never a
-          competing next step. */}
-      <TeacherSuggestionCard leadHref={plan?.overall && course ? courseNextHref(course) : null} />
+          competing next step. Not before the first practice: there is
+          nothing to review yet. */}
+      {!firstSteps && <TeacherSuggestionCard leadHref={plan?.overall && course ? courseNextHref(course) : null} />}
 
       {/* Mistakes from a trial lesson on this device, carried in once. */}
       {plan?.overall && <TrialCarryover />}
 
       {/* After placement, when there is a course to come back to. */}
-      {plan?.overall && <ReminderOptIn />}
+      {plan?.overall && !firstSteps && <ReminderOptIn />}
 
       {stats !== null && <SubscriptionBanner subscription={subscription} />}
 
-      {/* Today's XP goal beside the two ways to talk with the AI teacher. */}
-      <div className="mt-10 grid lg:grid-cols-[1.1fr_1fr] gap-3">
-        <DailyGoal profileId={profile.id} todayXp={todayXp} />
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-3">
-          {FEATURED_MODULES.map((m) => (
-            <div key={m.title}>
-              <Link
-                href={m.href}
-                className="game-press lit-plate lit-hover group h-full flex items-center gap-4 rounded-lg border border-card-border p-4 duration-150 hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-              >
-                <span
-                  className={`inline-flex w-11 h-11 shrink-0 items-center justify-center rounded-lg ${
-                    m.tone === "accent" ? "bg-accent/15 text-accent-hover" : "bg-primary/10 text-primary-hover"
-                  }`}
-                >
-                  <m.icon size={21} strokeWidth={2} aria-hidden="true" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-bold">{m.title}</h3>
-                  <p className="mt-0.5 text-xs text-muted truncate">{m.body}</p>
-                </div>
-                <ChevronLeft size={17} aria-hidden="true" className="shrink-0 text-muted transition-transform group-hover:-translate-x-0.5" />
-              </Link>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <h2 className="mt-12 text-xl font-black tracking-tight">כל האזורים</h2>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-        {MODULE_GROUPS.map((group) => (
-          <div key={group.title}>
-            <h2 className="text-sm font-bold text-muted mb-3">{group.title}</h2>
-            <div className="lit-plate rounded-lg border border-card-border overflow-hidden divide-y divide-card-border">
-              {group.items.map((m) => (
-                <Link
-                  key={m.title}
-                  href={m.href}
-                  className="lit-row group flex items-center gap-3 px-4 py-3.5 hover:bg-background-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
-                >
-                  <span className="inline-flex w-9 h-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
-                    <m.icon size={18} strokeWidth={2} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-bold text-sm">{m.title}</p>
-                    <p className="mt-0.5 text-xs text-muted truncate tabular-nums">{(plan && atLevel(plan, m.href)) ?? m.body}</p>
-                  </div>
-                  <ChevronLeft
-                    size={16}
-                    className="shrink-0 text-muted group-hover:text-primary group-hover:-translate-x-0.5 transition-[color,translate]"
-                  />
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      {firstSteps ? (
+        <details className="group mt-10">
+          <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 min-h-11 rounded font-bold text-primary hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden">
+            כל האזורים
+            <ChevronLeft size={16} aria-hidden="true" className="transition-transform group-open:-rotate-90" />
+          </summary>
+          {allAreas}
+        </details>
+      ) : (
+        allAreas
+      )}
     </div>
   );
 }
