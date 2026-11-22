@@ -1,14 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { getUser, consume, conversationLookup, insertRequest, sendEmail } = vi.hoisted(() => ({
+const { getUser, consume, conversationLookup, insertRequest, sendEmail, notifyAdmins } = vi.hoisted(() => ({
   getUser: vi.fn(),
   consume: vi.fn(),
   conversationLookup: vi.fn(),
   insertRequest: vi.fn(),
   sendEmail: vi.fn(),
+  notifyAdmins: vi.fn(),
 }));
 
 vi.mock("server-only", () => ({}));
+vi.mock("next/server", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/server")>()),
+  after: (fn: () => unknown) => void fn(),
+}));
+vi.mock("@/lib/notifications/adminPush", () => ({ isRealPerson: async () => true, notifyAdmins }));
 vi.mock("@/lib/supabase/serverClient", () => ({ createClient: async () => ({ auth: { getUser } }) }));
 vi.mock("@/lib/support/rateLimit", () => ({
   consumeRateLimit: consume,
@@ -75,6 +81,14 @@ describe("POST /api/support/request", () => {
     expect(sendEmail).toHaveBeenCalledOnce();
   });
 
+  it("pushes the admins' phones without any personal details", async () => {
+    await POST(request({ ...valid, preferredChannel: "whatsapp", phone: "050-123-4567", message: "my phone is 0501234567" }));
+    expect(notifyAdmins).toHaveBeenCalledOnce();
+    const push = JSON.stringify(notifyAdmins.mock.calls[0][0]);
+    for (const secret of ["דנה", "dana@example.com", "050", "+972", "0501234567"]) expect(push).not.toContain(secret);
+    expect(push).toContain("/admin/support?request=");
+  });
+
   it("requires consent and a usable contact for the chosen channel", async () => {
     expect((await POST(request({ ...valid, consent: false }))).status).toBe(400);
     expect((await POST(request({ ...valid, preferredChannel: "whatsapp" }))).status).toBe(400);
@@ -93,6 +107,7 @@ describe("POST /api/support/request", () => {
     expect(res.status).toBe(200);
     expect(insertRequest).not.toHaveBeenCalled();
     expect(sendEmail).not.toHaveBeenCalled();
+    expect(notifyAdmins).not.toHaveBeenCalled();
   });
 
   it("refuses once the daily limit is reached", async () => {
