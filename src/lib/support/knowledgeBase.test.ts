@@ -16,6 +16,8 @@ describe("support knowledge base", () => {
 
   it("states the real trial length, limits and contact email", () => {
     expect(SUPPORT_KNOWLEDGE_BASE).toContain(`${TRIAL_DAYS} ימי ניסיון`);
+    // Migration 060: the trial counts from the first practice.
+    expect(SUPPORT_KNOWLEDGE_BASE).toContain("נספרים מהתרגול הראשון");
     expect(SUPPORT_KNOWLEDGE_BASE).toContain(`עד ${DAILY_CONVERSATION_LIMIT} שיחות חדשות`);
     expect(SUPPORT_KNOWLEDGE_BASE).toContain(`עד ${DAILY_WRITING_LIMIT} הגשות`);
     expect(SUPPORT_KNOWLEDGE_BASE).toContain(CONTACT_EMAIL);
