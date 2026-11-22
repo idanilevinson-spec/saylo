@@ -126,7 +126,7 @@ export function buildQuickAnswer(id: Exclude<QuickReplyId, "talk_to_person">, ct
     case "how_to_cancel":
       return ctx.isNativeApp ? `${APPLE_CANCEL}\n\nמנוי שנרכש באתר: ${WEB_CANCEL}` : `${WEB_CANCEL}\n\n${APPLE_CANCEL}`;
     case "trial":
-      return `כל חשבון חדש מקבל ${TRIAL_DAYS} ימי ניסיון חינם, בלי כרטיס אשראי ובלי חיוב אוטומטי בסופם. הניסיון כולל את כל תכונות המנוי, וגם ${TRIAL_TEACHER_CONVERSATIONS} שיחות ניסיון עם מורה ה-AI, בטקסט ובקול, עד ${TRIAL_TEACHER_MESSAGES} הודעות בכל אחת.`;
+      return `כל חשבון חדש מקבל ${TRIAL_DAYS} ימי ניסיון חינם, בלי כרטיס אשראי ובלי חיוב אוטומטי בסופם. הימים נספרים מהתרגול הראשון, לא מההרשמה. הניסיון כולל את כל תכונות המנוי, וגם ${TRIAL_TEACHER_CONVERSATIONS} שיחות ניסיון עם מורה ה-AI, בטקסט ובקול, עד ${TRIAL_TEACHER_MESSAGES} הודעות בכל אחת.`;
     case "emails_off":
       return 'ב[פרופיל](/profile), בחלק "התראות", אפשר לכבות כל אחד בנפרד: תזכורות, דוח שבועי ודוח חודשי. מיילי שירות, כמו איפוס סיסמה, ממשיכים להישלח.';
     case "delete_account":
