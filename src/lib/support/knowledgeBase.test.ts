@@ -3,6 +3,7 @@ import { SUPPORT_KNOWLEDGE_BASE } from "./knowledgeBase";
 import { PRICING_PLANS, TRIAL_DAYS } from "@/lib/subscriptions/plans";
 import { CONTACT_EMAIL, DAILY_CONVERSATION_LIMIT, DAILY_WRITING_LIMIT } from "@/lib/legal/siteInfo";
 import { PAID_SIMULATIONS_PER_DAY, TRIAL_SIMULATIONS } from "@/lib/bagrut/oralAllowance";
+import { PAID_WRITING_CHECKS_PER_DAY, TRIAL_WRITING_CHECKS } from "@/lib/bagrut/writingAllowance";
 import { TRIAL_TEACHER_CONVERSATIONS, TRIAL_TEACHER_MESSAGES } from "@/lib/subscriptions/teacherTrial";
 
 // The assistant may only state what this text says, so the numbers in it
@@ -28,6 +29,12 @@ describe("support knowledge base", () => {
     expect(SUPPORT_KNOWLEDGE_BASE).toContain("בתקופת הניסיון: סימולציה אחת");
     expect(SUPPORT_KNOWLEDGE_BASE).toContain(`עד ${PAID_SIMULATIONS_PER_DAY} סימולציות ביום`);
     expect(SUPPORT_KNOWLEDGE_BASE).toContain("לא ציון של בוחן");
+  });
+
+  it("states the Bagrut writing check's real limits and that it is an estimate", () => {
+    expect(SUPPORT_KNOWLEDGE_BASE).toContain(`בתקופת הניסיון: ${TRIAL_WRITING_CHECKS} בדיקות`);
+    expect(SUPPORT_KNOWLEDGE_BASE).toContain(`עד ${PAID_WRITING_CHECKS_PER_DAY} בדיקות ב-24 שעות`);
+    expect(SUPPORT_KNOWLEDGE_BASE).toContain("לא ציון של בודק בגרות");
   });
 
   it("states the real trial teacher allowance", () => {

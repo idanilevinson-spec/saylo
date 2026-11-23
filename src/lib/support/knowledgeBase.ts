@@ -4,6 +4,7 @@ import { MAX_FREEZES, FREEZE_EARN_INTERVAL_DAYS } from "@/lib/gamification/strea
 import { REGEN_INTERVAL_MS } from "@/lib/subscriptions/hearts";
 import { ORAL_EXAM_MINUTES } from "@/lib/bagrut/oralRules";
 import { PAID_SIMULATIONS_PER_DAY, TRIAL_SIMULATIONS } from "@/lib/bagrut/oralAllowance";
+import { PAID_WRITING_CHECKS_PER_DAY, TRIAL_WRITING_CHECKS } from "@/lib/bagrut/writingAllowance";
 import { TRIAL_TEACHER_CONVERSATIONS, TRIAL_TEACHER_MESSAGES } from "@/lib/subscriptions/teacherTrial";
 
 // Everything the support assistant is allowed to state as fact about Saylo.
@@ -45,6 +46,7 @@ Saylo היא פלטפורמה ללימוד אנגלית לדוברי עברית,
 - [משחקים](/games) ו[טבלת המובילים](/games/leaderboard) השבועית.
 - [התקדמות](/progress): שבוע, חודש, מתחילת הדרך.
 - [בגרות](/bagrut): תרגול בפורמט של בחינת הבגרות באנגלית.
+- בדיקת מטלת הכתיבה בבגרות: בערכות התרגול של השאלונים שיש בהם כתיבה (B, C, D, F, G) כותבים את המטלה, לוחצים "בדקו לי" ומקבלים ציון לפי מחוון הכתיבה שמשרד החינוך מפרסם (תוכן וארגון, אוצר מילים, שימוש בשפה, כתיב ופיסוק), הערות בעברית, תיקונים מתוך הטקסט וגרסה משופרת שלו. בתקופת הניסיון: ${TRIAL_WRITING_CHECKS} בדיקות. במנוי: עד ${PAID_WRITING_CHECKS_PER_DAY} בדיקות ב-24 שעות. זו הערכה של AI, לא ציון של בודק בגרות ולא תחזית לציון האמיתי. צריך הסכמה לשימוש ב-AI. הטקסט וההערכה לא נשמרים.
 - [בגרות בעל פה](/bagrut/oral): סימולציה של הבחינה הממוחשבת בעל פה של 4 ו-5 יחידות, ${ORAL_EXAM_MINUTES} דקות, באותו מבנה: חלק A (שאלות אישיות), חלק B (הפרויקט, דקה עד שתי דקות) וחלק C (קטע להאזנה ושתי קבוצות שאלות). מקליטים תשובות בקול, ומקבלים ציון משוער לפי ארבעת הקריטריונים של המחוון, מה להוסיף בכל חלק ואת התשובה ברמה הבאה. בתקופת הניסיון: ${TRIAL_SIMULATIONS === 1 ? "סימולציה אחת" : `${TRIAL_SIMULATIONS} סימולציות`}. במנוי: עד ${PAID_SIMULATIONS_PER_DAY} סימולציות ביום. זו הערכה של AI, לא ציון של בוחן ולא תחזית לציון האמיתי. השאלות נכתבו על ידי Saylo ואינן שאלות של משרד החינוך. צריך מיקרופון והסכמה לשימוש ב-AI (ולמי שמתחת לגיל 18, הסכמת הורה). ההקלטות לא נשמרות.
 - [פרופיל](/profile): מנוי, ביטול מנוי, התראות, מחיקת חשבון.
 - [מסלולים ומחירים](/pricing), [תמיכה](/support), [תנאי שימוש](/terms), [ביטולים והחזרים](/refunds), [מדיניות פרטיות](/privacy), [הצהרת נגישות](/accessibility).
