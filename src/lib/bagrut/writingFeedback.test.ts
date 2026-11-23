@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseWritingFeedback, verifyWritingFeedback } from "./writingFeedback";
+import { escapeBreaksInStrings, parseWritingFeedback, verifyWritingFeedback } from "./writingFeedback";
 
 const TEXT = "Last year I have went to a small library in my town. The library is very old and the peoples there are nice.";
 
@@ -48,6 +48,23 @@ describe("parseWritingFeedback", () => {
 
   it("keeps paragraph breaks in the improved text", () => {
     expect(parseWritingFeedback(reply({ improved: "One.\n\n\n\nTwo." }))!.improved).toBe("One.\n\nTwo.");
+  });
+});
+
+describe("escapeBreaksInStrings", () => {
+  it("turns a raw paragraph break inside a string into a readable reply", () => {
+    const raw = `{"improved":"First paragraph.\n\nSecond paragraph.","x":"a\tb"}`;
+    expect(() => JSON.parse(raw)).toThrow();
+    expect(JSON.parse(escapeBreaksInStrings(raw))).toEqual({ improved: "First paragraph.\n\nSecond paragraph.", x: "a\tb" });
+  });
+
+  it("leaves line breaks between fields, escaped quotes and valid JSON alone", () => {
+    const valid = `{\n  "a": "say \\"hi\\"\\n",\n  "b": 1\n}`;
+    expect(escapeBreaksInStrings(valid)).toBe(valid);
+  });
+
+  it("drops a carriage return inside a string", () => {
+    expect(JSON.parse(escapeBreaksInStrings(`{"a":"one\r\ntwo"}`))).toEqual({ a: "one\ntwo" });
   });
 });
 

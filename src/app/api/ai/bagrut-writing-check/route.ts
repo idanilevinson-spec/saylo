@@ -9,8 +9,8 @@ import { isPaidServer, isPremiumServer } from "@/lib/subscriptions/requirePremiu
 import { BAGRUT_MODULE_FORMATS, type BagrutModuleCode } from "@/lib/content/bagrut/moduleFormats";
 import { getPublishableSampleUnit } from "@/lib/content/bagrut/sampleUnits";
 import { countWords, gradeWriting, minWordsToCheck, writingRulesFor } from "@/lib/bagrut/writingRules";
-import { parseWritingFeedback, verifyWritingFeedback } from "@/lib/bagrut/writingFeedback";
-import { WRITING_CHECK_FEATURE, WRITING_LIMIT_ERROR, writingCheckAllowed } from "@/lib/bagrut/writingAllowance";
+import { escapeBreaksInStrings, parseWritingFeedback, verifyWritingFeedback } from "@/lib/bagrut/writingFeedback";
+import { WRITING_CHECK_FEATURE, WRITING_LIMIT_ERROR, WRITING_RETRY_FEATURE, writingCheckAllowed } from "@/lib/bagrut/writingAllowance";
 
 // Far above any task's range (the longest asks for 140 words); a pasted
 // book chapter is cut here rather than paid for.
@@ -56,34 +56,48 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: WRITING_LIMIT_ERROR, trial: !paid }, { status: 429 });
   }
 
-  let message;
-  try {
-    message = await anthropic.messages.create({
+  const prompt = buildBagrutWritingCheckPrompt({
+    rubric: rules.rubric,
+    taskEn: unit.writingTask.promptEn,
+    wordRange: unit.writingTask.wordCountRange,
+    text,
+    words,
+  });
+  const ask = () =>
+    anthropic.messages.create({
       model: CLAUDE_MODEL,
       // Thinking off: it would eat into max_tokens before the JSON is written.
       max_tokens: 2000,
       thinking: { type: "disabled" },
-      messages: [
-        {
-          role: "user",
-          content: buildBagrutWritingCheckPrompt({
-            rubric: rules.rubric,
-            taskEn: unit.writingTask.promptEn,
-            wordRange: unit.writingTask.wordCountRange,
-            text,
-            words,
-          }),
-        },
-      ],
+      messages: [{ role: "user", content: prompt }],
     });
+  const read = (raw: string) =>
+    parseWritingFeedback(parseJsonResponse<unknown>(raw) ?? parseJsonResponse<unknown>(escapeBreaksInStrings(raw)));
+
+  let message;
+  try {
+    message = await ask();
   } catch (err) {
     console.error("bagrut-writing-check: AI call failed", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "check failed" }, { status: 502 });
   }
   await logAiUsage(supabase, user.id, WRITING_CHECK_FEATURE, message.usage.input_tokens, message.usage.output_tokens);
 
-  const raw = extractText(message);
-  const draft = parseWritingFeedback(parseJsonResponse<unknown>(raw));
+  let raw = extractText(message);
+  let draft = read(raw);
+  if (!draft) {
+    // One more try, so a reply the code can't read doesn't cost the learner
+    // a check. Logged for cost under its own name, never counted.
+    try {
+      const again = await ask();
+      await logAiUsage(supabase, user.id, WRITING_RETRY_FEATURE, again.usage.input_tokens, again.usage.output_tokens);
+      await reportAiParseFailure("bagrut-writing-check (retried)", raw);
+      raw = extractText(again);
+      draft = read(raw);
+    } catch (err) {
+      console.error("bagrut-writing-check: retry failed", err instanceof Error ? err.message : err);
+    }
+  }
   if (!draft) {
     // Development only: production logs never carry a learner's text.
     if (process.env.NODE_ENV === "development") console.warn("bagrut-writing-check: unusable AI reply", raw.slice(0, 1500));

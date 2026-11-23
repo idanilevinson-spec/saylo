@@ -2,6 +2,9 @@
 // §4). Counted from ai_usage_log rows of WRITING_CHECK_FEATURE, so a failed
 // AI call that still cost money counts too.
 export const WRITING_CHECK_FEATURE = "bagrut_writing_check";
+// The second try when a reply could not be read; logged for cost, never
+// counted, so an unreadable reply does not use up a learner's check.
+export const WRITING_RETRY_FEATURE = "bagrut_writing_check_retry";
 // Paid: five checks in any 24 hours, enough to write, fix and check again.
 // Trial: two checks, ever. The support assistant quotes these two numbers.
 export const PAID_WRITING_CHECKS_PER_DAY = 5;

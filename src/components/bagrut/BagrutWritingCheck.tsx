@@ -13,6 +13,7 @@ import type { WritingFix } from "@/lib/bagrut/writingFeedback";
 import type { BagrutWritingExample } from "@/lib/content/bagrut/skills";
 import { PAID_WRITING_CHECKS_PER_DAY, TRIAL_WRITING_CHECKS, WRITING_LIMIT_ERROR } from "@/lib/bagrut/writingAllowance";
 import { AI_CONSENT_REQUIRED_ERROR } from "@/lib/ai/consent";
+import { supabase } from "@/lib/supabase/browserClient";
 
 interface CheckResult {
   grade: WritingGrade;
@@ -28,6 +29,7 @@ type Status =
   | { kind: "loading" }
   | { kind: "error" }
   | { kind: "premium" }
+  | { kind: "consent" }
   | { kind: "limit"; trial: boolean };
 
 const points = (n: number) => (n === 1 ? "נקודה אחת" : `${n} נקודות`);
@@ -91,8 +93,12 @@ export default function BagrutWritingCheck({
       const data = await res.json().catch(() => null);
       if (res.status === 429 && data?.error === WRITING_LIMIT_ERROR) return setStatus({ kind: "limit", trial: !!data.trial });
       if (res.status === 403 && data?.error === AI_CONSENT_REQUIRED_ERROR) {
+        // The page thought consent was given but the server says no (for
+        // example it was withdrawn on another device): fetch the account
+        // again so the consent card can show, and never fail silently.
         setAskConsent(true);
-        return setStatus({ kind: "idle" });
+        await supabase.auth.refreshSession().catch(() => null);
+        return setStatus({ kind: "consent" });
       }
       if (res.status === 403) return setStatus({ kind: "premium" });
       if (!res.ok || !data?.grade) return setStatus({ kind: "error" });
@@ -144,6 +150,11 @@ export default function BagrutWritingCheck({
             <Link href="/pricing" className="font-medium text-primary underline underline-offset-2">
               לצפייה במסלולים
             </Link>
+          </p>
+        )}
+        {status.kind === "consent" && consented && (
+          <p className="mt-3 rounded-lg bg-background-2 px-4 py-3 text-sm">
+            לא מצאנו את האישור שלכם לשליחת טקסטים ל-AI. רעננו את הדף, אשרו מחדש ונסו שוב. הטקסט שלכם שמור.
           </p>
         )}
       </div>

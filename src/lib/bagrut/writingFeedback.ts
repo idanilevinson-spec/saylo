@@ -31,6 +31,33 @@ const wordsOnly = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").tri
 
 const str = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "");
 
+// Essays ask for paragraphs, and the model sometimes writes the break as a
+// real line break inside a JSON string, which JSON.parse refuses. Escapes
+// raw line breaks and tabs that sit inside strings; everything else is left
+// exactly as it was.
+export function escapeBreaksInStrings(raw: string): string {
+  let out = "";
+  let inString = false;
+  let escaped = false;
+  for (const ch of raw) {
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === '"') inString = false;
+      else if (ch === "\n") {
+        out += "\\n";
+        continue;
+      } else if (ch === "\r") continue;
+      else if (ch === "\t") {
+        out += "\\t";
+        continue;
+      }
+    } else if (ch === '"') inString = true;
+    out += ch;
+  }
+  return out;
+}
+
 // Anything off → null, and the route reports a failed check instead of
 // showing a made-up one. Scores are clamped to the rubric later, in
 // gradeWriting.
