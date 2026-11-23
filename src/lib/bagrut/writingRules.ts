@@ -3,13 +3,15 @@ import type { BagrutModuleCode } from "@/lib/content/bagrut/moduleFormats";
 // The public rules for marking the written Bagrut's writing task, from the
 // Ministry of Education's own rubrics; sources in
 // docs/specs/bagrut-writing-check.md. Structure and numbers only: no exam
-// content is copied here, and the band wording in the AI prompt is ours.
+// content is copied here.
 //
 // The Ministry publishes two writing rubrics: one out of 30 (Module C, and
 // Modules C and D for external examinees) and one out of 40 (Module G, and
 // Modules F and G for external examinees). Our B, D and F sets carry a
 // writing task too, so each is checked with the rubric the Ministry itself
-// attaches to a task of that kind and score.
+// uses for a task of that kind and score. The AI prompt explains each
+// criterion in our own words; no wording is taken from the Ministry's
+// documents, only the points and the rules.
 
 export type WritingRubricId = "C" | "G";
 
@@ -22,9 +24,9 @@ export const WRITING_CRITERIA = [
 
 export type WritingCriterionKey = (typeof WRITING_CRITERIA)[number]["key"];
 
-// The four levels of each criterion (correct / partially / minimally /
-// incorrect) and what each is worth. Markers may give in-between grades, so
-// any whole number up to the first value is a valid score.
+// What each criterion is worth at each of its four levels, best first. A
+// marker may also land between two levels, so any whole number from zero to
+// the first value is a valid score.
 export const WRITING_RUBRICS: Record<WritingRubricId, { total: number; levels: Record<WritingCriterionKey, readonly number[]> }> = {
   C: {
     total: 30,
@@ -102,7 +104,7 @@ export function lengthDeduction(moduleCode: BagrutModuleCode, words: number): nu
 
 export interface WritingGrade {
   rubric: WritingRubricId;
-  // Points per criterion, on merit, as if the text were the right length.
+  // Points per criterion for the writing itself, before any length deduction.
   points: Record<WritingCriterionKey, number>;
   max: Record<WritingCriterionKey, number>;
   onMerit: number;
@@ -111,8 +113,9 @@ export interface WritingGrade {
   outOf: number;
 }
 
-// The rubric's own order: mark on merit first, then take the length
-// deduction off the result. An off-topic or unreadable text is zero.
+// Score the writing first, then take the length deduction off the sum, the
+// same order the Ministry's markers follow. A text that misses the task, or
+// that nobody could follow, is worth zero.
 export function gradeWriting(
   moduleCode: BagrutModuleCode,
   scores: Partial<Record<WritingCriterionKey, number>>,

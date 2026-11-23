@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { BAGRUT_MODULE_FORMATS, type BagrutModuleCode } from "@/lib/content/bagrut/moduleFormats";
 import { getPublishableSampleUnit, getPublishableSampleUnits } from "@/lib/content/bagrut/sampleUnits";
 import BagrutPracticeUnit from "@/components/BagrutPracticeUnit";
+import { writingExampleFor } from "@/lib/content/bagrut/skills";
 
 interface PageProps {
   params: Promise<{ moduleCode: string; unitSlug: string }>;
@@ -37,6 +38,7 @@ export default async function BagrutUnitPage({ params }: PageProps) {
       unit={unit}
       format={BAGRUT_MODULE_FORMATS[moduleCode]}
       nextUnit={after ? { slug: after.unitSlug, titleHe: after.titleHe } : null}
+      writingExample={unit.writingTask ? writingExampleFor(moduleCode) : null}
     />
   );
 }

@@ -16,8 +16,8 @@ export interface WritingFix {
 export interface WritingFeedback {
   scores: Record<WritingCriterionKey, number>;
   notesHe: Record<WritingCriterionKey, string>;
-  // Totally unrelated to the task, or impossible to understand: the rubric
-  // gives the whole task zero.
+  // Nothing to do with the task, or impossible to follow: the whole task is
+  // worth zero.
   zero: boolean;
   fixes: WritingFix[];
   improved: string;
@@ -70,7 +70,10 @@ export function parseWritingFeedback(raw: unknown): WritingFeedback | null {
   return { scores, notesHe, zero: r.zero === true, fixes, improved };
 }
 
-const QUOTE = /'([^']*[A-Za-z][^']*)'/g;
+// A quote in a note: opens after anything but a Latin letter (a Hebrew
+// prefix like ב' is fine), closes before anything but a Latin letter, and
+// may hold an apostrophe between two letters ('I don't like', 'it's').
+const QUOTE = /(?<![A-Za-z])'((?:[^']|(?<=[A-Za-z])'(?=[A-Za-z]))*[A-Za-z](?:[^']|(?<=[A-Za-z])'(?=[A-Za-z]))*)'(?![A-Za-z])/g;
 
 // A note may carry English only as an exact quote from the learner's text.
 function sentenceBreaksRule(sentence: string, text: string): boolean {
