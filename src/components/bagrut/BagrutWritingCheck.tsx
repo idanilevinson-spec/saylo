@@ -8,9 +8,9 @@ import MixedText from "@/components/MixedText";
 import TextRights from "@/components/TextRights";
 import AiConsentGate, { useAiConsent } from "@/components/AiConsentGate";
 import type { BagrutModuleCode } from "@/lib/content/bagrut/moduleFormats";
-import { skillsForModule } from "@/lib/content/bagrut/skills";
 import { countWords, minWordsToCheck, WRITING_CRITERIA, WRITING_RUBRICS, writingRulesFor, type WritingGrade, type WritingCriterionKey } from "@/lib/bagrut/writingRules";
 import type { WritingFix } from "@/lib/bagrut/writingFeedback";
+import type { BagrutWritingExample } from "@/lib/content/bagrut/skills";
 import { PAID_WRITING_CHECKS_PER_DAY, TRIAL_WRITING_CHECKS, WRITING_LIMIT_ERROR } from "@/lib/bagrut/writingAllowance";
 import { AI_CONSENT_REQUIRED_ERROR } from "@/lib/ai/consent";
 
@@ -45,11 +45,13 @@ export default function BagrutWritingCheck({
   unitSlug,
   text,
   wordCountRange,
+  example,
 }: {
   moduleCode: BagrutModuleCode;
   unitSlug: string;
   text: string;
   wordCountRange: [number, number];
+  example: BagrutWritingExample | null;
 }) {
   const consented = useAiConsent();
   const [askConsent, setAskConsent] = useState(false);
@@ -169,7 +171,8 @@ export default function BagrutWritingCheck({
           ) : (
             g.lengthOff > 0 && (
               <p className="mt-2 text-sm leading-relaxed">
-                על התוכן והשפה: <span className="tabular-nums">{g.onMerit}</span>. ירדו {points(g.lengthOff)} על האורך: נבדקו{" "}
+                על התוכן והשפה: <span className="tabular-nums">{g.onMerit}</span>. {g.lengthOff === 1 ? "ירדה" : "ירדו"}{" "}
+                {points(g.lengthOff)} על האורך: נבדקו{" "}
                 <span className="tabular-nums">{result.data.words}</span> מילים, והמטלה מבקשת {min}–{max}.
               </p>
             )
@@ -237,18 +240,17 @@ export default function BagrutWritingCheck({
         </section>
       )}
 
-      <ExampleAnswer moduleCode={moduleCode} unlocked={words >= min || !!result} min={min} />
+      {example && <ExampleAnswer example={example} unlocked={words >= min || !!result} min={min} />}
     </div>
   );
 }
 
 // A model answer to a task of the same kind (not to this task), from the
-// skill pages. Opens once the learner has written their own, so it is a
-// point of comparison and not something to copy from.
-function ExampleAnswer({ moduleCode, unlocked, min }: { moduleCode: BagrutModuleCode; unlocked: boolean; min: number }) {
+// skill pages; picked on the server (writingExampleFor), so the whole skills
+// file never ships to the browser. Opens once the learner has written their
+// own, so it is a point of comparison and not something to copy from.
+function ExampleAnswer({ example: skill, unlocked, min }: { example: BagrutWritingExample; unlocked: boolean; min: number }) {
   const [open, setOpen] = useState(false);
-  const skill = skillsForModule(moduleCode).find((s) => s.kind === "writing" && s.example.modelAnswerEn);
-  if (!skill) return null;
   if (!unlocked) {
     return <p className="mt-5 text-sm text-muted">דוגמה לתשובה מהסוג הזה תיפתח כשתגיעו ל-{min} מילים.</p>;
   }
@@ -261,13 +263,13 @@ function ExampleAnswer({ moduleCode, unlocked, min }: { moduleCode: BagrutModule
         <div className="mt-2 rounded-lg bg-background-2 p-4">
           <p className="text-sm text-muted">זו תשובה למטלה אחרת, מאותו סוג:</p>
           <EnglishText as="p" className="mt-2 text-sm font-bold leading-relaxed">
-            {skill.example.questionEn}
+            {skill.questionEn}
           </EnglishText>
           <EnglishText as="p" className="mt-2 whitespace-pre-line leading-relaxed">
-            {skill.example.modelAnswerEn}
+            {skill.modelAnswerEn}
           </EnglishText>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            <MixedText>{skill.example.explanationHe}</MixedText>
+            <MixedText>{skill.explanationHe}</MixedText>
           </p>
           <Link href={`/bagrut/skills/${skill.slug}`} className={`mt-1 ${linkButton}`}>
             איך כותבים תשובה כזו, צעד אחר צעד

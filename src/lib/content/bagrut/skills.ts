@@ -444,6 +444,27 @@ export function getBagrutSkill(slug: string): BagrutSkill | undefined {
   return BAGRUT_SKILLS.find((s) => s.slug === slug);
 }
 
+// The model answer shown under a practice set's writing task: the first
+// writing skill of the module that has one. Only these few strings go to the
+// browser, not this whole file.
+export interface BagrutWritingExample {
+  slug: string;
+  questionEn: string;
+  modelAnswerEn: string;
+  explanationHe: string;
+}
+
+export function writingExampleFor(code: BagrutModuleCode): BagrutWritingExample | null {
+  const skill = skillsForModule(code).find((s) => s.kind === "writing" && s.example.modelAnswerEn);
+  if (!skill?.example.modelAnswerEn) return null;
+  return {
+    slug: skill.slug,
+    questionEn: skill.example.questionEn,
+    modelAnswerEn: skill.example.modelAnswerEn,
+    explanationHe: skill.example.explanationHe,
+  };
+}
+
 export function skillsForModule(code: BagrutModuleCode): BagrutSkill[] {
   return BAGRUT_SKILLS.filter((s) => s.modules.includes(code));
 }

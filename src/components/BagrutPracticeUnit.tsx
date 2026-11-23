@@ -40,11 +40,13 @@ import {
   type SelfMark,
 } from "@/lib/content/bagrut/setDraft";
 import type { BagrutModuleFormat } from "@/lib/content/bagrut/moduleFormats";
+import type { BagrutWritingExample } from "@/lib/content/bagrut/skills";
 
 interface BagrutPracticeUnitProps {
   unit: BagrutSampleUnit;
   format: BagrutModuleFormat;
   nextUnit?: { slug: string; titleHe: string } | null;
+  writingExample?: BagrutWritingExample | null;
 }
 
 type Question = BagrutReadingQuestion | BagrutVocabularyQuestion;
@@ -82,7 +84,7 @@ function goTo(id: string) {
   el.focus({ preventScroll: true });
 }
 
-export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPracticeUnitProps) {
+export default function BagrutPracticeUnit({ unit, format, nextUnit, writingExample = null }: BagrutPracticeUnitProps) {
   const isLiterature = unit.moduleCode === "D";
   const { profile } = useAuth();
   // Every answer lives here rather than in the question cards, so the set
@@ -349,6 +351,7 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
           unitSlug={unit.unitSlug}
           promptEn={unit.writingTask.promptEn}
           wordCountRange={unit.writingTask.wordCountRange}
+          example={writingExample}
           value={writing}
           onChange={setWriting}
         />
@@ -672,6 +675,7 @@ function WritingTaskCard({
   unitSlug,
   promptEn,
   wordCountRange,
+  example,
   value,
   onChange,
 }: {
@@ -679,6 +683,7 @@ function WritingTaskCard({
   unitSlug: string;
   promptEn: string;
   wordCountRange: [number, number];
+  example: BagrutWritingExample | null;
   value: string;
   onChange: (text: string) => void;
 }) {
@@ -713,7 +718,7 @@ function WritingTaskCard({
         <p id="writing-count" className={`mt-1.5 text-sm tabular-nums ${inRange ? "text-success" : "text-muted"}`}>
           {wordCount} מילים{inRange ? ", בטווח" : ""}
         </p>
-        <BagrutWritingCheck moduleCode={moduleCode} unitSlug={unitSlug} text={value} wordCountRange={wordCountRange} />
+        <BagrutWritingCheck moduleCode={moduleCode} unitSlug={unitSlug} text={value} wordCountRange={wordCountRange} example={example} />
       </div>
     </section>
   );

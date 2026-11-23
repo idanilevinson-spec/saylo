@@ -74,6 +74,30 @@ describe("verifyWritingFeedback", () => {
     expect(verifyWritingFeedback(f, TEXT).notesHe.content).toBe("כתבתם 'small library' וזה ברור.");
   });
 
+  it("keeps a true quote that has an apostrophe inside, after a Hebrew prefix", () => {
+    const text = "I don't like it's colour. My brother's room is small.";
+    const f = parseWritingFeedback(
+      reply({
+        notesHe: {
+          content: "כתבתם 'I don't like' בפתיחה. הדוגמה ב'My brother's room' טובה.",
+          vocabulary: "א.",
+          language: "ב-'it's colour' צריך מילה אחרת.",
+          mechanics: "ג.",
+        },
+      }),
+    )!;
+    const out = verifyWritingFeedback(f, text);
+    expect(out.notesHe.content).toBe("כתבתם 'I don't like' בפתיחה. הדוגמה ב'My brother's room' טובה.");
+    expect(out.notesHe.language).toBe("ב-'it's colour' צריך מילה אחרת.");
+  });
+
+  it("still cuts a quote with an apostrophe that is not in the text", () => {
+    const f = parseWritingFeedback(
+      reply({ notesHe: { content: "כתבתם 'I didn't go' וזה נכון.", vocabulary: "א.", language: "ב.", mechanics: "ג." } }),
+    )!;
+    expect(verifyWritingFeedback(f, TEXT).notesHe.content).not.toContain("didn't");
+  });
+
   it("cuts a sentence with English outside a quote, and never leaves a note empty", () => {
     const f = parseWritingFeedback(
       reply({ notesHe: { content: "א.", vocabulary: "כדאי להשתמש ב-however.", language: "ב.", mechanics: "ג." } }),
