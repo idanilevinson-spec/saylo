@@ -25,6 +25,7 @@ import PrintedPage from "@/components/PrintedPage";
 import ListeningPlayer from "@/components/ListeningPlayer";
 import type { BagrutSampleUnit, BagrutReadingQuestion, BagrutVocabularyQuestion } from "@/lib/content/bagrut/sampleUnits";
 import BagrutCredit from "@/components/BagrutCredit";
+import BagrutWritingCheck from "@/components/bagrut/BagrutWritingCheck";
 import TextRights from "@/components/TextRights";
 import { optionOrder } from "@/lib/utils/shuffle";
 import { withoutAnswerLetter } from "@/lib/content/bagrut/answerLetter";
@@ -63,8 +64,11 @@ function allQuestions(unit: BagrutSampleUnit): { key: string; q: Question }[] {
 // selection, and those are what the saved score is made of. Open and
 // sentence-completion questions reveal a model answer on demand, and the
 // learner rates their own answer against it (shown back to them, never
-// added to the saved score). The writing task is a counted textarea, not
-// submitted or graded anywhere. See docs/specs/bagrut-track.md §6.
+// added to the saved score). The writing task is a counted textarea; the
+// learner may send it to be checked against the Ministry's writing rubric
+// (BagrutWritingCheck, docs/specs/bagrut-writing-check.md). That check is
+// shown, never saved and never part of the saved score.
+// See docs/specs/bagrut-track.md §6.
 
 const paragraphId = (passage: number, paragraph: number) => `passage-${passage}-p${paragraph}`;
 
@@ -223,7 +227,7 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
     "קוראים את הקטע. המספרים בשוליים הם מספרי הפסקאות.",
     "עונים על השאלות. בשאלות עם אפשרויות רואים מיד אם צדקתם. בשאלות הפתוחות עונים לבד, פותחים את התשובה לדוגמה ומסמנים איך הלך.",
     unit.vocabularyQuestions?.length ? "עונים על שאלות אוצר המילים." : null,
-    unit.writingTask ? "כותבים את החיבור. הוא לתרגול עצמי ולא נשלח לבדיקה." : null,
+    unit.writingTask ? "כותבים את מטלת הכתיבה. אפשר לשלוח אותה לבדיקה לפי המחוון ולקבל ציון, הערות וגרסה משופרת." : null,
     mc.length > 0 ? "בסוף מקבלים ציון על השאלות עם האפשרויות, והוא נשמר." : null,
     "אפשר לעצור באמצע: התשובות נשמרות במכשיר הזה עד שמסיימים.",
   ].filter((s): s is string => s !== null);
@@ -340,6 +344,9 @@ export default function BagrutPracticeUnit({ unit, format, nextUnit }: BagrutPra
 
       {unit.writingTask && (
         <WritingTaskCard
+          key={round}
+          moduleCode={unit.moduleCode}
+          unitSlug={unit.unitSlug}
           promptEn={unit.writingTask.promptEn}
           wordCountRange={unit.writingTask.wordCountRange}
           value={writing}
@@ -661,11 +668,15 @@ function QuestionCard({
 }
 
 function WritingTaskCard({
+  moduleCode,
+  unitSlug,
   promptEn,
   wordCountRange,
   value,
   onChange,
 }: {
+  moduleCode: BagrutSampleUnit["moduleCode"];
+  unitSlug: string;
   promptEn: string;
   wordCountRange: [number, number];
   value: string;
@@ -702,7 +713,7 @@ function WritingTaskCard({
         <p id="writing-count" className={`mt-1.5 text-sm tabular-nums ${inRange ? "text-success" : "text-muted"}`}>
           {wordCount} מילים{inRange ? ", בטווח" : ""}
         </p>
-        <p className="mt-1 text-xs text-muted">הכתיבה כאן לתרגול עצמי ואינה נשלחת לבדיקה. היא נשמרת במכשיר הזה עד שמסיימים.</p>
+        <BagrutWritingCheck moduleCode={moduleCode} unitSlug={unitSlug} text={value} wordCountRange={wordCountRange} />
       </div>
     </section>
   );

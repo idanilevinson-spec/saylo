@@ -9,6 +9,7 @@ import { buildSpeakingTestResponsePrompt } from "./speakingTestResponse";
 import { buildTeacherSuggestionPrompt } from "./teacherSuggestion";
 import { buildVocabularyTopicIntroPrompt } from "./vocabularyTopicIntro";
 import { buildWritingCoachPrompt } from "./writingCoach";
+import { buildBagrutWritingCheckPrompt } from "./bagrutWritingCheck";
 import { SUPPORT_SYSTEM_PROMPT } from "@/lib/support/systemPrompt";
 import { buildBillingSystemPrompt } from "@/lib/billing/systemPrompt";
 
@@ -32,6 +33,8 @@ describe("Hebrew gender-neutral note", () => {
       sampleWords: [{ headword: "shirt", translationHe: "חולצה" }],
     }),
     writingCoach: buildWritingCoachPrompt("Describe your day", "I woke up."),
+    bagrutWritingCheckC: buildBagrutWritingCheckPrompt({ rubric: "C", taskEn: "Describe a place.", wordRange: [70, 90], text: "I like the park.", words: 4 }),
+    bagrutWritingCheckG: buildBagrutWritingCheckPrompt({ rubric: "G", taskEn: "Do you agree?", wordRange: [120, 140], text: "I agree.", words: 2 }),
     supportAssistant: SUPPORT_SYSTEM_PROMPT,
     billingAgent: buildBillingSystemPrompt("2026-10-06", true),
   };
