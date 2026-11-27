@@ -13,6 +13,12 @@ const bannerMotion = {
   transition: { duration: 0.35, ease: "easeOut" as const },
 };
 
+// What stays open without a subscription (answerTail: only a wrong answer
+// costs a heart, PremiumGate: only speaking, writing feedback and teacher
+// suggestions close). Learners who believed everything locks on day 3 left
+// on day 3; saying so is the cheapest reason to stay.
+const FREE_AFTER_TRIAL = "התרגול, החזרה החכמה, מחברת הטעויות והמסלול נשארים פתוחים בחינם.";
+
 interface SubscriptionBannerProps {
   subscription: Subscription | null;
 }
@@ -54,7 +60,7 @@ export default function SubscriptionBanner({ subscription }: SubscriptionBannerP
         >
           <p className="flex items-center gap-1.5 text-sm font-bold text-primary-ink">
             <Clock size={16} className="shrink-0" /> היום היום האחרון בניסיון החינמי. מחר נסגרים הדיבור, הכתיבה
-            וההמלצות של ה-AI
+            וההמלצות של ה-AI. {FREE_AFTER_TRIAL}
           </p>
           <Link href="/pricing" className="text-sm font-bold text-primary-ink underline underline-offset-2">
             שדרגו עכשיו ←
@@ -70,7 +76,7 @@ export default function SubscriptionBanner({ subscription }: SubscriptionBannerP
       >
         <p className="flex items-center gap-1.5 text-sm font-medium">
           <Gift size={16} className="shrink-0" /> נשארו לכם <strong>{daysLeft}</strong> ימים בניסיון החינמי, עם כל התכונות
-          פתוחות
+          פתוחות. גם אחריו התרגול נשאר בחינם.
         </p>
         <Link href="/pricing" className="text-sm font-bold text-primary">
           שדרגו עכשיו ←
@@ -85,7 +91,9 @@ export default function SubscriptionBanner({ subscription }: SubscriptionBannerP
         {...bannerMotion}
         className="mt-4 flex items-center justify-between gap-3 flex-wrap px-4 py-3 rounded-lg bg-danger-ink border border-danger/20"
       >
-        <p className="text-sm font-medium">תקופת הניסיון הסתיימה. דיבור, כתיבה והמלצות המורה זמינים במנוי</p>
+        <p className="text-sm font-medium">
+          {FREE_AFTER_TRIAL} כל טעות עולה לב: יש 5, ולב חוזר כל 4 שעות. דיבור, כתיבה והמלצות המורה זמינים במנוי.
+        </p>
         <Link href="/pricing" className="text-sm font-bold text-primary">
           שדרגו עכשיו ←
         </Link>
