@@ -5,6 +5,18 @@ import { supabase } from "@/lib/supabase/browserClient";
 import { fetchAll } from "@/lib/supabase/fetchAll";
 import type { DashboardMetrics } from "@/lib/admin/dashboardMetrics";
 import { buildFunnel, type FunnelStep } from "@/lib/admin/funnel";
+import type { SiteFunnelSummary } from "@/lib/admin/siteFunnel";
+
+// Labels for the sign-up method and error codes sent by SignupForm.
+const SIGNUP_METHOD_HE: Record<string, string> = { email: "אימייל", google: "Google", apple: "Apple" };
+const SIGNUP_ERROR_HE: Record<string, string> = {
+  already_registered: "האימייל כבר רשום",
+  password: "בעיה בסיסמה",
+  email: "בעיה באימייל",
+  rate_limited: "יותר מדי ניסיונות",
+  profile: "יצירת הפרופיל נכשלה",
+  other: "אחר",
+};
 
 interface PlanBreakdown {
   code: string;
@@ -31,6 +43,7 @@ interface AnalyticsState {
   funnel: FunnelStep[];
   aiUsage: AiUsageRow[];
   aiUsageCallsLast7Days: number;
+  siteFunnel: (SiteFunnelSummary & { days: number }) | null;
 }
 
 // Feature strings as written by logAiUsage() calls across src/app/api/ai/*
@@ -80,6 +93,7 @@ export default function AdminAnalyticsPage() {
 
       const [
         dashboardRes,
+        siteFunnelRes,
         { data: profiles },
         { data: streaks },
         { count: exerciseAttemptsLast7Days },
@@ -90,6 +104,7 @@ export default function AdminAnalyticsPage() {
         { count: aiUsageCallsLast7Days },
       ] = await Promise.all([
         fetch("/api/admin/metrics", { cache: "no-store" }),
+        fetch("/api/admin/site-funnel?days=30", { cache: "no-store" }),
         fetchAll((from, to) =>
           supabase.from("profiles").select("id, created_at, is_test_account").order("id").range(from, to),
         ),
@@ -118,6 +133,10 @@ export default function AdminAnalyticsPage() {
         return;
       }
       const dashboard = (await dashboardRes.json()) as DashboardMetrics;
+      // The site funnel is extra: if it fails, the rest of the page still shows.
+      const siteFunnel = siteFunnelRes.ok
+        ? ((await siteFunnelRes.json()) as SiteFunnelSummary & { days: number })
+        : null;
       // Test/demo accounts stay out of every learner number on this page.
       const realProfiles = (profiles ?? []).filter((p) => !p.is_test_account);
       const realProfileIds = new Set(realProfiles.map((p) => p.id));
@@ -164,6 +183,7 @@ export default function AdminAnalyticsPage() {
         }),
         aiUsage,
         aiUsageCallsLast7Days: aiUsageCallsLast7Days ?? 0,
+        siteFunnel,
       });
     }
     load();
@@ -224,8 +244,90 @@ export default function AdminAnalyticsPage() {
         </div>
       </div>
 
+      {state.siteFunnel && (
+        <div>
+          <h2 className="font-bold text-lg">משפך האתר עד ההרשמה</h2>
+          <p className="mt-1 text-sm text-muted">
+            {state.siteFunnel.days} הימים האחרונים · כל שלב נספר פעם אחת לכל ביקור, בלי מזהה אישי · הרשמות עם
+            Google ו-Apple נגמרות מחוץ לאתר, אז הן מופיעות במשפך החשבונות שלמטה
+          </p>
+          <div className="mt-3 bg-card border border-card-border rounded-lg p-5 space-y-4">
+            {state.siteFunnel.steps.map((s) => (
+              <Bar key={s.step} label={s.label} count={s.count} max={state.siteFunnel?.steps[0]?.count ?? 0} />
+            ))}
+          </div>
+          <div className="mt-4 grid sm:grid-cols-2 gap-4">
+            <div className="bg-card border border-card-border rounded-lg p-5">
+              <p className="text-sm text-muted">מאיפה הגיעו</p>
+              <table className="mt-2 w-full text-sm">
+                <thead>
+                  <tr className="text-muted text-right">
+                    <th className="py-1 font-medium">מקור</th>
+                    <th className="py-1 font-medium">כניסות</th>
+                    <th className="py-1 font-medium">התחילו שיעור</th>
+                    <th className="py-1 font-medium">ראו הרשמה</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {state.siteFunnel.sources.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="py-1 text-muted">עוד אין נתונים.</td>
+                    </tr>
+                  )}
+                  {state.siteFunnel.sources.map((s) => (
+                    <tr key={s.source} className="border-t border-card-border">
+                      <td className="py-1" dir="ltr">{s.source}</td>
+                      <td className="py-1 tabular-nums">{s.visits}</td>
+                      <td className="py-1 tabular-nums">{s.trialStarts}</td>
+                      <td className="py-1 tabular-nums">{s.signupViews}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="bg-card border border-card-border rounded-lg p-5 space-y-4 text-sm">
+              <div>
+                <p className="text-muted">עמודי כניסה</p>
+                <ul className="mt-1 space-y-0.5">
+                  {state.siteFunnel.topLandings.map((l) => (
+                    <li key={l.path} className="flex justify-between gap-3">
+                      <span dir="ltr">{l.path}</span>
+                      <span className="tabular-nums text-muted">{l.count}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="text-muted">דרך ההרשמה</p>
+                <ul className="mt-1 space-y-0.5">
+                  {state.siteFunnel.signupMethods.map((m) => (
+                    <li key={m.method} className="flex justify-between gap-3">
+                      <span>{SIGNUP_METHOD_HE[m.method] ?? m.method}</span>
+                      <span className="tabular-nums text-muted">{m.count}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {state.siteFunnel.signupErrors.length > 0 && (
+                <div>
+                  <p className="text-muted">שגיאות בהרשמה</p>
+                  <ul className="mt-1 space-y-0.5">
+                    {state.siteFunnel.signupErrors.map((e) => (
+                      <li key={e.reason} className="flex justify-between gap-3">
+                        <span>{SIGNUP_ERROR_HE[e.reason] ?? e.reason}</span>
+                        <span className="tabular-nums text-muted">{e.count}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div>
-        <h2 className="font-bold text-lg">משפך המרה</h2>
+        <h2 className="font-bold text-lg">משפך החשבונות</h2>
         <div className="mt-3 bg-card border border-card-border rounded-lg p-5 space-y-4">
           {state.funnel.map((step) => (
             <Bar key={step.label} label={step.label} count={step.count} max={funnelMax} />

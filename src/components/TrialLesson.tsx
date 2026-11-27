@@ -17,6 +17,7 @@ import { GameHud, GameStage, type RoundResult } from "@/components/games/GameKit
 import type { FillBlankContent, McqContent } from "@/types/exercises";
 import type { TrialLesson as TrialLessonData, TrialQuestion } from "@/lib/content/trialLesson";
 import { TRIAL_DAYS } from "@/lib/subscriptions/plans";
+import { trackStep } from "@/lib/marketing/funnelClient";
 
 const KIND_HE: Record<TrialQuestion["kind"], string> = { vocabulary: "אוצר מילים", grammar: "דקדוק" };
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
@@ -48,8 +49,14 @@ export default function TrialLesson({ lesson }: { lesson: TrialLessonData }) {
     () => false,
   );
 
+  // Anonymous funnel steps (lib/marketing/funnel.ts): each sent once per visit.
+  useEffect(() => {
+    trackStep("try_view", lesson.level);
+  }, [lesson.level]);
+
   function submit(response: Record<string, unknown>) {
     if (answered !== null || !question) return;
+    trackStep("try_start", lesson.level);
     const ok = gradeExercise(question.type, question.content, response);
     setAnswered(ok);
     setResults((r) => r.map((v, i) => (i === index ? (ok ? "correct" : "wrong") : v)));
@@ -96,8 +103,9 @@ export default function TrialLesson({ lesson }: { lesson: TrialLessonData }) {
   // round clears whatever an earlier round left.
   useEffect(() => {
     if (!done) return;
+    trackStep("try_finish", `${results.filter((r) => r === "correct").length}of${total}`);
     saveTrialMistakes(lesson.questions.filter((_, i) => results[i] === "wrong").map((q) => q.id));
-  }, [done, lesson.questions, results]);
+  }, [done, lesson.questions, results, total]);
 
   if (done) {
     const correct = results.filter((r) => r === "correct").length;
@@ -163,6 +171,9 @@ export default function TrialLesson({ lesson }: { lesson: TrialLessonData }) {
         <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <Link
             href={session ? "/dashboard" : "/signup"}
+            onClick={() => {
+              if (!session) trackStep("try_signup_click");
+            }}
             className="game-press flex items-center justify-center gap-2.5 min-h-12 px-7 rounded-lg bg-primary text-primary-ink font-bold text-lg hover:bg-primary-hover transition-colors"
           >
             <Play size={18} fill="currentColor" strokeWidth={0} aria-hidden="true" />

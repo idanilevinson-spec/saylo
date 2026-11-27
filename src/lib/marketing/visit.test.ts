@@ -62,6 +62,16 @@ describe("buildVisitPayload", () => {
     expect(buildVisitPayload("https://saylolearn.com/try", null)).toBeNull();
   });
 
+  it("keeps where a sign-in redirect was going, as a path only", () => {
+    expect(
+      buildVisitPayload("https://saylolearn.com/login?next=%2Fdashboard%3Fx%3D1", "https://l.instagram.com/"),
+    ).toEqual({ path: "/login?next=/dashboard", referrerHost: "l.instagram.com" });
+    expect(buildVisitPayload("https://saylolearn.com/login?next=https://evil.com", "https://l.instagram.com/")).toEqual({
+      path: "/login",
+      referrerHost: "l.instagram.com",
+    });
+  });
+
   it("never counts admin pages", () => {
     expect(buildVisitPayload("https://saylolearn.com/admin?utm_source=x", null)).toBeNull();
   });

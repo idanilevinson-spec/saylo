@@ -26,6 +26,15 @@ export async function GET(request: Request) {
     console.error("marketing visits cleanup failed", visitsError);
     return NextResponse.json({ error: "purge failed" }, { status: 500 });
   }
+  // Anonymous signup-funnel steps (migration 061), also kept 12 months.
+  const { error: funnelError } = await supabaseAdmin
+    .from("funnel_events")
+    .delete()
+    .lt("created_at", cutoff.toISOString());
+  if (funnelError) {
+    console.error("funnel steps cleanup failed", funnelError);
+    return NextResponse.json({ error: "purge failed" }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }

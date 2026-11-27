@@ -2,6 +2,8 @@
 // them (see supabase/seed/055_marketing_visits.sql). Shared by the browser
 // beacon (MarketingVisitBeacon) and the route that stores it (/api/visit).
 
+import { loginNextPath } from "./funnel";
+
 export const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
 export type UtmKey = (typeof UTM_KEYS)[number];
 
@@ -62,7 +64,11 @@ export function buildVisitPayload(href: string, referrer: string | null): VisitP
   const utm = pickUtm(url.searchParams);
   const referrerHost = socialHost(referrer);
   if (Object.keys(utm).length === 0 && !referrerHost) return null;
-  return { ...utm, path: url.pathname.slice(0, 200), referrerHost };
+  // A link to an app page lands on /login?next=…; keep where it was going,
+  // or five "/login" arrivals (2026-11-25) can't be traced to a link.
+  const next = url.pathname === "/login" ? loginNextPath(url.search) : null;
+  const path = next ? `/login?next=${next}` : url.pathname;
+  return { ...utm, path: path.slice(0, 200), referrerHost };
 }
 
 const BOT_PATTERN =
