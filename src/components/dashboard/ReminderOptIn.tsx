@@ -23,7 +23,25 @@ function readDismissed(): boolean {
   }
 }
 
-export default function ReminderOptIn() {
+// "practice": the end of a practice set, the moment a learner has just done
+// something and "tomorrow" means something. It was the dashboard only, and
+// only after the first steps, so the few who practised once and left were
+// never asked. Same switch, same dismissal: one "not now" hides both.
+const COPY = {
+  dashboard: {
+    title: "תזכורת במייל כשצריך",
+    body: "מייל קצר ביום שהרצף שלכם בסכנה, ומייל כשלא נכנסתם כמה ימים, עם הצעד הבא במסלול. אפשר לכבות בכל רגע.",
+    button: "להפעיל תזכורות",
+  },
+  practice: {
+    title: "להזכיר לכם מחר?",
+    body: "אם עד הערב לא תתרגלו, יגיע מייל קצר אחד. ואם לא תיכנסו כמה ימים, מייל עם הצעד הבא. אפשר לכבות בכל רגע.",
+    button: "כן, להזכיר",
+  },
+} as const;
+
+export default function ReminderOptIn({ variant = "dashboard" }: { variant?: keyof typeof COPY }) {
+  const copy = COPY[variant];
   const { profile, refreshProfile } = useAuth();
   // localStorage is browser-only: the server pass renders nothing.
   const storedDismissed = useSyncExternalStore(subscribeNever, readDismissed, () => true);
@@ -81,11 +99,9 @@ export default function ReminderOptIn() {
       </span>
       <div className="min-w-0 flex-1">
         <h2 id="reminder-optin-title" className="font-bold">
-          תזכורת במייל כשצריך
+          {copy.title}
         </h2>
-        <p className="mt-1 text-sm text-muted leading-relaxed">
-          מייל קצר ביום שהרצף שלכם בסכנה, ומייל כשלא נכנסתם כמה ימים, עם הצעד הבא במסלול. אפשר לכבות בכל רגע.
-        </p>
+        <p className="mt-1 text-sm text-muted leading-relaxed">{copy.body}</p>
         {failed && (
           <p role="alert" className="mt-1 text-sm text-danger-hover">
             לא הצלחנו לשמור. נסו שוב.
@@ -99,7 +115,7 @@ export default function ReminderOptIn() {
           disabled={saving}
           className="game-press inline-flex items-center justify-center min-h-11 px-4 rounded-lg bg-primary text-primary-ink text-sm font-bold hover:bg-primary-hover transition-[background-color,transform] disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
-          {saving ? "שומרים..." : "להפעיל תזכורות"}
+          {saving ? "שומרים..." : copy.button}
         </button>
         <button
           type="button"
