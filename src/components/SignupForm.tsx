@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Play } from "lucide-react";
@@ -16,6 +16,17 @@ import PasswordField from "@/components/PasswordField";
 import TermsConsent from "@/components/TermsConsent";
 import { TERMS_REQUIRED_MESSAGE, termsConsentMetadata } from "@/lib/legal/consent";
 import { EMAIL_INPUT } from "@/lib/utils/inputProps";
+import { trackStep } from "@/lib/marketing/funnelClient";
+
+// Short, fixed labels for the funnel (never the raw message, which can
+// contain the address someone typed).
+function errorLabel(message: string): string {
+  if (/already registered|already exists/i.test(message)) return "already_registered";
+  if (/password/i.test(message)) return "password";
+  if (/email/i.test(message)) return "email";
+  if (/rate|too many/i.test(message)) return "rate_limited";
+  return "other";
+}
 
 export default function SignupForm() {
   const router = useRouter();
@@ -28,6 +39,11 @@ export default function SignupForm() {
   const [loading, setLoading] = useState(false);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  // Anonymous funnel steps (lib/marketing/funnel.ts): each sent once per visit.
+  useEffect(() => {
+    trackStep("signup_view");
+  }, []);
 
   // The confirmation mail may be slow, land in spam, or be sent to a mistyped
   // address — none of which the learner can fix from a page that only says
@@ -44,6 +60,7 @@ export default function SignupForm() {
 
   function requireAccepted() {
     if (accepted) return true;
+    trackStep("signup_terms_blocked");
     setError(TERMS_REQUIRED_MESSAGE);
     return false;
   }
@@ -59,6 +76,7 @@ export default function SignupForm() {
     }
     if (!requireAccepted()) return;
 
+    trackStep("signup_submit", "email");
     setLoading(true);
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
@@ -73,6 +91,7 @@ export default function SignupForm() {
     });
 
     if (signUpError) {
+      trackStep("signup_error", errorLabel(signUpError.message));
       setError(signUpError.message);
       setLoading(false);
       return;
@@ -89,6 +108,7 @@ export default function SignupForm() {
       });
 
       if (profileError) {
+        trackStep("signup_error", "profile");
         setError(profileError.message);
         setLoading(false);
         return;
@@ -101,10 +121,12 @@ export default function SignupForm() {
 
       // Tells the admins' phones about the new signup; never blocks the learner.
       void fetch("/api/notify/new-signup", { method: "POST", keepalive: true }).catch(() => undefined);
+      trackStep("signup_done", "email");
       router.push("/dashboard");
       return;
     }
 
+    trackStep("signup_email_sent");
     setAwaitingConfirmation(true);
     setLoading(false);
   }
@@ -114,6 +136,7 @@ export default function SignupForm() {
   async function handleGoogleSignup() {
     setError(null);
     if (!requireAccepted()) return;
+    trackStep("signup_submit", "google");
     if (Capacitor.isNativePlatform()) {
       if (await signInWithOAuthNative("google")) router.push("/dashboard");
       return;
@@ -129,6 +152,7 @@ export default function SignupForm() {
   async function handleAppleSignup() {
     setError(null);
     if (!requireAccepted()) return;
+    trackStep("signup_submit", "apple");
     if (Capacitor.isNativePlatform()) {
       if (await signInWithOAuthNative("apple")) router.push("/dashboard");
       return;
