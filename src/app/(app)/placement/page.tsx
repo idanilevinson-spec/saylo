@@ -70,7 +70,9 @@ const GOAL_OPTIONS: { value: Goal; label: string; hint: string }[] = [
 // them never finished.
 const RESUME_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
-const CONNECTION_ERROR = "לא הצלחנו לשמור. בדקו את החיבור לאינטרנט ונסו שוב.";
+const ANSWER_SHOWN_MS = 350;
+
+const CONNECTION_ERROR ="לא הצלחנו לשמור. בדקו את החיבור לאינטרנט ונסו שוב.";
 
 interface Resumable {
   testId: string;
@@ -90,7 +92,7 @@ export default function PlacementPage() {
   const [showWritingStep, setShowWritingStep] = useState(false);
   const [writingSample, setWritingSample] = useState("");
   const [saving, setSaving] = useState(false);
-  // The state above only reaches handleNext after a re-render, so taps that
+  // The state above only reaches choose() after a re-render, so taps that
   // come before it (a fast double tap) would each pass a check on it.
   const savingRef = useRef(false);
   const [finishing, setFinishing] = useState(false);
@@ -177,7 +179,7 @@ export default function PlacementPage() {
     setBagrutAnswers(bagrutSection ? bagrutSection.questions.map(() => null) : []);
     const { data: test } = await supabase.from("placement_tests").insert({ profile_id: profile.id }).select().single();
     setStarting(false);
-    // Without a test to record into, "הבא" and the skip button do nothing,
+    // Without a test to record into, answers and the skip button do nothing,
     // so the learner would be stuck on the first question.
     if (!test) {
       setError(CONNECTION_ERROR);
@@ -351,26 +353,35 @@ export default function PlacementPage() {
     }
   }
 
-  async function handleNext() {
-    if (selected === null || !testId || !profile || savingRef.current) return;
+  // One tap answers: the choice is saved and the next question comes up by
+  // itself. It was pick, then "הבא", twice the taps over the whole test;
+  // of the learners who never finished it, two pressed start and left
+  // without answering the first question.
+  async function choose(choice: number) {
+    if (!testId || !profile || savingRef.current) return;
 
     // A second tap while the answer is saving would record it twice and
     // jump over the next question.
     savingRef.current = true;
     setSaving(true);
-    const isCorrect = selected === question.correct_index;
-    const { error: saveError } = await supabase.from("placement_test_responses").insert({
-      placement_test_id: testId,
-      question_id: question.id,
-      selected_index: selected,
-      is_correct: isCorrect,
-    });
+    setSelected(choice);
+    const isCorrect = choice === question.correct_index;
+    // Long enough to see which answer was taken before the question moves.
+    const [{ error: saveError }] = await Promise.all([
+      supabase.from("placement_test_responses").insert({
+        placement_test_id: testId,
+        question_id: question.id,
+        selected_index: choice,
+        is_correct: isCorrect,
+      }),
+      new Promise((resolve) => setTimeout(resolve, ANSWER_SHOWN_MS)),
+    ]);
     // Released together with the move to the next question, which also
-    // clears the selection, so a late tap finds nothing selected.
+    // clears the selection.
     savingRef.current = false;
     setSaving(false);
     // Moving on anyway would lose the answer without a word (it would then
-    // count as skipped); staying lets the learner tap again.
+    // count as skipped); staying lets the learner tap an answer again.
     if (saveError) {
       setError(CONNECTION_ERROR);
       return;
@@ -397,7 +408,7 @@ export default function PlacementPage() {
   // guessing (see placementScore). A skill with no answers at all still
   // shows "לא נבדק הפעם" on the results screen.
   function handleSkip() {
-    // While an answer is saving, "הבא" will move on by itself.
+    // While an answer is saving, the question moves on by itself.
     if (!testId || savingRef.current) return;
     setSelected(null);
     setError(null);
@@ -608,34 +619,28 @@ export default function PlacementPage() {
           {optionOrder(question.options.length, question.id).map((i) => (
             <motion.button
               key={i}
+              type="button"
               dir={/[֐-׿]/.test(question.options[i]) ? "rtl" : "ltr"}
-              whileHover={{ x: -2 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setSelected(i)}
-              className={`w-full text-start px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
-                selected === i ? "border-primary bg-primary/5" : "border-card-border hover:border-primary/40"
+              whileHover={saving ? undefined : { x: -2 }}
+              whileTap={saving ? undefined : { scale: 0.98 }}
+              onClick={() => choose(i)}
+              aria-disabled={saving}
+              className={`w-full min-h-12 text-start px-4 py-3 rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                selected === i ? "border-primary bg-primary/10" : saving ? "border-card-border" : "border-card-border hover:border-primary/40"
               }`}
             >
               <EnglishText>{question.options[i]}</EnglishText>
             </motion.button>
           ))}
         </div>
+        {index === 0 && <p className="mt-3 text-xs text-muted">לוחצים על התשובה, והשאלה הבאה עולה לבד.</p>}
 
         {error && <p role="alert" className="mt-4 text-sm text-danger">{error}</p>}
 
-        <motion.button
-          whileHover={selected !== null ? { scale: 1.02 } : undefined}
-          whileTap={selected !== null ? { scale: 0.97 } : undefined}
-          onClick={handleNext}
-          disabled={selected === null || saving}
-          className="mt-6 w-full px-4 py-2.5 rounded-lg bg-primary text-primary-ink font-medium disabled:opacity-40 hover:bg-primary-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-        >
-          {isLast ? "לשלב האחרון →" : "הבא →"}
-        </motion.button>
-
         <button
+          type="button"
           onClick={handleSkip}
-          className="mt-2.5 w-full px-4 py-2 rounded-lg text-sm text-muted font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+          className="mt-4 w-full px-4 py-2 rounded-lg text-sm text-muted font-medium hover:bg-background-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
           לא יודעים? דלגו לשאלה הבאה
         </button>
