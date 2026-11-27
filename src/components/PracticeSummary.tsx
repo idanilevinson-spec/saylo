@@ -2,8 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, RotateCcw, ChevronRight, Keyboard } from "lucide-react";
+import { CheckCircle2, RotateCcw, ChevronRight, Keyboard, CalendarClock } from "lucide-react";
 import EnglishText from "@/components/EnglishText";
+import ReminderOptIn from "@/components/dashboard/ReminderOptIn";
+import { tomorrowLines } from "@/lib/exercises/tomorrow";
 import { getActiveUnit, pathInUnit } from "@/lib/content/courseSession";
 import { startRetry, summarize, type PracticeRun } from "@/lib/exercises/practiceSession";
 
@@ -58,7 +60,8 @@ export default function PracticeSummary({
   }
 
   const s = run ? summarize(run) : null;
-  const words = s?.missed.some((m) => m.word) ?? false;
+  const missedWords = s?.missed.filter((m) => m.word).length ?? 0;
+  const tomorrow = tomorrowLines({ missedWords, missedOther: (s?.missed.length ?? 0) - missedWords, unit });
 
   return (
     <section aria-labelledby="practice-done" className="mt-6 border-t border-card-border pt-5">
@@ -95,7 +98,6 @@ export default function PracticeSummary({
               </li>
             ))}
           </ul>
-          {words && <p className="mt-2 text-xs text-muted">המילים שטעיתם בהן יחזרו אליכם בחזרה החכמה, במרווחים הולכים וגדלים.</p>}
         </div>
       )}
 
@@ -136,6 +138,28 @@ export default function PracticeSummary({
           {back.label}
         </Link>
       </div>
+
+      {tomorrow.length > 0 && (
+        <div className="mt-6">
+          <h3 className="flex items-center gap-2 font-bold">
+            <CalendarClock size={17} aria-hidden="true" className="text-primary-hover" />
+            מחר מחכה לכם
+          </h3>
+          <ul className="mt-2 space-y-1.5">
+            {tomorrow.map((line) => (
+              <li key={line.href}>
+                <Link
+                  href={line.href}
+                  className="inline-flex items-center min-h-11 text-sm hover:text-primary-hover underline-offset-4 hover:underline rounded focus-visible:outline-2 focus-visible:outline-primary"
+                >
+                  {line.text}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {s && s.answered > 0 && <ReminderOptIn variant="practice" />}
     </section>
   );
 }
